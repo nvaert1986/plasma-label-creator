@@ -3,6 +3,7 @@
     SPDX-License-Identifier: LGPL-2.1-or-later
 */
 
+#include "fields.h"
 #include "labelformat.h"
 #include "labelrenderer.h"
 #include "tapelayout.h"
@@ -340,6 +341,32 @@ private Q_SLOTS:
         const auto reread = reader.read(&buffer);
         QVERIFY(reread);
         QCOMPARE(std::get_if<BarcodeObject>(&reread->objects.constFirst())->type, type);
+    }
+
+    void picturesComeFromDataRows()
+    {
+        // Two pictures, one per row: black and white.
+        QTemporaryDir dir;
+        QImage black(40, 40, QImage::Format_RGB32);
+        black.fill(Qt::black);
+        QImage white(40, 40, QImage::Format_RGB32);
+        white.fill(Qt::white);
+        QVERIFY(black.save(dir.filePath(u"SRV-1.png"_s)));
+        QVERIFY(white.save(dir.filePath(u"SRV-2.png"_s)));
+
+        ImageObject image;
+        image.name = u"Photo"_s;
+        image.imageLocation = dir.path() + u"/{Serial}.png"_s;
+        image.scaleMode = ImageScaleMode::Fill;
+        image.bounds = QRectF(0, 0, 1000, 1000);
+        const LabelDocument label = singleObject(image);
+        LabelRenderer renderer(LabelRenderer::Mode::Print);
+        const auto inkOf = [&renderer, &label](const QString &serial) {
+            return inkBounds(renderer.renderImage(Fields::fill(label, {{u"Serial"_s, serial}}), Dpi));
+        };
+        QVERIFY(!inkOf(u"SRV-1"_s).isEmpty());
+        QVERIFY(renderer.warnings().isEmpty());
+        QVERIFY(inkOf(u"SRV-2"_s).isEmpty());
     }
 
     void writesAPdfOfTheLabelsSize()

@@ -3,7 +3,7 @@
 
 cmake_minimum_required(VERSION 3.22)
 
-project(plasma-label-creator VERSION 0.1.0 LANGUAGES CXX)
+project(plasma-label-creator VERSION 0.2.0 LANGUAGES CXX)
 
 set(QT_MIN_VERSION "6.6.0")
 set(KF_MIN_VERSION "6.0.0")
@@ -38,11 +38,12 @@ set_package_properties(Cups PROPERTIES
     TYPE REQUIRED)
 
 if(BUILD_APP)
-    find_package(Qt6 ${QT_MIN_VERSION} REQUIRED COMPONENTS Widgets PrintSupport DBus)
+    find_package(Qt6 ${QT_MIN_VERSION} REQUIRED COMPONENTS Widgets PrintSupport DBus Sql)
     # Noticing LabelWriters being plugged in.
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(Udev REQUIRED IMPORTED_TARGET libudev)
     find_package(KF6 ${KF_MIN_VERSION} REQUIRED COMPONENTS
+        Archive
         ConfigWidgets
         CoreAddons
         Crash

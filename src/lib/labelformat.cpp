@@ -10,6 +10,10 @@
 
 #include <QBuffer>
 #include <QFile>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QRegularExpression>
 #include <QSaveFile>
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
@@ -230,6 +234,123 @@ QPainterPath parseDrawCommands(const QString &captured)
     }
     outline.closeSubpath();
     return outline;
+}
+
+// What this program adds to DLS's format travels in a comment, which DLS
+// ignores: <!--plasma-label-creator {"questions": [...], "dataSource": {...}}-->
+constexpr QLatin1StringView ExtensionsTag = "plasma-label-creator"_L1;
+
+constexpr EnumName<PrintQuestion::Allowed> allowedNames[] = {
+    {PrintQuestion::Allowed::Anything, "anything"_L1},
+    {PrintQuestion::Allowed::Digits, "digits"_L1},
+    {PrintQuestion::Allowed::Letters, "letters"_L1},
+    {PrintQuestion::Allowed::LettersAndDigits, "lettersAndDigits"_L1},
+    {PrintQuestion::Allowed::Pattern, "pattern"_L1},
+};
+
+bool hasExtensions(const LabelDocument &document)
+{
+    return !document.questions.isEmpty() || document.dataSource.kind != DataSource::Kind::None;
+}
+
+QString extensionsJson(const LabelDocument &document)
+{
+    QJsonObject root;
+    root[u"version"_s] = 1;
+    if (!document.questions.isEmpty()) {
+        QJsonArray questions;
+        for (const PrintQuestion &question : document.questions) {
+            QJsonObject q;
+            q[u"name"_s] = question.name;
+            q[u"prompt"_s] = question.prompt;
+            q[u"default"_s] = question.defaultValue;
+            q[u"required"_s] = question.required;
+            q[u"minimumLength"_s] = question.minimumLength;
+            q[u"maximumLength"_s] = question.maximumLength;
+            q[u"allowed"_s] = QString(enumName(allowedNames, question.allowed));
+            q[u"pattern"_s] = question.pattern;
+            questions.append(q);
+        }
+        root[u"questions"_s] = questions;
+    }
+    const DataSource &source = document.dataSource;
+    if (source.kind != DataSource::Kind::None) {
+        QJsonObject s;
+        // Never a password: that is asked for when printing.
+        if (source.kind == DataSource::Kind::File) {
+            s[u"type"_s] = u"file"_s;
+            s[u"file"_s] = source.fileName;
+            s[u"sheet"_s] = source.sheet;
+            s[u"delimiter"_s] = source.delimiter.isNull() ? QString() : QString(source.delimiter);
+            s[u"firstRowNames"_s] = source.firstRowNames;
+        } else {
+            s[u"type"_s] = u"database"_s;
+            s[u"driver"_s] = source.driver;
+            s[u"database"_s] = source.database;
+            s[u"host"_s] = source.host;
+            s[u"port"_s] = source.port;
+            s[u"user"_s] = source.user;
+            s[u"query"_s] = source.query;
+        }
+        root[u"dataSource"_s] = s;
+    }
+    // "--" may not appear in an XML comment; inside JSON strings "\u002d"
+    // reads back as the same "-".
+    return QString::fromUtf8(QJsonDocument(root).toJson(QJsonDocument::Compact)).replace(u"--"_s, u"-\\u002d"_s);
+}
+
+void readExtensions(const QByteArray &data, LabelDocument &document, QStringList &warnings)
+{
+    static const QRegularExpression comment(u"<!--\\s*plasma-label-creator\\s+(\\{.*?\\})\\s*-->"_s, QRegularExpression::DotMatchesEverythingOption);
+    const QRegularExpressionMatch match = comment.match(QString::fromUtf8(data));
+    if (!match.hasMatch()) {
+        return;
+    }
+    QJsonParseError error;
+    const QJsonObject root = QJsonDocument::fromJson(match.captured(1).toUtf8(), &error).object();
+    if (error.error != QJsonParseError::NoError) {
+        warnings << u"Ignoring this program's settings in the file: %1"_s.arg(error.errorString());
+        return;
+    }
+    for (const QJsonValue &value : root[u"questions"_s].toArray()) {
+        const QJsonObject q = value.toObject();
+        PrintQuestion question;
+        question.name = q[u"name"_s].toString();
+        question.prompt = q[u"prompt"_s].toString();
+        question.defaultValue = q[u"default"_s].toString();
+        question.required = q[u"required"_s].toBool(true);
+        question.minimumLength = q[u"minimumLength"_s].toInt();
+        question.maximumLength = q[u"maximumLength"_s].toInt();
+        const QString allowed = q[u"allowed"_s].toString();
+        for (const auto &entry : allowedNames) {
+            if (allowed == entry.name) {
+                question.allowed = entry.value;
+            }
+        }
+        question.pattern = q[u"pattern"_s].toString();
+        if (!question.name.isEmpty()) {
+            document.questions << question;
+        }
+    }
+    const QJsonObject s = root[u"dataSource"_s].toObject();
+    const QString type = s[u"type"_s].toString();
+    DataSource &source = document.dataSource;
+    if (type == u"file"_s) {
+        source.kind = DataSource::Kind::File;
+        source.fileName = s[u"file"_s].toString();
+        source.sheet = s[u"sheet"_s].toString();
+        const QString delimiter = s[u"delimiter"_s].toString();
+        source.delimiter = delimiter.isEmpty() ? QChar() : delimiter.at(0);
+        source.firstRowNames = s[u"firstRowNames"_s].toBool(true);
+    } else if (type == u"database"_s) {
+        source.kind = DataSource::Kind::Database;
+        source.driver = s[u"driver"_s].toString();
+        source.database = s[u"database"_s].toString();
+        source.host = s[u"host"_s].toString();
+        source.port = s[u"port"_s].toInt();
+        source.user = s[u"user"_s].toString();
+        source.query = s[u"query"_s].toString();
+    }
 }
 
 class Parser
@@ -898,6 +1019,12 @@ private:
     void writeContinuousLabel(const LabelDocument &document);
     void writeCell(const LabelDocument &document, const TapeCell &cell);
     void writeCommon(const ObjectBase &object);
+    void writeExtensions(const LabelDocument &document)
+    {
+        if (hasExtensions(document)) {
+            m_xml.writeComment(u" "_s + ExtensionsTag + u" "_s + extensionsJson(document) + u" "_s);
+        }
+    }
     void writeText(const TextObject &object);
     void writeObjectBody(const TextObject &object);
     void writeObjectBody(const AddressObject &object);
@@ -927,6 +1054,7 @@ void Serializer::writeContinuousLabel(const LabelDocument &document)
     m_xml.writeStartElement("ContinuousLabel"_L1);
     m_xml.writeAttribute("Version"_L1, "8.0"_L1);
     m_xml.writeAttribute("Units"_L1, "twips"_L1);
+    writeExtensions(document);
     writeEnum("PaperOrientation"_L1, paperOrientationNames, document.orientation);
     m_xml.writeTextElement("Id"_L1, document.id);
     m_xml.writeTextElement("PaperName"_L1, document.paperName);
@@ -984,6 +1112,7 @@ void Serializer::writeDocument(const LabelDocument &document)
     if (document.mediaType) {
         m_xml.writeAttribute("MediaType"_L1, *document.mediaType);
     }
+    writeExtensions(document);
 
     writeEnum("PaperOrientation"_L1, paperOrientationNames, document.orientation);
     m_xml.writeTextElement("Id"_L1, document.id);
@@ -1238,9 +1367,15 @@ std::optional<LabelDocument> LabelReader::read(QIODevice *device)
     m_errorString.clear();
     m_warnings.clear();
 
-    QXmlStreamReader xml(device);
+    // Read whole, so this program's settings comment can be found too.
+    const QByteArray data = device->readAll();
+    QXmlStreamReader xml(data);
     Parser parser(xml, m_warnings);
-    return parser.parseDocument(m_errorString);
+    auto document = parser.parseDocument(m_errorString);
+    if (document) {
+        readExtensions(data, *document, m_warnings);
+    }
+    return document;
 }
 
 std::optional<LabelDocument> LabelReader::readFile(const QString &fileName)

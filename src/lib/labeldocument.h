@@ -334,6 +334,58 @@ struct TapeLabel {
     bool operator==(const TapeLabel &) const = default;
 };
 
+/**
+ * A question asked when printing, such as a batch number. The answer fills
+ * {name} wherever it appears on the label.
+ */
+struct PrintQuestion {
+    enum class Allowed {
+        Anything,
+        Digits,
+        Letters,
+        LettersAndDigits,
+        /** The whole answer matches a regular expression. */
+        Pattern,
+    };
+
+    QString name; // the field it fills: {name}
+    QString prompt; // what is asked; the name when empty
+    QString defaultValue;
+    bool required = true;
+    int minimumLength = 0;
+    int maximumLength = 0; // 0 for no limit
+    Allowed allowed = Allowed::Anything;
+    QString pattern; // for Allowed::Pattern
+
+    bool operator==(const PrintQuestion &) const = default;
+};
+
+/**
+ * Where the rows come from when printing a label per row: a file (CSV,
+ * Excel, OpenDocument) or a database query. Passwords are never kept.
+ */
+struct DataSource {
+    enum class Kind {
+        None,
+        File,
+        Database,
+    };
+
+    Kind kind = Kind::None;
+    QString fileName; // a .csv, .txt, .xlsx or .ods file
+    QString sheet; // spreadsheets: the sheet; empty for the first
+    QChar delimiter; // CSV: the separator; null to detect it
+    bool firstRowNames = true; // files: the first row names the columns
+    QString driver; // Qt SQL driver: QSQLITE, QODBC, QPSQL, QMYSQL...
+    QString database; // a file, a database name, or an ODBC data source or connection string
+    QString host;
+    int port = 0; // 0 for the driver's default
+    QString user;
+    QString query;
+
+    bool operator==(const DataSource &) const = default;
+};
+
 struct LabelDocument {
     PaperOrientation orientation = PaperOrientation::Landscape;
     QString id;
@@ -353,6 +405,11 @@ struct LabelDocument {
 
     /** Set for a tape label (DYMO LabelManager), which DLS calls a ContinuousLabel. */
     std::optional<TapeLabel> tape;
+
+    // What this program adds to DLS's format, kept in the file as a comment
+    // DLS ignores: questions asked when printing, and where data comes from.
+    QList<PrintQuestion> questions;
+    DataSource dataSource;
 
     /**
      * Adds @p object and returns its index. On tape it gets a cell of its

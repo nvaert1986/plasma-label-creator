@@ -5,6 +5,7 @@ set(tests
     addressbooktest
     barcodetest
     clipartlibrarytest
+    fieldstest
     labelformattest
     labelkindstest
     labelprintertest
@@ -51,6 +52,23 @@ if(BUILD_APP)
         LINK_LIBRARIES labelcreatorcore Qt6::Test Qt6::DBus KF6::I18n PkgConfig::Udev
         TEST_NAME printerdetectiontest)
     target_include_directories(printerdetectiontest PRIVATE ${CMAKE_SOURCE_DIR}/src/app)
+
+    # Reading data to print from: CSV, Excel, OpenDocument, databases.
+    ecm_add_test(datareadertest.cpp
+        ${CMAKE_SOURCE_DIR}/src/app/datareader.cpp
+        LINK_LIBRARIES labelcreatorcore Qt6::Test Qt6::Sql KF6::Archive KF6::I18n
+        TEST_NAME datareadertest)
+    target_include_directories(datareadertest PRIVATE ${CMAKE_SOURCE_DIR}/src/app)
+    target_compile_definitions(datareadertest PRIVATE LABELCREATOR_TEST_DATA="${CMAKE_CURRENT_SOURCE_DIR}/data")
+
+    # The data source, questions and answers dialogs.
+    ecm_add_test(datadialogstest.cpp
+        ${CMAKE_SOURCE_DIR}/src/app/datadialogs.cpp
+        ${CMAKE_SOURCE_DIR}/src/app/datareader.cpp
+        LINK_LIBRARIES labelcreatorcore Qt6::Test Qt6::Widgets Qt6::Sql KF6::Archive KF6::I18n
+        TEST_NAME datadialogstest)
+    target_include_directories(datadialogstest PRIVATE ${CMAKE_SOURCE_DIR}/src/app)
+    set_tests_properties(datadialogstest PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
 
     # The address book tab: check marks, searching, sorting.
     ecm_add_test(addressbookpaneltest.cpp

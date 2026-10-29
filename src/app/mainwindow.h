@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "datareader.h"
 #include "labelprinter.h"
 #include "objectfactory.h"
 #include "recentlayouts.h"
@@ -118,6 +119,23 @@ private:
     std::optional<QList<LabelCreator::LabelDocument>> labelsToPrint();
     LabelCreator::LabelPrinter::Options printOptions() const;
     void setupViewActions();
+    void setupDataActions();
+    /** Chooses the data source and the rows to print. */
+    void editDataSource();
+    void editQuestions();
+    /** Puts {name} in the selected object, or a new text object with it. */
+    void insertField(const QString &name);
+    /** The fields the label can use: the data's columns, then the questions. */
+    QStringList availableFields();
+    /** Loads the data source's rows if they are not loaded; false with the reason shown. */
+    bool ensureDataLoaded(bool quiet = false);
+    /** Offers printing from data in the print bar as the label's source allows. */
+    void updateDataRows();
+    /**
+     * @p document with its fields filled from @p values, and image paths
+     * that are relative made absolute: next to the data file, or the label.
+     */
+    LabelCreator::LabelDocument filled(const LabelCreator::LabelDocument &document, const QHash<QString, QString> &values) const;
     void setSelectedInverted(bool inverted);
     /** Asks for the selected printer's print offset, in on-screen terms for the current label. */
     void editPrintOffset();
@@ -140,6 +158,15 @@ private:
     KToggleAction *m_underline = nullptr;
     KToggleAction *m_strikeout = nullptr;
     KToggleAction *m_inverted = nullptr;
+
+    // Printing from data: the rows as loaded (and from which source), the
+    // ticked ones, the last answers to the questions, and a database
+    // password, kept in memory for this session only.
+    std::optional<DataTable> m_dataTable;
+    LabelCreator::DataSource m_dataTableSource;
+    QList<int> m_dataRows;
+    QHash<QString, QString> m_answers;
+    QString m_databasePassword;
     QList<KToggleAction *> m_fitModes; // none, shrink to fit, always fit
     KToggleAction *m_portrait = nullptr;
     KToggleAction *m_landscape = nullptr;

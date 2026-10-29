@@ -10,6 +10,7 @@ add_library(labelcreatorcore STATIC
     barcode.h
     clipartlibrary.cpp
     clipartlibrary.h
+    fields.cpp
     labeldocument.cpp
     labeldocument.h
     labelformat.cpp

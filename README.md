@@ -40,7 +40,17 @@ Altec, Zebra Technologies or KDE e.V. See [Trademarks](#trademarks).
   (PostNL) and Royal Mail. DLS cannot show labels that use these.
 - **DLS 8 files**: open and save `.label` files, die-cut labels as well as
   LabelManager tape labels. Objects it does not know are kept and written
-  back unchanged. DLS address books (`.ABX`) are supported too.
+  back unchanged. DLS address books (`.ABX`) are supported too. A label's
+  data source and print-time questions are kept in the file as a comment,
+  which DLS ignores, so DLS still opens the label.
+- **Print from data**: a label for each row of a CSV file, an Excel or
+  LibreOffice spreadsheet, or a database query (SQLite, ODBC for SQL Server
+  and others, MySQL, PostgreSQL). Put fields on the label as `{Column}`, in
+  texts, addresses, barcodes, or an image's file path for a picture per row.
+  Only queries that read are run, and database passwords are never saved.
+- **Questions at print time**, such as a batch number, with rules for the
+  answer: required, length, digits or letters only, or a pattern. The answer
+  fills `{Name}` on every label of the print run.
 - **Print** through CUPS, with the right driver per printer: DYMO's own
   drivers for LabelWriters and LabelManagers, CUPS's Zebra ZPL driver for
   ZPL printers. Before printing it checks that the label fits what the
@@ -147,6 +157,10 @@ plasma-label-creator-render --zpl-info 192.0.2.10
 Bug reports with the `.label` file (with any personal data removed) and,
 for print problems, a photo of the printed label help most. Please do not
 attach DYMO's clip art or files taken from DYMO's software.
+
+## Changes
+
+What each version changed is in [CHANGELOG.md](CHANGELOG.md).
 
 ## Licence
 

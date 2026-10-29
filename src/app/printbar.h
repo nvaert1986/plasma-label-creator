@@ -76,6 +76,15 @@ public:
     bool graphicsQuality() const;
     /** Whether to print one label per checked address rather than the label as it is. */
     bool printAddresses() const;
+    /** Whether to print a label for each ticked row of the data source. */
+    bool printRows() const;
+    /**
+     * Offers printing from data: @p available when the label has a data
+     * source; @p rows ticked rows, or -1 while they are not loaded yet.
+     */
+    void setDataRows(bool available, int rows);
+    /** Chooses printing a label per row, when the data source allows it. */
+    void choosePrintRows();
     /** How many addresses are checked in the address book. */
     void setCheckedAddresses(int count);
     /** Lists the label types of the selected printer again, as after adding a custom size. */
@@ -116,6 +125,8 @@ private:
     KMessageWidget *m_usbMessage;
     QRadioButton *m_printLabel;
     QRadioButton *m_printAddresses;
+    QRadioButton *m_printRows;
+    int m_dataRows = -1;
     QSpinBox *m_copies;
     QCheckBox *m_graphics;
     QPushButton *m_print;

@@ -97,9 +97,12 @@ PrintBar::PrintBar(QWidget *parent)
     m_printLabel->setChecked(true);
     m_printAddresses = new QRadioButton(i18n("All checked addresses in the address book"));
     m_printAddresses->setEnabled(false);
+    m_printRows = new QRadioButton(i18n("Each row of the data source"));
+    m_printRows->setEnabled(false);
     auto *whatColumn = new QVBoxLayout;
     whatColumn->addWidget(m_printLabel);
     whatColumn->addWidget(m_printAddresses);
+    whatColumn->addWidget(m_printRows);
 
     // Copies and the Print button, large, on the right.
     m_copies = new QSpinBox;
@@ -137,6 +140,7 @@ PrintBar::PrintBar(QWidget *parent)
 
     connect(m_copies, &QSpinBox::valueChanged, this, &PrintBar::updateLabelCount);
     connect(m_printAddresses, &QRadioButton::toggled, this, &PrintBar::updateLabelCount);
+    connect(m_printRows, &QRadioButton::toggled, this, &PrintBar::updateLabelCount);
     connect(m_print, &QPushButton::clicked, this, &PrintBar::printRequested);
     connect(m_printer, &QComboBox::currentIndexChanged, this, [this]() {
         reloadPaperSizes();
@@ -685,6 +689,30 @@ bool PrintBar::printAddresses() const
     return m_printAddresses->isChecked() && m_printAddresses->isEnabled();
 }
 
+bool PrintBar::printRows() const
+{
+    return m_printRows->isChecked() && m_printRows->isEnabled();
+}
+
+void PrintBar::setDataRows(bool available, int rows)
+{
+    m_dataRows = rows;
+    if (!available && m_printRows->isChecked()) {
+        m_printLabel->setChecked(true);
+    }
+    m_printRows->setEnabled(available);
+    m_printRows->setText(rows < 0 ? i18n("Each row of the data source")
+                                  : i18np("The ticked row of the data source", "Each of the %1 ticked rows of the data source", rows));
+    updateLabelCount();
+}
+
+void PrintBar::choosePrintRows()
+{
+    if (m_printRows->isEnabled()) {
+        m_printRows->setChecked(true);
+    }
+}
+
 void PrintBar::setCheckedAddresses(int count)
 {
     m_checkedAddresses = count;
@@ -699,6 +727,10 @@ void PrintBar::setCheckedAddresses(int count)
 
 void PrintBar::updateLabelCount()
 {
-    const int labels = m_copies->value() * (printAddresses() ? m_checkedAddresses : 1);
+    if (printRows() && m_dataRows < 0) {
+        m_labelCount->setText(i18np("1 label per row", "%1 labels per row", m_copies->value()));
+        return;
+    }
+    const int labels = m_copies->value() * (printAddresses() ? m_checkedAddresses : printRows() ? m_dataRows : 1);
     m_labelCount->setText(i18np("1 label will be printed", "%1 labels will be printed", labels));
 }

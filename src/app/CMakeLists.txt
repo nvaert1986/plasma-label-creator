@@ -10,6 +10,8 @@ add_executable(plasma-label-creator
     clipartpanel.cpp
     clipartpanel.h
     customlabels.cpp
+    datadialogs.cpp
+    datareader.cpp
     customlabels.h
     dragsupport.cpp
     dragsupport.h
@@ -54,6 +56,8 @@ target_link_libraries(plasma-label-creator
     Qt6::Widgets
     Qt6::PrintSupport
     Qt6::DBus
+    Qt6::Sql
+    KF6::Archive
     PkgConfig::Udev
     KF6::ConfigWidgets
     KF6::CoreAddons

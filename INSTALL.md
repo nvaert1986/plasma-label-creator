@@ -23,9 +23,9 @@ been tried; if one does not, please report it.
 | C++ compiler with C++20 support | GCC or Clang with C++20 | GCC 15.3 |
 | Extra CMake Modules (ECM) | 6.0 | 6.29 |
 | Qt 6: Core, Gui, Network | 6.6 | 6.11 |
-| Qt 6: Widgets, PrintSupport, DBus (application) | 6.6 | 6.11 |
+| Qt 6: Widgets, PrintSupport, DBus, Sql (application) | 6.6 | 6.11 |
 | Qt 6: Test (only for the tests) | 6.6 | 6.11 |
-| KDE Frameworks 6: ConfigWidgets, CoreAddons, Crash, I18n, IconThemes, WidgetsAddons, XmlGui | 6.0 | 6.29 |
+| KDE Frameworks 6: Archive, ConfigWidgets, CoreAddons, Crash, I18n, IconThemes, WidgetsAddons, XmlGui | 6.0 | 6.29 |
 | zint, with its CMake package files | any 2.x that installs them | 2.16 |
 | CUPS library and headers | 2.x | 2.4 |
 | libudev (application) | any | systemd 257 |
@@ -47,19 +47,22 @@ their usual package names and may need adjusting.
 emerge --ask --noreplace dev-build/cmake dev-build/ninja \
     kde-frameworks/extra-cmake-modules dev-qt/qtbase media-libs/zint \
     net-print/cups virtual/libudev dev-util/pkgconf \
-    kde-frameworks/kconfigwidgets kde-frameworks/kcoreaddons \
-    kde-frameworks/kcrash kde-frameworks/ki18n kde-frameworks/kiconthemes \
-    kde-frameworks/kwidgetsaddons kde-frameworks/kxmlgui
+    kde-frameworks/karchive kde-frameworks/kconfigwidgets \
+    kde-frameworks/kcoreaddons kde-frameworks/kcrash kde-frameworks/ki18n \
+    kde-frameworks/kiconthemes kde-frameworks/kwidgetsaddons \
+    kde-frameworks/kxmlgui
 ```
 
-`dev-qt/qtbase` needs the USE flags `gui`, `widgets`, `network` and `dbus`
-(a KDE Plasma system has them).
+`dev-qt/qtbase` needs the USE flags `gui`, `widgets`, `network`, `dbus` and
+`sql` (a KDE Plasma system has them), plus `sqlite` for SQLite databases and
+`odbc` for SQL Server, Access and other databases through ODBC. Printing from
+MySQL or PostgreSQL needs the `mysql` or `postgres` flag.
 
 **Debian / Ubuntu** (with KDE Frameworks 6, e.g. Debian 13)
 
 ```sh
 apt install build-essential cmake ninja-build extra-cmake-modules pkgconf \
-    qt6-base-dev libkf6configwidgets-dev libkf6coreaddons-dev \
+    qt6-base-dev libkf6archive-dev libkf6configwidgets-dev libkf6coreaddons-dev \
     libkf6crash-dev libkf6i18n-dev libkf6iconthemes-dev \
     libkf6widgetsaddons-dev libkf6xmlgui-dev libzint-dev libcups2-dev \
     libudev-dev
@@ -69,7 +72,7 @@ apt install build-essential cmake ninja-build extra-cmake-modules pkgconf \
 
 ```sh
 dnf install gcc-c++ cmake ninja-build extra-cmake-modules pkgconf \
-    qt6-qtbase-devel kf6-kconfigwidgets-devel kf6-kcoreaddons-devel \
+    qt6-qtbase-devel kf6-karchive-devel kf6-kconfigwidgets-devel kf6-kcoreaddons-devel \
     kf6-kcrash-devel kf6-ki18n-devel kf6-kiconthemes-devel \
     kf6-kwidgetsaddons-devel kf6-kxmlgui-devel zint-devel cups-devel \
     systemd-devel
@@ -79,7 +82,7 @@ dnf install gcc-c++ cmake ninja-build extra-cmake-modules pkgconf \
 
 ```sh
 pacman -S --needed base-devel cmake ninja extra-cmake-modules qt6-base \
-    kconfigwidgets kcoreaddons kcrash ki18n kiconthemes kwidgetsaddons \
+    karchive kconfigwidgets kcoreaddons kcrash ki18n kiconthemes kwidgetsaddons \
     kxmlgui zint cups systemd-libs
 ```
 

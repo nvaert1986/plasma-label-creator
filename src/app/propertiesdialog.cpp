@@ -379,7 +379,14 @@ bool editObjectProperties(QWidget *parent, LabelObject &object, TapeCell *cell)
         border->setDecimals(2);
         border->setSuffix(i18nc("points", " pt"));
         border->setValue(Units::twipsToPoints(image->borderWidth));
+        // Linked instead of embedded: a file path, which may hold fields
+        // such as {Photo} to take a picture per data row.
+        auto *location = new QLineEdit(image->imageLocation.value_or(QString()));
+        location->setPlaceholderText(i18n("Embedded in the label"));
+        location->setToolTip(i18n("A picture file to show instead of the embedded one. It may use fields, such as /photos/{Serial}.png, for a picture per data row; "
+                                  "a relative path is looked up next to the data file."));
         form->addRow(QString(), change);
+        form->addRow(i18n("Picture file:"), location);
         form->addRow(i18n("Scaling:"), scale);
         form->addRow(i18n("Horizontal alignment:"), horizontal);
         form->addRow(i18n("Vertical alignment:"), vertical);
@@ -387,6 +394,10 @@ bool editObjectProperties(QWidget *parent, LabelObject &object, TapeCell *cell)
         applySpecific = [=]() {
             if (!newData->isEmpty()) {
                 image->imageData = *newData;
+                image->imageLocation.reset();
+            } else if (!location->text().trimmed().isEmpty()) {
+                image->imageLocation = location->text().trimmed();
+            } else if (image->imageLocation) {
                 image->imageLocation.reset();
             }
             image->scaleMode = comboValue<ImageScaleMode>(scale);
