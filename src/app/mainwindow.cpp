@@ -1584,8 +1584,9 @@ void MainWindow::changePaper(const PaperSize &paper)
 
 void MainWindow::rotateLabel()
 {
+    // The objects turn with the label, so it prints as before.
     LabelDocument document = m_editor->document();
-    document.orientation = document.orientation == PaperOrientation::Landscape ? PaperOrientation::Portrait : PaperOrientation::Landscape;
+    document.rotateQuarter();
     m_editor->apply(document, i18n("Rotate Label"));
 }
 

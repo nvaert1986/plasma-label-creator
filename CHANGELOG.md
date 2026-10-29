@@ -40,6 +40,10 @@
   moving and resizing put edges on the grid; hold Alt to place freely.
 - **White on black** text (Format > White on Black), using the object's own
   colours, so DLS shows it the same way.
+- **Rotate Label turns the objects with it**: positions move round and each
+  object's rotation follows, tape cells included. The label looks the same,
+  just turned, and prints exactly as before (tested dot for dot). Before,
+  only the label turned and objects could end up off it.
 - **More barcodes**: Data Matrix, Aztec, MaxiCode, Micro QR, Code 93,
   Code 11, MSI Plessey, Pharmacode, GS1-128, GS1 Data Matrix, GS1 DataBar,
   HIBC (Code 128, Code 39, Data Matrix, QR), KIX (PostNL) and Royal Mail.

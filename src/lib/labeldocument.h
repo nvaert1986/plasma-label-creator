@@ -428,6 +428,13 @@ struct LabelDocument {
      */
     bool moveCell(int index, int steps);
 
+    /**
+     * Turns the label a quarter between landscape and portrait, and every
+     * object with it: positions move round, rotations follow, tape cells
+     * turn. Only the view turns: the label prints exactly as before.
+     */
+    void rotateQuarter();
+
     /** Size of the paper as it feeds, in twips. */
     QSizeF paperSize() const;
     /** Size of the area objects are laid out on, in twips. */

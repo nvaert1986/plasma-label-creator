@@ -5,6 +5,7 @@
 
 #include "labeldocument.h"
 
+#include <algorithm>
 #include <functional>
 
 #include "units.h"
@@ -255,6 +256,72 @@ bool LabelDocument::moveCell(int index, int steps)
     };
     search(tape->root);
     return moved;
+}
+
+namespace
+{
+
+// Rotations a quarter turn on, clockwise as seen on the paper.
+Rotation clockwise(Rotation rotation)
+{
+    switch (rotation) {
+    case Rotation::Rotation0:
+        return Rotation::Rotation270; // Rotation270 turns clockwise
+    case Rotation::Rotation270:
+        return Rotation::Rotation180;
+    case Rotation::Rotation180:
+        return Rotation::Rotation90;
+    case Rotation::Rotation90:
+        return Rotation::Rotation0;
+    }
+    Q_UNREACHABLE();
+}
+
+Rotation counterClockwise(Rotation rotation)
+{
+    return clockwise(clockwise(clockwise(rotation)));
+}
+
+} // namespace
+
+void LabelDocument::rotateQuarter()
+{
+    // A landscape canvas is the paper turned: canvas (x, y) is paper
+    // (width - y, x). Going to portrait, every object turns a quarter
+    // clockwise to stay where and how it is on the paper; going back,
+    // counter-clockwise.
+    const bool toPortrait = orientation == PaperOrientation::Landscape;
+    const qreal width = paperSize().width();
+    const auto turnRect = [&](const QRectF &r) {
+        return toPortrait ? QRectF(width - r.bottom(), r.x(), r.height(), r.width()) : QRectF(r.y(), width - r.right(), r.height(), r.width());
+    };
+    for (LabelObject &object : objects) {
+        ObjectBase &base = objectBase(object);
+        base.rotation = toPortrait ? clockwise(base.rotation) : counterClockwise(base.rotation);
+        if (!tape) {
+            base.bounds = turnRect(base.bounds);
+        }
+    }
+    if (tape) {
+        // Cells turn with the label; the layout places them. Margins move
+        // round the same way as the sides of a box, and cells stacked
+        // across the tape swap order, as top-to-bottom on a landscape
+        // canvas is right-to-left on the paper.
+        const std::function<void(TapeCell &)> turn = [&](TapeCell &cell) {
+            const QMarginsF m = cell.objectMargin;
+            cell.objectMargin = toPortrait ? QMarginsF(m.bottom(), m.left(), m.top(), m.right()) : QMarginsF(m.top(), m.right(), m.bottom(), m.left());
+            const bool across = toPortrait ? cell.subcellsOrientation == Qt::Vertical : cell.subcellsOrientation == Qt::Horizontal;
+            if (across) {
+                std::reverse(cell.subcells.begin(), cell.subcells.end());
+            }
+            cell.subcellsOrientation = cell.subcellsOrientation == Qt::Horizontal ? Qt::Vertical : Qt::Horizontal;
+            for (TapeCell &child : cell.subcells) {
+                turn(child);
+            }
+        };
+        turn(tape->root);
+    }
+    orientation = toPortrait ? PaperOrientation::Portrait : PaperOrientation::Landscape;
 }
 
 QSizeF LabelDocument::paperSize() const

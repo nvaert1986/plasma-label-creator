@@ -5,6 +5,7 @@
 
 #include "fields.h"
 #include "labelformat.h"
+#include "labelprinter.h"
 #include "labelrenderer.h"
 #include "tapelayout.h"
 #include "units.h"
@@ -341,6 +342,61 @@ private Q_SLOTS:
         const auto reread = reader.read(&buffer);
         QVERIFY(reread);
         QCOMPARE(std::get_if<BarcodeObject>(&reread->objects.constFirst())->type, type);
+    }
+
+    void rotatingTheLabelPrintsTheSame_data()
+    {
+        QTest::addColumn<QString>("fileName");
+        QTest::newRow("landscape address") << u"address.label"_s;
+        QTest::newRow("portrait, every object") << u"mixed.label"_s;
+        QTest::newRow("counter, date, curved text") << u"variable.label"_s;
+        QTest::newRow("tape with cells") << u"tape.label"_s;
+    }
+
+    void rotatingTheLabelPrintsTheSame()
+    {
+        QFETCH(QString, fileName);
+        LabelDocument original = readFixture(fileName);
+        TapeLayout::layout(original);
+        // The paper as the label feeds, in points.
+        PaperSize paper;
+        paper.size = original.paperSize() / Units::TwipsPerPoint;
+        const QDateTime when(QDate(2026, 10, 29), QTime(12, 0));
+        const QImage before = LabelPrinter::paperImage(original, paper, Dpi, nullptr, 0, when);
+
+        LabelDocument turned = original;
+        turned.rotateQuarter();
+        QVERIFY(turned.orientation != original.orientation);
+        QCOMPARE(turned.canvasSize(), original.canvasSize().transposed());
+        TapeLayout::layout(turned);
+        const QImage after = LabelPrinter::paperImage(turned, paper, Dpi, nullptr, 0, when);
+        QCOMPARE(after.size(), before.size());
+        // Glyph edges may round a dot differently; everything else is the same.
+        int different = 0;
+        int ink = 0;
+        for (int y = 0; y < before.height(); ++y) {
+            for (int x = 0; x < before.width(); ++x) {
+                different += before.pixelIndex(x, y) != after.pixelIndex(x, y) ? 1 : 0;
+                ink += qGray(before.pixel(x, y)) < 128 ? 1 : 0;
+            }
+        }
+        QVERIFY(ink > 100);
+        QVERIFY2(different <= ink / 50, qPrintable(u"%1 of %2 ink dots differ"_s.arg(different).arg(ink)));
+
+        // Turned back, it is the label it was.
+        turned.rotateQuarter();
+        TapeLayout::layout(turned);
+        QCOMPARE(turned.orientation, original.orientation);
+        for (qsizetype i = 0; i < original.objects.size(); ++i) {
+            QCOMPARE(objectBase(turned.objects.at(i)).rotation, objectBase(original.objects.at(i)).rotation);
+            const QRectF a = objectBase(turned.objects.at(i)).bounds;
+            const QRectF b = objectBase(original.objects.at(i)).bounds;
+            QVERIFY2(qAbs(a.x() - b.x()) < 0.01 && qAbs(a.y() - b.y()) < 0.01 && qAbs(a.width() - b.width()) < 0.01 && qAbs(a.height() - b.height()) < 0.01,
+                     qPrintable(objectBase(original.objects.at(i)).name));
+        }
+        if (original.tape) {
+            QCOMPARE(turned.tape->root, original.tape->root);
+        }
     }
 
     void picturesComeFromDataRows()
