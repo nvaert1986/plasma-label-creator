@@ -66,6 +66,9 @@
 
 ## 0.1.0 (2026-10-29)
 
-The first published version: a DYMO Label Software 8 style label designer
-for DYMO LabelWriter and LabelManager printers and ZPL printers (Altec ATP,
-Zebra), reading and writing DLS `.label` files.
+A Plasma label creator for Linux that supports DYMO LabelWriter and
+LabelManager printers and ZPL label printers (such as Altec ATP and Zebra):
+die-cut and tape labels, text, addresses, barcodes and QR codes, images,
+shapes, counters, dates and curved text, address books, labels of a kind
+(cable wraps and flags, patch panels, terminal blocks, rack markers), and
+opening and saving `.label` files.
