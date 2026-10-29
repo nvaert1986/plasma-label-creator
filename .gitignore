@@ -1,0 +1,28 @@
+# SPDX-FileCopyrightText: 2026 nvaert1986 <25772781+nvaert1986@users.noreply.github.com>
+# SPDX-License-Identifier: CC0-1.0
+
+/build*/
+/.cache/
+CMakeLists.txt.user*
+compile_commands.json
+
+# Editors and patch leftovers.
+.idea/
+.vscode/
+.kdev4/
+*.kdev4
+*~
+*.swp
+*.orig
+*.rej
+
+# Real labels and DLS renders from users; may contain names and addresses.
+/reference/
+
+# DYMO's clip art, extracted from DYMO Label Software for local use. It is
+# DYMO's copyright and must never be published, wherever it ends up.
+clipart/
+Clipart.xml
+
+# Local handover notes; contain environment details and notes on DYMO software.
+HANDOFF.md

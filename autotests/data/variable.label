@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    SPDX-FileCopyrightText: 2026 nvaert1986 <25772781+nvaert1986@users.noreply.github.com>
+    SPDX-License-Identifier: CC0-1.0
+    Written for the tests, in the element order DLS 8 serialises these objects.
+-->
+<DieCutLabel Version="8.0" Units="twips">
+	<PaperOrientation>Landscape</PaperOrientation>
+	<Id>Address</Id>
+	<PaperName>30252 Address</PaperName>
+	<DrawCommands>
+		<RoundRectangle X="0" Y="0" Width="1581" Height="5040" Rx="270" Ry="270" />
+	</DrawCommands>
+	<ObjectInfo>
+		<CounterObject>
+			<Name>COUNTER</Name>
+			<ForeColor Alpha="255" Red="0" Green="0" Blue="0" />
+			<BackColor Alpha="0" Red="255" Green="255" Blue="255" />
+			<LinkedObjectName></LinkedObjectName>
+			<Rotation>Rotation0</Rotation>
+			<IsMirrored>False</IsMirrored>
+			<IsVariable>False</IsVariable>
+			<HorizontalAlignment>Left</HorizontalAlignment>
+			<VerticalAlignment>Middle</VerticalAlignment>
+			<TextFitMode>ShrinkToFit</TextFitMode>
+			<UseFullFontHeight>True</UseFullFontHeight>
+			<Verticalized>False</Verticalized>
+			<Font Family="Arial" Size="12" Bold="False" Italic="False" Underline="False" Strikeout="False" />
+			<PreText>No. </PreText>
+			<PostText></PostText>
+			<Start>1</Start>
+			<Current>7</Current>
+			<Increment>2</Increment>
+			<FormatWidth>4</FormatWidth>
+			<UseLeadingZeros>True</UseLeadingZeros>
+		</CounterObject>
+		<Bounds X="300" Y="150" Width="2000" Height="400" />
+	</ObjectInfo>
+	<ObjectInfo>
+		<DateTimeObject>
+			<Name>DATETIME</Name>
+			<ForeColor Alpha="255" Red="0" Green="0" Blue="0" />
+			<BackColor Alpha="0" Red="255" Green="255" Blue="255" />
+			<LinkedObjectName></LinkedObjectName>
+			<Rotation>Rotation0</Rotation>
+			<IsMirrored>False</IsMirrored>
+			<IsVariable>False</IsVariable>
+			<HorizontalAlignment>Left</HorizontalAlignment>
+			<VerticalAlignment>Middle</VerticalAlignment>
+			<TextFitMode>ShrinkToFit</TextFitMode>
+			<UseFullFontHeight>True</UseFullFontHeight>
+			<Verticalized>False</Verticalized>
+			<DateTimeFormat>DayMonthLongYear</DateTimeFormat>
+			<Font Family="Arial" Size="10" Bold="False" Italic="False" Underline="False" Strikeout="False" />
+			<PreText>Printed </PreText>
+			<PostText></PostText>
+			<IncludeTime>True</IncludeTime>
+			<Use24HourFormat>True</Use24HourFormat>
+			<Culture>nl-NL</Culture>
+		</DateTimeObject>
+		<Bounds X="300" Y="700" Width="2400" Height="400" />
+	</ObjectInfo>
+	<ObjectInfo>
+		<CircularTextObject>
+			<Name>CIRCULARTEXT</Name>
+			<ForeColor Alpha="255" Red="0" Green="0" Blue="0" />
+			<BackColor Alpha="0" Red="255" Green="255" Blue="255" />
+			<LinkedObjectName></LinkedObjectName>
+			<Rotation>Rotation0</Rotation>
+			<IsMirrored>False</IsMirrored>
+			<IsVariable>False</IsVariable>
+			<Text>DYMO-compatible</Text>
+			<Font Family="Arial" Size="9" Bold="True" Italic="False" Underline="False" Strikeout="False" />
+			<StartAngle>45</StartAngle>
+			<Mode>CircularText</Mode>
+			<CircleAlignment>StartAngle</CircleAlignment>
+			<TextAlignment>Center</TextAlignment>
+			<VerticalAlignment>Middle</VerticalAlignment>
+		</CircularTextObject>
+		<Bounds X="3300" Y="150" Width="1300" Height="1300" />
+	</ObjectInfo>
+</DieCutLabel>

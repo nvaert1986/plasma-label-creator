@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AddressBook
+  Version="8.0"
+  DefaultPermutation="true"
+  Format="Native">
+  <AddressEntry>
+    <AddressData>Jan Jansen
+Dorpsstraat 1
+1234 AB  Ergens</AddressData>
+    <Name>
+      <FirstName>Jan</FirstName>
+      <LastName>Jansen</LastName>
+      <FileAs>Jansen, Jan</FileAs>
+    </Name>
+  </AddressEntry>
+  <AddressEntry>
+    <AddressData>Ångström Labs
+Box 42
+Uppsala</AddressData>
+    <Name>
+      <FirstName></FirstName>
+      <LastName></LastName>
+      <FileAs>Ångström Labs</FileAs>
+    </Name>
+  </AddressEntry>
+  <AddressEntry>
+    <AddressData>Alice de Vries
+Kerkstraat 9
+5678 CD  Elders</AddressData>
+    <Name>
+      <FirstName>Alice</FirstName>
+      <LastName>de Vries</LastName>
+      <FileAs>Vries, Alice de</FileAs>
+    </Name>
+  </AddressEntry>
+</AddressBook>

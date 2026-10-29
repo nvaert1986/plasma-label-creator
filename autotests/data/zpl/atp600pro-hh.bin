@@ -1,0 +1,46 @@
+  16.0                DARKNESS          
+  2 IPS               PRINT SPEED       
+  +000                TEAR OFF          
+  TEAR OFF            PRINT MODE        
+  NON-CONTINUOUS      MEDIA TYPE        
+  WEB                 SENSOR TYPE       
+  AUTO SELECT         SENSOR SELECT     
+  THERMAL-TRANS.      PRINT METHOD      
+  2400 DOTS           PRINT WIDTH       
+  0980                LABEL LENGTH      
+  AUTO                MAXIMUM LENGTH    
+  UNIDIRECTIONAL      PARALLEL COMM.    
+  RS232               SERIAL COMM.      
+  9600                BAUD              
+  8 BITS              DATA BITS         
+  NONE                PARITY            
+  DTR/DSR             HOST HANDSHAKE    
+  NONE                PROTOCOL          
+  NORMAL MODE         COMMUNICATIONS    
+  <~>  7EH            CONTROL PREFIX    
+  <^>  5EH            FORMAT PREFIX     
+  <,>  2CH            DELIMITER CHAR    
+  ZPL II              ZPL MODE          
+  NO MOTION           MEDIA POWER UP    
+  NO MOTION           HEAD CLOSE        
+  DEFAULT             BACKFEED          
+  +000                LABEL TOP         
+  +0000               LEFT POSITION     
+  DISABLED            REPRINT MODE      
+  DPSWFXM             MODES ENABLED     
+  .......             MODES DISABLED    
+  2496 23.6/MM FULL   RESOLUTION        
+  A2.11.AT6    <-     FIRMWARE          
+                      HARDWARE ID       
+  CUSTOMIZED          CONFIGURATION     
+  8192k............R: RAM               
+  0000k............B: MEMORY CARD       
+  0079m............E: ONBOARD FLASH     
+  NONE                FORMAT CONVERT    
+  5000 IN             NONRESET CNTR     
+  0 IN                RESET CNTR1       
+  0 IN                RESET CNTR2       
+  12711 CM            NONRESET CNTR     
+  0 CM                RESET CNTR1       
+  0 CM                RESET CNTR2       
+

@@ -1,0 +1,137 @@
+/*
+    SPDX-FileCopyrightText: 2026 nvaert1986 <25772781+nvaert1986@users.noreply.github.com>
+    SPDX-License-Identifier: GPL-2.0-or-later
+*/
+
+#pragma once
+
+#include "labelprinter.h"
+#include "objectfactory.h"
+#include "recentlayouts.h"
+
+#include <KXmlGuiWindow>
+
+#include <functional>
+#include <optional>
+
+class KFontAction;
+class KFontSizeAction;
+class KRecentFilesAction;
+class KToggleAction;
+class LabelEditor;
+class LabelView;
+class PrintBar;
+class QLabel;
+class QSlider;
+class Sidebar;
+
+class MainWindow : public KXmlGuiWindow
+{
+    Q_OBJECT
+
+public:
+    explicit MainWindow(QWidget *parent = nullptr);
+
+    bool openFile(const QString &fileName);
+    /** Shows tab @p index of the side panel; for screenshots while developing. */
+    void showScreenshotTab(int index);
+    /** Selects object @p index; for screenshots while developing. */
+    void selectForScreenshot(int index);
+    /** Starts editing object @p index's text on the label; for screenshots while developing. */
+    void editTextForScreenshot(int index);
+    /** Opens the label kinds dialog on kind @p row and saves a picture of it to @p file; for development. */
+    void labelKindForScreenshot(int row, const QString &file);
+
+protected:
+    bool queryClose() override;
+
+private:
+    void setupActions();
+    QWidget *createInfoBar();
+    void setupFormatActions();
+    void updateFormatActions();
+    /** The font of the selected object, if it has one the toolbar can change. */
+    std::optional<LabelCreator::LabelFont> selectedFont() const;
+    void changeSelectedFont(const std::function<void(LabelCreator::LabelFont &)> &change);
+    void setSelectedAlignment(std::optional<LabelCreator::HorizontalAlignment> horizontal, std::optional<LabelCreator::VerticalAlignment> vertical);
+    void setSelectedFitMode(LabelCreator::TextFitMode mode);
+    void setupLayoutActions();
+    void updateCaption();
+    void updateActions();
+    void updateStatus();
+
+    void newLabel();
+    /**
+     * The label type to start new labels with: the one used last if the
+     * printer offers it, else one that fits the labels loaded in it.
+     */
+    LabelCreator::PaperSize startingPaper() const;
+    /** Asks before printing a label that is not what the printer has loaded; false if cancelled. */
+    bool confirmLabelFitsPrinter();
+    /** Whether the label type is one the printer offers and fits what is loaded in it. */
+    bool labelFitsPrinter() const;
+    /**
+     * Gives the label a type that suits the printer: always for a new,
+     * untouched label, else after the user chose another printer.
+     */
+    void followPrinter();
+    /** Shows the printable part of the label type on the canvas, if it has one. */
+    void updatePrintArea();
+    /** Asks whether the tape label is as long as its content or of a fixed length. */
+    void editTapeLength();
+    void open();
+    bool save();
+    bool saveAs();
+    /** Asks to save unsaved changes; false if the user cancelled. */
+    bool maybeSave();
+
+    /** Inserts a new object, centred on @p at (twips) if given, else on the label. */
+    void insertObject(ObjectFactory::Kind kind, std::optional<QPointF> at = std::nullopt);
+    void insertClipart(const QString &fileName, std::optional<QPointF> at = std::nullopt);
+    void insert(LabelCreator::LabelObject object, std::optional<QPointF> at = std::nullopt);
+    /** Puts @p address in the label's first address object, as DLS does. */
+    void useAddress(const QString &address);
+    /** After printing, counters continue where the print run stopped. */
+    void advanceCounters(int printedLabels);
+    void editObject(int index);
+    void deleteObject();
+    void duplicateObject();
+    void copyObject();
+    void cutObject();
+    void paste();
+    /** Moves the selected object against an edge or to the middle of the label. */
+    void positionObject(Qt::Alignment alignment);
+    void setOrientation(LabelCreator::PaperOrientation orientation);
+    void raiseObject();
+    void lowerObject();
+    void changePaper(const LabelCreator::PaperSize &paper);
+    void rotateLabel();
+    void print();
+    /** Asks for the selected printer's print offset, in on-screen terms for the current label. */
+    void editPrintOffset();
+    void openRecentLayout(const LabelCreator::RecentLayout &layout);
+
+    LabelCreator::RecentLayouts m_recentLayouts;
+    LabelEditor *m_editor;
+    LabelView *m_view;
+    Sidebar *m_sidebar;
+    PrintBar *m_printBar;
+    QLabel *m_paperName;
+    QLabel *m_paperSize;
+    QLabel *m_zoomLabel;
+    QSlider *m_zoomSlider;
+    KRecentFilesAction *m_recentFiles = nullptr;
+    KFontAction *m_fontFamily = nullptr;
+    KFontSizeAction *m_fontSize = nullptr;
+    KToggleAction *m_bold = nullptr;
+    KToggleAction *m_italic = nullptr;
+    KToggleAction *m_underline = nullptr;
+    KToggleAction *m_strikeout = nullptr;
+    QList<KToggleAction *> m_fitModes; // none, shrink to fit, always fit
+    KToggleAction *m_portrait = nullptr;
+    KToggleAction *m_landscape = nullptr;
+    QAction *m_paste = nullptr;
+    bool m_followPrinter = false; // the user chose another printer; the label type follows
+    QList<KToggleAction *> m_horizontalAlignment; // left, centre, right
+    QList<KToggleAction *> m_verticalAlignment; // top, middle, bottom
+};

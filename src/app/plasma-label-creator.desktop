@@ -1,0 +1,11 @@
+# SPDX-FileCopyrightText: 2026 nvaert1986 <25772781+nvaert1986@users.noreply.github.com>
+# SPDX-License-Identifier: CC0-1.0
+[Desktop Entry]
+Type=Application
+Name=Plasma Label Creator
+GenericName=Label Designer
+Comment=Design and print labels on DYMO LabelWriter printers
+Exec=plasma-label-creator %F
+Icon=document-print
+Terminal=false
+Categories=Qt;KDE;Office;

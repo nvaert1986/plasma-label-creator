@@ -1,0 +1,17 @@
+# SPDX-FileCopyrightText: 2026 nvaert1986 <25772781+nvaert1986@users.noreply.github.com>
+# SPDX-License-Identifier: CC0-1.0
+
+# Licences for files that cannot carry an SPDX header themselves.
+version = 1
+
+[[annotations]]
+path = [
+    "autotests/data/addresses.ABX",
+    "autotests/data/fake-dls.dll",
+    "autotests/data/zpl/**",
+    "doc/screenshot.png",
+    "src/app/data/altec-labels.json",
+    "src/app/plasma-label-creator.qrc",
+]
+SPDX-FileCopyrightText = "2026 nvaert1986 <25772781+nvaert1986@users.noreply.github.com>"
+SPDX-License-Identifier = "CC0-1.0"

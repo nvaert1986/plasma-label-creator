@@ -1,0 +1,9 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+    <qresource prefix="/kxmlgui5/plasma-label-creator">
+        <file>plasma-label-creatorui.rc</file>
+    </qresource>
+    <qresource prefix="/plasma-label-creator">
+        <file>data/altec-labels.json</file>
+    </qresource>
+</RCC>

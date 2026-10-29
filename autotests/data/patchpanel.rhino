@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    SPDX-FileCopyrightText: 2026 nvaert1986 <25772781+nvaert1986@users.noreply.github.com>
+    SPDX-License-Identifier: CC0-1.0
+
+    Written for the tests in the layout of a DYMO Rhino template.
+-->
+<plist version="1.0">
+	<dict>
+		<key>VersionMajor</key>
+		<integer>1</integer>
+		<key>LabelTemplate</key>
+		<dict>
+			<key>TapeWidth</key>
+			<string>tw9</string>
+			<key>Font</key>
+			<dict>
+				<key>FontFamily</key>
+				<string>Arial</string>
+				<key>FontSize</key>
+				<real>10</real>
+				<key>Bold</key>
+				<true />
+			</dict>
+			<key>CellCount</key>
+			<integer>4</integer>
+			<key>CellLength</key>
+			<real>936</real>
+			<key>HasCellSeparator</key>
+			<true />
+			<key>IsReversed</key>
+			<false />
+			<key>TemplateClass</key>
+			<string>DYMO.RhinoPro.SDK.PatchPanelLabel</string>
+		</dict>
+		<key>Labeldata</key>
+		<dict>
+			<key>Rows</key>
+			<array>
+				<array>
+					<dict><key>Items</key><array><dict><key>Text</key><string>A-01</string></dict></array></dict>
+					<dict><key>Items</key><array><dict><key>Text</key><string>A-02</string></dict></array></dict>
+				</array>
+				<array>
+					<dict><key>Items</key><array><dict><key>Text</key><string>B-01</string></dict></array></dict>
+				</array>
+			</array>
+		</dict>
+	</dict>
+</plist>

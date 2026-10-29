@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    SPDX-FileCopyrightText: 2026 nvaert1986 <25772781+nvaert1986@users.noreply.github.com>
+    SPDX-License-Identifier: CC0-1.0
+-->
+<!DOCTYPE gui>
+<gui name="plasma-label-creator" version="10"
+     xmlns="http://www.kde.org/standards/kxmlgui/1.0"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://www.kde.org/standards/kxmlgui/1.0 http://www.kde.org/standards/kxmlgui/1.0/kxmlgui.xsd">
+    <MenuBar>
+        <Menu name="file">
+            <Action name="layout_recent" append="open_merge"/>
+        </Menu>
+        <Menu name="edit">
+            <Action name="edit_delete" append="edit_paste_merge"/>
+            <Action name="edit_duplicate" append="edit_paste_merge"/>
+            <Separator append="edit_paste_merge"/>
+            <Action name="edit_properties" append="edit_paste_merge"/>
+        </Menu>
+        <Menu name="format">
+            <text>F&amp;ormat</text>
+            <Action name="format_font_family"/>
+            <Action name="format_font_size"/>
+            <Action name="format_font_grow"/>
+            <Action name="format_font_shrink"/>
+            <Separator/>
+            <Action name="format_bold"/>
+            <Action name="format_italic"/>
+            <Action name="format_underline"/>
+            <Action name="format_strikeout"/>
+            <Separator/>
+            <Menu name="format_horizontal" icon="format-justify-left">
+                <text>&amp;Horizontal Alignment</text>
+                <Action name="format_align_left"/>
+                <Action name="format_align_center"/>
+                <Action name="format_align_right"/>
+            </Menu>
+            <Menu name="format_vertical" icon="align-vertical-center">
+                <text>&amp;Vertical Alignment</text>
+                <Action name="format_valign_top"/>
+                <Action name="format_valign_middle"/>
+                <Action name="format_valign_bottom"/>
+            </Menu>
+            <Menu name="format_fit">
+                <text>&amp;Text Fit</text>
+                <Action name="format_fit_none"/>
+                <Action name="format_fit_shrink"/>
+                <Action name="format_fit_always"/>
+            </Menu>
+            <Separator/>
+            <Action name="edit_properties"/>
+        </Menu>
+        <Menu name="insert">
+            <text>&amp;Insert</text>
+            <Action name="insert_address"/>
+            <Action name="insert_text"/>
+            <Action name="insert_counter"/>
+            <Action name="insert_datetime"/>
+            <Action name="insert_barcode"/>
+            <Action name="insert_image"/>
+            <Action name="insert_curvedtext"/>
+            <Separator/>
+            <Action name="insert_label_kind"/>
+            <Separator/>
+            <Action name="insert_rectangle"/>
+            <Action name="insert_ellipse"/>
+            <Action name="insert_hline"/>
+            <Action name="insert_vline"/>
+        </Menu>
+        <Menu name="layout">
+            <text>&amp;Layout</text>
+            <Action name="label_type"/>
+            <Action name="label_custom_size"/>
+            <Menu name="layout_orientation" icon="object-rotate-right">
+                <text>Label &amp;Orientation</text>
+                <Action name="layout_portrait"/>
+                <Action name="layout_landscape"/>
+            </Menu>
+            <Separator/>
+            <Action name="tape_length"/>
+            <Action name="tape_move_earlier"/>
+            <Action name="tape_move_later"/>
+            <Separator/>
+            <Menu name="layout_position" icon="align-horizontal-center">
+                <text>&amp;Position Object on Label</text>
+                <Action name="layout_position_left"/>
+                <Action name="layout_position_hcenter"/>
+                <Action name="layout_position_right"/>
+                <Separator/>
+                <Action name="layout_position_top"/>
+                <Action name="layout_position_vcenter"/>
+                <Action name="layout_position_bottom"/>
+                <Separator/>
+                <Action name="layout_position_center"/>
+            </Menu>
+            <Separator/>
+            <Action name="edit_raise"/>
+            <Action name="edit_lower"/>
+        </Menu>
+        <Menu name="addressbook">
+            <text>&amp;Address Book</text>
+            <Action name="book_new"/>
+            <Action name="book_open"/>
+            <Action name="book_import"/>
+            <Separator/>
+            <Action name="book_save"/>
+            <Action name="book_saveas"/>
+        </Menu>
+    </MenuBar>
+    <ToolBar name="mainToolBar" noMerge="1">
+        <text>Main Toolbar</text>
+        <Action name="layout_recent"/>
+        <Separator/>
+        <Action name="file_new"/>
+        <Action name="file_open"/>
+        <Action name="file_save"/>
+        <Separator/>
+        <Action name="edit_undo"/>
+        <Action name="edit_redo"/>
+        <Separator/>
+        <Action name="insert_address"/>
+        <Action name="insert_text"/>
+        <Action name="insert_barcode"/>
+        <Action name="insert_image"/>
+        <Separator/>
+        <Action name="label_rotate"/>
+        <Action name="view_zoom_to_page"/>
+        <Separator/>
+        <Action name="file_print"/>
+    </ToolBar>
+    <ToolBar name="formatToolBar" iconText="icononly" newline="true">
+        <text>Format Toolbar</text>
+        <Action name="format_font_family"/>
+        <Action name="format_font_size"/>
+        <Action name="format_font_grow"/>
+        <Action name="format_font_shrink"/>
+        <Separator/>
+        <Action name="format_bold"/>
+        <Action name="format_italic"/>
+        <Action name="format_underline"/>
+        <Action name="format_strikeout"/>
+        <Separator/>
+        <Action name="format_align_left"/>
+        <Action name="format_align_center"/>
+        <Action name="format_align_right"/>
+        <Separator/>
+        <Action name="format_valign_top"/>
+        <Action name="format_valign_middle"/>
+        <Action name="format_valign_bottom"/>
+        <Separator/>
+        <Action name="edit_properties"/>
+    </ToolBar>
+    <Menu name="object_popup">
+        <Action name="edit_properties"/>
+        <Separator/>
+        <Action name="edit_cut"/>
+        <Action name="edit_copy"/>
+        <Action name="edit_paste"/>
+        <Action name="edit_duplicate"/>
+        <Action name="edit_delete"/>
+        <Separator/>
+        <Menu name="popup_position" icon="align-horizontal-center">
+            <text>&amp;Position on Label</text>
+            <Action name="layout_position_left"/>
+            <Action name="layout_position_hcenter"/>
+            <Action name="layout_position_right"/>
+            <Separator/>
+            <Action name="layout_position_top"/>
+            <Action name="layout_position_vcenter"/>
+            <Action name="layout_position_bottom"/>
+            <Separator/>
+            <Action name="layout_position_center"/>
+        </Menu>
+        <Separator/>
+        <Action name="edit_raise"/>
+        <Action name="edit_lower"/>
+    </Menu>
+</gui>
