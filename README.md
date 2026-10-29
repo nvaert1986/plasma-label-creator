@@ -27,10 +27,17 @@ Altec, Zebra Technologies or KDE e.V. See [Trademarks](#trademarks).
 
 ## What it does
 
-- **Design labels** on a canvas with rulers: text, addresses, barcodes and
-  QR codes (zint), images, DLS clip art, lines and shapes, counters,
-  date/time and curved text. Edit text directly on the label, format it
-  from the toolbar, drag objects in from the Insert tab or from Dolphin.
+- **Design labels** on a canvas with rulers and an optional grid to snap
+  to: text (also white on black), addresses, barcodes and 2D codes, images,
+  DLS clip art, lines and shapes, counters, date/time and curved text. Edit
+  text directly on the label, format it from the toolbar, drag objects in
+  from the Insert tab or from Dolphin.
+- **Barcodes** (zint): DLS's types (Code 128, Code 39, Codabar, 2 of 5,
+  ITF-14, EAN, UPC, QR Code, PDF417, POSTNET, PLANET, Intelligent Mail) and
+  more that DLS does not have: Data Matrix, Aztec, MaxiCode, Micro QR,
+  Code 93, Code 11, MSI Plessey, Pharmacode, GS1-128, GS1 Data Matrix and
+  GS1 DataBar (data with `[AI]` application identifiers), HIBC, KIX
+  (PostNL) and Royal Mail. DLS cannot show labels that use these.
 - **DLS 8 files**: open and save `.label` files, die-cut labels as well as
   LabelManager tape labels. Objects it does not know are kept and written
   back unchanged. DLS address books (`.ABX`) are supported too.
@@ -46,9 +53,13 @@ Altec, Zebra Technologies or KDE e.V. See [Trademarks](#trademarks).
   from a few values. DYMO Rhino templates (`.rhino`) open as tape labels.
 - **Custom label sizes** with a printable area, and a per-printer print
   offset for printers that need fine adjustment.
+- **Print preview**: the pages exactly as the printer receives them, dot
+  for dot, stepping through a run where counters or addresses change.
+- **Export** a label as a PDF (vector, the label's own size) or as a PNG at
+  the printer's resolution.
 - **Recently used layouts**: every printed label, with a thumbnail.
 - **`plasma-label-creator-render`**: a command-line tool that renders a
-  label to PNG, prints it, or shows what a printer would receive.
+  label to PNG or PDF, prints it, or shows what a printer would receive.
 
 ## Printers
 

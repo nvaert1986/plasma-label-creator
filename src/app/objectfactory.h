@@ -60,6 +60,16 @@ void alignOnLabel(LabelCreator::LabelObject &object, const LabelCreator::LabelDo
  */
 LabelCreator::LabelDocument newLabel(const LabelCreator::PaperSize &paper);
 
+/** Whether @p object has text that can be printed white on black. */
+bool canInvert(const LabelCreator::LabelObject &object);
+/** Whether @p object's text is white on a black box. */
+bool isInverted(const LabelCreator::LabelObject &object);
+/**
+ * Prints @p object's text white on a black box, or back to black on nothing.
+ * Uses the object's colours, so DLS shows it the same way.
+ */
+void setInverted(LabelCreator::LabelObject &object, bool inverted);
+
 /** A label of @p paperSize (in points), oriented as DLS orients it. */
 LabelCreator::LabelDocument newLabel(const QString &paperName, const QString &id, const QSizeF &paperSize);
 

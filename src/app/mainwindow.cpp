@@ -16,6 +16,8 @@
 #include "labeleditor.h"
 #include "labelview.h"
 #include "printbar.h"
+#include "printpreviewdialog.h"
+#include "labelrenderer.h"
 #include "propertiesdialog.h"
 #include "recentlayoutsmenu.h"
 #include "rulerwidget.h"
@@ -31,6 +33,7 @@
 #include <KLocalizedString>
 #include <KMessageBox>
 #include <KRecentFilesAction>
+#include <KSelectAction>
 #include <KSharedConfig>
 #include <KXMLGUIFactory>
 #include <KStandardAction>
@@ -274,6 +277,10 @@ void MainWindow::setupActions()
     KStandardAction::save(this, &MainWindow::save, actions);
     KStandardAction::saveAs(this, &MainWindow::saveAs, actions);
     KStandardAction::print(this, &MainWindow::print, actions);
+    KStandardAction::printPreview(this, &MainWindow::printPreview, actions);
+    QAction *exportAction = actions->addAction(u"file_export"_s, this, &MainWindow::exportLabel);
+    exportAction->setText(i18n("&Export as PDF or Image…"));
+    exportAction->setIcon(QIcon::fromTheme(u"document-export"_s));
     KStandardAction::quit(qApp, &QApplication::closeAllWindows, actions);
 
     QUndoStack *undoStack = m_editor->undoStack();
@@ -336,6 +343,7 @@ void MainWindow::setupActions()
             m_view->setZoom(1.0);
         },
         actions);
+    setupViewActions();
 
     const auto addInsert = [&](const QString &name, const QString &text, const QString &icon, ObjectFactory::Kind kind) {
         QAction *action = actions->addAction(name, this, [this, kind]() {
@@ -544,6 +552,11 @@ void MainWindow::setupFormatActions()
     m_underline = addStyle(u"format_underline"_s, i18n("Underline"), u"format-text-underline"_s, QKeySequence::Underline, &LabelFont::underline);
     m_strikeout = addStyle(u"format_strikeout"_s, i18n("Strikeout"), u"format-text-strikethrough"_s, QKeySequence(), &LabelFont::strikeout);
 
+    // White text on a black box, which DLS shows the same way (its colours).
+    m_inverted = new KToggleAction(QIcon::fromTheme(u"color-mode-invert-text"_s, QIcon::fromTheme(u"format-fill-color"_s)), i18n("White on Black"), this);
+    actions->addAction(u"format_inverted"_s, m_inverted);
+    connect(m_inverted, &QAction::triggered, this, &MainWindow::setSelectedInverted);
+
     const auto addAlignment = [&](const QString &name, const QString &text, const QString &icon, QActionGroup *group, auto apply) {
         auto *action = new KToggleAction(QIcon::fromTheme(icon), text, this);
         action->setActionGroup(group);
@@ -589,6 +602,60 @@ void MainWindow::setupFormatActions()
             setSelectedFitMode(TextFitMode::AlwaysFit);
         }),
     };
+}
+
+void MainWindow::setupViewActions()
+{
+    KActionCollection *actions = actionCollection();
+    KConfigGroup view = KSharedConfig::openConfig()->group(u"View"_s);
+
+    auto *showGrid = new KToggleAction(QIcon::fromTheme(u"view-grid"_s), i18n("Show &Grid"), this);
+    actions->addAction(u"view_show_grid"_s, showGrid);
+    actions->setDefaultShortcut(showGrid, QKeySequence(Qt::CTRL | Qt::Key_Apostrophe));
+    showGrid->setChecked(view.readEntry("ShowGrid", false));
+    m_view->setGridVisible(showGrid->isChecked());
+    connect(showGrid, &QAction::toggled, this, [this](bool on) {
+        m_view->setGridVisible(on);
+        KSharedConfig::openConfig()->group(u"View"_s).writeEntry("ShowGrid", on);
+    });
+
+    auto *snap = new KToggleAction(QIcon::fromTheme(u"snap-bounding-box"_s), i18n("&Snap to Grid"), this);
+    snap->setToolTip(i18n("Moving and resizing put edges on the grid. Hold Alt to place freely."));
+    actions->addAction(u"view_snap_grid"_s, snap);
+    actions->setDefaultShortcut(snap, QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_Apostrophe));
+    snap->setChecked(view.readEntry("SnapToGrid", false));
+    m_view->setSnapToGrid(snap->isChecked());
+    connect(snap, &QAction::toggled, this, [this](bool on) {
+        m_view->setSnapToGrid(on);
+        KSharedConfig::openConfig()->group(u"View"_s).writeEntry("SnapToGrid", on);
+    });
+
+    // In millimetres, like the rulers.
+    const QList<qreal> spacings = {0.5, 1, 2, 2.5, 5, 10};
+    auto *spacing = new KSelectAction(i18n("Grid S&pacing"), this);
+    actions->addAction(u"view_grid_spacing"_s, spacing);
+    for (const qreal mm : spacings) {
+        spacing->addAction(i18nc("grid spacing", "%1 mm", QLocale().toString(mm)));
+    }
+    const qreal chosen = view.readEntry("GridSpacingMm", 2.0);
+    const qsizetype index = spacings.indexOf(chosen);
+    spacing->setCurrentItem(int(index < 0 ? spacings.indexOf(2.0) : index));
+    m_view->setGridSpacing(Units::mmToTwips(spacings.at(spacing->currentItem())));
+    connect(spacing, &KSelectAction::indexTriggered, this, [this, spacings](int i) {
+        m_view->setGridSpacing(Units::mmToTwips(spacings.at(i)));
+        KSharedConfig::openConfig()->group(u"View"_s).writeEntry("GridSpacingMm", spacings.at(i));
+    });
+}
+
+void MainWindow::setSelectedInverted(bool inverted)
+{
+    const int index = m_editor->selection();
+    if (index < 0 || !ObjectFactory::canInvert(m_editor->document().objects.at(index))) {
+        return;
+    }
+    LabelDocument document = m_editor->document();
+    ObjectFactory::setInverted(document.objects[index], inverted);
+    m_editor->apply(document, inverted ? i18n("White on Black") : i18n("Black on White"));
 }
 
 void MainWindow::setSelectedFitMode(TextFitMode mode)
@@ -717,6 +784,10 @@ void MainWindow::updateFormatActions()
         m_underline->setChecked(font->underline);
         m_strikeout->setChecked(font->strikeout);
     }
+
+    const bool invertible = index >= 0 && ObjectFactory::canInvert(m_editor->document().objects.at(index));
+    m_inverted->setEnabled(invertible);
+    m_inverted->setChecked(invertible && ObjectFactory::isInverted(m_editor->document().objects.at(index)));
 
     std::optional<TextFitMode> fitMode;
     if (index >= 0) {
@@ -1316,53 +1387,65 @@ void MainWindow::rotateLabel()
     m_editor->apply(document, i18n("Rotate Label"));
 }
 
-void MainWindow::print()
+LabelPrinter::Options MainWindow::printOptions() const
 {
-    const QString printerName = m_printBar->printerName();
-    if (printerName.isEmpty()) {
-        KMessageBox::error(this, i18n("No printer was found. Connect a DYMO LabelWriter or add one in the system's printer settings first."));
-        return;
-    }
-    if (!confirmLabelFitsPrinter()) {
-        return;
-    }
-    LabelPrinter printer(printerName, m_printBar->printerDriver());
     LabelPrinter::Options options;
     // The printer's own calibration, in its directions, in points.
     options.offset = m_printBar->printOffsetMm() * 72.0 / Units::MmPerInch;
     options.copies = m_printBar->copies();
     options.printQuality = m_printBar->graphicsQuality() ? u"Graphics"_s : u"Text"_s;
     options.jobTitle = m_editor->fileName().isEmpty() ? i18n("Label") : QFileInfo(m_editor->fileName()).fileName();
+    return options;
+}
 
-    // One label per checked address, each with the address filled in.
-    QList<LabelDocument> labels;
-    if (m_printBar->printAddresses()) {
-        const LabelDocument document = m_editor->document();
-        const bool hasAddress = std::any_of(document.objects.cbegin(), document.objects.cend(), [](const LabelObject &object) {
-            return std::holds_alternative<AddressObject>(object);
-        });
-        if (!hasAddress) {
-            KMessageBox::error(this, i18n("To print the checked addresses, the label needs an address object."));
-            return;
-        }
-        for (const QString &address : m_sidebar->addressBook()->checkedAddresses()) {
-            LabelDocument label = document;
-            for (LabelObject &object : label.objects) {
-                if (auto *target = std::get_if<AddressObject>(&object)) {
-                    const TextSpan first = target->spans.isEmpty() ? TextSpan{QString(), LabelFont(), Qt::black} : target->spans.constFirst();
-                    target->spans = {{address, first.font, first.color}};
-                    target->fitLineFonts();
-                    break;
-                }
-            }
-            labels << label;
-        }
-    } else {
-        labels << m_editor->document();
+std::optional<QList<LabelDocument>> MainWindow::labelsToPrint()
+{
+    if (m_printBar->printerName().isEmpty()) {
+        KMessageBox::error(this, i18n("No printer was found. Connect a DYMO LabelWriter or add one in the system's printer settings first."));
+        return std::nullopt;
     }
+    if (!confirmLabelFitsPrinter()) {
+        return std::nullopt;
+    }
+    if (!m_printBar->printAddresses()) {
+        return QList<LabelDocument>{m_editor->document()};
+    }
+    // One label per checked address, each with the address filled in.
+    const LabelDocument document = m_editor->document();
+    const bool hasAddress = std::any_of(document.objects.cbegin(), document.objects.cend(), [](const LabelObject &object) {
+        return std::holds_alternative<AddressObject>(object);
+    });
+    if (!hasAddress) {
+        KMessageBox::error(this, i18n("To print the checked addresses, the label needs an address object."));
+        return std::nullopt;
+    }
+    QList<LabelDocument> labels;
+    for (const QString &address : m_sidebar->addressBook()->checkedAddresses()) {
+        LabelDocument label = document;
+        for (LabelObject &object : label.objects) {
+            if (auto *target = std::get_if<AddressObject>(&object)) {
+                const TextSpan first = target->spans.isEmpty() ? TextSpan{QString(), LabelFont(), Qt::black} : target->spans.constFirst();
+                target->spans = {{address, first.font, first.color}};
+                target->fitLineFonts();
+                break;
+            }
+        }
+        labels << label;
+    }
+    return labels;
+}
+
+void MainWindow::print()
+{
+    const auto labels = labelsToPrint();
+    if (!labels) {
+        return;
+    }
+    const QString printerName = m_printBar->printerName();
+    LabelPrinter printer(printerName, m_printBar->printerDriver());
 
     QApplication::setOverrideCursor(Qt::WaitCursor);
-    const int job = printer.print(labels, options);
+    const int job = printer.print(*labels, printOptions());
     QApplication::restoreOverrideCursor();
 
     if (job == 0) {
@@ -1382,6 +1465,69 @@ void MainWindow::print()
         message += u' ' + i18np("Note: %2", "%1 notes, first: %2", printer.warnings().size(), printer.warnings().constFirst());
     }
     statusBar()->showMessage(message, 10000);
+}
+
+void MainWindow::printPreview()
+{
+    const auto labels = labelsToPrint();
+    if (!labels) {
+        return;
+    }
+    LabelPrinter printer(m_printBar->printerName(), m_printBar->printerDriver());
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    const QList<QImage> pages = printer.pages(*labels, printOptions());
+    QApplication::restoreOverrideCursor();
+    if (pages.isEmpty()) {
+        KMessageBox::error(this, printer.errorString());
+        return;
+    }
+    PrintPreviewDialog dialog(pages, printer.resolution(), m_printBar->printerName(), printer.warnings(), this);
+    if (dialog.exec() == QDialog::Accepted) {
+        print();
+    }
+}
+
+void MainWindow::exportLabel()
+{
+    const QString pdfFilter = i18n("PDF document (*.pdf)");
+    const QString pngFilter = i18n("PNG image at the printer's resolution (*.png)");
+    QString filter = pdfFilter;
+    const QString base = m_editor->fileName().isEmpty() ? i18n("Label") : QFileInfo(m_editor->fileName()).completeBaseName();
+    QString fileName = QFileDialog::getSaveFileName(this, i18n("Export Label"), base + u".pdf"_s, pdfFilter + u";;"_s + pngFilter, &filter);
+    if (fileName.isEmpty()) {
+        return;
+    }
+    const bool png = filter == pngFilter || fileName.endsWith(u".png"_s, Qt::CaseInsensitive);
+    if (QFileInfo(fileName).suffix().isEmpty()) {
+        fileName += png ? u".png"_s : u".pdf"_s;
+    }
+
+    // As on the canvas, tape laid out to its length; no outline, nothing
+    // that only shows on screen.
+    LabelDocument document = m_editor->document();
+    TapeLayout::layout(document);
+    LabelRenderer renderer(LabelRenderer::Mode::Print);
+    qreal dpi = 300;
+    if (!m_printBar->printerName().isEmpty()) {
+        LabelPrinter printer(m_printBar->printerName(), m_printBar->printerDriver());
+        if (printer.load()) {
+            dpi = printer.resolution();
+        }
+    }
+    renderer.setPrinterResolution(dpi);
+
+    bool saved = false;
+    if (png) {
+        const QImage image = renderer.renderImage(document, dpi);
+        saved = image.save(fileName, "PNG");
+    } else {
+        saved = renderer.writePdf(document, fileName, base);
+    }
+    if (!saved) {
+        KMessageBox::error(this, i18n("Could not write %1.", fileName));
+        return;
+    }
+    statusBar()->showMessage(i18n("Exported to %1.", fileName), 10000);
 }
 
 void MainWindow::openRecentLayout(const RecentLayout &layout)

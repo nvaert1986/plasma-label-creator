@@ -4,19 +4,26 @@
     SPDX-License-Identifier: CC0-1.0
 -->
 <!DOCTYPE gui>
-<gui name="plasma-label-creator" version="10"
+<gui name="plasma-label-creator" version="11"
      xmlns="http://www.kde.org/standards/kxmlgui/1.0"
      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
      xsi:schemaLocation="http://www.kde.org/standards/kxmlgui/1.0 http://www.kde.org/standards/kxmlgui/1.0/kxmlgui.xsd">
     <MenuBar>
         <Menu name="file">
             <Action name="layout_recent" append="open_merge"/>
+            <Action name="file_export" append="save_merge"/>
         </Menu>
         <Menu name="edit">
             <Action name="edit_delete" append="edit_paste_merge"/>
             <Action name="edit_duplicate" append="edit_paste_merge"/>
             <Separator append="edit_paste_merge"/>
             <Action name="edit_properties" append="edit_paste_merge"/>
+        </Menu>
+        <Menu name="view">
+            <Separator/>
+            <Action name="view_show_grid"/>
+            <Action name="view_snap_grid"/>
+            <Action name="view_grid_spacing"/>
         </Menu>
         <Menu name="format">
             <text>F&amp;ormat</text>
@@ -29,6 +36,7 @@
             <Action name="format_italic"/>
             <Action name="format_underline"/>
             <Action name="format_strikeout"/>
+            <Action name="format_inverted"/>
             <Separator/>
             <Menu name="format_horizontal" icon="format-justify-left">
                 <text>&amp;Horizontal Alignment</text>
@@ -140,6 +148,7 @@
         <Action name="format_italic"/>
         <Action name="format_underline"/>
         <Action name="format_strikeout"/>
+        <Action name="format_inverted"/>
         <Separator/>
         <Action name="format_align_left"/>
         <Action name="format_align_center"/>

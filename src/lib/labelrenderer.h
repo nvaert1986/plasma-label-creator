@@ -53,6 +53,12 @@ public:
     /** Renders the whole label at @p dpi. */
     QImage renderImage(const LabelDocument &document, qreal dpi);
 
+    /**
+     * Writes the label as a one-page PDF of its own size, as on the canvas,
+     * in vectors (text stays text). False if the file cannot be written.
+     */
+    bool writePdf(const LabelDocument &document, const QString &fileName, const QString &title = {});
+
     /** Problems found while drawing the last label, such as invalid barcode data. */
     QStringList warnings() const;
 

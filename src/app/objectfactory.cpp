@@ -217,4 +217,55 @@ LabelDocument newLabel(const QString &paperName, const QString &id, const QSizeF
     return document;
 }
 
+bool canInvert(const LabelObject &object)
+{
+    return std::holds_alternative<TextObject>(object) || std::holds_alternative<AddressObject>(object) || std::holds_alternative<CounterObject>(object)
+        || std::holds_alternative<DateTimeObject>(object) || std::holds_alternative<CircularTextObject>(object);
+}
+
+bool isInverted(const LabelObject &object)
+{
+    if (!canInvert(object)) {
+        return false;
+    }
+    const ObjectBase &base = objectBase(object);
+    if (base.backColor != QColor(Qt::black)) {
+        return false;
+    }
+    // Text and addresses colour their text per run; the others use the
+    // object's colour.
+    if (const auto *text = std::get_if<TextObject>(&object)) {
+        return std::all_of(text->spans.cbegin(), text->spans.cend(), [](const TextSpan &span) {
+            return span.color == QColor(Qt::white);
+        });
+    }
+    if (const auto *address = std::get_if<AddressObject>(&object)) {
+        return std::all_of(address->spans.cbegin(), address->spans.cend(), [](const TextSpan &span) {
+            return span.color == QColor(Qt::white);
+        });
+    }
+    return base.foreColor == QColor(Qt::white);
+}
+
+void setInverted(LabelObject &object, bool inverted)
+{
+    if (!canInvert(object)) {
+        return;
+    }
+    const QColor text = inverted ? QColor(Qt::white) : QColor(Qt::black);
+    ObjectBase &base = objectBase(object);
+    base.backColor = inverted ? QColor(Qt::black) : QColor(255, 255, 255, 0);
+    base.foreColor = text;
+    std::visit(
+        [&text](auto &o) {
+            using T = std::decay_t<decltype(o)>;
+            if constexpr (std::is_same_v<T, TextObject> || std::is_same_v<T, AddressObject>) {
+                for (TextSpan &span : o.spans) {
+                    span.color = text;
+                }
+            }
+        },
+        object);
+}
+
 } // namespace ObjectFactory

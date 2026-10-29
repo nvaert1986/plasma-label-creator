@@ -11,7 +11,9 @@
 
 #include <QFontMetricsF>
 #include <QHash>
+#include <QPageSize>
 #include <QPainter>
+#include <QPdfWriter>
 
 #include <functional>
 
@@ -48,7 +50,9 @@ const BarcodeType *barcodeType(const QString &type)
 {
     // The "Lib" variants are library-binding layouts of Code 39 and Codabar.
     // Code128Ean is DLS's "UCC/EAN 128": Code 128 with a leading FNC1.
-    // Not supported yet: the US postal codes Postnet, Planet and IMail.
+    // Postnet, Planet and IMail are DLS's names for the US postal codes; the
+    // types after them are this program's own, beyond what DLS offers, and
+    // their widths follow the nearest DLS type.
     static const QHash<QString, BarcodeType> types = {
         {u"code39"_s, {Barcode::Symbology::Code39, 0.011, 0.022, 2.0, {0.9, 0.95, 0.9}}},
         {u"code39cs"_s, {Barcode::Symbology::Code39WithCheckDigit, 0.011, 0.022, 2.0, {0.9, 0.95, 0.9}}},
@@ -70,6 +74,27 @@ const BarcodeType *barcodeType(const QString &type)
         {u"itf14"_s, {Barcode::Symbology::Itf14, 0.025, 0.05, 2.2, {0.75, 0.8, 0.75}}},
         {u"pdf417"_s, {Barcode::Symbology::Pdf417, 0.012, 0.0215, 1.0, {1.0, 1.0, 1.0}}},
         {u"qrcode"_s, {Barcode::Symbology::QrCode, 0.012, 0.0215, 1.0, {1.0, 1.0, 1.0}}},
+        {u"postnet"_s, {Barcode::Symbology::Postnet, 0.02, 0.025, 1.0, {1.0, 1.0, 1.0}}},
+        {u"planet"_s, {Barcode::Symbology::Planet, 0.02, 0.025, 1.0, {1.0, 1.0, 1.0}}},
+        {u"imail"_s, {Barcode::Symbology::UspsIntelligentMail, 0.02, 0.025, 1.0, {1.0, 1.0, 1.0}}},
+        {u"datamatrix"_s, {Barcode::Symbology::DataMatrix, 0.012, 0.0215, 1.0, {1.0, 1.0, 1.0}}},
+        {u"aztec"_s, {Barcode::Symbology::Aztec, 0.012, 0.0215, 1.0, {1.0, 1.0, 1.0}}},
+        {u"maxicode"_s, {Barcode::Symbology::MaxiCode, 0.012, 0.0215, 1.0, {1.0, 1.0, 1.0}}},
+        {u"microqrcode"_s, {Barcode::Symbology::MicroQr, 0.012, 0.0215, 1.0, {1.0, 1.0, 1.0}}},
+        {u"code93"_s, {Barcode::Symbology::Code93, 0.015, 0.025, 1.0, {0.75, 0.9, 0.8}}},
+        {u"code11"_s, {Barcode::Symbology::Code11, 0.015, 0.025, 1.0, {0.75, 0.9, 0.8}}},
+        {u"msiplessey"_s, {Barcode::Symbology::MsiPlessey, 0.015, 0.025, 1.0, {0.75, 0.9, 0.8}}},
+        {u"pharmacode"_s, {Barcode::Symbology::Pharmacode, 0.015, 0.025, 1.0, {0.75, 0.9, 0.8}}},
+        {u"gs1_128"_s, {Barcode::Symbology::Gs1_128, 0.015, 0.025, 1.0, {0.6, 0.8, 0.8}}},
+        {u"gs1datamatrix"_s, {Barcode::Symbology::Gs1DataMatrix, 0.012, 0.0215, 1.0, {1.0, 1.0, 1.0}}},
+        {u"gs1databar"_s, {Barcode::Symbology::Gs1DataBarOmni, 0.015, 0.025, 1.0, {0.75, 0.9, 0.8}}},
+        {u"gs1databarexpanded"_s, {Barcode::Symbology::Gs1DataBarExpanded, 0.015, 0.025, 1.0, {0.75, 0.9, 0.8}}},
+        {u"hibc128"_s, {Barcode::Symbology::Hibc128, 0.015, 0.025, 1.0, {0.75, 0.9, 0.8}}},
+        {u"hibc39"_s, {Barcode::Symbology::Hibc39, 0.011, 0.022, 1.0, {0.9, 0.95, 0.9}}},
+        {u"hibcdatamatrix"_s, {Barcode::Symbology::HibcDataMatrix, 0.012, 0.0215, 1.0, {1.0, 1.0, 1.0}}},
+        {u"hibcqrcode"_s, {Barcode::Symbology::HibcQrCode, 0.012, 0.0215, 1.0, {1.0, 1.0, 1.0}}},
+        {u"kix"_s, {Barcode::Symbology::Kix, 0.02, 0.025, 1.0, {1.0, 1.0, 1.0}}},
+        {u"royalmail"_s, {Barcode::Symbology::RoyalMail4State, 0.02, 0.025, 1.0, {1.0, 1.0, 1.0}}},
     };
     const auto it = types.constFind(type.toLower());
     return it == types.constEnd() ? nullptr : &*it;
@@ -318,6 +343,28 @@ QImage LabelRenderer::renderImage(const LabelDocument &original, qreal dpi)
     painter.scale(Units::twipsToDots(1.0, dpi), Units::twipsToDots(1.0, dpi));
     paint(&painter, document);
     return image;
+}
+
+bool LabelRenderer::writePdf(const LabelDocument &original, const QString &fileName, const QString &title)
+{
+    // A tape label's length follows its content: lay it out to size the page.
+    LabelDocument document = original;
+    TapeLayout::layout(document);
+    const QSizeF canvas = document.canvasSize();
+    QPdfWriter writer(fileName);
+    writer.setTitle(title);
+    writer.setCreator(u"Plasma Label Creator"_s);
+    writer.setResolution(1200);
+    writer.setPageMargins(QMarginsF());
+    writer.setPageSize(QPageSize(QSizeF(Units::twipsToMm(canvas.width()), Units::twipsToMm(canvas.height())), QPageSize::Millimeter, title, QPageSize::ExactMatch));
+    QPainter painter;
+    if (!painter.begin(&writer)) {
+        return false;
+    }
+    const qreal scale = writer.resolution() / Units::TwipsPerInch;
+    painter.scale(scale, scale);
+    paint(&painter, document);
+    return painter.end();
 }
 
 void LabelRenderer::paint(QPainter *painter, const LabelDocument &laidOut)
@@ -614,7 +661,13 @@ void LabelRenderer::paintBarcode(QPainter *painter, const BarcodeObject &object,
     if (textHeight > 0 && !symbol.isEmpty()) {
         const qreal y = object.textPosition == BarcodeTextPosition::Top ? symbol.top() - textHeight : symbol.bottom();
         painter->setPen(object.foreColor);
-        painter->drawText(QRectF(symbol.left(), y, symbol.width(), textHeight), Qt::AlignHCenter | Qt::AlignTop | Qt::TextDontClip, object.text);
+        // GS1 data is typed with its application identifiers in square
+        // brackets; the human-readable line shows them in round ones.
+        QString text = object.text;
+        if (Barcode::takesGs1Data(type->symbology)) {
+            text.replace(u'[', u'(').replace(u']', u')');
+        }
+        painter->drawText(QRectF(symbol.left(), y, symbol.width(), textHeight), Qt::AlignHCenter | Qt::AlignTop | Qt::TextDontClip, text);
     }
     painter->restore();
 }

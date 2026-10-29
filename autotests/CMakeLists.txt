@@ -39,6 +39,7 @@ if(BUILD_APP)
         ${CMAKE_SOURCE_DIR}/src/app/labeleditor.cpp
         ${CMAKE_SOURCE_DIR}/src/app/labelview.cpp
         ${CMAKE_SOURCE_DIR}/src/app/objectfactory.cpp
+        ${CMAKE_SOURCE_DIR}/src/app/printpreviewdialog.cpp
         LINK_LIBRARIES labelcreatorcore Qt6::Test Qt6::Widgets KF6::I18n
         TEST_NAME labeleditortest)
     target_include_directories(labeleditortest PRIVATE ${CMAKE_SOURCE_DIR}/src/app)

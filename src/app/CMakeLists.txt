@@ -30,6 +30,7 @@ add_executable(plasma-label-creator
     objectfactory.cpp
     objectfactory.h
     printbar.cpp
+    printpreviewdialog.cpp
     printbar.h
     printersetup.cpp
     printersetup.h

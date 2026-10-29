@@ -131,7 +131,8 @@ private:
     QCheckBox *m_underline;
 };
 
-// The barcode types DLS offers, under the names DLS shows.
+// The barcode types DLS offers, under the names DLS shows, then the ones
+// this program adds (DLS does not know those).
 const QList<std::pair<QString, QString>> &barcodeTypes()
 {
     static const QList<std::pair<QString, QString>> types = {
@@ -151,6 +152,27 @@ const QList<std::pair<QString, QString>> &barcodeTypes()
         {u"Itf14"_s, u"ITF-14"_s},
         {u"Pdf417"_s, u"PDF417"_s},
         {u"QRCode"_s, u"QR Code"_s},
+        {u"Postnet"_s, u"POSTNET (US)"_s},
+        {u"Planet"_s, u"PLANET (US)"_s},
+        {u"IMail"_s, u"Intelligent Mail (US)"_s},
+        {u"DataMatrix"_s, u"Data Matrix"_s},
+        {u"Aztec"_s, u"Aztec Code"_s},
+        {u"MaxiCode"_s, u"MaxiCode"_s},
+        {u"MicroQRCode"_s, u"Micro QR Code"_s},
+        {u"Code93"_s, u"Code 93"_s},
+        {u"Code11"_s, u"Code 11"_s},
+        {u"MsiPlessey"_s, u"MSI Plessey"_s},
+        {u"Pharmacode"_s, u"Pharmacode"_s},
+        {u"GS1_128"_s, u"GS1-128 ([AI] data)"_s},
+        {u"GS1DataMatrix"_s, u"GS1 Data Matrix ([AI] data)"_s},
+        {u"GS1DataBar"_s, u"GS1 DataBar Omnidirectional"_s},
+        {u"GS1DataBarExpanded"_s, u"GS1 DataBar Expanded ([AI] data)"_s},
+        {u"HIBC128"_s, u"HIBC Code 128"_s},
+        {u"HIBC39"_s, u"HIBC Code 39"_s},
+        {u"HIBCDataMatrix"_s, u"HIBC Data Matrix"_s},
+        {u"HIBCQRCode"_s, u"HIBC QR Code"_s},
+        {u"KIX"_s, u"KIX (PostNL)"_s},
+        {u"RoyalMail"_s, u"Royal Mail 4-State (RM4SCC)"_s},
     };
     return types;
 }

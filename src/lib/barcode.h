@@ -60,6 +60,29 @@ public:
         QrCode,
         DataMatrix,
         Pdf417,
+        // Beyond what DLS offers; DLS shows these as an unknown type.
+        Aztec,
+        MaxiCode,
+        MicroQr,
+        Code93,
+        Code11,
+        MsiPlessey,
+        Pharmacode,
+        /** GS1 data with application identifiers in brackets: "[01]09501101530003[17]251231". */
+        Gs1_128,
+        Gs1DataMatrix,
+        Gs1DataBarOmni,
+        Gs1DataBarExpanded,
+        Hibc128,
+        Hibc39,
+        HibcDataMatrix,
+        HibcQrCode,
+        // Postal codes. DLS has Postnet, Planet and IMail too.
+        Postnet,
+        Planet,
+        UspsIntelligentMail,
+        Kix,
+        RoyalMail4State,
     };
 
     Barcode(Symbology symbology, const QString &data);
@@ -114,6 +137,8 @@ public:
 
     static bool isTwoDimensional(Symbology symbology);
     static bool hasTwoWidths(Symbology symbology);
+    /** Whether the data is GS1 element strings with bracketed application identifiers. */
+    static bool takesGs1Data(Symbology symbology);
 
 private:
     // A bar or space of a symbology Plasma Label Creator encodes itself.

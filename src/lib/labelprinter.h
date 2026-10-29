@@ -219,6 +219,15 @@ public:
                              const QDateTime &when = {},
                              const QPointF &offset = {});
 
+    /**
+     * The pages print() would send for @p labels: one per label printed, as
+     * they feed through the printer, with counters advancing. Empty, with
+     * errorString() set, if the printer has no paper for the label.
+     */
+    QList<QImage> pages(const QList<LabelDocument> &labels, const Options &options);
+    /** The paper pages() and print() use for @p document. */
+    std::optional<PaperSize> paperOf(const LabelDocument &document);
+
     /** Writes @p page @p copies times as 1-bit CUPS raster to @p fd. */
     static bool writeRaster(int fd, const QImage &page, int copies, const PaperSize &paper, qreal dpi, QString *errorString = nullptr);
     /** Writes @p pages as 1-bit CUPS raster to @p fd. */

@@ -62,6 +62,18 @@ public:
     void setPrintArea(const QRectF &area);
     QRectF printArea() const;
 
+    /** Dots over the label at every grid point. */
+    void setGridVisible(bool visible);
+    bool isGridVisible() const;
+    /** Moving and resizing put edges on the grid; holding Alt places freely. */
+    void setSnapToGrid(bool snap);
+    bool snapsToGrid() const;
+    /** The grid's spacing in twips. */
+    void setGridSpacing(qreal twips);
+    qreal gridSpacing() const;
+    /** @p value on the nearest multiple of @p spacing. */
+    static qreal snapped(qreal value, qreal spacing);
+
 Q_SIGNALS:
     void editObjectRequested(int index);
     void contextMenuRequested(const QPoint &globalPos);
@@ -128,6 +140,9 @@ private:
     bool m_dragMoved = false;
 
     QRectF m_printArea;
+    bool m_gridVisible = false;
+    bool m_snapToGrid = false;
+    qreal m_gridSpacing = 113.385826771653543; // twips, 2 mm
     QPointer<InlineTextEditor> m_textEditor;
     int m_textEditIndex = -1;
     // The object's name, to find it again when objects are reordered meanwhile.

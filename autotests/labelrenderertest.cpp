@@ -8,6 +8,10 @@
 #include "tapelayout.h"
 #include "units.h"
 
+#include <QBuffer>
+#include <QFile>
+#include <QRegularExpression>
+#include <QTemporaryDir>
 #include <QFontMetricsF>
 #include <QTest>
 
@@ -286,6 +290,76 @@ private Q_SLOTS:
             }
         }
         QCOMPARE(*std::min_element(runs.cbegin(), runs.cend()), narrow);
+    }
+
+    void moreBarcodeTypesDraw_data()
+    {
+        QTest::addColumn<QString>("type");
+        QTest::addColumn<QString>("text");
+        // DLS's US postal codes, then the types beyond DLS.
+        QTest::newRow("postnet") << u"Postnet"_s << u"12345678901"_s;
+        QTest::newRow("planet") << u"Planet"_s << u"12345678901"_s;
+        QTest::newRow("imail") << u"IMail"_s << u"01234567094987654321-01234567891"_s;
+        QTest::newRow("datamatrix") << u"DataMatrix"_s << u"SRV-HV01"_s;
+        QTest::newRow("aztec") << u"Aztec"_s << u"SRV-HV01"_s;
+        QTest::newRow("maxicode") << u"MaxiCode"_s << u"SRV-HV01"_s;
+        QTest::newRow("micro qr") << u"MicroQRCode"_s << u"12345"_s;
+        QTest::newRow("code93") << u"Code93"_s << u"SRV-HV01"_s;
+        QTest::newRow("code11") << u"Code11"_s << u"123-45"_s;
+        QTest::newRow("msi") << u"MsiPlessey"_s << u"123456"_s;
+        QTest::newRow("pharmacode") << u"Pharmacode"_s << u"1234"_s;
+        QTest::newRow("gs1-128") << u"GS1_128"_s << u"[01]09501101530003[17]251231"_s;
+        QTest::newRow("gs1 datamatrix") << u"GS1DataMatrix"_s << u"[01]09501101530003[21]SERIAL1"_s;
+        QTest::newRow("gs1 databar") << u"GS1DataBar"_s << u"0950110153000"_s;
+        QTest::newRow("gs1 databar expanded") << u"GS1DataBarExpanded"_s << u"[01]09501101530003[3103]000123"_s;
+        QTest::newRow("hibc128") << u"HIBC128"_s << u"A123BJC5D6E71"_s;
+        QTest::newRow("hibc39") << u"HIBC39"_s << u"A123BJC5D6E71"_s;
+        QTest::newRow("hibc datamatrix") << u"HIBCDataMatrix"_s << u"A123BJC5D6E71"_s;
+        QTest::newRow("hibc qr") << u"HIBCQRCode"_s << u"A123BJC5D6E71"_s;
+        QTest::newRow("kix") << u"KIX"_s << u"2500GG30250"_s;
+        QTest::newRow("royal mail") << u"RoyalMail"_s << u"LE28HS9Z"_s;
+    }
+
+    void moreBarcodeTypesDraw()
+    {
+        QFETCH(QString, type);
+        QFETCH(QString, text);
+        BarcodeObject barcode = barcodeObject(type, text, BarcodeSize::Medium);
+        barcode.textPosition = BarcodeTextPosition::None;
+        const LabelDocument document = singleObject(barcode, QSizeF(6480, 1800));
+        LabelRenderer renderer(LabelRenderer::Mode::Print);
+        const QImage image = renderer.renderImage(document, Dpi);
+        QVERIFY2(renderer.warnings().isEmpty(), qPrintable(renderer.warnings().join(u'\n')));
+        QVERIFY(!inkBounds(image).isEmpty());
+
+        // The type is kept as written in the file.
+        LabelReader reader;
+        QBuffer buffer;
+        buffer.setData(LabelWriter::toByteArray(document));
+        buffer.open(QIODevice::ReadOnly);
+        const auto reread = reader.read(&buffer);
+        QVERIFY(reread);
+        QCOMPARE(std::get_if<BarcodeObject>(&reread->objects.constFirst())->type, type);
+    }
+
+    void writesAPdfOfTheLabelsSize()
+    {
+        QTemporaryDir dir;
+        const QString fileName = dir.filePath(u"label.pdf"_s);
+        LabelRenderer renderer(LabelRenderer::Mode::Print);
+        QVERIFY(renderer.writePdf(readFixture(u"address.label"_s), fileName, u"Address"_s));
+        QFile file(fileName);
+        QVERIFY(file.open(QIODevice::ReadOnly));
+        const QByteArray pdf = file.readAll();
+        QVERIFY(pdf.startsWith("%PDF-"));
+        // 30252 Address on screen: 5040 x 1581 twips is 252 x 79.05 points.
+        const QRegularExpression mediaBox(u"/MediaBox \\[0 0 ([\\d.]+) ([\\d.]+)\\]"_s);
+        const QRegularExpressionMatch match = mediaBox.match(QString::fromLatin1(pdf));
+        QVERIFY2(match.hasMatch(), "no MediaBox");
+        QVERIFY(qAbs(match.captured(1).toDouble() - 252) < 0.5);
+        QVERIFY(qAbs(match.captured(2).toDouble() - 79.05) < 0.5);
+        // The text stays text, not an image.
+        QVERIFY(!pdf.contains("/Subtype /Image"));
     }
 
     void barcodeTextUsesTheObjectFont_data()

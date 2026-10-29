@@ -107,6 +107,18 @@ private:
     void changePaper(const LabelCreator::PaperSize &paper);
     void rotateLabel();
     void print();
+    /** Shows the pages print() would send, and prints them if asked. */
+    void printPreview();
+    /** Saves the label as a PDF (vector, for sharing) or a PNG at the printer's resolution. */
+    void exportLabel();
+    /**
+     * The labels print() sends: the label, or one per checked address.
+     * Empty, with the reason shown, when there is nothing to print.
+     */
+    std::optional<QList<LabelCreator::LabelDocument>> labelsToPrint();
+    LabelCreator::LabelPrinter::Options printOptions() const;
+    void setupViewActions();
+    void setSelectedInverted(bool inverted);
     /** Asks for the selected printer's print offset, in on-screen terms for the current label. */
     void editPrintOffset();
     void openRecentLayout(const LabelCreator::RecentLayout &layout);
@@ -127,6 +139,7 @@ private:
     KToggleAction *m_italic = nullptr;
     KToggleAction *m_underline = nullptr;
     KToggleAction *m_strikeout = nullptr;
+    KToggleAction *m_inverted = nullptr;
     QList<KToggleAction *> m_fitModes; // none, shrink to fit, always fit
     KToggleAction *m_portrait = nullptr;
     KToggleAction *m_landscape = nullptr;

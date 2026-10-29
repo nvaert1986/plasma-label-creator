@@ -561,24 +561,29 @@ int LabelPrinter::print(const LabelDocument &document, const Options &options)
     return print(QList<LabelDocument>{document}, options);
 }
 
-int LabelPrinter::print(const QList<LabelDocument> &labels, const Options &options)
+std::optional<PaperSize> LabelPrinter::paperOf(const LabelDocument &document)
 {
-    m_errorString.clear();
-    m_warnings.clear();
-    m_printedLabels = 0;
-    if (labels.isEmpty()) {
-        m_errorString = u"Nothing to print"_s;
-        return 0;
-    }
     if (!m_loaded && !load()) {
-        return 0;
+        return std::nullopt;
     }
-
-    const LabelDocument &document = labels.constFirst();
     const auto paper = paperFor(document);
     if (!paper) {
         m_errorString = u"%1 has no paper size for \"%2\""_s.arg(m_printerName, document.paperName);
-        return 0;
+    }
+    return paper;
+}
+
+QList<QImage> LabelPrinter::pages(const QList<LabelDocument> &labels, const Options &options)
+{
+    m_errorString.clear();
+    m_warnings.clear();
+    if (labels.isEmpty()) {
+        m_errorString = u"Nothing to print"_s;
+        return {};
+    }
+    const auto paper = paperOf(labels.constFirst());
+    if (!paper) {
+        return {};
     }
 
     // One page per label printed. Labels without counters look the same in
@@ -608,6 +613,17 @@ int LabelPrinter::print(const QList<LabelDocument> &labels, const Options &optio
             pages << page;
         }
     }
+    return pages;
+}
+
+int LabelPrinter::print(const QList<LabelDocument> &labels, const Options &options)
+{
+    m_printedLabels = 0;
+    const QList<QImage> pages = this->pages(labels, options);
+    if (pages.isEmpty()) {
+        return 0;
+    }
+    const auto paper = paperFor(labels.constFirst());
 
     char fileName[1024];
     const int fd = cupsTempFd(fileName, sizeof(fileName));
@@ -637,7 +653,7 @@ int LabelPrinter::print(const QList<LabelDocument> &labels, const Options &optio
         optionCount = cupsAddOption("DymoHalftoning", "Default", optionCount, &cupsOptions);
     }
 
-    const QByteArray title = (options.jobTitle.isEmpty() ? document.paperName : options.jobTitle).toUtf8();
+    const QByteArray title = (options.jobTitle.isEmpty() ? labels.constFirst().paperName : options.jobTitle).toUtf8();
     if (!m_driver.isEmpty()) {
         cupsFreeOptions(optionCount, cupsOptions);
         const int job = sendThroughLocalDriver(QString::fromLocal8Bit(fileName), *paper, options, title);

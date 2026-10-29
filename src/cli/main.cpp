@@ -110,7 +110,7 @@ int main(int argc, char *argv[])
                        queueOption,
                        zplInfoOption});
     parser.addPositionalArgument(u"input"_s, u"The .label file."_s);
-    parser.addPositionalArgument(u"output"_s, u"The image to write, for example label.png."_s, u"[output]"_s);
+    parser.addPositionalArgument(u"output"_s, u"The image to write, for example label.png, or label.pdf for a PDF."_s, u"[output]"_s);
     parser.process(app);
 
     QTextStream out(stdout);
@@ -257,7 +257,18 @@ int main(int argc, char *argv[])
         }
     }
 
-    if (arguments.size() == 2) {
+    if (arguments.size() == 2 && arguments.at(1).endsWith(u".pdf"_s, Qt::CaseInsensitive)) {
+        // A PDF is the label as it is, without the outline: always print mode.
+        LabelRenderer renderer(LabelRenderer::Mode::Print);
+        renderer.setPrinterResolution(dpi);
+        if (!renderer.writePdf(*document, arguments.at(1), QFileInfo(arguments.at(0)).completeBaseName())) {
+            err << arguments.at(1) << ": could not write the PDF\n";
+            return 3;
+        }
+        for (const QString &warning : renderer.warnings()) {
+            err << "warning: " << warning << '\n';
+        }
+    } else if (arguments.size() == 2) {
         LabelRenderer renderer(parser.isSet(printOption) ? LabelRenderer::Mode::Print : LabelRenderer::Mode::Preview);
         const QImage image = renderer.renderImage(*document, dpi);
         for (const QString &warning : renderer.warnings()) {

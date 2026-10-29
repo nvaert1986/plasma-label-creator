@@ -66,6 +66,27 @@ private Q_SLOTS:
         QTest::newRow("qr") << Barcode::Symbology::QrCode << u"https://example.org/ünïcode"_s;
         QTest::newRow("datamatrix") << Barcode::Symbology::DataMatrix << u"LABELCREATOR"_s;
         QTest::newRow("pdf417") << Barcode::Symbology::Pdf417 << u"LABELCREATOR"_s;
+        // Beyond DLS's set.
+        QTest::newRow("aztec") << Barcode::Symbology::Aztec << u"LABELCREATOR"_s;
+        QTest::newRow("maxicode") << Barcode::Symbology::MaxiCode << u"LABELCREATOR"_s;
+        QTest::newRow("microqr") << Barcode::Symbology::MicroQr << u"12345"_s;
+        QTest::newRow("code93") << Barcode::Symbology::Code93 << u"LABEL-93"_s;
+        QTest::newRow("code11") << Barcode::Symbology::Code11 << u"123-45"_s;
+        QTest::newRow("msi") << Barcode::Symbology::MsiPlessey << u"123456"_s;
+        QTest::newRow("pharmacode") << Barcode::Symbology::Pharmacode << u"1234"_s;
+        QTest::newRow("gs1-128") << Barcode::Symbology::Gs1_128 << u"[01]09501101530003[17]251231[10]ABC123"_s;
+        QTest::newRow("gs1 datamatrix") << Barcode::Symbology::Gs1DataMatrix << u"[01]09501101530003[21]SERIAL1"_s;
+        QTest::newRow("gs1 databar") << Barcode::Symbology::Gs1DataBarOmni << u"0950110153000"_s;
+        QTest::newRow("gs1 databar expanded") << Barcode::Symbology::Gs1DataBarExpanded << u"[01]09501101530003[3103]000123"_s;
+        QTest::newRow("hibc128") << Barcode::Symbology::Hibc128 << u"A123BJC5D6E71"_s;
+        QTest::newRow("hibc39") << Barcode::Symbology::Hibc39 << u"A123BJC5D6E71"_s;
+        QTest::newRow("hibc datamatrix") << Barcode::Symbology::HibcDataMatrix << u"A123BJC5D6E71"_s;
+        QTest::newRow("hibc qr") << Barcode::Symbology::HibcQrCode << u"A123BJC5D6E71"_s;
+        QTest::newRow("postnet") << Barcode::Symbology::Postnet << u"12345678901"_s;
+        QTest::newRow("planet") << Barcode::Symbology::Planet << u"12345678901"_s;
+        QTest::newRow("intelligent mail") << Barcode::Symbology::UspsIntelligentMail << u"01234567094987654321-01234567891"_s;
+        QTest::newRow("kix") << Barcode::Symbology::Kix << u"2500GG30250"_s;
+        QTest::newRow("royal mail") << Barcode::Symbology::RoyalMail4State << u"LE28HS9Z"_s;
     }
 
     void encodesValidData()
@@ -182,6 +203,33 @@ private Q_SLOTS:
         QVERIFY(!barcode.encode());
         QVERIFY(!barcode.isValid());
         QVERIFY(!barcode.errorString().isEmpty());
+    }
+
+    void rejectsGs1DataWithoutApplicationIdentifiers()
+    {
+        // GS1 data names each field: "[01]..." rather than bare digits.
+        Barcode barcode(Barcode::Symbology::Gs1_128, u"09501101530003"_s);
+        QVERIFY(!barcode.encode());
+        QVERIFY(!barcode.errorString().isEmpty());
+    }
+
+    void dataMatrixIsSquare()
+    {
+        // Data that fits a smaller rectangular symbol still gets a square one.
+        for (const auto symbology : {Barcode::Symbology::DataMatrix, Barcode::Symbology::Gs1DataMatrix}) {
+            Barcode barcode(symbology, symbology == Barcode::Symbology::DataMatrix ? u"ABCDEFGHIJKLMNOPQRS"_s : u"[01]09501101530003[21]SN42"_s);
+            QVERIFY2(barcode.encode(), qPrintable(barcode.errorString()));
+            QCOMPARE(barcode.naturalSize().width(), barcode.naturalSize().height());
+        }
+    }
+
+    void newTwoDimensionalCodesKeepTheirShape()
+    {
+        for (const Barcode::Symbology symbology : {Barcode::Symbology::Aztec, Barcode::Symbology::MaxiCode, Barcode::Symbology::MicroQr}) {
+            QVERIFY(Barcode::isTwoDimensional(symbology));
+        }
+        QVERIFY(Barcode::takesGs1Data(Barcode::Symbology::Gs1DataMatrix));
+        QVERIFY(!Barcode::takesGs1Data(Barcode::Symbology::DataMatrix));
     }
 
     void changingTextVisibilityNeedsReencode()

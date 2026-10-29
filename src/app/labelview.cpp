@@ -20,11 +20,13 @@
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPainterPath>
+#include <QPolygonF>
 #include <QWheelEvent>
 
 #include <QtMath>
 
 #include <algorithm>
+#include <cmath>
 
 using namespace LabelCreator;
 
@@ -94,6 +96,43 @@ void LabelView::setPrintArea(const QRectF &area)
 QRectF LabelView::printArea() const
 {
     return m_printArea;
+}
+
+void LabelView::setGridVisible(bool visible)
+{
+    m_gridVisible = visible;
+    update();
+}
+
+bool LabelView::isGridVisible() const
+{
+    return m_gridVisible;
+}
+
+void LabelView::setSnapToGrid(bool snap)
+{
+    m_snapToGrid = snap;
+}
+
+bool LabelView::snapsToGrid() const
+{
+    return m_snapToGrid;
+}
+
+void LabelView::setGridSpacing(qreal twips)
+{
+    m_gridSpacing = std::max<qreal>(1, twips);
+    update();
+}
+
+qreal LabelView::gridSpacing() const
+{
+    return m_gridSpacing;
+}
+
+qreal LabelView::snapped(qreal value, qreal spacing)
+{
+    return spacing > 0 ? std::round(value / spacing) * spacing : value;
 }
 
 bool LabelView::isEditingText() const
@@ -335,6 +374,24 @@ void LabelView::paintEvent(QPaintEvent *)
     renderer.paint(&painter, document);
     painter.restore();
 
+    // A dot at every grid point; at small zoom levels only every few, so the
+    // dots stay apart.
+    if (m_gridVisible) {
+        qreal step = m_gridSpacing;
+        while (step * scale() < 6) {
+            step *= 2;
+        }
+        const QSizeF canvas = document.canvasSize();
+        QPolygonF points;
+        for (qreal y = 0; y <= canvas.height(); y += step) {
+            for (qreal x = 0; x <= canvas.width(); x += step) {
+                points << labelOrigin() + QPointF(x, y) * scale();
+            }
+        }
+        painter.setPen(QPen(QColor(0, 0, 0, 90), 1.5));
+        painter.drawPoints(points);
+    }
+
     // Only part of the label takes print (a wrap label's strip): shade the
     // rest, outline the part.
     if (!m_printArea.isEmpty()) {
@@ -461,6 +518,28 @@ void LabelView::mouseMoveEvent(QMouseEvent *event)
     case Left:
         bounds.setLeft(bounds.left() + delta.x());
         break;
+    }
+    // Edges that move go onto the grid; Alt places freely.
+    if (m_snapToGrid && !(event->modifiers() & Qt::AltModifier)) {
+        const auto snap = [this](qreal value) {
+            return snapped(value, m_gridSpacing);
+        };
+        if (m_dragHandle == NoHandle) {
+            bounds.moveTopLeft(QPointF(snap(bounds.left()), snap(bounds.top())));
+        } else {
+            if (m_dragHandle == TopLeft || m_dragHandle == Left || m_dragHandle == BottomLeft) {
+                bounds.setLeft(snap(bounds.left()));
+            }
+            if (m_dragHandle == TopRight || m_dragHandle == Right || m_dragHandle == BottomRight) {
+                bounds.setRight(snap(bounds.right()));
+            }
+            if (m_dragHandle == TopLeft || m_dragHandle == Top || m_dragHandle == TopRight) {
+                bounds.setTop(snap(bounds.top()));
+            }
+            if (m_dragHandle == BottomLeft || m_dragHandle == Bottom || m_dragHandle == BottomRight) {
+                bounds.setBottom(snap(bounds.bottom()));
+            }
+        }
     }
     bounds = bounds.normalized();
     // Objects already thinner than the minimum, such as lines, keep their

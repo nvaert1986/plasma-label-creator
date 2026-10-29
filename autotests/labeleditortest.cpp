@@ -10,13 +10,21 @@
 #include "labeleditor.h"
 #include "labelview.h"
 #include "objectfactory.h"
+#include "printpreviewdialog.h"
+#include "labelprinter.h"
+#include "labelrenderer.h"
+#include "units.h"
 
 #include <QDropEvent>
+#include <QLabel>
 #include <QLineEdit>
+#include <QPushButton>
 #include <QMimeData>
 #include <QSignalSpy>
 #include <QTemporaryDir>
 #include <QTest>
+
+#include <cmath>
 
 using namespace LabelCreator;
 using namespace Qt::Literals::StringLiterals;
@@ -158,6 +166,127 @@ private Q_SLOTS:
 
         editor.undoStack()->undo();
         QCOMPARE(objectBase(editor.document().objects.at(0)).bounds, before);
+    }
+
+    void dragSnapsToTheGrid()
+    {
+        LabelEditor editor;
+        editor.reset(addressLabel());
+        LabelView view(&editor);
+        view.resize(800, 400);
+        view.show();
+        QVERIFY(QTest::qWaitForWindowExposed(&view));
+        view.setZoom(1.0);
+        const qreal grid = Units::mmToTwips(2);
+        view.setGridSpacing(grid);
+        view.setSnapToGrid(true);
+
+        const QRectF before = objectBase(editor.document().objects.at(0)).bounds;
+        const QPoint start = (view.labelOrigin() + before.center() * view.scale()).toPoint();
+        QTest::mousePress(&view, Qt::LeftButton, {}, start);
+        QTest::mouseMove(&view, start + QPoint(20, 0));
+        QTest::mouseMove(&view, start + QPoint(37, 11));
+        QTest::mouseRelease(&view, Qt::LeftButton, {}, start + QPoint(37, 11));
+
+        // The top-left corner lands on the grid; the size stays.
+        const QRectF after = objectBase(editor.document().objects.at(0)).bounds;
+        QCOMPARE(after.size(), before.size());
+        QVERIFY(qAbs(std::remainder(after.x(), grid)) < 0.01);
+        QVERIFY(qAbs(std::remainder(after.y(), grid)) < 0.01);
+        QVERIFY(after.x() > before.x());
+
+        QCOMPARE(LabelView::snapped(130, 100), 100.0);
+        QCOMPARE(LabelView::snapped(-60, 100), -100.0);
+        QCOMPARE(LabelView::snapped(42, 0), 42.0);
+    }
+
+    void textPrintsWhiteOnBlack()
+    {
+        LabelDocument document = addressLabel();
+        LabelObject &text = document.objects[0];
+        QVERIFY(std::holds_alternative<TextObject>(text));
+        QVERIFY(ObjectFactory::canInvert(text));
+        QVERIFY(!ObjectFactory::isInverted(text));
+        ObjectFactory::setInverted(text, true);
+        QVERIFY(ObjectFactory::isInverted(text));
+        QCOMPARE(objectBase(text).backColor, QColor(Qt::black));
+        QCOMPARE(std::get_if<TextObject>(&text)->spans.constFirst().color, QColor(Qt::white));
+        ObjectFactory::setInverted(text, false);
+        QVERIFY(!ObjectFactory::isInverted(text));
+        QCOMPARE(objectBase(text).backColor.alpha(), 0);
+
+        // Counters use the object's colour rather than the runs'.
+        LabelObject counter = ObjectFactory::create(ObjectFactory::Kind::Counter, document);
+        ObjectFactory::setInverted(counter, true);
+        QVERIFY(ObjectFactory::isInverted(counter));
+        QCOMPARE(objectBase(counter).foreColor, QColor(Qt::white));
+
+        // Shapes and barcodes have no text to invert.
+        LabelObject shape = ShapeObject();
+        QVERIFY(!ObjectFactory::canInvert(shape));
+        ObjectFactory::setInverted(shape, true);
+        QVERIFY(!ObjectFactory::isInverted(shape));
+
+        // White on black prints: the box is black, the text leaves it white.
+        LabelDocument label = addressLabel();
+        ObjectFactory::setInverted(label.objects[0], true);
+        LabelRenderer renderer(LabelRenderer::Mode::Print);
+        const QImage image = renderer.renderImage(label, 150);
+        const QRectF box = objectBase(label.objects.at(0)).bounds;
+        int black = 0;
+        int white = 0;
+        const QRect pixels(Units::twipsToDots(box.x(), 150), Units::twipsToDots(box.y(), 150), Units::twipsToDots(box.width(), 150), Units::twipsToDots(box.height(), 150));
+        for (int y = pixels.top() + 1; y < pixels.bottom(); ++y) {
+            for (int x = pixels.left() + 1; x < pixels.right(); ++x) {
+                (qGray(image.pixel(x, y)) < 128 ? black : white)++;
+            }
+        }
+        QVERIFY(black > white); // mostly box
+        QVERIFY(white > 50); // and the letters
+    }
+
+    void printPreviewStepsThroughTheLabels()
+    {
+        // Three labels of a run, the way a counter makes them differ.
+        LabelDocument label = addressLabel();
+        label.objects = {ObjectFactory::create(ObjectFactory::Kind::Counter, label)};
+        objectBase(label.objects[0]).bounds = QRectF(200, 200, 3000, 1000);
+        PaperSize paper;
+        paper.keyword = u"w79h252"_s;
+        paper.name = u"30252 Address"_s;
+        paper.size = QSizeF(79, 252);
+        paper.imageableArea = QRectF(4.32, 16.56, 71.76, 231.12);
+        QList<QImage> pages;
+        for (int step = 0; step < 3; ++step) {
+            pages << LabelPrinter::paperImage(label, paper, 300, nullptr, step);
+        }
+        QVERIFY(pages.at(0) != pages.at(1));
+
+        PrintPreviewDialog dialog(pages, 300, u"DYMO LabelWriter 450"_s, {});
+        dialog.show();
+        QVERIFY(QTest::qWaitForWindowExposed(&dialog));
+        const auto positionShows = [&dialog](const QString &text) {
+            const auto labels = dialog.findChildren<QLabel *>();
+            return std::any_of(labels.cbegin(), labels.cend(), [&text](const QLabel *label) {
+                return label->text() == text;
+            });
+        };
+        QVERIFY(positionShows(u"Label 1 of 3"_s));
+        QPushButton *next = nullptr;
+        for (QPushButton *button : dialog.findChildren<QPushButton *>()) {
+            if (button->text().contains(u"Next"_s)) {
+                next = button;
+            }
+        }
+        QVERIFY(next);
+        next->click();
+        QVERIFY(positionShows(u"Label 2 of 3"_s));
+        next->click();
+        QVERIFY(positionShows(u"Label 3 of 3"_s));
+        QVERIFY(!next->isEnabled());
+        if (qEnvironmentVariableIsSet("LABELCREATOR_TEST_GRAB")) {
+            dialog.grab().save(qEnvironmentVariable("LABELCREATOR_TEST_GRAB"));
+        }
     }
 
     void clickOnEmptySpaceDeselects()

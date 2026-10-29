@@ -55,6 +55,46 @@ int zintSymbology(Barcode::Symbology symbology)
         return BARCODE_DATAMATRIX;
     case Barcode::Symbology::Pdf417:
         return BARCODE_PDF417;
+    case Barcode::Symbology::Aztec:
+        return BARCODE_AZTEC;
+    case Barcode::Symbology::MaxiCode:
+        return BARCODE_MAXICODE;
+    case Barcode::Symbology::MicroQr:
+        return BARCODE_MICROQR;
+    case Barcode::Symbology::Code93:
+        return BARCODE_CODE93;
+    case Barcode::Symbology::Code11:
+        return BARCODE_CODE11;
+    case Barcode::Symbology::MsiPlessey:
+        return BARCODE_MSI_PLESSEY;
+    case Barcode::Symbology::Pharmacode:
+        return BARCODE_PHARMA;
+    case Barcode::Symbology::Gs1_128:
+        return BARCODE_GS1_128;
+    case Barcode::Symbology::Gs1DataMatrix:
+        return BARCODE_DATAMATRIX;
+    case Barcode::Symbology::Gs1DataBarOmni:
+        return BARCODE_DBAR_OMN;
+    case Barcode::Symbology::Gs1DataBarExpanded:
+        return BARCODE_DBAR_EXP;
+    case Barcode::Symbology::Hibc128:
+        return BARCODE_HIBC_128;
+    case Barcode::Symbology::Hibc39:
+        return BARCODE_HIBC_39;
+    case Barcode::Symbology::HibcDataMatrix:
+        return BARCODE_HIBC_DM;
+    case Barcode::Symbology::HibcQrCode:
+        return BARCODE_HIBC_QR;
+    case Barcode::Symbology::Postnet:
+        return BARCODE_POSTNET;
+    case Barcode::Symbology::Planet:
+        return BARCODE_PLANET;
+    case Barcode::Symbology::UspsIntelligentMail:
+        return BARCODE_USPS_IMAIL;
+    case Barcode::Symbology::Kix:
+        return BARCODE_KIX;
+    case Barcode::Symbology::RoyalMail4State:
+        return BARCODE_RM4SCC;
     }
     Q_UNREACHABLE();
 }
@@ -221,7 +261,7 @@ bool Barcode::encode()
     }
 
     m_symbol->symbology = zintSymbology(m_symbology);
-    m_symbol->input_mode = UNICODE_MODE;
+    m_symbol->input_mode = takesGs1Data(m_symbology) ? GS1_MODE : UNICODE_MODE;
     m_symbol->show_hrt = m_showText ? 1 : 0;
     // Label files carry their own quiet-zone padding.
     m_symbol->output_options |= BARCODE_NO_QUIET_ZONES;
@@ -230,6 +270,11 @@ bool Barcode::encode()
     m_symbol->scale = 0.5f;
     if (m_symbology == Symbology::QrCode) {
         m_symbol->option_1 = m_errorCorrectionLevel + 1;
+    }
+    // Square Data Matrix symbols only, which every scanner reads; zint would
+    // otherwise pick a rectangular one when it is smaller.
+    if (m_symbology == Symbology::DataMatrix || m_symbology == Symbology::Gs1DataMatrix || m_symbology == Symbology::HibcDataMatrix) {
+        m_symbol->option_3 = DM_SQUARE;
     }
 
     QByteArray utf8 = m_data.toUtf8();
@@ -362,10 +407,21 @@ bool Barcode::isTwoDimensional(Symbology symbology)
     case Symbology::QrCode:
     case Symbology::DataMatrix:
     case Symbology::Pdf417:
+    case Symbology::Aztec:
+    case Symbology::MaxiCode:
+    case Symbology::MicroQr:
+    case Symbology::Gs1DataMatrix:
+    case Symbology::HibcDataMatrix:
+    case Symbology::HibcQrCode:
         return true;
     default:
         return false;
     }
+}
+
+bool Barcode::takesGs1Data(Symbology symbology)
+{
+    return symbology == Symbology::Gs1_128 || symbology == Symbology::Gs1DataMatrix || symbology == Symbology::Gs1DataBarExpanded;
 }
 
 QRectF Barcode::paint(QPainter *painter, const QRectF &target, BarWidths widths, Qt::Alignment alignment) const
