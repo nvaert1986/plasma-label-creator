@@ -27,6 +27,17 @@ designer comes first; the section "Later" at the end is low priority.
 - [ ] **Layers and non-printing objects**, such as a picture of the product
   to design on that does not print.
 
+Harder, after the items above:
+
+- [ ] **The printer's own fonts and barcodes, and labels stored on the
+  printer**: send ZPL text and barcode commands instead of an image, and
+  keep label formats in the printer's memory to recall with new data.
+  (Hard)
+- [ ] **RFID encoding**: write RFID tags in RFID labels on printers that
+  have an encoder. (Hard; the LabelWriter 550's RFID label check stays out.)
+- [ ] **Scripting** in labels: fields calculated by a small script. (Hard)
+- [ ] **Read NiceLabel `.nlbl` files**: see Files below. (Hard)
+
 ## Testing on real printers
 
 - [ ] **Landscape print offset.** Prints are moved up by the driver's
