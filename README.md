@@ -5,10 +5,10 @@
 
 # Plasma Label Creator
 
-A KDE Plasma label designer for DYMO LabelWriter and LabelManager printers,
-and for ZPL label printers such as the Altec ATP series. It follows the
-workflow of DYMO Label Software 8 (DLS) and reads and writes its `.label`
-files, so labels move between Linux and Windows unchanged.
+A Plasma label creator for Linux that supports DYMO LabelWriter and
+LabelManager printers and ZPL label printers, such as the Altec ATP series
+and Zebra. It opens and saves `.label` files, so labels move between Linux
+and Windows unchanged.
 
 ![Plasma Label Creator with the DYMO label types on the left and an empty 30252 Address label on the canvas](doc/screenshot.png)
 
@@ -16,8 +16,8 @@ files, so labels move between Linux and Windows unchanged.
 > **This project is fully vibe-coded.** Every line was written by an AI
 > coding assistant (Claude, by Anthropic) working under the direction of the
 > maintainer, who did not write the code by hand. It has been tested
-> thoroughly: 16 automated test suites, comparisons against DLS 8's own
-> renders, and test prints on real printers, with the assistant's mistakes
+> thoroughly: 19 automated test suites, comparisons with reference labels,
+> and test prints on real printers, with the assistant's mistakes
 > corrected wherever they were found. Even so, nobody has reviewed the code
 > line by line the way a human-written project would be. Read it before you
 > rely on it, expect rough edges, and please report what you find.
@@ -29,20 +29,20 @@ Altec, Zebra Technologies or KDE e.V. See [Trademarks](#trademarks).
 
 - **Design labels** on a canvas with rulers and an optional grid to snap
   to: text (also white on black), addresses, barcodes and 2D codes, images,
-  DLS clip art, lines and shapes, counters, date/time and curved text. Edit
+  clip art, lines and shapes, counters, date/time and curved text. Edit
   text directly on the label, format it from the toolbar, drag objects in
   from the Insert tab or from Dolphin.
-- **Barcodes** (zint): DLS's types (Code 128, Code 39, Codabar, 2 of 5,
-  ITF-14, EAN, UPC, QR Code, PDF417, POSTNET, PLANET, Intelligent Mail) and
-  more that DLS does not have: Data Matrix, Aztec, MaxiCode, Micro QR,
-  Code 93, Code 11, MSI Plessey, Pharmacode, GS1-128, GS1 Data Matrix and
-  GS1 DataBar (data with `[AI]` application identifiers), HIBC, KIX
-  (PostNL) and Royal Mail. DLS cannot show labels that use these.
-- **DLS 8 files**: open and save `.label` files, die-cut labels as well as
+- **Barcodes** (zint): Code 128, Code 39, Codabar, 2 of 5, ITF-14, EAN,
+  UPC, QR Code, PDF417, POSTNET, PLANET and Intelligent Mail, and also Data
+  Matrix, Aztec, MaxiCode, Micro QR, Code 93, Code 11, MSI Plessey,
+  Pharmacode, GS1-128, GS1 Data Matrix and GS1 DataBar (data with `[AI]`
+  application identifiers), HIBC, KIX (PostNL) and Royal Mail. Other label
+  software that opens the file may not show the types in the second group.
+- **`.label` files**: open and save them, die-cut labels as well as
   LabelManager tape labels. Objects it does not know are kept and written
-  back unchanged. DLS address books (`.ABX`) are supported too. A label's
-  data source and print-time questions are kept in the file as a comment,
-  which DLS ignores, so DLS still opens the label.
+  back unchanged. Address books (`.ABX`) are supported too. A label's data
+  source and print-time questions are kept in the file as a comment, which
+  other label software ignores, so the file stays compatible.
 - **Print from data**: a label for each row of a CSV file, an Excel or
   LibreOffice spreadsheet, or a database query (SQLite, ODBC for SQL Server
   and others, MySQL, PostgreSQL). Put fields on the label as `{Column}`, in

@@ -32,14 +32,16 @@
   answers fill `{Name}` on every label of the run, and are offered again
   the next time.
 - The data source and the questions are kept in the `.label` file as a
-  comment, which DLS ignores: DLS still opens the label.
+  comment, which other label software ignores, so the file stays
+  compatible.
 
 ### Designing
 
 - **Grid and snapping** (View > Show Grid, Snap to Grid, Grid Spacing):
   moving and resizing put edges on the grid; hold Alt to place freely.
 - **White on black** text (Format > White on Black), using the object's own
-  colours, so DLS shows it the same way.
+  colours, so other label software that opens the file shows it the same
+  way.
 - **Rotate Label turns the objects with it**: positions move round and each
   object's rotation follows, tape cells included. The label looks the same,
   just turned, and prints exactly as before (tested dot for dot). Before,
@@ -48,8 +50,9 @@
   Code 11, MSI Plessey, Pharmacode, GS1-128, GS1 Data Matrix, GS1 DataBar,
   HIBC (Code 128, Code 39, Data Matrix, QR), KIX (PostNL) and Royal Mail.
   GS1 data is typed with `[AI]` brackets and shows `(AI)` under the bars.
-  Data Matrix symbols are always square. DLS's own POSTNET, PLANET and
-  Intelligent Mail now draw too. DLS cannot show the new types.
+  Data Matrix symbols are always square. POSTNET, PLANET and Intelligent
+  Mail, which `.label` files could already name, now draw too. Other label
+  software that opens the file may not show the new types.
 
 ### Printing and output
 
