@@ -279,6 +279,7 @@ bool LabelPrinter::load()
     // DYMO's drivers, LabelWriter and LabelManager alike, have DYMO's halftoning.
     m_dymoOptions = ppdFindOption(ppd, "DymoHalftoning") != nullptr;
     m_customSizes = ppd->variable_sizes && !m_dymoOptions;
+    m_mediaTracking = ppdFindOption(ppd, "zeMediaTracking") != nullptr;
     const ppd_option_t *pageSize = ppdFindOption(ppd, "PageSize");
     for (int i = 0; i < ppd->num_sizes; ++i) {
         const ppd_size_t &size = ppd->sizes[i];
@@ -378,8 +379,13 @@ std::optional<PaperSize> LabelPrinter::paperFor(const LabelDocument &document) c
         }
         return tape;
     }
-    if (const auto paper = matchPaper(document, m_paperSizes)) {
-        return paper;
+    // Labels across the roll and continuous rolls print at a size of their
+    // own: a row of labels, or the length chosen.
+    const RollLayout &roll = document.roll;
+    if (roll.across <= 1 && !roll.continuous) {
+        if (const auto paper = matchPaper(document, m_paperSizes)) {
+            return paper;
+        }
     }
     // A label the driver does not list, such as Altec's labels on CUPS's
     // Zebra driver: printed at its own size, to a tenth of a millimetre.
@@ -388,9 +394,13 @@ std::optional<PaperSize> LabelPrinter::paperFor(const LabelDocument &document) c
     }
     const QSizeF twips = document.paperSize();
     const auto tenths = [](qreal value) {
-        return std::round(Units::twipsToMm(value) * 10) / 10;
+        return std::round(value * 10) / 10;
     };
-    return PaperSize::custom(document.paperName, QSizeF(tenths(twips.width()), tenths(twips.height())));
+    const int across = std::max(1, roll.across);
+    const qreal width = across * Units::twipsToMm(twips.width()) + (across - 1) * roll.gapMm;
+    PaperSize paper = PaperSize::custom(document.paperName, QSizeF(tenths(width), tenths(Units::twipsToMm(twips.height()))));
+    paper.roll = roll;
+    return paper;
 }
 
 qreal LabelPrinter::resolution() const
@@ -593,6 +603,14 @@ QList<QImage> LabelPrinter::pages(const QList<LabelDocument> &labels, const Opti
     if (options.compensateTopMargin) {
         offset.ry() -= paper->imageableArea.top();
     }
+    // With labels across the roll, each is drawn at its own size, then put
+    // in its row.
+    const RollLayout &roll = paper->roll;
+    PaperSize single = *paper;
+    if (roll.across > 1) {
+        single.size = labels.constFirst().paperSize() / Units::TwipsPerPoint;
+        single.imageableArea = QRectF(QPointF(0, 0), single.size);
+    }
     QList<QImage> pages;
     int step = 0;
     for (const LabelDocument &label : labels) {
@@ -603,7 +621,7 @@ QList<QImage> LabelPrinter::pages(const QList<LabelDocument> &labels, const Opti
         for (int copy = 0; copy < std::max(1, options.copies); ++copy, ++step) {
             if (page.isNull() || counts) {
                 QStringList warnings;
-                page = paperImage(label, *paper, m_resolution, &warnings, step, when, offset);
+                page = paperImage(label, single, m_resolution, &warnings, step, when, offset);
                 for (const QString &warning : std::as_const(warnings)) {
                     if (!m_warnings.contains(warning)) {
                         m_warnings << warning;
@@ -613,7 +631,29 @@ QList<QImage> LabelPrinter::pages(const QList<LabelDocument> &labels, const Opti
             pages << page;
         }
     }
-    return pages;
+    m_pagedLabels = int(pages.size());
+    return roll.across > 1 ? rowsAcross(pages, *paper, m_resolution) : pages;
+}
+
+QList<QImage> LabelPrinter::rowsAcross(const QList<QImage> &labels, const PaperSize &paper, qreal dpi)
+{
+    const int across = std::max(1, paper.roll.across);
+    const QSize size(qRound(paper.size.width() * dpi / 72.0), qRound(paper.size.height() * dpi / 72.0));
+    QList<QImage> rows;
+    for (qsizetype first = 0; first < labels.size(); first += across) {
+        QImage row(size, QImage::Format_RGB32);
+        row.fill(Qt::white);
+        QPainter painter(&row);
+        for (int i = 0; i < across && first + i < labels.size(); ++i) {
+            // Across the head: label width plus gap per place, in dots.
+            const qreal labelMm = labels.at(first + i).width() * Units::MmPerInch / dpi;
+            const int x = qRound(i * (labelMm + paper.roll.gapMm) * dpi / Units::MmPerInch);
+            painter.drawImage(x, 0, labels.at(first + i));
+        }
+        painter.end();
+        rows << row.convertToFormat(QImage::Format_Mono, Qt::MonoOnly | Qt::ThresholdDither);
+    }
+    return rows;
 }
 
 int LabelPrinter::print(const QList<LabelDocument> &labels, const Options &options)
@@ -641,6 +681,11 @@ int LabelPrinter::print(const QList<LabelDocument> &labels, const Options &optio
     cups_option_t *cupsOptions = nullptr;
     int optionCount = 0;
     optionCount = cupsAddOption("PageSize", paper->keyword.toUtf8().constData(), optionCount, &cupsOptions);
+    // A continuous roll has no gaps to find: the driver feeds the label's
+    // length. Other jobs keep the queue's setting.
+    if (m_mediaTracking && paper->roll.continuous) {
+        optionCount = cupsAddOption("zeMediaTracking", "Continuous", optionCount, &cupsOptions);
+    }
     // DYMO's own options, for DYMO's drivers (or when converting with one here).
     if (m_dymoOptions || !m_driver.isEmpty()) {
         if (!options.printQuality.isEmpty()) {
@@ -659,7 +704,7 @@ int LabelPrinter::print(const QList<LabelDocument> &labels, const Options &optio
         const int job = sendThroughLocalDriver(QString::fromLocal8Bit(fileName), *paper, options, title);
         unlink(fileName);
         if (job > 0) {
-            m_printedLabels = int(pages.size());
+            m_printedLabels = m_pagedLabels;
         }
         return job;
     }
@@ -670,7 +715,7 @@ int LabelPrinter::print(const QList<LabelDocument> &labels, const Options &optio
     if (job == 0) {
         m_errorString = u"Printing on %1 failed: %2"_s.arg(m_printerName, QString::fromUtf8(cupsLastErrorString()));
     } else {
-        m_printedLabels = int(pages.size());
+        m_printedLabels = m_pagedLabels;
     }
     return job;
 }
@@ -710,6 +755,9 @@ bool LabelPrinter::convertWithDriver(const QString &rasterFile,
     // Run the filter as CUPS would: job, user, title, copies, options, with
     // the raster on standard input and the printer data on standard output.
     QStringList filterOptions = {u"PageSize="_s + paper.keyword, u"DymoHalftoning=Default"_s};
+    if (paper.roll.continuous) {
+        filterOptions << u"zeMediaTracking=Continuous"_s; // ZPL drivers; others ignore it
+    }
     if (!options.printQuality.isEmpty()) {
         filterOptions << u"DymoPrintQuality="_s + options.printQuality;
     }

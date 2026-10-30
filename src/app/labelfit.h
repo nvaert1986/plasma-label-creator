@@ -23,6 +23,8 @@ enum class Problem {
     NotOffered,
     /** Not as long as the labels the printer said are loaded. */
     WrongLength,
+    /** Labels across or a continuous roll, on a printer that takes only its own label sizes. */
+    RollNotSupported,
 };
 
 /**

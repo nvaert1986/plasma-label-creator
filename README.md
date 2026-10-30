@@ -37,6 +37,8 @@ Altec, Zebra Technologies or KDE e.V. See [Trademarks](#trademarks).
   layers. Text can wrap within its box; objects can be left out of print.
 - **Calculated fields** and date offsets, filters and shared counters;
   a **GS1 builder** for GS1-128 and GS1 Data Matrix data.
+- **Rolls with labels across** and **continuous rolls** on printers that
+  take any label size (Altec, Zebra).
 - **Barcodes** (zint): Code 128, Code 39, Codabar, 2 of 5, ITF-14, EAN,
   UPC, QR Code, PDF417, POSTNET, PLANET and Intelligent Mail, and also Data
   Matrix, Aztec, MaxiCode, Micro QR, Code 93, Code 11, MSI Plessey,
@@ -96,7 +98,9 @@ does not read or work around that.
 
 For Altec ATP printers the application offers Altec's die-cut and round
 labels by product, those fitting the loaded label length first; wrap
-labels show the white strip that takes print. The label
+labels show the white strip that takes print, rolls with labels across
+print a row at a time, and continuous rolls take a length of your choice.
+The label
 sizes and product names come from Altec's public website (altec.nl); they
 are listed only to help choose a label and will be removed if Altec asks.
 

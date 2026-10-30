@@ -14,7 +14,7 @@ namespace
 {
 
 // Used for new labels until a label type has been chosen once.
-const PaperSize FallbackPaper{u"w79h252"_s, u"30252 Address"_s, QSizeF(78.96, 252), QRectF(), QString(), QRectF(), 0};
+const PaperSize FallbackPaper{u"w79h252"_s, u"30252 Address"_s, QSizeF(78.96, 252), QRectF(), QString(), QRectF(), 0, {}};
 
 } // namespace
 
@@ -815,6 +815,12 @@ void MainWindow::changePaper(const PaperSize &paper)
     document.paperOutline = blank.paperOutline;
     document.drawCommandsXml.clear();
     document.orientation = blank.orientation;
+    document.roll = paper.roll;
+    if (paper.roll.continuous) {
+        // Cut from the roll: square corners.
+        document.paperOutline = QPainterPath();
+        document.paperOutline.addRect(QRectF(QPointF(0, 0), paper.size * Units::TwipsPerPoint));
+    }
     m_editor->apply(document, i18n("Change Label Type"));
     settings().writeEntry("Paper", paper.name);
 }

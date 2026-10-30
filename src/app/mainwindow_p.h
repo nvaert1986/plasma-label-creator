@@ -27,6 +27,7 @@
 #include "printpreviewdialog.h"
 #include "propertiesdialog.h"
 #include "recentlayoutsmenu.h"
+#include "rolllayoutdialog.h"
 #include "rulerwidget.h"
 #include "sharedcounter.h"
 #include "sidebar.h"

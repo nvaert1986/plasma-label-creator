@@ -337,7 +337,7 @@ bool hasObjectExtensions(const LabelDocument &document)
 bool hasExtensions(const LabelDocument &document)
 {
     return !document.questions.isEmpty() || document.dataSource.kind != DataSource::Kind::None || !document.layers.isEmpty()
-        || !document.calculated.isEmpty() || hasObjectExtensions(document);
+        || !document.calculated.isEmpty() || document.roll != RollLayout() || hasObjectExtensions(document);
 }
 
 QString extensionsJson(const LabelDocument &document)
@@ -372,6 +372,17 @@ QString extensionsJson(const LabelDocument &document)
             }
         }
         root[u"objects"_s] = objects;
+    }
+    if (document.roll != RollLayout()) {
+        QJsonObject roll;
+        if (document.roll.across > 1) {
+            roll[u"across"_s] = document.roll.across;
+            roll[u"gap"_s] = document.roll.gapMm;
+        }
+        if (document.roll.continuous) {
+            roll[u"continuous"_s] = true;
+        }
+        root[u"roll"_s] = roll;
     }
     if (!document.calculated.isEmpty()) {
         QJsonArray calculated;
@@ -455,6 +466,10 @@ void readExtensions(const QByteArray &data, LabelDocument &document, QStringList
         }
         applyObjectExtensions(document.objects[at], o);
     }
+    const QJsonObject roll = root[u"roll"_s].toObject();
+    document.roll.across = std::clamp(roll[u"across"_s].toInt(1), 1, 20);
+    document.roll.gapMm = std::clamp(roll[u"gap"_s].toDouble(), 0.0, 100.0);
+    document.roll.continuous = roll[u"continuous"_s].toBool();
     for (const QJsonValue &value : root[u"calculated"_s].toArray()) {
         const QJsonObject c = value.toObject();
         const CalculatedField field{c[u"name"_s].toString(), c[u"expression"_s].toString()};

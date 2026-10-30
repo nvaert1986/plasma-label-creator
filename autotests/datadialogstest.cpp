@@ -6,8 +6,12 @@
 #include "datadialogs.h"
 #include "gs1dialog.h"
 #include "layersdialog.h"
+#include "rolllayoutdialog.h"
 
 #include <QDialogButtonBox>
+#include <QCheckBox>
+#include <QSpinBox>
+#include <QDoubleSpinBox>
 #include <QFile>
 #include <QLabel>
 #include <QLineEdit>
@@ -180,6 +184,26 @@ private Q_SLOTS:
         QVERIFY(table->item(0, 2)->text().contains(u"check digit 3 added"_s));
         grab(&dialog, u"gs1"_s);
         QCOMPARE(dialog.data(), u"[01]09501101530003[10]{Batch}[17]261231"_s);
+    }
+
+    void rollLayoutIsChosen()
+    {
+        RollLayoutDialog dialog({}, 40, 14.4, true, nullptr);
+        dialog.show();
+        QVERIFY(QTest::qWaitForWindowExposed(&dialog));
+        const QList<QDoubleSpinBox *> spins = dialog.findChildren<QDoubleSpinBox *>();
+        QCOMPARE(spins.size(), 2); // gap, length
+        QVERIFY(!spins.at(0)->isEnabled() && !spins.at(1)->isEnabled());
+        dialog.findChild<QSpinBox *>()->setValue(2);
+        QVERIFY(spins.at(0)->isEnabled());
+        spins.at(0)->setValue(3);
+        grab(&dialog, u"roll"_s);
+        QCOMPARE(dialog.roll(), (RollLayout{2, 3, false}));
+        dialog.findChild<QCheckBox *>()->setChecked(true);
+        QVERIFY(spins.at(1)->isEnabled());
+        spins.at(1)->setValue(75);
+        QCOMPARE(dialog.roll(), (RollLayout{2, 3, true}));
+        QCOMPARE(dialog.lengthMm(), 75.0);
     }
 
     void questionsAreEdited()

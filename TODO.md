@@ -26,6 +26,8 @@ See `CHANGELOG.md` under "Unreleased" for the details.
 - [x] Calculated fields, date offsets and filters in fields, counters
   shared between computers.
 - [x] GS1 builder for GS1-128, GS1 Data Matrix and GS1 DataBar Expanded.
+- [x] Several labels across a roll, and continuous rolls with a set length
+  (printers that take any label size: Altec, Zebra).
 
 ## Bug review (2026-10-30)
 
@@ -50,10 +52,8 @@ Still to do by hand, in the running app:
 
 ## Designer
 
-- [ ] **Several labels across a roll**, and continuous rolls with a set
-  length (Altec and other ZPL printers). Next up; see HANDOFF.md.
-
-Harder, after the items above:
+The Medium designer items are done (see "Done since 0.2.0"). Left, all
+Hard:
 
 - [ ] **The printer's own fonts and barcodes, and labels stored on the
   printer**: send ZPL text and barcode commands instead of an image, and
@@ -75,6 +75,12 @@ Harder, after the items above:
 - [ ] **Raw CUPS queues.** Labels for a queue without the DYMO driver are
   converted on this computer and sent raw; still to try on a real raw
   network queue.
+- [ ] **Labels across and continuous rolls on a real Altec.** The gap
+  between labels across is not on Altec's site: 2 mm is assumed for the
+  catalogue's rolls (adjust in Layout > Roll Layout). Print a frame label
+  on a 2-across roll to find the real gap and the left edge, and one on a
+  continuous roll (the job switches the printer to continuous media, `^MNN`;
+  the next normal job switches back to gap sensing, `^MNY`).
 - [ ] **Altec wrap label strips.** The catalogue's wrap labels take print
   on the strip at the end that leaves the printer first; Altec's site does
   not say which end it is. Print a frame label on a wrap label to confirm.
@@ -89,8 +95,8 @@ Harder, after the items above:
 - [ ] **DYMO Rhino 6000 / 6500.** DYMO has no Linux driver for them. DLS
   treats them as tape printers like the LabelManager 450, so its driver may
   work; needs their USB IDs and a test on a real Rhino.
-- [ ] **Altec:** continuous rolls, several labels across the roll, round
-  label outlines, and label detection over USB (only over the network now).
+- [ ] **Altec:** round label outlines, and label detection over USB (only
+  over the network now).
 
 ## Files
 

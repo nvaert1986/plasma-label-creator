@@ -63,6 +63,8 @@ struct PaperSize {
     QRectF printArea;
     /** Millimetres of tape for a LabelManager's tape label types; 0 for other labels. */
     int tape = 0;
+    /** How the labels sit on their roll: across, the gap between them, continuous. */
+    LabelCreator::RollLayout roll;
 
     /**
      * A label size the driver does not list, printed with CUPS's custom
@@ -221,7 +223,8 @@ public:
 
     /**
      * The pages print() would send for @p labels: one per label printed, as
-     * they feed through the printer, with counters advancing. Empty, with
+     * they feed through the printer, with counters advancing; with labels
+     * across the roll, one per row of them, side by side. Empty, with
      * errorString() set, if the printer has no paper for the label.
      */
     QList<QImage> pages(const QList<LabelDocument> &labels, const Options &options);
@@ -230,6 +233,11 @@ public:
 
     /** Writes @p page @p copies times as 1-bit CUPS raster to @p fd. */
     static bool writeRaster(int fd, const QImage &page, int copies, const PaperSize &paper, qreal dpi, QString *errorString = nullptr);
+    /**
+     * Puts @p labels, images of one label each, side by side in rows of
+     * @p paper's labels across, with its gap between them.
+     */
+    static QList<QImage> rowsAcross(const QList<QImage> &labels, const PaperSize &paper, qreal dpi);
     /** Writes @p pages as 1-bit CUPS raster to @p fd. */
     static bool writeRaster(int fd, const QList<QImage> &pages, const PaperSize &paper, qreal dpi, QString *errorString = nullptr);
 
@@ -243,6 +251,8 @@ private:
     bool m_loaded = false;
     bool m_customSizes = false; // the driver takes sizes it does not list
     bool m_dymoOptions = false; // one of DYMO's drivers (LabelWriter or LabelManager)
+    bool m_mediaTracking = false; // CUPS's Zebra driver: continuous or gapped media
+    int m_pagedLabels = 0; // labels on the pages pages() made last
     int m_printedLabels = 0;
     QString m_errorString;
     QStringList m_warnings;

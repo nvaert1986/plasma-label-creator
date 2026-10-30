@@ -40,6 +40,11 @@ bool MainWindow::confirmLabelFitsPrinter()
                       m_printBar->printerName(),
                       QString::number(*loaded, 'f', 1));
         break;
+    case LabelFit::Problem::RollNotSupported:
+        reason = i18n("This label is laid out for several labels across or a continuous roll (Layout > Roll Layout), which %1 does not print: "
+                      "it takes one die-cut label at a time.",
+                      m_printBar->printerName());
+        break;
     case LabelFit::Problem::None:
         break;
     }

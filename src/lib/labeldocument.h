@@ -415,6 +415,17 @@ struct DataSource {
 };
 
 /**
+ * How labels sit on the roll, for printers that take any label size (ZPL).
+ * Not in DLS's format: kept in the settings comment.
+ */
+struct RollLayout {
+    int across = 1; // labels side by side; printed with consecutive labels
+    qreal gapMm = 0; // between labels across
+    bool continuous = false; // no gaps along the roll: cut to the label's length
+    bool operator==(const RollLayout &) const = default;
+};
+
+/**
  * A field worked out from others when printing, such as {BestBefore} from
  * {Date+30|date:dd-MM-yyyy}. Not in DLS's format: kept in the settings
  * comment.
@@ -463,6 +474,7 @@ struct LabelDocument {
     DataSource dataSource;
     QList<Layer> layers;
     QList<CalculatedField> calculated; // worked out in this order
+    RollLayout roll;
 
     /**
      * Adds @p object and returns its index. On tape it gets a cell of its

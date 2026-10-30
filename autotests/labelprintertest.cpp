@@ -25,8 +25,8 @@ namespace
 constexpr qreal Dpi = 300.0;
 
 // The 30252 and 30334 entries of the LabelWriter 450 driver.
-const PaperSize Address{u"w79h252"_s, u"30252 Address"_s, QSizeF(78.96, 252), QRectF(QPointF(4.32, 16.56), QPointF(76.08, 247.68)), QString(), QRectF(), 0};
-const PaperSize Small{u"30334_2-1_4_in_x_1-1_4_in"_s, u"30334 2-1/4 in x 1-1/4 in"_s, QSizeF(162, 90), QRectF(QPointF(2.88, 4.32), QPointF(159.12, 85.68)), QString(), QRectF(), 0};
+const PaperSize Address{u"w79h252"_s, u"30252 Address"_s, QSizeF(78.96, 252), QRectF(QPointF(4.32, 16.56), QPointF(76.08, 247.68)), QString(), QRectF(), 0, {}};
+const PaperSize Small{u"30334_2-1_4_in_x_1-1_4_in"_s, u"30334 2-1/4 in x 1-1/4 in"_s, QSizeF(162, 90), QRectF(QPointF(2.88, 4.32), QPointF(159.12, 85.68)), QString(), QRectF(), 0, {}};
 
 LabelDocument document(PaperOrientation orientation, const QSizeF &paper)
 {
@@ -310,6 +310,79 @@ private Q_SLOTS:
         QVERIFY(paper);
         QCOMPARE(paper->keyword, u"Custom.41x41.5mm"_s);
         QCOMPARE(paper->name, u"Wrap label 41 × 41.5 mm"_s);
+    }
+
+    void labelsAcrossPrintInRows()
+    {
+        // Three labels, two across with a 2 mm gap: two rows, the second
+        // with an empty place.
+        PaperSize paper = PaperSize::custom(u"Row"_s, QSizeF(2 * 20 + 2, 10));
+        paper.roll.across = 2;
+        paper.roll.gapMm = 2;
+        const qreal dpi = 254; // 10 dots per millimetre
+        QList<QImage> labels;
+        for (int i = 0; i < 3; ++i) {
+            QImage label(200, 100, QImage::Format_Mono);
+            label.fill(0); // black: the whole label
+            labels << label;
+        }
+        const QList<QImage> rows = LabelPrinter::rowsAcross(labels, paper, dpi);
+        QCOMPARE(rows.size(), 2);
+        QCOMPARE(rows.at(0).size(), QSize(420, 100));
+        const auto black = [](const QImage &image, int x) {
+            return image.pixelColor(x, 50).lightness() < 128;
+        };
+        QVERIFY(black(rows.at(0), 0) && black(rows.at(0), 199));
+        QVERIFY(!black(rows.at(0), 200) && !black(rows.at(0), 219)); // the gap
+        QVERIFY(black(rows.at(0), 220) && black(rows.at(0), 419));
+        QVERIFY(black(rows.at(1), 100) && !black(rows.at(1), 300));
+    }
+
+    void rollLayoutsPrintAtTheirOwnSize()
+    {
+        if (LabelPrinter::filterProgram(u"rastertolabel"_s).isEmpty() || LabelPrinter::driverFilter(u"drv:///sample.drv/zebra.ppd"_s) != u"rastertolabel"_s) {
+            QSKIP("CUPS's label drivers (rastertolabel) are not installed");
+        }
+        LabelPrinter printer(u"unused"_s, u"drv:///sample.drv/zebra.ppd"_s);
+        QVERIFY2(printer.load(), qPrintable(printer.errorString()));
+
+        // Two 40 x 14.4 mm labels across, 2 mm apart: an 82 mm wide page.
+        LabelDocument across = withBlock(document(PaperOrientation::Portrait, QSizeF(40 * 1440 / 25.4, 14.4 * 1440 / 25.4)), QRectF(72, 72, 400, 200));
+        across.paperName = u"ADC 40 x 14.4 mm (2 across)"_s;
+        across.roll.across = 2;
+        across.roll.gapMm = 2;
+        const auto paper = printer.paperFor(across);
+        QVERIFY(paper);
+        QCOMPARE(paper->keyword, u"Custom.82x14.4mm"_s);
+        LabelPrinter::Options options;
+        options.copies = 3;
+        options.compensateTopMargin = false;
+        const QList<QImage> pages = printer.pages({across}, options);
+        QCOMPARE(pages.size(), 2); // three labels in two rows
+        QCOMPARE(pages.at(0).width(), qRound(82 * 203 / 25.4));
+
+        // A continuous roll: the driver is told there are no gaps to find.
+        LabelDocument continuous = withBlock(document(PaperOrientation::Portrait, QSizeF(55 * 1440 / 25.4, 30 * 1440 / 25.4)), QRectF(72, 72, 400, 200));
+        continuous.paperName = u"Industrial polyester 55 mm, continuous"_s;
+        continuous.roll.continuous = true;
+        const auto roll = printer.paperFor(continuous);
+        QVERIFY(roll);
+        QCOMPARE(roll->keyword, u"Custom.55x30mm"_s);
+        QVERIFY(roll->roll.continuous);
+        QTemporaryFile raster;
+        QVERIFY(raster.open());
+        QVERIFY(LabelPrinter::writeRaster(raster.handle(), LabelPrinter::paperImage(continuous, *roll, 203), 1, *roll, 203));
+        raster.close();
+        QTemporaryFile output;
+        QVERIFY(output.open());
+        output.close();
+        QString error;
+        QVERIFY2(LabelPrinter::convertWithDriver(raster.fileName(), u"drv:///sample.drv/zebra.ppd"_s, *roll, {}, output.fileName(), &error), qPrintable(error));
+        QFile data(output.fileName());
+        QVERIFY(data.open(QIODevice::ReadOnly));
+        const QByteArray zpl = data.readAll();
+        QVERIFY2(zpl.contains("^MNN"), zpl.left(200).constData()); // continuous media
+        QVERIFY(!zpl.contains("^MNY"));
     }
 
     void dymoDriversPrintOnlyTheirOwnSizes()

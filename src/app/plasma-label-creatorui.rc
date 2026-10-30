@@ -4,7 +4,7 @@
     SPDX-License-Identifier: CC0-1.0
 -->
 <!DOCTYPE gui>
-<gui name="plasma-label-creator" version="15"
+<gui name="plasma-label-creator" version="16"
      xmlns="http://www.kde.org/standards/kxmlgui/1.0"
      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
      xsi:schemaLocation="http://www.kde.org/standards/kxmlgui/1.0 http://www.kde.org/standards/kxmlgui/1.0/kxmlgui.xsd">
@@ -81,6 +81,7 @@
             <text>&amp;Layout</text>
             <Action name="label_type"/>
             <Action name="label_custom_size"/>
+            <Action name="label_roll"/>
             <Menu name="layout_orientation" icon="object-rotate-right">
                 <text>Label &amp;Orientation</text>
                 <Action name="layout_portrait"/>

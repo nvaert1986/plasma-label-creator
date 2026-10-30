@@ -239,6 +239,27 @@ void MainWindow::setObjectsPrinted(bool printed)
     m_editor->apply(document, printed ? i18n("Print Objects") : i18n("Do Not Print Objects"));
 }
 
+void MainWindow::editRollLayout()
+{
+    const LabelDocument &current = m_editor->document();
+    const QSizeF paper = current.paperSize();
+    RollLayoutDialog dialog(current.roll, Units::twipsToMm(paper.width()), Units::twipsToMm(paper.height()), m_printBar->acceptsCustomSizes(), this);
+    if (dialog.exec() != QDialog::Accepted) {
+        return;
+    }
+    LabelDocument document = current;
+    document.roll = dialog.roll();
+    // A continuous roll's label is as long as asked, with square corners.
+    if (document.roll.continuous) {
+        const qreal widthMm = std::round(Units::twipsToMm(paper.width()) * 10) / 10;
+        const qreal lengthMm = std::round(dialog.lengthMm() * 10) / 10;
+        document.paperOutline = QPainterPath();
+        document.paperOutline.addRect(QRectF(0, 0, paper.width(), Units::mmToTwips(lengthMm)));
+        document.id = u"Custom.%1x%2mm"_s.arg(widthMm).arg(lengthMm);
+    }
+    m_editor->apply(document, i18n("Change Roll Layout"));
+}
+
 void MainWindow::editLayers()
 {
     LayersDialog dialog(m_editor->document().layers, this);
@@ -358,6 +379,11 @@ void MainWindow::setupArrangeActions()
     ungroup->setText(i18n("Ungroup"));
     ungroup->setIcon(QIcon::fromTheme(u"object-ungroup"_s));
     actions->setDefaultShortcut(ungroup, QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_G));
+
+    QAction *roll = actions->addAction(u"label_roll"_s, this, &MainWindow::editRollLayout);
+    roll->setText(i18n("&Roll Layout…"));
+    roll->setIcon(QIcon::fromTheme(u"view-split-left-right"_s));
+    roll->setToolTip(i18n("Labels across the roll, or a continuous roll"));
 
     // Layers, and objects that only help to design.
     QAction *layers = actions->addAction(u"layout_layers"_s, this, &MainWindow::editLayers);

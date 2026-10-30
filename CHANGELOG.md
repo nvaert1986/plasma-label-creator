@@ -64,6 +64,16 @@
   rest of the label is shaded on the canvas. The strip's length comes from
   Altec's article codes; it is placed at the end that leaves the printer
   first, which is still to be confirmed on paper.
+- **Labels across the roll** (Layout > Roll Layout…): rolls with 2 to 10
+  labels side by side print a row at a time, with the next labels (data
+  rows, copies, counters going on) next to each other, on printers that
+  take any label size (Altec, Zebra). The gap between them is set there.
+- **Continuous rolls**: a label of the length set in Roll Layout; the job
+  tells CUPS's Zebra driver there are no gaps to find.
+- The Altec catalogue now has its rolls with 2 to 6 labels across laid out
+  as such (2 mm apart until measured) and its 36 continuous rolls.
+- Labels across or continuous rolls on a printer that takes only its own
+  label sizes (a LabelWriter) are warned about before printing.
 
 ### Fixed
 

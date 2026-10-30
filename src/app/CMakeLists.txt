@@ -47,6 +47,8 @@ add_executable(plasma-label-creator
     propertiesdialog.cpp
     propertiesdialog.h
     recentlayoutsmenu.cpp
+    rolllayoutdialog.cpp
+    rolllayoutdialog.h
     recentlayoutsmenu.h
     rulerwidget.cpp
     rulerwidget.h

@@ -33,15 +33,23 @@ QList<PaperSize> all()
             const QJsonObject label = value.toObject();
             const QString product = label.value("product"_L1).toString();
             const qreal width = label.value("width"_L1).toDouble();
-            const qreal height = label.value("height"_L1).toDouble();
+            const bool continuous = label.value("continuous"_L1).toBool();
+            // A continuous roll gets a length to start with, changed in Roll Layout.
+            const qreal height = continuous ? ContinuousLengthMm : label.value("height"_L1).toDouble();
             const int across = label.value("across"_L1).toInt(1);
             QString name = label.value("round"_L1).toBool() ? i18nc("product, round label diameter", "%1 Ø %2 mm", product, width)
-                                                             : i18nc("product, label width x height", "%1 %2 × %3 mm", product, width, height);
+                : continuous                                ? i18nc("product, roll width", "%1 %2 mm, continuous", product, width)
+                                                            : i18nc("product, label width x height", "%1 %2 × %3 mm", product, width, height);
             if (across > 1) {
                 name = i18nc("label name, labels across the roll", "%1 (%2 across)", name, across);
             }
             PaperSize paper = PaperSize::custom(name, QSizeF(width, height));
             paper.group = product;
+            paper.roll.across = across;
+            // Altec does not say how far apart labels across are: 2 mm, to
+            // be adjusted in Roll Layout.
+            paper.roll.gapMm = across > 1 ? DefaultGapMm : 0;
+            paper.roll.continuous = continuous;
             // Wrap labels print on a white strip, the first part off the
             // printer; the clear rest wraps over it. Altec's article codes
             // give its length (24x12x36 mm: 12 mm of a 36 mm label).
@@ -73,7 +81,7 @@ QList<PaperSize> fitting(const QList<PaperSize> &labels, qreal loadedLengthMm)
 {
     QList<PaperSize> list;
     for (const PaperSize &paper : labels) {
-        if (fitsLoaded(paper.size.height() * Units::MmPerInch / 72.0, loadedLengthMm)) {
+        if (!paper.roll.continuous && fitsLoaded(paper.size.height() * Units::MmPerInch / 72.0, loadedLengthMm)) {
             list << paper;
         }
     }

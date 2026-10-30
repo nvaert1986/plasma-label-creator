@@ -16,13 +16,19 @@ namespace LabelFit
 
 Problem check(const LabelDocument &document, const QList<PaperSize> &offered, bool acceptsCustomSizes, std::optional<qreal> loadedLengthMm)
 {
+    // Rows of labels and continuous rolls print at sizes of their own.
+    if ((document.roll.across > 1 || document.roll.continuous) && !acceptsCustomSizes) {
+        return Problem::RollNotSupported;
+    }
     // A custom size is not expected in the list of a printer that takes
     // them; its length still counts. A DYMO takes none.
     const bool custom = document.id.startsWith(u"Custom."_s) && acceptsCustomSizes;
     if (!custom && !offered.isEmpty() && !LabelPrinter::matchPaper(document, offered)) {
         return Problem::NotOffered;
     }
-    if (loadedLengthMm && !AltecLabels::fitsLoaded(Units::twipsToMm(document.paperSize().height()), *loadedLengthMm)) {
+    // The length the printer measured between gaps means nothing on a
+    // continuous roll.
+    if (loadedLengthMm && !document.roll.continuous && !AltecLabels::fitsLoaded(Units::twipsToMm(document.paperSize().height()), *loadedLengthMm)) {
         return Problem::WrongLength;
     }
     return Problem::None;

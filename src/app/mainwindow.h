@@ -128,6 +128,7 @@ private:
     void setObjectsLocked(bool locked);
     void setObjectsPrinted(bool printed);
     void editLayers();
+    void editRollLayout();
     /** Puts the selected objects on layer @p name; empty for the label itself. */
     void moveToLayer(const QString &name);
     void selectAllObjects();

@@ -4,6 +4,7 @@
 */
 
 #include "customlabels.h"
+#include "alteclabels.h"
 #include "labelfit.h"
 #include "objectfactory.h"
 
@@ -19,8 +20,8 @@ namespace
 constexpr qreal TwipsPerMm = 1440 / 25.4;
 
 // DYMO's 30334, as its driver lists it.
-const PaperSize Dymo30334{u"30334_2-1_4_in_x_1-1_4_in"_s, u"30334 2-1/4 in x 1-1/4 in"_s, QSizeF(162, 90), QRectF(0, 0, 162, 90), QString(), QRectF(), 0};
-const PaperSize Dymo30252{u"w79h252"_s, u"30252 Address"_s, QSizeF(78.96, 252), QRectF(0, 0, 78.96, 252), QString(), QRectF(), 0};
+const PaperSize Dymo30334{u"30334_2-1_4_in_x_1-1_4_in"_s, u"30334 2-1/4 in x 1-1/4 in"_s, QSizeF(162, 90), QRectF(0, 0, 162, 90), QString(), QRectF(), 0, {}};
+const PaperSize Dymo30252{u"w79h252"_s, u"30252 Address"_s, QSizeF(78.96, 252), QRectF(0, 0, 78.96, 252), QString(), QRectF(), 0, {}};
 
 LabelDocument labelOn(const PaperSize &paper)
 {
@@ -59,6 +60,35 @@ private Q_SLOTS:
         const QList<PaperSize> altec = {PaperSize::custom(u"Labels 50 × 25 mm"_s, QSizeF(50, 25))};
         QCOMPARE(LabelFit::check(labelOn(wrap), altec, true, 41.5), LabelFit::Problem::None);
         QCOMPARE(LabelFit::check(labelOn(wrap), altec, true, 25.0), LabelFit::Problem::WrongLength);
+    }
+
+    void rollLayoutsNeedAPrinterThatTakesThem()
+    {
+        PaperSize roll = PaperSize::custom(u"Industrial polyester 55 mm, continuous"_s, QSizeF(55, 50));
+        LabelDocument label = labelOn(roll);
+        label.roll.continuous = true;
+        // On an Altec, whatever length it measured between gaps.
+        QCOMPARE(LabelFit::check(label, {}, true, 41.5), LabelFit::Problem::None);
+        QCOMPARE(LabelFit::check(label, {Dymo30334, Dymo30252}, false, std::nullopt), LabelFit::Problem::RollNotSupported);
+        LabelDocument across = labelOn(Dymo30334);
+        across.roll.across = 2;
+        QCOMPARE(LabelFit::check(across, {Dymo30334, Dymo30252}, false, std::nullopt), LabelFit::Problem::RollNotSupported);
+
+        // From the catalogue: rolls across and continuous rolls know it.
+        const QList<PaperSize> catalogue = AltecLabels::all();
+        const auto twoAcross = std::find_if(catalogue.cbegin(), catalogue.cend(), [](const PaperSize &paper) {
+            return paper.roll.across == 2;
+        });
+        QVERIFY(twoAcross != catalogue.cend());
+        QCOMPARE(twoAcross->roll.gapMm, AltecLabels::DefaultGapMm);
+        const int continuous = std::count_if(catalogue.cbegin(), catalogue.cend(), [](const PaperSize &paper) {
+            return paper.roll.continuous;
+        });
+        QCOMPARE(continuous, 36);
+        // Not offered as fitting the measured labels.
+        for (const PaperSize &paper : AltecLabels::fitting(catalogue, 50)) {
+            QVERIFY(!paper.roll.continuous);
+        }
     }
 
     void aDymoLabelOnAnAltec()

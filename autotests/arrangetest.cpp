@@ -244,6 +244,13 @@ private Q_SLOTS:
             QCOMPARE(std::get<TextObject>(object).wrap, name == u"C"_s);
         }
 
+        // The roll layout too.
+        document.roll = {2, 2.5, false};
+        buffer.close();
+        buffer.setData(LabelWriter::toByteArray(document));
+        buffer.open(QIODevice::ReadOnly);
+        QCOMPARE(reader.read(&buffer)->roll, (RollLayout{2, 2.5, false}));
+
         // Without them, no comment.
         QVERIFY(!LabelWriter::toByteArray(labelWith({{0, 0, 10, 10}})).contains("<!--"));
     }

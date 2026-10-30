@@ -71,6 +71,7 @@ if(BUILD_APP)
         ${CMAKE_SOURCE_DIR}/src/app/datareader.cpp
         ${CMAKE_SOURCE_DIR}/src/app/layersdialog.cpp
         ${CMAKE_SOURCE_DIR}/src/app/gs1dialog.cpp
+        ${CMAKE_SOURCE_DIR}/src/app/rolllayoutdialog.cpp
         LINK_LIBRARIES labelcreatorcore Qt6::Test Qt6::Widgets Qt6::Sql KF6::Archive KF6::I18n
         TEST_NAME datadialogstest)
     target_include_directories(datadialogstest PRIVATE ${CMAKE_SOURCE_DIR}/src/app)
@@ -96,6 +97,7 @@ if(BUILD_APP)
         ${CMAKE_SOURCE_DIR}/src/app/customlabels.cpp
         ${CMAKE_SOURCE_DIR}/src/app/labelfit.cpp
         ${CMAKE_SOURCE_DIR}/src/app/objectfactory.cpp
+        ${CMAKE_SOURCE_DIR}/src/app/plasma-label-creator.qrc # the Altec catalogue
         LINK_LIBRARIES labelcreatorcore Qt6::Test Qt6::Widgets KF6::ConfigCore KF6::I18n
         TEST_NAME labeltypestest)
 

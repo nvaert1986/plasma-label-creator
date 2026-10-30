@@ -9,12 +9,17 @@
 
 /**
  * The labels Altec sells for its ATP printers, as listed on altec.nl for
- * the ATP-600 Pro (2026-10-29): die-cut and round labels, grouped by
- * product; wrap labels with the white strip that takes print. Continuous rolls are left out until the editor can design
- * labels of a chosen length.
+ * the ATP-600 Pro (2026-10-29), grouped by product: die-cut and round
+ * labels, wrap labels with the white strip that takes print, rolls with
+ * labels across, and continuous rolls at a length to start with.
  */
 namespace AltecLabels
 {
+
+/** The length a continuous roll's label starts with, in millimetres. */
+constexpr qreal ContinuousLengthMm = 50;
+/** The gap between labels across, which Altec does not give, in millimetres. */
+constexpr qreal DefaultGapMm = 2;
 
 /** Every label, as custom sizes grouped by product. */
 QList<LabelCreator::PaperSize> all();

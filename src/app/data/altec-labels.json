@@ -234,6 +234,11 @@
 "height":50.0
 },
 {
+"product":"Checkerboard labels",
+"width":76.0,
+"continuous":true
+},
+{
 "product":"Cleanroom labels",
 "width":50.0,
 "height":25.0
@@ -527,6 +532,21 @@
 "height":50.0
 },
 {
+"product":"Industrial polyester",
+"width":55.0,
+"continuous":true
+},
+{
+"product":"Industrial polyester",
+"width":75.0,
+"continuous":true
+},
+{
+"product":"Industrial polyester",
+"width":100.0,
+"continuous":true
+},
+{
 "product":"Industrial polyester | Gestanst",
 "width":25.0,
 "height":13.0
@@ -585,6 +605,36 @@
 "product":"Industrial polyester | Gestanst",
 "width":100.0,
 "height":150.0
+},
+{
+"product":"Industrial vinyl",
+"width":15.0,
+"continuous":true
+},
+{
+"product":"Industrial vinyl",
+"width":23.0,
+"continuous":true
+},
+{
+"product":"Industrial vinyl",
+"width":45.0,
+"continuous":true
+},
+{
+"product":"Industrial vinyl",
+"width":55.0,
+"continuous":true
+},
+{
+"product":"Industrial vinyl",
+"width":75.0,
+"continuous":true
+},
+{
+"product":"Industrial vinyl",
+"width":100.0,
+"continuous":true
 },
 {
 "product":"Industrial vinyl | Gestanst",
@@ -700,6 +750,11 @@
 "height":150.0
 },
 {
+"product":"Industriële typeplaten",
+"width":76.0,
+"continuous":true
+},
+{
 "product":"Kabelvlaggen | Plakkend",
 "width":60.0,
 "height":25.0
@@ -752,6 +807,71 @@
 "product":"Laslabels",
 "width":50.0,
 "height":50.0
+},
+{
+"product":"Logistic vinyl",
+"width":15.0,
+"continuous":true
+},
+{
+"product":"Logistic vinyl",
+"width":23.0,
+"continuous":true
+},
+{
+"product":"Logistic vinyl",
+"width":45.0,
+"continuous":true
+},
+{
+"product":"Logistic vinyl",
+"width":75.0,
+"continuous":true
+},
+{
+"product":"Logistic vinyl",
+"width":100.0,
+"continuous":true
+},
+{
+"product":"Magneetband",
+"width":15.0,
+"continuous":true
+},
+{
+"product":"Magneetband",
+"width":23.0,
+"continuous":true
+},
+{
+"product":"Magneetband",
+"width":30.0,
+"continuous":true
+},
+{
+"product":"Magneetband",
+"width":35.0,
+"continuous":true
+},
+{
+"product":"Magneetband",
+"width":45.0,
+"continuous":true
+},
+{
+"product":"Magneetband",
+"width":60.0,
+"continuous":true
+},
+{
+"product":"Magneetband",
+"width":75.0,
+"continuous":true
+},
+{
+"product":"Magneetband",
+"width":100.0,
+"continuous":true
 },
 {
 "product":"Magneetlabels",
@@ -981,6 +1101,21 @@
 "height":100.0
 },
 {
+"product":"Reflecterende labels",
+"width":50.0,
+"continuous":true
+},
+{
+"product":"Reflecterende labels",
+"width":75.0,
+"continuous":true
+},
+{
+"product":"Reflecterende labels",
+"width":100.0,
+"continuous":true
+},
+{
 "product":"ResoPrint",
 "width":15.0,
 "height":8.0
@@ -1198,6 +1333,31 @@
 "height":30.0
 },
 {
+"product":"SwapLabel",
+"width":25.0,
+"continuous":true
+},
+{
+"product":"SwapLabel",
+"width":50.0,
+"continuous":true
+},
+{
+"product":"SwapLabel",
+"width":60.0,
+"continuous":true
+},
+{
+"product":"SwapLabel",
+"width":80.0,
+"continuous":true
+},
+{
+"product":"SwapLabel",
+"width":105.0,
+"continuous":true
+},
+{
 "product":"Tag Extreme",
 "width":70.0,
 "height":140.0
@@ -1350,6 +1510,11 @@
 "height":70.0
 },
 {
+"product":"Verwijderbare labels | PeelPro",
+"width":100.0,
+"continuous":true
+},
+{
 "product":"Verzendlabels papier",
 "width":38.0,
 "height":19.0
@@ -1438,6 +1603,21 @@
 "product":"Vlaglabels",
 "width":30.0,
 "height":10.0
+},
+{
+"product":"Vloerlabels",
+"width":55.0,
+"continuous":true
+},
+{
+"product":"Vloerlabels",
+"width":75.0,
+"continuous":true
+},
+{
+"product":"Vloerlabels",
+"width":100.0,
+"continuous":true
 },
 {
 "product":"WetPaintLabel",
