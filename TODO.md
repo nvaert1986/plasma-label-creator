@@ -69,8 +69,19 @@ Still to do by hand, in the running app:
 
 ## Designer
 
-The Medium designer items are done (see "Done since 0.2.0"). Left, all
-Hard:
+- [ ] **Turn objects with the mouse** (Medium): a rotate handle above a
+  selected object, joined by a short line; dragging turns it about its
+  centre with the angle shown by the cursor, Shift snaps to 15°, one undo
+  step per drag. No handle on locked objects, locked layers or tape.
+  While turned, the resize handles work along the object's own sides.
+  Uses the existing Angle setting: files and printing stay as they are.
+- [ ] **Turn Left 15° / Turn Right 15°** in the Format menu, with
+  shortcuts (Ctrl+[ and Ctrl+]). (Easy)
+- [ ] **An angle box in the format toolbar** for the selected objects.
+  (Easy)
+
+The other Medium designer items are done (see "Done since 0.2.0"). Left
+after these, all Hard:
 
 - [ ] **The printer's own fonts and barcodes, and labels stored on the
   printer**: send ZPL text and barcode commands instead of an image, and
