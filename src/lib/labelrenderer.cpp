@@ -672,8 +672,20 @@ void LabelRenderer::paint(QPainter *painter, const LabelDocument &laidOut)
         painter->drawPath(toCanvas.map(document.paperOutline));
     }
 
-    for (const LabelObject &object : document.objects) {
-        paintObject(painter, object);
+    for (int i = 0; i < document.objects.size(); ++i) {
+        // Printing leaves out what does not print; the screen leaves out
+        // hidden layers and shows what does not print faded.
+        if (preview ? !document.isShown(i) : !document.isPrinted(i)) {
+            continue;
+        }
+        if (preview && !document.isPrinted(i)) {
+            painter->save();
+            painter->setOpacity(0.35);
+            paintObject(painter, document.objects.at(i));
+            painter->restore();
+        } else {
+            paintObject(painter, document.objects.at(i));
+        }
     }
 
     // A tape label's cell borders, which print too.

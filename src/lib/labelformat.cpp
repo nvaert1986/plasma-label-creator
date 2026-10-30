@@ -272,27 +272,62 @@ QList<int> writtenOrder(const LabelDocument &document)
     return order;
 }
 
-bool wraps(const LabelObject &object)
+// The text object inside @p object, for what only text has.
+const TextObject *textOf(const LabelObject &object)
 {
     if (const auto *text = std::get_if<TextObject>(&object)) {
-        return text->wrap;
+        return text;
     }
-    if (const auto *address = std::get_if<AddressObject>(&object)) {
-        return address->wrap;
+    return std::get_if<AddressObject>(&object);
+}
+
+TextObject *textOf(LabelObject &object)
+{
+    return const_cast<TextObject *>(textOf(std::as_const(object)));
+}
+
+// What an object has that DLS has no element for; empty when nothing.
+QJsonObject objectExtensions(const LabelObject &object)
+{
+    const ObjectBase &base = objectBase(object);
+    QJsonObject o;
+    if (base.locked) {
+        o[u"locked"_s] = true;
     }
-    return false;
+    if (const TextObject *text = textOf(object); text && text->wrap) {
+        o[u"wrap"_s] = true;
+    }
+    if (!base.layer.isEmpty()) {
+        o[u"layer"_s] = base.layer;
+    }
+    if (!base.printed) {
+        o[u"print"_s] = false;
+    }
+    return o;
+}
+
+void applyObjectExtensions(LabelObject &object, const QJsonObject &o)
+{
+    ObjectBase &base = objectBase(object);
+    base.locked = o[u"locked"_s].toBool();
+    base.layer = o[u"layer"_s].toString();
+    base.printed = o[u"print"_s].toBool(true);
+    if (TextObject *text = textOf(object)) {
+        text->wrap = o[u"wrap"_s].toBool();
+    }
 }
 
 bool hasObjectExtensions(const LabelDocument &document)
 {
     return std::any_of(document.objects.cbegin(), document.objects.cend(), [](const LabelObject &object) {
-        return objectBase(object).locked || wraps(object);
+        return !objectExtensions(object).isEmpty();
     });
 }
 
 bool hasExtensions(const LabelDocument &document)
 {
-    return !document.questions.isEmpty() || document.dataSource.kind != DataSource::Kind::None || hasObjectExtensions(document);
+    return !document.questions.isEmpty() || document.dataSource.kind != DataSource::Kind::None || !document.layers.isEmpty()
+        || hasObjectExtensions(document);
 }
 
 QString extensionsJson(const LabelDocument &document)
@@ -320,21 +355,20 @@ QString extensionsJson(const LabelDocument &document)
         QJsonArray objects;
         const QList<int> order = writtenOrder(document);
         for (qsizetype at = 0; at < order.size(); ++at) {
-            const LabelObject &object = document.objects.at(order.at(at));
-            if (!objectBase(object).locked && !wraps(object)) {
-                continue;
+            QJsonObject o = objectExtensions(document.objects.at(order.at(at)));
+            if (!o.isEmpty()) {
+                o[u"at"_s] = int(at);
+                objects.append(o);
             }
-            QJsonObject o;
-            o[u"at"_s] = int(at);
-            if (objectBase(object).locked) {
-                o[u"locked"_s] = true;
-            }
-            if (wraps(object)) {
-                o[u"wrap"_s] = true;
-            }
-            objects.append(o);
         }
         root[u"objects"_s] = objects;
+    }
+    if (!document.layers.isEmpty()) {
+        QJsonArray layers;
+        for (const Layer &layer : document.layers) {
+            layers.append(QJsonObject{{u"name"_s, layer.name}, {u"visible"_s, layer.visible}, {u"print"_s, layer.printed}, {u"locked"_s, layer.locked}});
+        }
+        root[u"layers"_s] = layers;
     }
     const DataSource &source = document.dataSource;
     if (source.kind != DataSource::Kind::None) {
@@ -402,12 +436,17 @@ void readExtensions(const QByteArray &data, LabelDocument &document, QStringList
         if (at < 0 || at >= document.objects.size()) {
             continue;
         }
-        LabelObject &object = document.objects[at];
-        objectBase(object).locked = o[u"locked"_s].toBool();
-        if (auto *text = std::get_if<TextObject>(&object)) {
-            text->wrap = o[u"wrap"_s].toBool();
-        } else if (auto *address = std::get_if<AddressObject>(&object)) {
-            address->wrap = o[u"wrap"_s].toBool();
+        applyObjectExtensions(document.objects[at], o);
+    }
+    for (const QJsonValue &value : root[u"layers"_s].toArray()) {
+        const QJsonObject l = value.toObject();
+        Layer layer;
+        layer.name = l[u"name"_s].toString();
+        layer.visible = l[u"visible"_s].toBool(true);
+        layer.printed = l[u"print"_s].toBool(true);
+        layer.locked = l[u"locked"_s].toBool();
+        if (!layer.name.isEmpty()) {
+            document.layers << layer;
         }
     }
     const QJsonObject s = root[u"dataSource"_s].toObject();

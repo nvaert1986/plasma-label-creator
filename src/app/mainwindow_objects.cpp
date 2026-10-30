@@ -174,7 +174,7 @@ void MainWindow::positionObject(Qt::Alignment alignment)
     QRectF around;
     for (const int index : m_editor->selectedObjects()) {
         const ObjectBase &base = objectBase(document.objects.at(index));
-        if (!base.locked) {
+        if (!document.isLocked(index)) {
             movable << index;
             around = around.isNull() ? base.bounds : around.united(base.bounds);
         }
@@ -229,11 +229,55 @@ void MainWindow::setObjectsLocked(bool locked)
     m_editor->apply(document, locked ? i18n("Lock Objects") : i18n("Unlock Objects"));
 }
 
+void MainWindow::setObjectsPrinted(bool printed)
+{
+    LabelDocument document = m_editor->document();
+    for (const int index : m_editor->selectedObjects()) {
+        objectBase(document.objects[index]).printed = printed;
+    }
+    m_editor->apply(document, printed ? i18n("Print Objects") : i18n("Do Not Print Objects"));
+}
+
+void MainWindow::editLayers()
+{
+    LayersDialog dialog(m_editor->document().layers, this);
+    if (dialog.exec() != QDialog::Accepted) {
+        return;
+    }
+    LabelDocument document = m_editor->document();
+    document.changeLayers(dialog.layers(), dialog.renamed());
+    // Objects on a layer that no longer shows or can be edited are not selected.
+    QList<int> selection;
+    for (const int index : m_editor->selectedObjects()) {
+        if (document.isSelectable(index)) {
+            selection << index;
+        }
+    }
+    m_editor->apply(document, i18n("Change Layers"), selection);
+}
+
+void MainWindow::moveToLayer(const QString &name)
+{
+    LabelDocument document = m_editor->document();
+    for (const int index : m_editor->selectedObjects()) {
+        objectBase(document.objects[index]).layer = name;
+    }
+    QList<int> selection;
+    for (const int index : m_editor->selectedObjects()) {
+        if (document.isSelectable(index)) {
+            selection << index;
+        }
+    }
+    m_editor->apply(document, i18n("Move to Layer"), selection);
+}
+
 void MainWindow::selectAllObjects()
 {
     QList<int> all;
     for (int i = 0; i < m_editor->document().objects.size(); ++i) {
-        all << i;
+        if (m_editor->document().isSelectable(i)) {
+            all << i;
+        }
     }
     m_editor->setSelectedObjects(all, m_editor->selection());
 }
@@ -313,6 +357,40 @@ void MainWindow::setupArrangeActions()
     ungroup->setText(i18n("Ungroup"));
     ungroup->setIcon(QIcon::fromTheme(u"object-ungroup"_s));
     actions->setDefaultShortcut(ungroup, QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_G));
+
+    // Layers, and objects that only help to design.
+    QAction *layers = actions->addAction(u"layout_layers"_s, this, &MainWindow::editLayers);
+    layers->setText(i18n("La&yers…"));
+    layers->setIcon(QIcon::fromTheme(u"layer-visible-on"_s));
+    auto *moveTo = new KActionMenu(QIcon::fromTheme(u"layer-next"_s), i18n("Move to Layer"), this);
+    moveTo->setPopupMode(QToolButton::InstantPopup);
+    actions->addAction(u"layout_move_to_layer"_s, moveTo);
+    connect(moveTo->menu(), &QMenu::aboutToShow, this, [this, moveTo]() {
+        QMenu *menu = moveTo->menu();
+        menu->clear();
+        const QList<int> selected = m_editor->selectedObjects();
+        const auto addLayer = [&](const QString &text, const QString &name) {
+            QAction *action = menu->addAction(text, this, [this, name]() {
+                moveToLayer(name);
+            });
+            action->setCheckable(true);
+            action->setChecked(!selected.isEmpty() && std::all_of(selected.cbegin(), selected.cend(), [this, &name](int index) {
+                return objectBase(m_editor->document().objects.at(index)).layer == name;
+            }));
+        };
+        addLayer(i18n("The Label Itself"), QString());
+        for (const Layer &layer : m_editor->document().layers) {
+            addLayer(layer.name, layer.name);
+        }
+        menu->addSeparator();
+        menu->addAction(QIcon::fromTheme(u"layer-visible-on"_s), i18n("Edit Layers…"), this, &MainWindow::editLayers);
+    });
+    m_noPrint = new KToggleAction(QIcon::fromTheme(u"document-print-direct"_s), i18n("Do Not Print"), this);
+    m_noPrint->setToolTip(i18n("Shown faded while designing, left out when printing"));
+    actions->addAction(u"object_no_print"_s, m_noPrint);
+    connect(m_noPrint, &QAction::triggered, this, [this](bool noPrint) {
+        setObjectsPrinted(!noPrint);
+    });
 
     m_lock = new KToggleAction(QIcon::fromTheme(u"object-locked"_s), i18n("Lock Position and Size"), this);
     m_lock->setToolTip(i18n("Locked objects cannot be moved or resized"));

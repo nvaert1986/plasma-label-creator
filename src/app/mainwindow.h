@@ -111,6 +111,10 @@ private:
     void groupObjects();
     void ungroupObjects();
     void setObjectsLocked(bool locked);
+    void setObjectsPrinted(bool printed);
+    void editLayers();
+    /** Puts the selected objects on layer @p name; empty for the label itself. */
+    void moveToLayer(const QString &name);
     void selectAllObjects();
     void setOrientation(LabelCreator::PaperOrientation orientation);
     void raiseObject();
@@ -191,6 +195,7 @@ private:
     KToggleAction *m_portrait = nullptr;
     KToggleAction *m_landscape = nullptr;
     KToggleAction *m_lock = nullptr;
+    KToggleAction *m_noPrint = nullptr;
     QAction *m_paste = nullptr;
     bool m_followPrinter = false; // the user chose another printer; the label type follows
     QList<KToggleAction *> m_horizontalAlignment; // left, centre, right

@@ -21,6 +21,7 @@
 #include "labelkindsdialog.h"
 #include "labelrenderer.h"
 #include "labelview.h"
+#include "layersdialog.h"
 #include "mainwindow.h"
 #include "printbar.h"
 #include "printpreviewdialog.h"

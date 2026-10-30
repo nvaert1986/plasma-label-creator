@@ -762,6 +762,11 @@ void MainWindow::updateActions()
     actionCollection()->action(u"arrange_ungroup"_s)->setEnabled(grouped);
     actionCollection()->action(u"edit_select_all"_s)->setEnabled(!document.objects.isEmpty());
     m_lock->setEnabled(selected && !tape);
+    m_noPrint->setEnabled(selected);
+    m_noPrint->setChecked(selected && std::none_of(selection.cbegin(), selection.cend(), [&document](int index) {
+                              return objectBase(document.objects.at(index)).printed;
+                          }));
+    actionCollection()->action(u"layout_move_to_layer"_s)->setEnabled(selected);
     m_lock->setChecked(selected && std::all_of(selection.cbegin(), selection.cend(), [&document](int index) {
                            return objectBase(document.objects.at(index)).locked;
                        }));

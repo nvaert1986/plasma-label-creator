@@ -135,6 +135,42 @@ private Q_SLOTS:
         QCOMPARE(lefts(), (QList<int>{4, 2, 3, 1, 0}));
     }
 
+    void layersShowPrintAndLock()
+    {
+        LabelDocument document = labelWith({{0, 0, 10, 10}, {20, 0, 10, 10}, {40, 0, 10, 10}, {60, 0, 10, 10}});
+        document.layers = {{u"Photo"_s, true, false, false}, {u"Hidden"_s, false, true, false}, {u"Fixed"_s, true, true, true}};
+        objectBase(document.objects[0]).layer = u"Photo"_s;
+        objectBase(document.objects[1]).layer = u"Hidden"_s;
+        objectBase(document.objects[2]).layer = u"Fixed"_s;
+        objectBase(document.objects[3]).printed = false;
+        QVERIFY(document.isShown(0) && !document.isPrinted(0) && document.isSelectable(0));
+        QVERIFY(!document.isShown(1) && document.isPrinted(1) && !document.isSelectable(1));
+        QVERIFY(document.isLocked(2) && !document.isSelectable(2) && document.isPrinted(2));
+        QVERIFY(!document.isPrinted(3) && !document.isLocked(3));
+        // A locked layer's object stays when lining up.
+        QVERIFY(Arrange::align(document, {2, 3}, Qt::AlignLeft));
+        QCOMPARE(boundsOf(document, 2).left(), 40.0);
+        QCOMPARE(boundsOf(document, 3).left(), 40.0);
+
+        // Renamed layers keep their objects; removed ones hand them to the label.
+        document.changeLayers({{u"Product photo"_s, true, false, false}}, {{u"Photo"_s, u"Product photo"_s}, {u"Hidden"_s, QString()}, {u"Fixed"_s, QString()}});
+        QCOMPARE(objectBase(document.objects.at(0)).layer, u"Product photo"_s);
+        QVERIFY(objectBase(document.objects.at(1)).layer.isEmpty());
+        QVERIFY(document.isShown(1) && document.isSelectable(2));
+
+        // Saved and read back.
+        QBuffer buffer;
+        buffer.setData(LabelWriter::toByteArray(document));
+        buffer.open(QIODevice::ReadOnly);
+        LabelReader reader;
+        const auto read = reader.read(&buffer);
+        QVERIFY2(read, qPrintable(reader.errorString()));
+        QCOMPARE(read->layers, document.layers);
+        QCOMPARE(objectBase(read->objects.at(0)).layer, u"Product photo"_s);
+        QVERIFY(!objectBase(read->objects.at(3)).printed);
+        QVERIFY(objectBase(read->objects.at(2)).printed);
+    }
+
     void lockAndWrapAreSaved()
     {
         LabelDocument document = labelWith({{100, 100, 200, 100}, {500, 300, 400, 200}});

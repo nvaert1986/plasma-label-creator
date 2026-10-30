@@ -425,6 +425,42 @@ private Q_SLOTS:
         QCOMPARE(objectBase(pasted.at(1)).name, u"C"_s);
     }
 
+    void lockedAndHiddenLayersCannotBeSelected()
+    {
+        LabelDocument document = addressLabel();
+        document.objects.clear();
+        for (const QRectF &rect : {QRectF(200, 200, 600, 400), QRectF(1200, 200, 600, 400), QRectF(2200, 200, 600, 400)}) {
+            ShapeObject shape;
+            shape.bounds = rect;
+            document.objects << shape;
+        }
+        document.layers = {{u"Fixed"_s, true, true, true}, {u"Hidden"_s, false, true, false}};
+        objectBase(document.objects[1]).layer = u"Fixed"_s;
+        objectBase(document.objects[2]).layer = u"Hidden"_s;
+        LabelEditor editor;
+        editor.reset(document);
+        LabelView view(&editor);
+        view.resize(800, 400);
+        view.show();
+        QVERIFY(QTest::qWaitForWindowExposed(&view));
+        view.setZoom(1.0);
+        const auto centreOf = [&](int index) {
+            return (view.labelOrigin() + objectBase(editor.document().objects.at(index)).bounds.center() * view.scale()).toPoint();
+        };
+        QTest::mouseClick(&view, Qt::LeftButton, {}, centreOf(1));
+        QCOMPARE(editor.selection(), -1);
+        QTest::mouseClick(&view, Qt::LeftButton, {}, centreOf(2));
+        QCOMPARE(editor.selection(), -1);
+        QTest::mouseClick(&view, Qt::LeftButton, {}, centreOf(0));
+        QCOMPARE(editor.selection(), 0);
+        // A band over all of them takes only the one that can be edited.
+        const QPoint end = (view.labelOrigin() + QPointF(2900, 700) * view.scale()).toPoint();
+        QTest::mousePress(&view, Qt::LeftButton, {}, QPoint(2, 2));
+        QTest::mouseMove(&view, end);
+        QTest::mouseRelease(&view, Qt::LeftButton, {}, end);
+        QCOMPARE(editor.selectedObjects(), QList<int>{0});
+    }
+
     void severalObjectsCopyWithTheirGroup()
     {
         LabelDocument document = addressLabel();

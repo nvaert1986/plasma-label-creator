@@ -339,7 +339,7 @@ LabelView::Handle LabelView::handleAt(const QPointF &pos) const
     const int selection = m_editor->selection();
     // On tape, cells place and size the objects. Only a single object that
     // is not locked has handles.
-    if (selection < 0 || shownDocument().tape || m_editor->selectedObjects().size() != 1 || objectBase(shownDocument().objects.at(selection)).locked) {
+    if (selection < 0 || shownDocument().tape || m_editor->selectedObjects().size() != 1 || shownDocument().isLocked(selection)) {
         return NoHandle;
     }
     const QList<QRectF> rects = handleRects(objectBase(shownDocument().objects.at(selection)).bounds);
@@ -358,7 +358,7 @@ int LabelView::objectAt(const QPointF &pos) const
     // Topmost first; thin lines get some slack so they can be grabbed.
     const qreal slack = 3 / scale();
     for (qsizetype i = objects.size() - 1; i >= 0; --i) {
-        if (objectBase(objects.at(i)).bounds.adjusted(-slack, -slack, slack, slack).contains(twips)) {
+        if (shownDocument().isSelectable(int(i)) && objectBase(objects.at(i)).bounds.adjusted(-slack, -slack, slack, slack).contains(twips)) {
             return int(i);
         }
     }
@@ -413,8 +413,10 @@ void LabelView::paintEvent(QPaintEvent *)
     painter.setRenderHint(QPainter::Antialiasing, false);
     painter.setBrush(Qt::NoBrush);
     painter.setPen(QPen(QColor(0, 0, 0, 50), 0, Qt::DotLine));
-    for (const LabelObject &object : document.objects) {
-        painter.drawRect(toWidget(objectBase(object).bounds));
+    for (int i = 0; i < document.objects.size(); ++i) {
+        if (document.isShown(i)) {
+            painter.drawRect(toWidget(objectBase(document.objects.at(i)).bounds));
+        }
     }
 
     // Every selected object framed; a selected group also as a whole, locked
@@ -455,7 +457,7 @@ void LabelView::paintEvent(QPaintEvent *)
             }
         }
     }
-    if (selected.size() == 1 && !document.tape && !objectBase(document.objects.at(selected.constFirst())).locked) {
+    if (selected.size() == 1 && !document.tape && !document.isLocked(selected.constFirst())) {
         painter.setPen(QPen(highlight, 1));
         painter.setBrush(palette().color(QPalette::Base));
         for (const QRectF &handle : handleRects(objectBase(document.objects.at(selected.constFirst())).bounds)) {
@@ -534,7 +536,7 @@ void LabelView::mousePressEvent(QMouseEvent *event)
     m_dragStartAll.clear();
     const QList<int> dragged = m_dragHandle == NoHandle ? m_editor->selectedObjects() : QList<int>{selection};
     for (const int index : dragged) {
-        if (!objectBase(document.objects.at(index)).locked) {
+        if (!document.isLocked(index)) {
             m_dragIndices << index;
             m_dragStartAll << objectBase(document.objects.at(index)).bounds;
         }
@@ -559,7 +561,7 @@ void LabelView::mouseMoveEvent(QMouseEvent *event)
         QList<int> enclosed;
         const auto &objects = m_editor->document().objects;
         for (int i = 0; i < objects.size(); ++i) {
-            if (band.contains(objectBase(objects.at(i)).bounds)) {
+            if (m_editor->document().isSelectable(i) && band.contains(objectBase(objects.at(i)).bounds)) {
                 enclosed << i;
             }
         }
@@ -579,7 +581,7 @@ void LabelView::mouseMoveEvent(QMouseEvent *event)
             setCursor(Qt::SizeHorCursor);
         } else {
             const int index = objectAt(event->position());
-            const bool movable = index >= 0 && !m_editor->document().tape && !objectBase(m_editor->document().objects.at(index)).locked;
+            const bool movable = index >= 0 && !m_editor->document().tape && !m_editor->document().isLocked(index);
             setCursor(movable ? Qt::SizeAllCursor : Qt::ArrowCursor);
         }
         return;
@@ -700,9 +702,8 @@ void LabelView::moveSelection(const QPointF &delta, const QString &description)
     LabelDocument document = m_editor->document();
     bool moved = false;
     for (const int index : m_editor->selectedObjects()) {
-        ObjectBase &base = objectBase(document.objects[index]);
-        if (!base.locked) {
-            base.bounds.translate(delta);
+        if (!document.isLocked(index)) {
+            objectBase(document.objects[index]).bounds.translate(delta);
             moved = true;
         }
     }

@@ -324,6 +324,60 @@ void LabelDocument::rotateQuarter()
     orientation = toPortrait ? PaperOrientation::Portrait : PaperOrientation::Landscape;
 }
 
+void LabelDocument::changeLayers(const QList<Layer> &newLayers, const QHash<QString, QString> &renamed)
+{
+    layers = newLayers;
+    for (LabelObject &object : objects) {
+        QString &layer = objectBase(object).layer;
+        layer = renamed.value(layer, layer);
+        const bool exists = std::any_of(layers.cbegin(), layers.cend(), [&layer](const Layer &l) {
+            return l.name == layer;
+        });
+        if (!exists) {
+            layer.clear();
+        }
+    }
+}
+
+const Layer *LabelDocument::layerOf(int index) const
+{
+    if (index < 0 || index >= objects.size()) {
+        return nullptr;
+    }
+    const QString &name = objectBase(objects.at(index)).layer;
+    if (name.isEmpty()) {
+        return nullptr;
+    }
+    const auto it = std::find_if(layers.cbegin(), layers.cend(), [&name](const Layer &layer) {
+        return layer.name == name;
+    });
+    return it != layers.cend() ? &*it : nullptr;
+}
+
+bool LabelDocument::isShown(int index) const
+{
+    const Layer *layer = layerOf(index);
+    return !layer || layer->visible;
+}
+
+bool LabelDocument::isPrinted(int index) const
+{
+    const Layer *layer = layerOf(index);
+    return index >= 0 && index < objects.size() && objectBase(objects.at(index)).printed && (!layer || layer->printed);
+}
+
+bool LabelDocument::isLocked(int index) const
+{
+    const Layer *layer = layerOf(index);
+    return index >= 0 && index < objects.size() && (objectBase(objects.at(index)).locked || (layer && layer->locked));
+}
+
+bool LabelDocument::isSelectable(int index) const
+{
+    const Layer *layer = layerOf(index);
+    return index >= 0 && index < objects.size() && (!layer || (layer->visible && !layer->locked));
+}
+
 QSizeF LabelDocument::paperSize() const
 {
     if (tape) {

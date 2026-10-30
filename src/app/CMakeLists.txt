@@ -27,6 +27,8 @@ add_executable(plasma-label-creator
     labeleditor.h
     labelview.cpp
     labelview.h
+    layersdialog.cpp
+    layersdialog.h
     mainwindow.cpp
     mainwindow_data.cpp
     mainwindow_format.cpp

@@ -9,6 +9,7 @@
 #include <QColor>
 #include <QDateTime>
 #include <QFont>
+#include <QHash>
 #include <QList>
 #include <QMarginsF>
 #include <QPainterPath>
@@ -157,6 +158,10 @@ struct ObjectBase {
     QRectF bounds;
     /** Cannot be moved or resized. Not in DLS's format: kept in the settings comment. */
     bool locked = false;
+    /** The layer it is on; empty for the label's own, which always shows and prints. */
+    QString layer;
+    /** False for an object only to design with, such as a picture of the product. */
+    bool printed = true;
 
     bool operator==(const ObjectBase &) const = default;
 };
@@ -395,6 +400,18 @@ struct DataSource {
     bool operator==(const DataSource &) const = default;
 };
 
+/**
+ * A layer of objects that show, print and move as it says. Not in DLS's
+ * format: kept in the settings comment.
+ */
+struct Layer {
+    QString name;
+    bool visible = true; // on screen
+    bool printed = true;
+    bool locked = false; // its objects cannot be selected or moved
+    bool operator==(const Layer &) const = default;
+};
+
 struct LabelDocument {
     PaperOrientation orientation = PaperOrientation::Landscape;
     QString id;
@@ -419,6 +436,7 @@ struct LabelDocument {
     // DLS ignores: questions asked when printing, and where data comes from.
     QList<PrintQuestion> questions;
     DataSource dataSource;
+    QList<Layer> layers;
 
     /**
      * Adds @p object and returns its index. On tape it gets a cell of its
@@ -443,6 +461,23 @@ struct LabelDocument {
      * turn. Only the view turns: the label prints exactly as before.
      */
     void rotateQuarter();
+
+    /**
+     * Replaces the layers with @p newLayers. Objects follow their layer's
+     * new name in @p renamed (old name to new); objects on a layer that is
+     * gone are on the label itself again.
+     */
+    void changeLayers(const QList<Layer> &newLayers, const QHash<QString, QString> &renamed);
+    /** The layer object @p index is on; nullptr for the label's own. */
+    const Layer *layerOf(int index) const;
+    /** Whether object @p index shows on screen: its layer is visible. */
+    bool isShown(int index) const;
+    /** Whether object @p index prints: it and its layer are printed. */
+    bool isPrinted(int index) const;
+    /** Whether object @p index cannot move: it or its layer is locked. */
+    bool isLocked(int index) const;
+    /** Whether object @p index can be selected: shown, on a layer that is not locked. */
+    bool isSelectable(int index) const;
 
     /** Size of the paper as it feeds, in twips. */
     QSizeF paperSize() const;

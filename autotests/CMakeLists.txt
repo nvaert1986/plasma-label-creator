@@ -67,6 +67,7 @@ if(BUILD_APP)
     ecm_add_test(datadialogstest.cpp
         ${CMAKE_SOURCE_DIR}/src/app/datadialogs.cpp
         ${CMAKE_SOURCE_DIR}/src/app/datareader.cpp
+        ${CMAKE_SOURCE_DIR}/src/app/layersdialog.cpp
         LINK_LIBRARIES labelcreatorcore Qt6::Test Qt6::Widgets Qt6::Sql KF6::Archive KF6::I18n
         TEST_NAME datadialogstest)
     target_include_directories(datadialogstest PRIVATE ${CMAKE_SOURCE_DIR}/src/app)

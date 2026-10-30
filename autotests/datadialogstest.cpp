@@ -4,6 +4,7 @@
 */
 
 #include "datadialogs.h"
+#include "layersdialog.h"
 
 #include <QDialogButtonBox>
 #include <QFile>
@@ -103,6 +104,34 @@ private Q_SLOTS:
         // None ticked before: none ticked now.
         DataSourceDialog none(source, DataReader::read(source), {}, nullptr);
         QCOMPARE(none.selectedRows(), QList<int>());
+    }
+
+    void layersAreEdited()
+    {
+        LayersDialog dialog({{u"Photo"_s, true, false, false}, {u"Old"_s, true, true, false}}, nullptr);
+        dialog.show();
+        QVERIFY(QTest::qWaitForWindowExposed(&dialog));
+        auto *table = dialog.findChild<QTableWidget *>();
+        QCOMPARE(table->rowCount(), 2);
+        table->item(0, 0)->setText(u"Product photo"_s);
+        table->item(0, 3)->setCheckState(Qt::Checked);
+        table->setCurrentCell(1, 0);
+        for (QPushButton *button : dialog.findChildren<QPushButton *>()) {
+            if (button->text().contains(u"Remove"_s)) {
+                button->click();
+            }
+        }
+        for (QPushButton *button : dialog.findChildren<QPushButton *>()) {
+            if (button->text().contains(u"Add"_s)) {
+                button->click();
+            }
+        }
+        grab(&dialog, u"layers"_s);
+        const QList<Layer> layers = dialog.layers();
+        QCOMPARE(layers.size(), 2);
+        QCOMPARE(layers.at(0), (Layer{u"Product photo"_s, true, false, true}));
+        QCOMPARE(layers.at(1).name, u"Layer 1"_s);
+        QCOMPARE(dialog.renamed(), (QHash<QString, QString>{{u"Photo"_s, u"Product photo"_s}, {u"Old"_s, QString()}}));
     }
 
     void questionsAreEdited()

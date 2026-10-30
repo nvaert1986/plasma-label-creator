@@ -33,7 +33,7 @@ QList<Unit> unitsOf(const LabelDocument &document, const QList<int> &indices)
         for (const int member : std::as_const(unit.members)) {
             const ObjectBase &base = objectBase(document.objects.at(member));
             unit.bounds = unit.bounds.isNull() ? base.bounds : unit.bounds.united(base.bounds);
-            unit.locked = unit.locked || base.locked;
+            unit.locked = unit.locked || document.isLocked(member);
             done << member;
         }
         units << unit;
@@ -92,7 +92,7 @@ int unitCount(const LabelDocument &document, const QList<int> &indices)
 bool canMove(const LabelDocument &document, const QList<int> &indices)
 {
     return std::any_of(indices.cbegin(), indices.cend(), [&document](int index) {
-        return index >= 0 && index < document.objects.size() && !objectBase(document.objects.at(index)).locked;
+        return index >= 0 && index < document.objects.size() && !document.isLocked(index);
     });
 }
 

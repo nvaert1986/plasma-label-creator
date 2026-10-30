@@ -248,6 +248,31 @@ private Q_SLOTS:
         QVERIFY(ink.height() > inkBounds(renderer.renderImage(singleObject(single), Dpi)).height() * 1.5);
     }
 
+    void objectsThatDoNotPrintAreLeftOut()
+    {
+        ShapeObject box;
+        box.shapeType = ShapeType::Rectangle;
+        box.fillColor = Qt::black;
+        box.bounds = QRectF(200, 200, 1000, 500);
+        LabelDocument document = singleObject(box);
+        LabelRenderer print(LabelRenderer::Mode::Print);
+        QVERIFY(!inkBounds(print.renderImage(document, Dpi)).isEmpty());
+
+        objectBase(document.objects[0]).printed = false;
+        QVERIFY(inkBounds(print.renderImage(document, Dpi)).isEmpty());
+        // On screen it still shows.
+        LabelRenderer screen(LabelRenderer::Mode::Preview);
+        const QImage shown = screen.renderImage(document, Dpi);
+        QVERIFY(shown.pixelColor(toDots(box.bounds).center()).lightness() < 250);
+
+        // A hidden layer does not show, but prints.
+        objectBase(document.objects[0]).printed = true;
+        objectBase(document.objects[0]).layer = u"Back"_s;
+        document.layers = {{u"Back"_s, false, true, false}};
+        QVERIFY(!inkBounds(print.renderImage(document, Dpi)).isEmpty());
+        QCOMPARE(screen.renderImage(document, Dpi).pixelColor(toDots(box.bounds).center()), QColor(Qt::white));
+    }
+
     void wordsTooWideBreakInside()
     {
         const QRectF bounds(200, 200, 400, 1400);

@@ -4,7 +4,7 @@
     SPDX-License-Identifier: CC0-1.0
 -->
 <!DOCTYPE gui>
-<gui name="plasma-label-creator" version="13"
+<gui name="plasma-label-creator" version="14"
      xmlns="http://www.kde.org/standards/kxmlgui/1.0"
      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
      xsi:schemaLocation="http://www.kde.org/standards/kxmlgui/1.0 http://www.kde.org/standards/kxmlgui/1.0/kxmlgui.xsd">
@@ -123,6 +123,10 @@
             <Separator/>
             <Action name="edit_raise"/>
             <Action name="edit_lower"/>
+            <Separator/>
+            <Action name="layout_layers"/>
+            <Action name="layout_move_to_layer"/>
+            <Action name="object_no_print"/>
         </Menu>
         <Menu name="data">
             <text>&amp;Data</text>
@@ -227,5 +231,8 @@
         <Separator/>
         <Action name="edit_raise"/>
         <Action name="edit_lower"/>
+        <Separator/>
+        <Action name="layout_move_to_layer"/>
+        <Action name="object_no_print"/>
     </Menu>
 </gui>
