@@ -8,6 +8,29 @@
 What is done is described in the README; this lists what is left. The
 designer comes first; the section "Later" at the end is low priority.
 
+## Next: look for bugs
+
+The 0.2.0 features and the unreleased designer work (multi-select, align,
+distribute, group, lock, wrapping text) look fine in use and pass their
+tests. Before building more, review and try them on purpose to be sure:
+
+- [ ] **Review the changes since 0.2.0** (`git diff 4705b7f..`) for
+  correctness: selection indices after undo, redo, delete and reorder;
+  drags, rubber band and Escape or undo in the middle of them; tape labels
+  with several objects selected (delete, paste, raise, cells).
+- [ ] **Groups in existing files**: check that labels made by other label
+  software never get grouped by accident (their GroupID values), and that
+  groups survive save, reopen, copy, paste and Rotate Label.
+- [ ] **Locked and wrapping flags**: kept per object through save and
+  reopen, on tape labels too, and after reordering objects.
+- [ ] **Wrapping text**: speed with long texts (the fit size is searched on
+  every paint), Rotate Label, fields filled at print time, address objects,
+  editing on the label, print equals preview.
+- [ ] **Align and distribute** with locked objects at the ends, groups
+  mixed with single objects, and objects partly off the label.
+- [ ] **Everything else since 0.1.0**: printing from data, questions, print
+  preview, export, grid and snapping, white on black, barcodes.
+
 ## Designer
 
 - [ ] **Calculated fields**: joining fields and text, parts of a field,
