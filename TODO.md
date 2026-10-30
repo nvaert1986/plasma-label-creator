@@ -8,7 +8,7 @@
 What is done is described in the README; this lists what is left. The
 designer comes first; the section "Later" at the end is low priority.
 
-## Done since 0.2.0 (not released yet)
+## Done in 0.3.0
 
 See `CHANGELOG.md` under "Unreleased" for the details.
 
@@ -34,9 +34,17 @@ See `CHANGELOG.md` under "Unreleased" for the details.
 
 ## Next session
 
-Niels is trying the app (started 2026-10-30 from the commit after
-`60fa89e`). Start from his findings; then the hands-on checks under "Bug
-review" and the printer tests below. Nothing since 0.2.0 is pushed.
+Version 0.3.0 is committed locally, not pushed (0.2.0 is the last on
+GitHub). Start from what Niels finds in the app; then the hands-on checks
+under "Bug review" and the printer tests below.
+
+## Third bug review (2026-10-30, 0.3.0)
+
+Done for turning with the mouse and the new toolbars: the angle shown
+while turning could stay behind after an undo during the drag and show up
+in the next move; the pointer is a closed hand while turning. clang-tidy
+over all sources: the same 24 checked findings as before, nothing new. 22
+test suites pass.
 
 ## Second bug review (2026-10-30, evening)
 
@@ -75,7 +83,7 @@ Still to do by hand, in the running app:
 
 ## Designer
 
-The Medium designer items are done (see "Done since 0.2.0"). Left, all
+The Medium designer items are done (see "Done in 0.3.0"). Left, all
 Hard:
 
 - [ ] **The printer's own fonts and barcodes, and labels stored on the

@@ -68,6 +68,7 @@ LabelView::LabelView(LabelEditor *editor, QWidget *parent)
         // Something else (undo by keyboard, say) changed the label during a
         // drag: the drag's copy is out of date, so the drag ends.
         m_dragDocument.reset();
+        m_angleShownAt.reset();
         // Changed meanwhile (the Format toolbar, say): editing goes on in the
         // new fonts, unless the object is gone or no longer matches.
         if (m_textEditor) {
@@ -604,6 +605,9 @@ void LabelView::mousePressEvent(QMouseEvent *event)
     m_pressAngle = angleOf(event->position() - toWidget(m_dragStartBounds).center());
     m_pressTwips = toTwips(event->position());
     m_dragMoved = false;
+    if (m_dragHandle == Rotate) {
+        setCursor(Qt::ClosedHandCursor);
+    }
 }
 
 void LabelView::mouseMoveEvent(QMouseEvent *event)
