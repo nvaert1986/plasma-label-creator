@@ -15,6 +15,8 @@
 #include "labelrenderer.h"
 #include "units.h"
 
+#include <KLocalizedString>
+
 #include <QDropEvent>
 #include <QLabel>
 #include <QLineEdit>
@@ -39,6 +41,14 @@ LabelDocument addressLabel()
     return document;
 }
 
+// Saves a picture of @p widget when LABELCREATOR_TEST_GRAB names a folder.
+void grab(QWidget *widget, const QString &name)
+{
+    if (qEnvironmentVariableIsSet("LABELCREATOR_TEST_GRAB")) {
+        widget->grab().save(qEnvironmentVariable("LABELCREATOR_TEST_GRAB") + u'/' + name + u".png"_s);
+    }
+}
+
 } // namespace
 
 class LabelEditorTest : public QObject
@@ -46,6 +56,11 @@ class LabelEditorTest : public QObject
     Q_OBJECT
 
 private Q_SLOTS:
+    void initTestCase()
+    {
+        KLocalizedString::setApplicationDomain("plasma-label-creator");
+    }
+
     void newLabelsAreLandscapeWhenLong()
     {
         const LabelDocument address = ObjectFactory::newLabel(u"30252 Address"_s, u"w79h252"_s, QSizeF(78.96, 252));
@@ -303,6 +318,103 @@ private Q_SLOTS:
         QCOMPARE(editor.undoStack()->count(), 0);
     }
 
+    void severalObjectsSelectAndMoveTogether()
+    {
+        LabelDocument document = addressLabel();
+        document.objects.clear();
+        for (const QRectF &rect : {QRectF(200, 200, 600, 400), QRectF(1200, 200, 600, 400), QRectF(2200, 600, 600, 400)}) {
+            ShapeObject shape;
+            shape.bounds = rect;
+            document.objects << shape;
+        }
+        objectBase(document.objects[2]).locked = true;
+        LabelEditor editor;
+        editor.reset(document);
+        LabelView view(&editor);
+        view.resize(800, 400);
+        view.show();
+        QVERIFY(QTest::qWaitForWindowExposed(&view));
+        view.setZoom(1.0);
+        const auto centreOf = [&](int index) {
+            return (view.labelOrigin() + objectBase(editor.document().objects.at(index)).bounds.center() * view.scale()).toPoint();
+        };
+
+        // Ctrl adds and takes out again; the last one clicked is the current one.
+        QTest::mouseClick(&view, Qt::LeftButton, {}, centreOf(0));
+        QTest::mouseClick(&view, Qt::LeftButton, Qt::ControlModifier, centreOf(1));
+        QTest::mouseClick(&view, Qt::LeftButton, Qt::ShiftModifier, centreOf(2));
+        QCOMPARE(editor.selectedObjects(), (QList<int>{0, 1, 2}));
+        QCOMPARE(editor.selection(), 2);
+        QTest::mouseClick(&view, Qt::LeftButton, Qt::ControlModifier, centreOf(1));
+        QCOMPARE(editor.selectedObjects(), (QList<int>{0, 2}));
+        QTest::mouseClick(&view, Qt::LeftButton, Qt::ControlModifier, centreOf(1));
+
+        // A drag takes along everything selected except what is locked.
+        const QPoint start = centreOf(0);
+        QTest::mousePress(&view, Qt::LeftButton, {}, start);
+        QCOMPARE(editor.selectedObjects(), (QList<int>{0, 1, 2}));
+        QTest::mouseMove(&view, start + QPoint(20, 0));
+        QTest::mouseMove(&view, start + QPoint(40, 0));
+        QTest::mouseRelease(&view, Qt::LeftButton, {}, start + QPoint(40, 0));
+        const qreal moved = objectBase(editor.document().objects.at(0)).bounds.left() - 200;
+        QVERIFY(moved > 0);
+        QCOMPARE(objectBase(editor.document().objects.at(1)).bounds.left(), 1200 + moved);
+        QCOMPARE(objectBase(editor.document().objects.at(2)).bounds.left(), 2200.0);
+        QCOMPARE(editor.undoStack()->count(), 1);
+        QCOMPARE(editor.selectedObjects(), (QList<int>{0, 1, 2}));
+
+        // The arrow keys too.
+        QTest::keyClick(&view, Qt::Key_Down);
+        QCOMPARE(objectBase(editor.document().objects.at(1)).bounds.top(), 220.0);
+        QCOMPARE(objectBase(editor.document().objects.at(2)).bounds.top(), 600.0);
+
+        // Undo brings the selection back with the document.
+        editor.setSelection(-1);
+        editor.undoStack()->undo();
+        QCOMPARE(editor.selectedObjects(), (QList<int>{0, 1, 2}));
+
+        // A band from empty space selects what it encloses: not the third.
+        const QRectF second = objectBase(editor.document().objects.at(1)).bounds;
+        const QPoint end = (view.labelOrigin() + second.bottomRight() * view.scale()).toPoint() + QPoint(3, 3);
+        QTest::mousePress(&view, Qt::LeftButton, {}, QPoint(2, 2));
+        QCOMPARE(editor.selectedObjects(), QList<int>());
+        QTest::mouseMove(&view, end);
+        QTest::mouseRelease(&view, Qt::LeftButton, {}, end);
+        QCOMPARE(editor.selectedObjects(), (QList<int>{0, 1}));
+        QCOMPARE(editor.undoStack()->count(), 2);
+
+        // A group selects as one.
+        LabelDocument grouped = editor.document();
+        objectBase(grouped.objects[1]).groupId = 0;
+        objectBase(grouped.objects[2]).groupId = 0;
+        editor.apply(grouped, u"Group"_s, -1);
+        QTest::mouseClick(&view, Qt::LeftButton, {}, centreOf(1));
+        QCOMPARE(editor.selectedObjects(), (QList<int>{1, 2}));
+        QCOMPARE(editor.selection(), 1);
+        QTest::mouseClick(&view, Qt::LeftButton, Qt::ControlModifier, centreOf(0));
+        grab(&view, u"multiselect"_s);
+    }
+
+    void severalObjectsCopyWithTheirGroup()
+    {
+        LabelDocument document = addressLabel();
+        LabelObject second = document.objects.at(0);
+        objectBase(second).name = u"TEXT_2"_s;
+        objectBase(second).bounds.translate(0, 400);
+        document.objects << second;
+        objectBase(document.objects[0]).groupId = 0;
+        objectBase(document.objects[1]).groupId = 0;
+        std::unique_ptr<QMimeData> data(LabelClipboard::mimeData({document.objects.at(0), document.objects.at(1)}, document));
+        QCOMPARE(data->text(), u"Text\nText"_s);
+        const QList<LabelObject> pasted = LabelClipboard::objectsToPaste(data.get(), document);
+        QCOMPARE(pasted.size(), 2);
+        // Moved on together, and a group of their own.
+        QCOMPARE(objectBase(pasted.at(0)).bounds, objectBase(document.objects.at(0)).bounds.translated(144, 144));
+        QCOMPARE(objectBase(pasted.at(1)).bounds, objectBase(document.objects.at(1)).bounds.translated(144, 144));
+        QCOMPARE(objectBase(pasted.at(0)).groupId, std::optional<int>(1));
+        QCOMPARE(objectBase(pasted.at(1)).groupId, std::optional<int>(1));
+    }
+
     void arrowKeysNudge()
     {
         LabelEditor editor;
@@ -418,7 +530,7 @@ private Q_SLOTS:
     void copiedObjectsPasteWithANewName()
     {
         const LabelDocument document = addressLabel(); // one TEXT
-        std::unique_ptr<QMimeData> data(LabelClipboard::mimeData(document.objects.at(0), document));
+        std::unique_ptr<QMimeData> data(LabelClipboard::mimeData({document.objects.at(0)}, document));
         QVERIFY(LabelClipboard::canPaste(data.get()));
         QCOMPARE(data->text(), u"Text"_s); // other programs get the text
 
@@ -693,6 +805,24 @@ private Q_SLOTS:
         QVERIFY(AltecLabels::isAltec(u"atp-3000"_s));
         QVERIFY(!AltecLabels::isAltec(u"DYMO LabelWriter 450 Turbo"_s));
         QVERIFY(!AltecLabels::isAltec(u"ATP-Office Zebra"_s)); // not an ATP model
+
+        // Wrap labels from the catalogue take print on their strip only.
+        const QList<PaperSize> catalogue = AltecLabels::all();
+        QVERIFY(!catalogue.isEmpty());
+        {
+            const auto wrap = std::find_if(catalogue.cbegin(), catalogue.cend(), [](const PaperSize &paper) {
+                return paper.group == u"Wikkellabels"_s && paper.name.contains(u"24 × 57"_s) && !paper.name.contains(u"across"_s);
+            });
+            QVERIFY(wrap != catalogue.cend());
+            // 24 mm across the head, the first 19 mm of 57 along the feed.
+            QCOMPARE(qRound(wrap->printArea.width() * Units::MmPerInch / 72.0), 24);
+            QCOMPARE(qRound(wrap->printArea.height() * Units::MmPerInch / 72.0), 19);
+            QCOMPARE(wrap->printArea.top(), 0.0);
+            const int strips = std::count_if(catalogue.cbegin(), catalogue.cend(), [](const PaperSize &paper) {
+                return !paper.printArea.isEmpty();
+            });
+            QCOMPARE(strips, 15);
+        }
     }
 
     void addressLineFontsFollowTheLines()

@@ -8,6 +8,8 @@
 #include "labelformat.h"
 #include "tapelayout.h"
 
+#include <algorithm>
+
 using namespace LabelCreator;
 
 namespace
@@ -16,34 +18,38 @@ namespace
 class SnapshotCommand : public QUndoCommand
 {
 public:
-    SnapshotCommand(LabelEditor *editor, const LabelDocument &before, const LabelDocument &after, int selectionAfter, const QString &text)
+    SnapshotCommand(LabelEditor *editor, const LabelDocument &before, const LabelDocument &after, const QList<int> &selectionAfter, int currentAfter, const QString &text)
         : QUndoCommand(text)
         , m_editor(editor)
         , m_before(before)
         , m_after(after)
-        , m_selectionBefore(editor->selection())
+        , m_selectionBefore(editor->selectedObjects())
+        , m_currentBefore(editor->selection())
         , m_selectionAfter(selectionAfter)
+        , m_currentAfter(currentAfter)
     {
     }
 
     void undo() override
     {
         m_editor->setDocument(m_before);
-        m_editor->setSelection(m_selectionBefore);
+        m_editor->setSelectedObjects(m_selectionBefore, m_currentBefore);
     }
 
     void redo() override
     {
         m_editor->setDocument(m_after);
-        m_editor->setSelection(m_selectionAfter);
+        m_editor->setSelectedObjects(m_selectionAfter, m_currentAfter);
     }
 
 private:
     LabelEditor *m_editor;
     LabelDocument m_before;
     LabelDocument m_after;
-    int m_selectionBefore;
-    int m_selectionAfter;
+    QList<int> m_selectionBefore;
+    int m_currentBefore;
+    QList<int> m_selectionAfter;
+    int m_currentAfter;
 };
 
 } // namespace
@@ -80,22 +86,40 @@ void LabelEditor::reset(const LabelDocument &original, const QString &fileName)
     Q_EMIT modifiedChanged(false);
 }
 
-void LabelEditor::apply(const LabelDocument &original, const QString &description, std::optional<int> selection)
+void LabelEditor::apply(const LabelDocument &document, const QString &description, std::optional<int> selection)
+{
+    // Without a selection given, the selection stays as it is.
+    if (!selection) {
+        apply(document, description, m_selected);
+        return;
+    }
+    apply(document, description, *selection >= 0 ? QList<int>{*selection} : QList<int>());
+}
+
+void LabelEditor::apply(const LabelDocument &original, const QString &description, const QList<int> &selection)
 {
     LabelDocument document = original;
     TapeLayout::layout(document);
+    const int current = selection.contains(m_selection) ? m_selection : (selection.isEmpty() ? -1 : selection.constLast());
     if (document == m_document) {
-        setSelection(selection.value_or(m_selection));
+        setSelectedObjects(selection, current);
         return;
     }
-    m_undoStack.push(new SnapshotCommand(this, m_document, document, selection.value_or(m_selection), description));
+    m_undoStack.push(new SnapshotCommand(this, m_document, document, selection, current, description));
 }
 
 void LabelEditor::setDocument(const LabelDocument &document)
 {
     m_document = document;
-    if (m_selection >= m_document.objects.size()) {
-        setSelection(-1);
+    // Objects that are gone are no longer selected.
+    QList<int> kept;
+    for (const int index : std::as_const(m_selected)) {
+        if (index < m_document.objects.size()) {
+            kept << index;
+        }
+    }
+    if (kept != m_selected) {
+        setSelectedObjects(kept, m_selection < m_document.objects.size() ? m_selection : -1);
     }
     Q_EMIT documentChanged();
 }
@@ -143,11 +167,34 @@ int LabelEditor::selection() const
 
 void LabelEditor::setSelection(int index)
 {
-    if (index < -1 || index >= m_document.objects.size()) {
-        index = -1;
+    setSelectedObjects(index >= 0 ? QList<int>{index} : QList<int>(), index);
+}
+
+QList<int> LabelEditor::selectedObjects() const
+{
+    return m_selected;
+}
+
+bool LabelEditor::isSelected(int index) const
+{
+    return m_selected.contains(index);
+}
+
+void LabelEditor::setSelectedObjects(const QList<int> &indices, int current)
+{
+    QList<int> selected;
+    for (const int index : indices) {
+        if (index >= 0 && index < m_document.objects.size() && !selected.contains(index)) {
+            selected << index;
+        }
     }
-    if (m_selection != index) {
-        m_selection = index;
+    std::sort(selected.begin(), selected.end());
+    if (!selected.contains(current)) {
+        current = selected.isEmpty() ? -1 : (indices.isEmpty() || !selected.contains(indices.constLast()) ? selected.constLast() : indices.constLast());
+    }
+    if (selected != m_selected || current != m_selection) {
+        m_selected = selected;
+        m_selection = current;
         Q_EMIT selectionChanged();
     }
 }

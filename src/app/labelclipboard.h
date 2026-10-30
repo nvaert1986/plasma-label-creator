@@ -17,15 +17,16 @@ class QMimeData;
 namespace LabelClipboard
 {
 
-/** Clipboard data for @p object, taken from @p document. */
-QMimeData *mimeData(const LabelCreator::LabelObject &object, const LabelCreator::LabelDocument &document);
+/** Clipboard data for @p objects, taken from @p document. */
+QMimeData *mimeData(const QList<LabelCreator::LabelObject> &objects, const LabelCreator::LabelDocument &document);
 
 /** Whether @p data holds something that can be pasted onto a label. */
 bool canPaste(const QMimeData *data);
 
 /**
- * The objects to add to @p document for @p data: with names of their own,
- * and moved a little when they would land exactly on an object already there.
+ * The objects to add to @p document for @p data: with names and groups of
+ * their own, and moved a little together when one would land exactly on an
+ * object already there.
  */
 QList<LabelCreator::LabelObject> objectsToPaste(const QMimeData *data, const LabelCreator::LabelDocument &document);
 

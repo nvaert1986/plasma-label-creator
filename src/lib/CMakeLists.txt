@@ -6,6 +6,8 @@
 add_library(labelcreatorcore STATIC
     addressbook.cpp
     addressbook.h
+    arrange.cpp
+    arrange.h
     barcode.cpp
     barcode.h
     clipartlibrary.cpp

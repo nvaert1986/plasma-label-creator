@@ -10,10 +10,6 @@ designer comes first; the section "Later" at the end is low priority.
 
 ## Designer
 
-- [ ] **Select several objects at once**, then align them to each other,
-  distribute them, group and lock them.
-- [ ] **Text that wraps** into paragraphs within its box, besides the
-  current line breaks and shrink-to-fit.
 - [ ] **Calculated fields**: joining fields and text, parts of a field,
   date offsets (best before = today + 30 days), counters shared between
   computers.
@@ -49,6 +45,11 @@ Harder, after the items above:
 - [ ] **Raw CUPS queues.** Labels for a queue without the DYMO driver are
   converted on this computer and sent raw; still to try on a real raw
   network queue.
+- [ ] **Altec wrap label strips.** The catalogue's wrap labels take print
+  on the strip at the end that leaves the printer first; Altec's site does
+  not say which end it is. Print a frame label on a wrap label to confirm.
+  Also: Wikkellabels 12.7 × 19.05 mm and some Twistlabels sizes have no
+  strip length in the catalogue.
 - [ ] **LabelManager tape widths.** 12 mm is tested; 6, 9, 19 and 24 mm and
   the printable band on each are not.
 - [ ] **Zebra printers.** Should work like the Altec (ZPL); not tested on one.
@@ -60,8 +61,6 @@ Harder, after the items above:
   work; needs their USB IDs and a test on a real Rhino.
 - [ ] **Altec:** continuous rolls, several labels across the roll, round
   label outlines, and label detection over USB (only over the network now).
-- [ ] **Printable areas for Altec's catalogue wrap labels.** Custom label
-  sizes can have one; the catalogue's wrap labels do not yet.
 
 ## Files
 
@@ -74,8 +73,7 @@ Harder, after the items above:
 
 ## Code
 
-- [ ] Split `mainwindow.cpp` and `printbar.cpp`; both have grown large.
-- [ ] The desktop entry's description mentions only LabelWriter printers.
+- [ ] Split `printbar.cpp`; it has grown large (`mainwindow.cpp` is split).
 
 ## Later (low priority)
 

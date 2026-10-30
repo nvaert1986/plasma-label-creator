@@ -150,9 +150,13 @@ struct ObjectBase {
     bool mirrored = false;
     bool variable = false;
     // Only some versions of DLS write these; kept so they are written back.
+    // Objects with the same group id (0 or more) move and select together;
+    // DLS writes -1 for none.
     std::optional<int> groupId;
     std::optional<bool> outlined;
     QRectF bounds;
+    /** Cannot be moved or resized. Not in DLS's format: kept in the settings comment. */
+    bool locked = false;
 
     bool operator==(const ObjectBase &) const = default;
 };
@@ -164,6 +168,11 @@ struct TextObject : ObjectBase {
     bool useFullFontHeight = true;
     bool verticalized = false;
     QList<TextSpan> spans;
+    /**
+     * Long lines wrap at word boundaries to the object's width. Not in DLS's
+     * format: kept in the settings comment.
+     */
+    bool wrap = false;
 
     QString plainText() const;
 

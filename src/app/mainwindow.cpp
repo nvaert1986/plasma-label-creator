@@ -274,6 +274,7 @@ void MainWindow::setupActions()
         actions);
     setupViewActions();
     setupDataActions();
+    setupArrangeActions();
 
     const auto addInsert = [&](const QString &name, const QString &text, const QString &icon, ObjectFactory::Kind kind) {
         QAction *action = actions->addAction(name, this, [this, kind]() {
@@ -732,8 +733,44 @@ void MainWindow::updateActions()
         actionCollection()->action(name)->setEnabled(selected && !tape);
     }
     actionCollection()->action(u"tape_length"_s)->setEnabled(tape);
-    actionCollection()->action(u"tape_move_earlier"_s)->setEnabled(selected && tape);
-    actionCollection()->action(u"tape_move_later"_s)->setEnabled(selected && tape);
+    // Cells move one at a time.
+    const QList<int> selection = m_editor->selectedObjects();
+    actionCollection()->action(u"tape_move_earlier"_s)->setEnabled(selection.size() == 1 && tape);
+    actionCollection()->action(u"tape_move_later"_s)->setEnabled(selection.size() == 1 && tape);
+
+    // Lining up and spreading out: what moves are groups and objects on their own.
+    const LabelDocument &document = m_editor->document();
+    QList<int> units;
+    bool grouped = false;
+    for (const int index : selection) {
+        if (Arrange::isGrouped(document, index)) {
+            grouped = true;
+            const int id = *objectBase(document.objects.at(index)).groupId;
+            if (!units.contains(-2 - id)) {
+                units << -2 - id;
+            }
+        } else {
+            units << index;
+        }
+    }
+    const bool movable = !tape && Arrange::canMove(document, selection);
+    for (const QString &name : {u"arrange_align_left"_s,
+                                u"arrange_align_hcenter"_s,
+                                u"arrange_align_right"_s,
+                                u"arrange_align_top"_s,
+                                u"arrange_align_vcenter"_s,
+                                u"arrange_align_bottom"_s}) {
+        actionCollection()->action(name)->setEnabled(movable && units.size() >= 2);
+    }
+    actionCollection()->action(u"arrange_distribute_horizontal"_s)->setEnabled(movable && units.size() >= 3);
+    actionCollection()->action(u"arrange_distribute_vertical"_s)->setEnabled(movable && units.size() >= 3);
+    actionCollection()->action(u"arrange_group"_s)->setEnabled(units.size() >= 2);
+    actionCollection()->action(u"arrange_ungroup"_s)->setEnabled(grouped);
+    actionCollection()->action(u"edit_select_all"_s)->setEnabled(!document.objects.isEmpty());
+    m_lock->setEnabled(selected && !tape);
+    m_lock->setChecked(selected && std::all_of(selection.cbegin(), selection.cend(), [&document](int index) {
+                           return objectBase(document.objects.at(index)).locked;
+                       }));
     const bool landscape = m_editor->document().orientation == PaperOrientation::Landscape;
     m_landscape->setChecked(landscape);
     m_portrait->setChecked(!landscape);

@@ -6,6 +6,7 @@
 #include "labelview.h"
 
 #include "labeleditor.h"
+#include "arrange.h"
 #include "dragsupport.h"
 #include "inlinetexteditor.h"
 #include "labelrenderer.h"
@@ -16,6 +17,7 @@
 #include <QContextMenuEvent>
 #include <QDragEnterEvent>
 #include <QDropEvent>
+#include <QIcon>
 #include <QKeyEvent>
 #include <QMouseEvent>
 #include <QPainter>
@@ -29,6 +31,7 @@
 #include <cmath>
 
 using namespace LabelCreator;
+using namespace Qt::Literals::StringLiterals;
 
 namespace
 {
@@ -334,8 +337,9 @@ QList<QRectF> LabelView::handleRects(const QRectF &bounds) const
 LabelView::Handle LabelView::handleAt(const QPointF &pos) const
 {
     const int selection = m_editor->selection();
-    // On tape, cells place and size the objects.
-    if (selection < 0 || shownDocument().tape) {
+    // On tape, cells place and size the objects. Only a single object that
+    // is not locked has handles.
+    if (selection < 0 || shownDocument().tape || m_editor->selectedObjects().size() != 1 || objectBase(shownDocument().objects.at(selection)).locked) {
         return NoHandle;
     }
     const QList<QRectF> rects = handleRects(objectBase(shownDocument().objects.at(selection)).bounds);
@@ -413,18 +417,58 @@ void LabelView::paintEvent(QPaintEvent *)
         painter.drawRect(toWidget(objectBase(object).bounds));
     }
 
-    const int selection = m_editor->selection();
-    if (selection >= 0 && selection < document.objects.size()) {
-        const QRectF bounds = objectBase(document.objects.at(selection)).bounds;
-        const QColor highlight = palette().color(QPalette::Highlight);
-        painter.setPen(QPen(highlight, 1));
-        painter.drawRect(toWidget(bounds));
-        painter.setBrush(palette().color(QPalette::Base));
-        if (!document.tape) {
-            for (const QRectF &handle : handleRects(bounds)) {
-                painter.drawRect(handle);
+    // Every selected object framed; a selected group also as a whole, locked
+    // objects with a padlock. Handles only on a single object.
+    const QColor highlight = palette().color(QPalette::Highlight);
+    const QList<int> selected = m_editor->selectedObjects();
+    QList<int> groupsDrawn;
+    for (const int index : selected) {
+        if (index >= document.objects.size()) {
+            continue;
+        }
+        const ObjectBase &base = objectBase(document.objects.at(index));
+        painter.setBrush(Qt::NoBrush);
+        painter.setPen(QPen(highlight, index == m_editor->selection() ? 1.5 : 1));
+        painter.drawRect(toWidget(base.bounds));
+        if (Arrange::isGrouped(document, index) && !groupsDrawn.contains(*base.groupId)) {
+            groupsDrawn << *base.groupId;
+            QRectF around;
+            for (const int member : Arrange::withGroups(document, {index})) {
+                around = around.isNull() ? objectBase(document.objects.at(member)).bounds : around.united(objectBase(document.objects.at(member)).bounds);
+            }
+            painter.setPen(QPen(highlight, 1, Qt::DashLine));
+            painter.drawRect(toWidget(around).adjusted(-3, -3, 3, 3));
+        }
+        if (base.locked) {
+            const QRectF frame = toWidget(base.bounds);
+            const QRectF padlock(frame.right() - 14, frame.top() + 2, 12, 12);
+            const QIcon icon = QIcon::fromTheme(u"object-locked"_s);
+            if (!icon.isNull()) {
+                icon.paint(&painter, padlock.toRect());
+            } else {
+                // Without an icon theme: a shackle over a body.
+                painter.setPen(QPen(highlight, 1.5));
+                painter.setBrush(Qt::NoBrush);
+                painter.drawArc(QRectF(padlock.left() + 3, padlock.top(), 6, 8), 0, 180 * 16);
+                painter.setBrush(highlight);
+                painter.drawRect(QRectF(padlock.left() + 2, padlock.top() + 5, 8, 6));
             }
         }
+    }
+    if (selected.size() == 1 && !document.tape && !objectBase(document.objects.at(selected.constFirst())).locked) {
+        painter.setPen(QPen(highlight, 1));
+        painter.setBrush(palette().color(QPalette::Base));
+        for (const QRectF &handle : handleRects(objectBase(document.objects.at(selected.constFirst())).bounds)) {
+            painter.drawRect(handle);
+        }
+    }
+
+    if (m_rubberBand) {
+        QColor fill = highlight;
+        fill.setAlpha(40);
+        painter.setBrush(fill);
+        painter.setPen(QPen(highlight, 1, Qt::DashLine));
+        painter.drawRect(*m_rubberBand);
     }
 
     // Cross hairs over the label where a dragged object would be centred.
@@ -449,24 +493,80 @@ void LabelView::mousePressEvent(QMouseEvent *event)
         return;
     }
     setFocus();
-    m_dragHandle = handleAt(event->position());
+    const LabelDocument &document = m_editor->document();
+    const bool adding = event->modifiers() & (Qt::ControlModifier | Qt::ShiftModifier);
+    m_dragHandle = adding ? NoHandle : handleAt(event->position());
     if (m_dragHandle == NoHandle) {
-        m_editor->setSelection(objectAt(event->position()));
+        const int index = objectAt(event->position());
+        if (index < 0) {
+            // Empty space: a rubber band selects what it encloses.
+            m_rubberStart = event->position();
+            m_rubberBand = QRectF(m_rubberStart, m_rubberStart);
+            m_rubberBase = adding ? m_editor->selectedObjects() : QList<int>();
+            if (!adding) {
+                m_editor->setSelection(-1);
+            }
+            return;
+        }
+        const QList<int> clicked = Arrange::withGroups(document, {index});
+        QList<int> selection = m_editor->selectedObjects();
+        if (adding) {
+            if (m_editor->isSelected(index)) {
+                for (const int member : clicked) {
+                    selection.removeAll(member);
+                }
+                m_editor->setSelectedObjects(selection);
+            } else {
+                m_editor->setSelectedObjects(selection + clicked, index);
+            }
+            return;
+        }
+        // A click on a selected object keeps the selection, so all of it can be dragged.
+        m_editor->setSelectedObjects(m_editor->isSelected(index) ? selection : clicked, index);
     }
     const int selection = m_editor->selection();
-    if (selection < 0 || m_editor->document().tape) {
+    if (selection < 0 || document.tape) {
         return;
     }
-    m_dragStart = m_editor->document();
+    // A move takes along everything selected that is not locked; a resize
+    // only the object of the handle.
+    m_dragIndices.clear();
+    m_dragStartAll.clear();
+    const QList<int> dragged = m_dragHandle == NoHandle ? m_editor->selectedObjects() : QList<int>{selection};
+    for (const int index : dragged) {
+        if (!objectBase(document.objects.at(index)).locked) {
+            m_dragIndices << index;
+            m_dragStartAll << objectBase(document.objects.at(index)).bounds;
+        }
+    }
+    if (m_dragIndices.isEmpty()) {
+        return;
+    }
+    m_dragStart = document;
     m_dragDocument = m_dragStart;
-    m_dragIndex = selection;
-    m_dragStartBounds = objectBase(m_dragStart.objects.at(selection)).bounds;
+    // The object under the mouse leads, unless it is locked.
+    m_dragIndex = m_dragIndices.contains(selection) ? selection : m_dragIndices.constFirst();
+    m_dragStartBounds = objectBase(m_dragStart.objects.at(m_dragIndex)).bounds;
     m_pressTwips = toTwips(event->position());
     m_dragMoved = false;
 }
 
 void LabelView::mouseMoveEvent(QMouseEvent *event)
 {
+    if (m_rubberBand) {
+        m_rubberBand = QRectF(m_rubberStart, event->position()).normalized();
+        const QRectF band(toTwips(m_rubberBand->topLeft()), toTwips(m_rubberBand->bottomRight()));
+        QList<int> enclosed;
+        const auto &objects = m_editor->document().objects;
+        for (int i = 0; i < objects.size(); ++i) {
+            if (band.contains(objectBase(objects.at(i)).bounds)) {
+                enclosed << i;
+            }
+        }
+        m_editor->setSelectedObjects(m_rubberBase + Arrange::withGroups(m_editor->document(), enclosed));
+        update();
+        return;
+    }
     if (!m_dragDocument) {
         const Handle handle = handleAt(event->position());
         if (handle == TopLeft || handle == BottomRight) {
@@ -478,7 +578,9 @@ void LabelView::mouseMoveEvent(QMouseEvent *event)
         } else if (handle == Left || handle == Right) {
             setCursor(Qt::SizeHorCursor);
         } else {
-            setCursor(objectAt(event->position()) >= 0 && !m_editor->document().tape ? Qt::SizeAllCursor : Qt::ArrowCursor);
+            const int index = objectAt(event->position());
+            const bool movable = index >= 0 && !m_editor->document().tape && !objectBase(m_editor->document().objects.at(index)).locked;
+            setCursor(movable ? Qt::SizeAllCursor : Qt::ArrowCursor);
         }
         return;
     }
@@ -547,19 +649,36 @@ void LabelView::mouseMoveEvent(QMouseEvent *event)
     bounds.setWidth(std::max(bounds.width(), std::min(MinimumSize, m_dragStartBounds.width())));
     bounds.setHeight(std::max(bounds.height(), std::min(MinimumSize, m_dragStartBounds.height())));
 
-    objectBase(m_dragDocument->objects[m_dragIndex]).bounds = bounds;
+    if (m_dragHandle == NoHandle) {
+        // Everything moves as far as the object under the mouse.
+        const QPointF moved = bounds.topLeft() - m_dragStartBounds.topLeft();
+        for (qsizetype i = 0; i < m_dragIndices.size(); ++i) {
+            objectBase(m_dragDocument->objects[m_dragIndices.at(i)]).bounds = m_dragStartAll.at(i).translated(moved);
+        }
+    } else {
+        objectBase(m_dragDocument->objects[m_dragIndex]).bounds = bounds;
+    }
     update();
 }
 
 void LabelView::mouseReleaseEvent(QMouseEvent *event)
 {
-    if (event->button() != Qt::LeftButton || !m_dragDocument) {
+    if (event->button() != Qt::LeftButton) {
+        return;
+    }
+    if (m_rubberBand) {
+        m_rubberBand.reset();
+        update();
+        return;
+    }
+    if (!m_dragDocument) {
         return;
     }
     const LabelDocument result = *m_dragDocument;
     m_dragDocument.reset();
     if (m_dragMoved) {
-        m_editor->apply(result, m_dragHandle == NoHandle ? i18n("Move Object") : i18n("Resize Object"), m_dragIndex);
+        const QString description = m_dragHandle != NoHandle ? i18n("Resize Object") : (m_dragIndices.size() > 1 ? i18n("Move Objects") : i18n("Move Object"));
+        m_editor->apply(result, description, m_editor->selectedObjects());
     }
     update();
 }
@@ -568,20 +687,28 @@ void LabelView::mouseDoubleClickEvent(QMouseEvent *event)
 {
     const int index = objectAt(event->position());
     if (index >= 0) {
-        m_editor->setSelection(index);
+        m_editor->setSelectedObjects(Arrange::withGroups(m_editor->document(), {index}), index);
         editObject(index);
     }
 }
 
 void LabelView::moveSelection(const QPointF &delta, const QString &description)
 {
-    const int selection = m_editor->selection();
-    if (selection < 0 || m_editor->document().tape) {
+    if (m_editor->document().tape) {
         return;
     }
     LabelDocument document = m_editor->document();
-    objectBase(document.objects[selection]).bounds.translate(delta);
-    m_editor->apply(document, description);
+    bool moved = false;
+    for (const int index : m_editor->selectedObjects()) {
+        ObjectBase &base = objectBase(document.objects[index]);
+        if (!base.locked) {
+            base.bounds.translate(delta);
+            moved = true;
+        }
+    }
+    if (moved) {
+        m_editor->apply(document, description);
+    }
 }
 
 void LabelView::keyPressEvent(QKeyEvent *event)
@@ -631,9 +758,12 @@ void LabelView::wheelEvent(QWheelEvent *event)
 
 void LabelView::contextMenuEvent(QContextMenuEvent *event)
 {
+    // On an object outside the selection, the menu is for that object (and its group).
     const int index = objectAt(event->pos());
-    if (index >= 0) {
-        m_editor->setSelection(index);
+    if (index >= 0 && !m_editor->isSelected(index)) {
+        m_editor->setSelectedObjects(Arrange::withGroups(m_editor->document(), {index}), index);
+    } else if (index >= 0) {
+        m_editor->setSelectedObjects(m_editor->selectedObjects(), index);
     }
     Q_EMIT contextMenuRequested(event->globalPos());
 }

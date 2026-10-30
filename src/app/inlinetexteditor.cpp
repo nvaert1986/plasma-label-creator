@@ -59,8 +59,12 @@ InlineTextEditor::InlineTextEditor(const LabelObject &object, qreal scale, QWidg
 {
     setAcceptRichText(false);
     setTabChangesFocus(true);
-    // Lines on a label only break where the text says so.
-    setLineWrapMode(QTextEdit::NoWrap);
+    // Lines on a label only break where the text says so, unless it wraps.
+    const auto *wrapping = std::get_if<TextObject>(&object);
+    if (!wrapping) {
+        wrapping = std::get_if<AddressObject>(&object);
+    }
+    setLineWrapMode(wrapping && wrapping->wrap ? QTextEdit::WidgetWidth : QTextEdit::NoWrap);
     document()->setDocumentMargin(2);
 
     const auto [spans, alignment] = textOf(object);

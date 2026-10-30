@@ -9,6 +9,7 @@
 #include "units.h"
 
 #include <QBuffer>
+#include <functional>
 #include <QFile>
 #include <QJsonArray>
 #include <QJsonDocument>
@@ -248,9 +249,50 @@ constexpr EnumName<PrintQuestion::Allowed> allowedNames[] = {
     {PrintQuestion::Allowed::Pattern, "pattern"_L1},
 };
 
+// The objects in the order the file lists them: on tape, as the cells hold
+// them; reading them back gives this order again.
+QList<int> writtenOrder(const LabelDocument &document)
+{
+    QList<int> order;
+    if (!document.tape) {
+        for (int i = 0; i < document.objects.size(); ++i) {
+            order << i;
+        }
+        return order;
+    }
+    const std::function<void(const TapeCell &)> walk = [&](const TapeCell &cell) {
+        if (cell.object >= 0 && cell.object < document.objects.size()) {
+            order << cell.object;
+        }
+        for (const TapeCell &child : cell.subcells) {
+            walk(child);
+        }
+    };
+    walk(document.tape->root);
+    return order;
+}
+
+bool wraps(const LabelObject &object)
+{
+    if (const auto *text = std::get_if<TextObject>(&object)) {
+        return text->wrap;
+    }
+    if (const auto *address = std::get_if<AddressObject>(&object)) {
+        return address->wrap;
+    }
+    return false;
+}
+
+bool hasObjectExtensions(const LabelDocument &document)
+{
+    return std::any_of(document.objects.cbegin(), document.objects.cend(), [](const LabelObject &object) {
+        return objectBase(object).locked || wraps(object);
+    });
+}
+
 bool hasExtensions(const LabelDocument &document)
 {
-    return !document.questions.isEmpty() || document.dataSource.kind != DataSource::Kind::None;
+    return !document.questions.isEmpty() || document.dataSource.kind != DataSource::Kind::None || hasObjectExtensions(document);
 }
 
 QString extensionsJson(const LabelDocument &document)
@@ -272,6 +314,27 @@ QString extensionsJson(const LabelDocument &document)
             questions.append(q);
         }
         root[u"questions"_s] = questions;
+    }
+    // Per object, by its place in the file: what DLS has no element for.
+    if (hasObjectExtensions(document)) {
+        QJsonArray objects;
+        const QList<int> order = writtenOrder(document);
+        for (qsizetype at = 0; at < order.size(); ++at) {
+            const LabelObject &object = document.objects.at(order.at(at));
+            if (!objectBase(object).locked && !wraps(object)) {
+                continue;
+            }
+            QJsonObject o;
+            o[u"at"_s] = int(at);
+            if (objectBase(object).locked) {
+                o[u"locked"_s] = true;
+            }
+            if (wraps(object)) {
+                o[u"wrap"_s] = true;
+            }
+            objects.append(o);
+        }
+        root[u"objects"_s] = objects;
     }
     const DataSource &source = document.dataSource;
     if (source.kind != DataSource::Kind::None) {
@@ -330,6 +393,21 @@ void readExtensions(const QByteArray &data, LabelDocument &document, QStringList
         question.pattern = q[u"pattern"_s].toString();
         if (!question.name.isEmpty()) {
             document.questions << question;
+        }
+    }
+    // Objects were read in the order the file lists them.
+    for (const QJsonValue &value : root[u"objects"_s].toArray()) {
+        const QJsonObject o = value.toObject();
+        const int at = o[u"at"_s].toInt(-1);
+        if (at < 0 || at >= document.objects.size()) {
+            continue;
+        }
+        LabelObject &object = document.objects[at];
+        objectBase(object).locked = o[u"locked"_s].toBool();
+        if (auto *text = std::get_if<TextObject>(&object)) {
+            text->wrap = o[u"wrap"_s].toBool();
+        } else if (auto *address = std::get_if<AddressObject>(&object)) {
+            address->wrap = o[u"wrap"_s].toBool();
         }
     }
     const QJsonObject s = root[u"dataSource"_s].toObject();

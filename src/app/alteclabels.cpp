@@ -42,6 +42,13 @@ QList<PaperSize> all()
             }
             PaperSize paper = PaperSize::custom(name, QSizeF(width, height));
             paper.group = product;
+            // Wrap labels print on a white strip, the first part off the
+            // printer; the clear rest wraps over it. Altec's article codes
+            // give its length (24x12x36 mm: 12 mm of a 36 mm label).
+            const qreal strip = label.value("print"_L1).toDouble();
+            if (strip > 0 && strip < height) {
+                paper.printArea = QRectF(0, 0, width * 72.0 / Units::MmPerInch, strip * 72.0 / Units::MmPerInch);
+            }
             list << paper;
         }
         return list;

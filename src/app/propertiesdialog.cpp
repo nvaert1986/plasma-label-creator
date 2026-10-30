@@ -301,12 +301,15 @@ bool editObjectProperties(QWidget *parent, LabelObject &object, TapeCell *cell)
                               int(text->fitMode));
         auto *fullHeight = new QCheckBox(i18n("Use full font height"));
         fullHeight->setChecked(text->useFullFontHeight);
+        auto *wrap = new QCheckBox(i18n("Wrap long lines to the box's width"));
+        wrap->setChecked(text->wrap);
         form->addRow(edit);
         form->addRow(i18n("Font:"), font);
         form->addRow(i18n("Horizontal alignment:"), horizontal);
         form->addRow(i18n("Vertical alignment:"), vertical);
         form->addRow(i18n("Text size:"), fit);
         form->addRow(QString(), fullHeight);
+        form->addRow(QString(), wrap);
         if (text->spans.size() > 1) {
             form->addRow(new QLabel(i18n("This text uses several fonts. Changing the text or font gives all of it the font above.")));
         }
@@ -315,6 +318,7 @@ bool editObjectProperties(QWidget *parent, LabelObject &object, TapeCell *cell)
             text->verticalAlignment = comboValue<VerticalAlignment>(vertical);
             text->fitMode = comboValue<TextFitMode>(fit);
             text->useFullFontHeight = fullHeight->isChecked();
+            text->wrap = wrap->isChecked();
             const QString newText = edit->toPlainText();
             const LabelFont newFont = font->font();
             if (newText != originalText || !(newFont == originalFont)) {

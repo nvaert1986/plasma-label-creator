@@ -4,7 +4,7 @@
 Type=Application
 Name=Plasma Label Creator
 GenericName=Label Designer
-Comment=Design and print labels on DYMO LabelWriter printers
+Comment=Design and print labels on DYMO LabelWriter and LabelManager printers and ZPL label printers
 Exec=plasma-label-creator %F
 Icon=document-print
 Terminal=false

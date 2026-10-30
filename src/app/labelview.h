@@ -18,8 +18,11 @@ class LabelEditor;
 
 /**
  * The label canvas: draws the label as it will print and lets the user
- * select, move and resize objects. Drags change a working copy of the
- * document and are applied to the editor as one undo step on release.
+ * select, move and resize objects. Ctrl or Shift and a click adds an object
+ * to the selection or takes it out; dragging over empty space selects what
+ * the band encloses. Groups select as one; locked objects do not move.
+ * Drags change a working copy of the document and are applied to the editor
+ * as one undo step on release.
  */
 class LabelView : public QWidget
 {
@@ -135,9 +138,18 @@ private:
     LabelCreator::LabelDocument m_dragStart;
     QRectF m_dragStartBounds;
     int m_dragIndex = -1; // the object dragged; the selection may change meanwhile
+    // Everything a move drags along, with where it started.
+    QList<int> m_dragIndices;
+    QList<QRectF> m_dragStartAll;
     QPointF m_pressTwips;
     Handle m_dragHandle = NoHandle;
     bool m_dragMoved = false;
+
+    // An ongoing rubber band, in widget pixels, and what was selected before
+    // it when it adds to the selection.
+    std::optional<QRectF> m_rubberBand;
+    QPointF m_rubberStart;
+    QList<int> m_rubberBase;
 
     QRectF m_printArea;
     bool m_gridVisible = false;

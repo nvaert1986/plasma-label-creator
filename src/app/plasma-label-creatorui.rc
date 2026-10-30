@@ -4,7 +4,7 @@
     SPDX-License-Identifier: CC0-1.0
 -->
 <!DOCTYPE gui>
-<gui name="plasma-label-creator" version="12"
+<gui name="plasma-label-creator" version="13"
      xmlns="http://www.kde.org/standards/kxmlgui/1.0"
      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
      xsi:schemaLocation="http://www.kde.org/standards/kxmlgui/1.0 http://www.kde.org/standards/kxmlgui/1.0/kxmlgui.xsd">
@@ -56,6 +56,7 @@
                 <Action name="format_fit_shrink"/>
                 <Action name="format_fit_always"/>
             </Menu>
+            <Action name="format_wrap"/>
             <Separator/>
             <Action name="edit_properties"/>
         </Menu>
@@ -102,6 +103,23 @@
                 <Separator/>
                 <Action name="layout_position_center"/>
             </Menu>
+            <Separator/>
+            <Menu name="layout_align" icon="align-horizontal-left">
+                <text>&amp;Align Objects</text>
+                <Action name="arrange_align_left"/>
+                <Action name="arrange_align_hcenter"/>
+                <Action name="arrange_align_right"/>
+                <Separator/>
+                <Action name="arrange_align_top"/>
+                <Action name="arrange_align_vcenter"/>
+                <Action name="arrange_align_bottom"/>
+                <Separator/>
+                <Action name="arrange_distribute_horizontal"/>
+                <Action name="arrange_distribute_vertical"/>
+            </Menu>
+            <Action name="arrange_group"/>
+            <Action name="arrange_ungroup"/>
+            <Action name="arrange_lock"/>
             <Separator/>
             <Action name="edit_raise"/>
             <Action name="edit_lower"/>
@@ -157,6 +175,7 @@
         <Action name="format_underline"/>
         <Action name="format_strikeout"/>
         <Action name="format_inverted"/>
+        <Action name="format_wrap"/>
         <Separator/>
         <Action name="format_align_left"/>
         <Action name="format_align_center"/>
@@ -189,6 +208,22 @@
             <Separator/>
             <Action name="layout_position_center"/>
         </Menu>
+        <Menu name="popup_align" icon="align-horizontal-left">
+            <text>&amp;Align Objects</text>
+            <Action name="arrange_align_left"/>
+            <Action name="arrange_align_hcenter"/>
+            <Action name="arrange_align_right"/>
+            <Separator/>
+            <Action name="arrange_align_top"/>
+            <Action name="arrange_align_vcenter"/>
+            <Action name="arrange_align_bottom"/>
+            <Separator/>
+            <Action name="arrange_distribute_horizontal"/>
+            <Action name="arrange_distribute_vertical"/>
+        </Menu>
+        <Action name="arrange_group"/>
+        <Action name="arrange_ungroup"/>
+        <Action name="arrange_lock"/>
         <Separator/>
         <Action name="edit_raise"/>
         <Action name="edit_lower"/>

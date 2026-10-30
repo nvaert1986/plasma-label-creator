@@ -214,8 +214,92 @@ struct TextLine {
     qreal inkDescent = 0;
 };
 
-// Splits the spans into lines and measures them at the nominal font sizes.
-QList<TextLine> layoutLines(const TextObject &object)
+// Breaks @p line into lines no wider than @p width: after spaces, or inside a
+// word that is wider on its own. Runs keep their fonts.
+QList<TextLine> wrapLine(const TextLine &line, qreal width)
+{
+    // Pieces that stay together: a word with the spaces after it.
+    struct Piece {
+        QString text;
+        const TextRun *run;
+    };
+    QList<Piece> pieces;
+    for (const TextRun &run : line.runs) {
+        qsizetype start = 0;
+        for (qsizetype i = 0; i < run.text.size(); ++i) {
+            if (run.text.at(i).isSpace() && (i + 1 == run.text.size() || !run.text.at(i + 1).isSpace())) {
+                pieces.append({run.text.mid(start, i + 1 - start), &run});
+                start = i + 1;
+            }
+        }
+        if (start < run.text.size()) {
+            pieces.append({run.text.mid(start), &run});
+        }
+    }
+
+    QList<TextLine> lines(1);
+    qreal used = 0;
+    const auto add = [&lines](const QString &text, const TextRun *run) {
+        QList<TextRun> &runs = lines.last().runs;
+        if (!runs.isEmpty() && runs.last().font == run->font && runs.last().color == run->color) {
+            runs.last().text += text;
+        } else {
+            runs.append({text, run->font, run->color});
+        }
+    };
+    const auto newLine = [&lines, &used]() {
+        // Spaces where a line breaks take no room.
+        QList<TextRun> &runs = lines.last().runs;
+        while (!runs.isEmpty()) {
+            QString &text = runs.last().text;
+            while (!text.isEmpty() && text.back().isSpace()) {
+                text.chop(1);
+            }
+            if (!text.isEmpty()) {
+                break;
+            }
+            runs.removeLast();
+        }
+        lines.append(TextLine());
+        used = 0;
+    };
+    for (const Piece &piece : std::as_const(pieces)) {
+        const QFontMetricsF metrics(piece.run->font);
+        const qreal ink = metrics.horizontalAdvance(piece.text.trimmed());
+        if (used > 0 && used + ink > width) {
+            newLine();
+        }
+        if (used == 0 && ink > width) {
+            // Too wide on its own: as many characters as fit on each line.
+            QString rest = piece.text;
+            while (!rest.isEmpty()) {
+                qsizetype count = 1;
+                while (count < rest.size() && metrics.horizontalAdvance(rest.left(count + 1).trimmed()) <= width) {
+                    ++count;
+                }
+                add(rest.left(count), piece.run);
+                rest.remove(0, count);
+                if (!rest.trimmed().isEmpty()) {
+                    newLine();
+                } else {
+                    used = metrics.horizontalAdvance(lines.last().runs.constLast().text);
+                    rest.clear();
+                }
+            }
+            continue;
+        }
+        add(piece.text, piece.run);
+        used += metrics.horizontalAdvance(piece.text);
+    }
+    if (lines.size() > 1 && lines.last().runs.isEmpty()) {
+        lines.removeLast();
+    }
+    return lines;
+}
+
+// Splits the spans into lines and measures them at the nominal font sizes;
+// with @p wrapWidth, long lines wrap to that width.
+QList<TextLine> layoutLines(const TextObject &object, std::optional<qreal> wrapWidth = std::nullopt)
 {
     QList<TextLine> lines(1);
     QFont lastFont = toQFont(object.spans.isEmpty() ? LabelFont() : object.spans.constFirst().font);
@@ -234,6 +318,14 @@ QList<TextLine> layoutLines(const TextObject &object)
                 lines.last().runs.append({part, font, span.color});
             }
         }
+    }
+
+    if (wrapWidth) {
+        QList<TextLine> wrapped;
+        for (const TextLine &line : std::as_const(lines)) {
+            wrapped += line.runs.isEmpty() ? QList<TextLine>{line} : wrapLine(line, *wrapWidth);
+        }
+        lines = wrapped;
     }
 
     for (TextLine &line : lines) {
@@ -549,19 +641,27 @@ void LabelRenderer::paintObject(QPainter *painter, const LabelObject &object)
     painter->restore();
 }
 
-void LabelRenderer::paintText(QPainter *painter, const TextObject &object, const QRectF &box)
+namespace
 {
-    const QList<TextLine> lines = layoutLines(object);
 
+// The size of a block of lines; see paintText().
+struct TextBlock {
+    qreal width = 0;
+    qreal top = 0;
+    qreal height = 0;
+};
+
+TextBlock measure(const QList<TextLine> &lines, bool useFullFontHeight)
+{
     // Lines always stack at full line spacing. Without "full font height" the
     // block is measured by its ink instead, from the highest to the lowest
     // glyph, which is what DLS 8 fits and aligns.
-    qreal blockWidth = 0;
+    TextBlock block;
     qreal baseline = 0;
     qreal inkTop = std::numeric_limits<qreal>::max();
     qreal inkBottom = std::numeric_limits<qreal>::lowest();
     for (const TextLine &line : lines) {
-        blockWidth = std::max(blockWidth, line.width);
+        block.width = std::max(block.width, line.width);
         baseline += line.ascent;
         if (!line.runs.isEmpty()) {
             inkTop = std::min(inkTop, baseline - line.inkAscent);
@@ -569,21 +669,57 @@ void LabelRenderer::paintText(QPainter *painter, const TextObject &object, const
         }
         baseline += line.descent;
     }
-
-    qreal blockTop = 0;
-    qreal blockHeight = baseline;
-    if (!object.useFullFontHeight && inkBottom > inkTop) {
-        blockTop = inkTop;
-        blockHeight = inkBottom - inkTop;
+    block.height = baseline;
+    if (!useFullFontHeight && inkBottom > inkTop) {
+        block.top = inkTop;
+        block.height = inkBottom - inkTop;
     }
-    if (blockWidth <= 0 || blockHeight <= 0) {
+    return block;
+}
+
+} // namespace
+
+void LabelRenderer::paintText(QPainter *painter, const TextObject &object, const QRectF &box)
+{
+    QList<TextLine> lines = layoutLines(object);
+    TextBlock block = measure(lines, object.useFullFontHeight);
+    if (block.width <= 0 || block.height <= 0) {
         return;
     }
 
     qreal scale = 1.0;
-    const qreal fit = std::min(box.width() / blockWidth, box.height() / blockHeight);
-    if (object.fitMode == TextFitMode::AlwaysFit || (object.fitMode == TextFitMode::ShrinkToFit && fit < 1.0)) {
-        scale = fit;
+    if (!object.wrap) {
+        const qreal fit = std::min(box.width() / block.width, box.height() / block.height);
+        if (object.fitMode == TextFitMode::AlwaysFit || (object.fitMode == TextFitMode::ShrinkToFit && fit < 1.0)) {
+            scale = fit;
+        }
+    } else {
+        // Wrapping text fills the box's width at the size it is drawn, so
+        // smaller text wraps less: find the largest size whose lines fit.
+        const auto wrappedAt = [&](qreal s) {
+            lines = layoutLines(object, box.width() / s);
+            block = measure(lines, object.useFullFontHeight);
+            return block.height * s <= box.height() && block.width * s <= box.width() * 1.0001;
+        };
+        if (object.fitMode != TextFitMode::None) {
+            // Wrapping only adds lines, so the text unwrapped bounds the size.
+            const qreal largest = object.fitMode == TextFitMode::AlwaysFit ? box.height() / block.height : 1.0;
+            if (wrappedAt(largest)) {
+                scale = largest;
+            } else {
+                qreal low = 0;
+                qreal high = largest;
+                for (int i = 0; i < 24; ++i) {
+                    const qreal middle = (low + high) / 2;
+                    (wrappedAt(middle) ? low : high) = middle;
+                }
+                scale = low > 0 ? low : high;
+            }
+        }
+        wrappedAt(scale);
+        if (block.width <= 0 || block.height <= 0) {
+            return;
+        }
     }
 
     painter->save();
@@ -594,13 +730,13 @@ void LabelRenderer::paintText(QPainter *painter, const TextObject &object, const
     // Lay out in nominal font units inside a box scaled by the fit factor,
     // so every line keeps its proportions.
     const QRectF layoutBox(box.topLeft() / scale, box.size() / scale);
-    const QRectF block = aligned(QSizeF(layoutBox.width(), blockHeight), layoutBox, toQt(object.verticalAlignment));
+    const QRectF area = aligned(QSizeF(layoutBox.width(), block.height), layoutBox, toQt(object.verticalAlignment));
     painter->scale(scale, scale);
 
-    qreal y = block.top() - blockTop;
+    qreal y = area.top() - block.top;
     for (const TextLine &line : lines) {
         y += line.ascent;
-        qreal x = aligned(QSizeF(line.width, 0), QRectF(block.left(), 0, block.width(), 0), toQt(object.horizontalAlignment)).left();
+        qreal x = aligned(QSizeF(line.width, 0), QRectF(area.left(), 0, area.width(), 0), toQt(object.horizontalAlignment)).left();
         x += line.leftOverhang;
         for (const TextRun &run : line.runs) {
             painter->setFont(printFont(run.font));

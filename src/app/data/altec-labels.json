@@ -472,37 +472,44 @@
 {
 "product":"Gekleurde Wikkellabels",
 "width":24.0,
-"height":36.0
+"height":36.0,
+"print":12.0
 },
 {
 "product":"Gekleurde Wikkellabels",
 "width":24.0,
-"height":57.0
+"height":57.0,
+"print":19.0
 },
 {
 "product":"Gekleurde Wikkellabels",
 "width":25.0,
-"height":95.0
+"height":95.0,
+"print":25.0
 },
 {
 "product":"Gekleurde Wikkellabels",
 "width":35.0,
-"height":210.0
+"height":210.0,
+"print":30.0
 },
 {
 "product":"Gekleurde Wikkellabels",
 "width":38.0,
-"height":63.0
+"height":63.0,
+"print":19.0
 },
 {
 "product":"Gekleurde Wikkellabels",
 "width":50.0,
-"height":95.0
+"height":95.0,
+"print":25.0
 },
 {
 "product":"Gekleurde Wikkellabels",
 "width":50.0,
-"height":165.0
+"height":165.0,
+"print":35.0
 },
 {
 "product":"Hittebestendige tags (250°C)",
@@ -1293,7 +1300,8 @@
 {
 "product":"Twistlabels",
 "width":25.0,
-"height":95.0
+"height":95.0,
+"print":25.0
 },
 {
 "product":"Twistlabels",
@@ -1303,7 +1311,8 @@
 {
 "product":"Twistlabels",
 "width":50.0,
-"height":95.0
+"height":95.0,
+"print":25.0
 },
 {
 "product":"Verwijderbare kledinglabels",
@@ -1445,34 +1454,40 @@
 "product":"Wikkellabels",
 "width":24.0,
 "height":36.0,
-"across":4
-},
-{
-"product":"Wikkellabels",
-"width":24.0,
-"height":57.0
+"across":4,
+"print":12.0
 },
 {
 "product":"Wikkellabels",
 "width":24.0,
 "height":57.0,
-"across":4
+"print":19.0
+},
+{
+"product":"Wikkellabels",
+"width":24.0,
+"height":57.0,
+"across":4,
+"print":19.0
 },
 {
 "product":"Wikkellabels",
 "width":25.0,
-"height":95.0
+"height":95.0,
+"print":25.0
 },
 {
 "product":"Wikkellabels",
 "width":50.0,
 "height":57.0,
-"across":2
+"across":2,
+"print":26.0
 },
 {
 "product":"Wikkellabels",
 "width":50.0,
-"height":95.0
+"height":95.0,
+"print":25.0
 },
 {
 "product":"Wire tags",

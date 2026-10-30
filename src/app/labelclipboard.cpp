@@ -9,8 +9,11 @@
 #include "objectfactory.h"
 
 #include <QBuffer>
+#include <QHash>
 #include <QImage>
 #include <QMimeData>
+
+#include <algorithm>
 
 using namespace LabelCreator;
 using namespace Qt::Literals::StringLiterals;
@@ -53,18 +56,25 @@ QByteArray toPng(const QImage &image)
 namespace LabelClipboard
 {
 
-QMimeData *mimeData(const LabelObject &object, const LabelDocument &document)
+QMimeData *mimeData(const QList<LabelObject> &objects, const LabelDocument &document)
 {
     LabelDocument holder = document;
-    holder.objects = {object};
+    holder.objects = objects;
     auto *data = new QMimeData;
     data->setData(ObjectsMimeType, LabelWriter::toByteArray(holder));
-    const QString text = textOf(object);
-    if (!text.isEmpty()) {
-        data->setText(text);
+    QStringList texts;
+    for (const LabelObject &object : objects) {
+        if (const QString text = textOf(object); !text.isEmpty()) {
+            texts << text;
+        }
     }
-    if (const auto *image = std::get_if<ImageObject>(&object)) {
-        data->setImageData(QImage::fromData(image->imageData));
+    if (!texts.isEmpty()) {
+        data->setText(texts.join(u'\n'));
+    }
+    if (objects.size() == 1) {
+        if (const auto *image = std::get_if<ImageObject>(&objects.constFirst())) {
+            data->setImageData(QImage::fromData(image->imageData));
+        }
     }
     return data;
 }
@@ -99,18 +109,36 @@ QList<LabelObject> objectsToPaste(const QMimeData *data, const LabelDocument &do
         objects << text;
     }
 
-    // Unique names, and no object hidden exactly on top of another.
+    // No object hidden exactly on top of another: all move on together, so
+    // they keep their places to each other.
+    const auto occupied = [&document, &objects]() {
+        return std::any_of(objects.cbegin(), objects.cend(), [&document](const LabelObject &object) {
+            return std::any_of(document.objects.cbegin(), document.objects.cend(), [&object](const LabelObject &other) {
+                return objectBase(other).bounds == objectBase(object).bounds;
+            });
+        });
+    };
+    for (int tries = 0; tries < 100 && occupied(); ++tries) {
+        for (LabelObject &object : objects) {
+            objectBase(object).bounds.translate(PasteOffset, PasteOffset);
+        }
+    }
+
+    // Unique names; pasted groups become new groups, not part of one on the label.
+    int nextGroup = 0;
+    for (const LabelObject &object : document.objects) {
+        nextGroup = std::max(nextGroup, objectBase(object).groupId.value_or(-1) + 1);
+    }
+    QHash<int, int> groups;
     LabelDocument target = document;
     for (LabelObject &object : objects) {
         ObjectBase &base = objectBase(object);
         base.name = ObjectFactory::copyName(target, base.name);
-        const auto occupied = [&target](const QRectF &bounds) {
-            return std::any_of(target.objects.cbegin(), target.objects.cend(), [&bounds](const LabelObject &other) {
-                return objectBase(other).bounds == bounds;
-            });
-        };
-        while (occupied(base.bounds)) {
-            base.bounds.translate(PasteOffset, PasteOffset);
+        if (base.groupId && *base.groupId >= 0) {
+            if (!groups.contains(*base.groupId)) {
+                groups.insert(*base.groupId, nextGroup++);
+            }
+            base.groupId = groups.value(*base.groupId);
         }
         target.objects << object;
     }

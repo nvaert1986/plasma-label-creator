@@ -32,6 +32,8 @@ Altec, Zebra Technologies or KDE e.V. See [Trademarks](#trademarks).
   clip art, lines and shapes, counters, date/time and curved text. Edit
   text directly on the label, format it from the toolbar, drag objects in
   from the Insert tab or from Dolphin.
+- **Arrange objects**: select several at once, align and distribute them,
+  group them, lock them in place. Text can wrap within its box.
 - **Barcodes** (zint): Code 128, Code 39, Codabar, 2 of 5, ITF-14, EAN,
   UPC, QR Code, PDF417, POSTNET, PLANET and Intelligent Mail, and also Data
   Matrix, Aztec, MaxiCode, Micro QR, Code 93, Code 11, MSI Plessey,
@@ -90,7 +92,8 @@ does not read or work around that.
 ### Altec label catalogue
 
 For Altec ATP printers the application offers Altec's die-cut and round
-labels by product, those fitting the loaded label length first. The label
+labels by product, those fitting the loaded label length first; wrap
+labels show the white strip that takes print. The label
 sizes and product names come from Altec's public website (altec.nl); they
 are listed only to help choose a label and will be removed if Altec asks.
 

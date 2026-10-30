@@ -205,6 +205,60 @@ private Q_SLOTS:
         QVERIFY(toDots(bounds).adjusted(-1, -1, 1, 1).contains(inkBounds(image)));
     }
 
+    void wrappedTextFillsTheBoxWidth_data()
+    {
+        QTest::addColumn<TextFitMode>("fitMode");
+        QTest::newRow("none") << TextFitMode::None;
+        QTest::newRow("shrink") << TextFitMode::ShrinkToFit;
+        QTest::newRow("always") << TextFitMode::AlwaysFit;
+    }
+
+    void wrappedTextFillsTheBoxWidth()
+    {
+        QFETCH(TextFitMode, fitMode);
+        const QRectF bounds(200, 200, 1440, 1400);
+        TextObject text = textObject(u"A rather long line that cannot possibly fit at 12 pt on one line"_s, bounds, fitMode);
+        text.wrap = true;
+        LabelRenderer renderer(LabelRenderer::Mode::Print);
+        const QImage image = renderer.renderImage(singleObject(text), Dpi);
+
+        const QRect ink = inkBounds(image);
+        QVERIFY2(toDots(bounds).adjusted(-1, -1, 1, 1).contains(ink), qPrintable(u"ink %1,%2 %3x%4"_s.arg(ink.x()).arg(ink.y()).arg(ink.width()).arg(ink.height())));
+        // Several lines across most of the width.
+        QVERIFY(ink.width() > toDots(bounds).width() * 0.75);
+        QVERIFY(ink.height() > 120); // 12 pt lines are 50 dots apart
+        if (fitMode != TextFitMode::AlwaysFit) {
+            // At its own size: no line taller than 12 pt, so at least three lines.
+            QVERIFY(ink.height() < toDots(bounds).height());
+        }
+    }
+
+    void wrappedTextShrinksWhenTheLinesDoNotFit()
+    {
+        const QRectF bounds(200, 200, 1440, 400);
+        TextObject text = textObject(u"A rather long line that cannot possibly fit at 12 pt in this small box at all"_s, bounds, TextFitMode::ShrinkToFit);
+        text.wrap = true;
+        LabelRenderer renderer(LabelRenderer::Mode::Print);
+        const QImage image = renderer.renderImage(singleObject(text), Dpi);
+        const QRect ink = inkBounds(image);
+        QVERIFY(toDots(bounds).adjusted(-1, -1, 1, 1).contains(ink));
+        // Wrapped, so taller than one shrunk line would be.
+        TextObject single = text;
+        single.wrap = false;
+        QVERIFY(ink.height() > inkBounds(renderer.renderImage(singleObject(single), Dpi)).height() * 1.5);
+    }
+
+    void wordsTooWideBreakInside()
+    {
+        const QRectF bounds(200, 200, 400, 1400);
+        TextObject text = textObject(u"Supercalifragilistic"_s, bounds, TextFitMode::None);
+        text.wrap = true;
+        LabelRenderer renderer(LabelRenderer::Mode::Print);
+        const QRect ink = inkBounds(renderer.renderImage(singleObject(text), Dpi));
+        QVERIFY(toDots(bounds).adjusted(-1, -1, 1, 1).contains(ink));
+        QVERIFY(ink.height() > 100); // more than one line
+    }
+
     void horizontalLineSitsOnItsAlignment_data()
     {
         QTest::addColumn<LineAlignment>("alignment");

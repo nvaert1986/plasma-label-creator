@@ -10,7 +10,7 @@
 /**
  * The labels Altec sells for its ATP printers, as listed on altec.nl for
  * the ATP-600 Pro (2026-10-29): die-cut and round labels, grouped by
- * product. Continuous rolls are left out until the editor can design
+ * product; wrap labels with the white strip that takes print. Continuous rolls are left out until the editor can design
  * labels of a chosen length.
  */
 namespace AltecLabels

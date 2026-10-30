@@ -148,34 +148,56 @@ void MainWindow::setupFormatActions()
             setSelectedFitMode(TextFitMode::AlwaysFit);
         }),
     };
+
+    // Long lines break at spaces to the box's width.
+    m_wrap = new KToggleAction(QIcon::fromTheme(u"text-wrap"_s), i18n("Wrap Text"), this);
+    m_wrap->setToolTip(i18n("Break long lines at spaces to fit the box's width"));
+    actions->addAction(u"format_wrap"_s, m_wrap);
+    connect(m_wrap, &QAction::triggered, this, &MainWindow::setSelectedWrap);
 }
+
+// The format actions change every selected object they apply to; their
+// state shows the current object's.
 
 void MainWindow::setSelectedInverted(bool inverted)
 {
-    const int index = m_editor->selection();
-    if (index < 0 || !ObjectFactory::canInvert(m_editor->document().objects.at(index))) {
-        return;
-    }
     LabelDocument document = m_editor->document();
-    ObjectFactory::setInverted(document.objects[index], inverted);
+    for (const int index : m_editor->selectedObjects()) {
+        if (ObjectFactory::canInvert(document.objects.at(index))) {
+            ObjectFactory::setInverted(document.objects[index], inverted);
+        }
+    }
     m_editor->apply(document, inverted ? i18n("White on Black") : i18n("Black on White"));
+}
+
+void MainWindow::setSelectedWrap(bool wrap)
+{
+    LabelDocument document = m_editor->document();
+    for (const int index : m_editor->selectedObjects()) {
+        TextObject *text = std::get_if<TextObject>(&document.objects[index]);
+        if (!text) {
+            text = std::get_if<AddressObject>(&document.objects[index]);
+        }
+        if (text) {
+            text->wrap = wrap;
+        }
+    }
+    m_editor->apply(document, wrap ? i18n("Wrap Text") : i18n("Do Not Wrap Text"));
 }
 
 void MainWindow::setSelectedFitMode(TextFitMode mode)
 {
-    const int index = m_editor->selection();
-    if (index < 0) {
-        return;
-    }
     LabelDocument document = m_editor->document();
-    TextObject *text = std::get_if<TextObject>(&document.objects[index]);
-    if (!text) {
-        text = std::get_if<AddressObject>(&document.objects[index]);
+    for (const int index : m_editor->selectedObjects()) {
+        TextObject *text = std::get_if<TextObject>(&document.objects[index]);
+        if (!text) {
+            text = std::get_if<AddressObject>(&document.objects[index]);
+        }
+        if (text) {
+            text->fitMode = mode;
+        }
     }
-    if (text) {
-        text->fitMode = mode;
-        m_editor->apply(document, i18n("Change Text Fit"));
-    }
+    m_editor->apply(document, i18n("Change Text Fit"));
 }
 
 std::optional<LabelFont> MainWindow::selectedFont() const
@@ -195,53 +217,49 @@ std::optional<LabelFont> MainWindow::selectedFont() const
 
 void MainWindow::changeSelectedFont(const std::function<void(LabelFont &)> &change)
 {
-    const int index = m_editor->selection();
-    if (index < 0) {
-        return;
-    }
     LabelDocument document = m_editor->document();
-    std::visit(
-        [&change](auto &o) {
-            using T = std::decay_t<decltype(o)>;
-            if constexpr (std::is_same_v<T, TextObject> || std::is_same_v<T, AddressObject>) {
-                // Mixed fonts: the change applies to every run.
-                for (TextSpan &span : o.spans) {
-                    change(span.font);
+    for (const int index : m_editor->selectedObjects()) {
+        std::visit(
+            [&change](auto &o) {
+                using T = std::decay_t<decltype(o)>;
+                if constexpr (std::is_same_v<T, TextObject> || std::is_same_v<T, AddressObject>) {
+                    // Mixed fonts: the change applies to every run.
+                    for (TextSpan &span : o.spans) {
+                        change(span.font);
+                    }
+                } else if (LabelFont *font = editableFont(o)) {
+                    change(*font);
                 }
-            } else if (LabelFont *font = editableFont(o)) {
-                change(*font);
-            }
-        },
-        document.objects[index]);
+            },
+            document.objects[index]);
+    }
     m_editor->apply(document, i18n("Change Font"));
 }
 
 void MainWindow::setSelectedAlignment(std::optional<HorizontalAlignment> horizontal, std::optional<VerticalAlignment> vertical)
 {
-    const int index = m_editor->selection();
-    if (index < 0) {
-        return;
-    }
     LabelDocument document = m_editor->document();
-    std::visit(
-        [&](auto &o) {
-            using T = std::decay_t<decltype(o)>;
-            if constexpr (std::is_same_v<T, TextObject> || std::is_same_v<T, AddressObject>) {
-                o.horizontalAlignment = horizontal.value_or(o.horizontalAlignment);
-                o.verticalAlignment = vertical.value_or(o.verticalAlignment);
-            } else if constexpr (std::is_same_v<T, CounterObject> || std::is_same_v<T, DateTimeObject>) {
-                o.layout.horizontalAlignment = horizontal.value_or(o.layout.horizontalAlignment);
-                o.layout.verticalAlignment = vertical.value_or(o.layout.verticalAlignment);
-            } else if constexpr (std::is_same_v<T, ImageObject>) {
-                o.horizontalAlignment = horizontal.value_or(o.horizontalAlignment);
-                o.verticalAlignment = vertical.value_or(o.verticalAlignment);
-            } else if constexpr (std::is_same_v<T, BarcodeObject>) {
-                o.horizontalAlignment = horizontal.value_or(o.horizontalAlignment);
-            } else if constexpr (std::is_same_v<T, CircularTextObject>) {
-                o.textAlignment = horizontal.value_or(o.textAlignment);
-            }
-        },
-        document.objects[index]);
+    for (const int index : m_editor->selectedObjects()) {
+        std::visit(
+            [&](auto &o) {
+                using T = std::decay_t<decltype(o)>;
+                if constexpr (std::is_same_v<T, TextObject> || std::is_same_v<T, AddressObject>) {
+                    o.horizontalAlignment = horizontal.value_or(o.horizontalAlignment);
+                    o.verticalAlignment = vertical.value_or(o.verticalAlignment);
+                } else if constexpr (std::is_same_v<T, CounterObject> || std::is_same_v<T, DateTimeObject>) {
+                    o.layout.horizontalAlignment = horizontal.value_or(o.layout.horizontalAlignment);
+                    o.layout.verticalAlignment = vertical.value_or(o.layout.verticalAlignment);
+                } else if constexpr (std::is_same_v<T, ImageObject>) {
+                    o.horizontalAlignment = horizontal.value_or(o.horizontalAlignment);
+                    o.verticalAlignment = vertical.value_or(o.verticalAlignment);
+                } else if constexpr (std::is_same_v<T, BarcodeObject>) {
+                    o.horizontalAlignment = horizontal.value_or(o.horizontalAlignment);
+                } else if constexpr (std::is_same_v<T, CircularTextObject>) {
+                    o.textAlignment = horizontal.value_or(o.textAlignment);
+                }
+            },
+            document.objects[index]);
+    }
     m_editor->apply(document, i18n("Change Alignment"));
 }
 
@@ -253,68 +271,73 @@ void MainWindow::updateFormatActions()
     std::optional<VerticalAlignment> vertical;
     if (index >= 0) {
         std::visit(
-            [&](const auto &o) {
-                using T = std::decay_t<decltype(o)>;
-                if constexpr (std::is_same_v<T, TextObject> || std::is_same_v<T, AddressObject> || std::is_same_v<T, ImageObject>) {
-                    horizontal = o.horizontalAlignment;
-                    vertical = o.verticalAlignment;
-                } else if constexpr (std::is_same_v<T, CounterObject> || std::is_same_v<T, DateTimeObject>) {
-                    horizontal = o.layout.horizontalAlignment;
-                    vertical = o.layout.verticalAlignment;
-                } else if constexpr (std::is_same_v<T, BarcodeObject>) {
-                    horizontal = o.horizontalAlignment;
-                } else if constexpr (std::is_same_v<T, CircularTextObject>) {
-                    horizontal = o.textAlignment;
-                }
-            },
-            m_editor->document().objects.at(index));
-    }
+                [&](const auto &o) {
+                    using T = std::decay_t<decltype(o)>;
+                    if constexpr (std::is_same_v<T, TextObject> || std::is_same_v<T, AddressObject> || std::is_same_v<T, ImageObject>) {
+                        horizontal = o.horizontalAlignment;
+                        vertical = o.verticalAlignment;
+                    } else if constexpr (std::is_same_v<T, CounterObject> || std::is_same_v<T, DateTimeObject>) {
+                        horizontal = o.layout.horizontalAlignment;
+                        vertical = o.layout.verticalAlignment;
+                    } else if constexpr (std::is_same_v<T, BarcodeObject>) {
+                        horizontal = o.horizontalAlignment;
+                    } else if constexpr (std::is_same_v<T, CircularTextObject>) {
+                        horizontal = o.textAlignment;
+                    }
+                },
+                m_editor->document().objects.at(index));
+        }
 
-    const std::optional<LabelFont> font = selectedFont();
-    for (QAction *action : std::initializer_list<QAction *>{m_fontFamily, m_fontSize, m_bold, m_italic, m_underline, m_strikeout}) {
-        action->setEnabled(font.has_value());
-    }
-    actionCollection()->action(u"format_font_grow"_s)->setEnabled(font.has_value());
-    actionCollection()->action(u"format_font_shrink"_s)->setEnabled(font.has_value());
-    if (font) {
-        // Showing the font must not change it.
-        const QSignalBlocker familyBlocker(m_fontFamily);
-        const QSignalBlocker sizeBlocker(m_fontSize);
-        m_fontFamily->setFont(font->family);
-        m_fontSize->setFontSize(qRound(font->size));
-        m_bold->setChecked(font->bold);
-        m_italic->setChecked(font->italic);
-        m_underline->setChecked(font->underline);
-        m_strikeout->setChecked(font->strikeout);
-    }
+        const std::optional<LabelFont> font = selectedFont();
+        for (QAction *action : std::initializer_list<QAction *>{m_fontFamily, m_fontSize, m_bold, m_italic, m_underline, m_strikeout}) {
+            action->setEnabled(font.has_value());
+        }
+        actionCollection()->action(u"format_font_grow"_s)->setEnabled(font.has_value());
+        actionCollection()->action(u"format_font_shrink"_s)->setEnabled(font.has_value());
+        if (font) {
+            // Showing the font must not change it.
+            const QSignalBlocker familyBlocker(m_fontFamily);
+            const QSignalBlocker sizeBlocker(m_fontSize);
+            m_fontFamily->setFont(font->family);
+            m_fontSize->setFontSize(qRound(font->size));
+            m_bold->setChecked(font->bold);
+            m_italic->setChecked(font->italic);
+            m_underline->setChecked(font->underline);
+            m_strikeout->setChecked(font->strikeout);
+        }
 
-    const bool invertible = index >= 0 && ObjectFactory::canInvert(m_editor->document().objects.at(index));
-    m_inverted->setEnabled(invertible);
-    m_inverted->setChecked(invertible && ObjectFactory::isInverted(m_editor->document().objects.at(index)));
+        const bool invertible = index >= 0 && ObjectFactory::canInvert(m_editor->document().objects.at(index));
+        m_inverted->setEnabled(invertible);
+        m_inverted->setChecked(invertible && ObjectFactory::isInverted(m_editor->document().objects.at(index)));
 
-    std::optional<TextFitMode> fitMode;
-    if (index >= 0) {
-        const LabelObject &object = m_editor->document().objects.at(index);
-        if (const auto *text = std::get_if<TextObject>(&object)) {
-            fitMode = text->fitMode;
-        } else if (const auto *address = std::get_if<AddressObject>(&object)) {
-            fitMode = address->fitMode;
+        std::optional<TextFitMode> fitMode;
+        bool wraps = false;
+        if (index >= 0) {
+            const LabelObject &object = m_editor->document().objects.at(index);
+            if (const auto *text = std::get_if<TextObject>(&object)) {
+                fitMode = text->fitMode;
+                wraps = text->wrap;
+            } else if (const auto *address = std::get_if<AddressObject>(&object)) {
+                fitMode = address->fitMode;
+                wraps = address->wrap;
+            }
+        }
+        m_wrap->setEnabled(fitMode.has_value());
+        m_wrap->setChecked(wraps);
+        const QList<TextFitMode> fitModes = {TextFitMode::None, TextFitMode::ShrinkToFit, TextFitMode::AlwaysFit};
+        for (int i = 0; i < m_fitModes.size(); ++i) {
+            m_fitModes.at(i)->setEnabled(fitMode.has_value());
+            m_fitModes.at(i)->setChecked(fitMode == fitModes.at(i));
+        }
+
+        const QList<HorizontalAlignment> horizontals = {HorizontalAlignment::Left, HorizontalAlignment::Center, HorizontalAlignment::Right};
+        for (int i = 0; i < m_horizontalAlignment.size(); ++i) {
+            m_horizontalAlignment.at(i)->setEnabled(horizontal.has_value());
+            m_horizontalAlignment.at(i)->setChecked(horizontal == horizontals.at(i));
+        }
+        const QList<VerticalAlignment> verticals = {VerticalAlignment::Top, VerticalAlignment::Middle, VerticalAlignment::Bottom};
+        for (int i = 0; i < m_verticalAlignment.size(); ++i) {
+            m_verticalAlignment.at(i)->setEnabled(vertical.has_value());
+            m_verticalAlignment.at(i)->setChecked(vertical == verticals.at(i));
         }
     }
-    const QList<TextFitMode> fitModes = {TextFitMode::None, TextFitMode::ShrinkToFit, TextFitMode::AlwaysFit};
-    for (int i = 0; i < m_fitModes.size(); ++i) {
-        m_fitModes.at(i)->setEnabled(fitMode.has_value());
-        m_fitModes.at(i)->setChecked(fitMode == fitModes.at(i));
-    }
-
-    const QList<HorizontalAlignment> horizontals = {HorizontalAlignment::Left, HorizontalAlignment::Center, HorizontalAlignment::Right};
-    for (int i = 0; i < m_horizontalAlignment.size(); ++i) {
-        m_horizontalAlignment.at(i)->setEnabled(horizontal.has_value());
-        m_horizontalAlignment.at(i)->setChecked(horizontal == horizontals.at(i));
-    }
-    const QList<VerticalAlignment> verticals = {VerticalAlignment::Top, VerticalAlignment::Middle, VerticalAlignment::Bottom};
-    for (int i = 0; i < m_verticalAlignment.size(); ++i) {
-        m_verticalAlignment.at(i)->setEnabled(vertical.has_value());
-        m_verticalAlignment.at(i)->setChecked(vertical == verticals.at(i));
-    }
-}

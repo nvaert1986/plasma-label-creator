@@ -100,8 +100,18 @@ private:
     void copyObject();
     void cutObject();
     void paste();
-    /** Moves the selected object against an edge or to the middle of the label. */
+    /**
+     * Moves the selected objects, together, against an edge or to the middle
+     * of the label.
+     */
     void positionObject(Qt::Alignment alignment);
+    /** Lines the selected objects up with each other. */
+    void alignObjects(Qt::Alignment alignment);
+    void distributeObjects(Qt::Orientation orientation);
+    void groupObjects();
+    void ungroupObjects();
+    void setObjectsLocked(bool locked);
+    void selectAllObjects();
     void setOrientation(LabelCreator::PaperOrientation orientation);
     void raiseObject();
     void lowerObject();
@@ -120,6 +130,7 @@ private:
     LabelCreator::LabelPrinter::Options printOptions() const;
     void setupViewActions();
     void setupDataActions();
+    void setupArrangeActions();
     /** Chooses the data source and the rows to print. */
     void editDataSource();
     void editQuestions();
@@ -137,6 +148,7 @@ private:
      */
     LabelCreator::LabelDocument filled(const LabelCreator::LabelDocument &document, const QHash<QString, QString> &values) const;
     void setSelectedInverted(bool inverted);
+    void setSelectedWrap(bool wrap);
     /** Asks for the selected printer's print offset, in on-screen terms for the current label. */
     void editPrintOffset();
     void openRecentLayout(const LabelCreator::RecentLayout &layout);
@@ -158,6 +170,7 @@ private:
     KToggleAction *m_underline = nullptr;
     KToggleAction *m_strikeout = nullptr;
     KToggleAction *m_inverted = nullptr;
+    KToggleAction *m_wrap = nullptr;
 
     // Printing from data: the rows as loaded (and from which source), the
     // ticked ones, the last answers to the questions, and a database
@@ -170,6 +183,7 @@ private:
     QList<KToggleAction *> m_fitModes; // none, shrink to fit, always fit
     KToggleAction *m_portrait = nullptr;
     KToggleAction *m_landscape = nullptr;
+    KToggleAction *m_lock = nullptr;
     QAction *m_paste = nullptr;
     bool m_followPrinter = false; // the user chose another printer; the label type follows
     QList<KToggleAction *> m_horizontalAlignment; // left, centre, right

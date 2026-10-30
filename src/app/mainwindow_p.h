@@ -10,6 +10,7 @@
 
 #include "addressbookpanel.h"
 #include "alteclabels.h"
+#include "arrange.h"
 #include "customlabels.h"
 #include "datadialogs.h"
 #include "fields.h"
@@ -61,6 +62,7 @@
 #include <QLabel>
 #include <QListWidget>
 #include <QMenu>
+#include <QMimeData>
 #include <QPushButton>
 #include <QRadioButton>
 #include <QScrollArea>

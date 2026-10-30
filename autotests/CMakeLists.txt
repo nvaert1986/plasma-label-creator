@@ -3,6 +3,7 @@
 
 set(tests
     addressbooktest
+    arrangetest
     barcodetest
     clipartlibrarytest
     fieldstest
@@ -41,6 +42,7 @@ if(BUILD_APP)
         ${CMAKE_SOURCE_DIR}/src/app/labelview.cpp
         ${CMAKE_SOURCE_DIR}/src/app/objectfactory.cpp
         ${CMAKE_SOURCE_DIR}/src/app/printpreviewdialog.cpp
+        ${CMAKE_SOURCE_DIR}/src/app/plasma-label-creator.qrc # the Altec catalogue
         LINK_LIBRARIES labelcreatorcore Qt6::Test Qt6::Widgets KF6::I18n
         TEST_NAME labeleditortest)
     target_include_directories(labeleditortest PRIVATE ${CMAKE_SOURCE_DIR}/src/app)

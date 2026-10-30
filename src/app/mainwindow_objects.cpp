@@ -92,48 +92,63 @@ void MainWindow::editObject(int index)
 
 void MainWindow::deleteObject()
 {
-    const int index = m_editor->selection();
-    if (index < 0) {
+    const QList<int> selected = m_editor->selectedObjects();
+    if (selected.isEmpty()) {
         return;
     }
     LabelDocument document = m_editor->document();
-    document.removeObject(index);
-    m_editor->apply(document, i18n("Delete Object"), -1);
+    for (auto it = selected.crbegin(); it != selected.crend(); ++it) {
+        document.removeObject(*it);
+    }
+    m_editor->apply(document, selected.size() > 1 ? i18n("Delete Objects") : i18n("Delete Object"), -1);
 }
 
 void MainWindow::duplicateObject()
 {
-    const int index = m_editor->selection();
-    if (index < 0) {
+    const QList<int> selected = m_editor->selectedObjects();
+    if (selected.isEmpty()) {
         return;
     }
+    // Through the clipboard's format, without touching the clipboard: copies
+    // get names and groups of their own and land a little further on.
     LabelDocument document = m_editor->document();
-    LabelObject copy = document.objects.at(index);
-    ObjectBase &base = objectBase(copy);
-    base.name = ObjectFactory::copyName(document, base.name);
-    base.bounds.translate(144, 144);
-    const int added = document.addObject(copy);
-    m_editor->apply(document, i18n("Duplicate Object"), added);
+    QList<LabelObject> originals;
+    for (const int index : selected) {
+        originals << document.objects.at(index);
+    }
+    const std::unique_ptr<QMimeData> data(LabelClipboard::mimeData(originals, document));
+    QList<int> added;
+    for (const LabelObject &copy : LabelClipboard::objectsToPaste(data.get(), document)) {
+        added << document.addObject(copy);
+    }
+    m_editor->apply(document, selected.size() > 1 ? i18n("Duplicate Objects") : i18n("Duplicate Object"), added);
 }
 
 void MainWindow::copyObject()
 {
-    const int index = m_editor->selection();
-    if (index >= 0) {
-        QApplication::clipboard()->setMimeData(LabelClipboard::mimeData(m_editor->document().objects.at(index), m_editor->document()));
+    const QList<int> selected = m_editor->selectedObjects();
+    if (selected.isEmpty()) {
+        return;
     }
+    QList<LabelObject> objects;
+    for (const int index : selected) {
+        objects << m_editor->document().objects.at(index);
+    }
+    QApplication::clipboard()->setMimeData(LabelClipboard::mimeData(objects, m_editor->document()));
 }
 
 void MainWindow::cutObject()
 {
-    const int index = m_editor->selection();
-    if (index < 0) {
+    const QList<int> selected = m_editor->selectedObjects();
+    if (selected.isEmpty()) {
         return;
     }
     copyObject();
     LabelDocument document = m_editor->document();
-    document.removeObject(index);
-    m_editor->apply(document, i18n("Cut Object"), -1);
+    for (auto it = selected.crbegin(); it != selected.crend(); ++it) {
+        document.removeObject(*it);
+    }
+    m_editor->apply(document, selected.size() > 1 ? i18n("Cut Objects") : i18n("Cut Object"), -1);
 }
 
 void MainWindow::paste()
@@ -143,23 +158,84 @@ void MainWindow::paste()
         return;
     }
     LabelDocument document = m_editor->document();
-    int last = -1;
+    QList<int> added;
     for (const LabelObject &object : objects) {
-        last = document.addObject(object);
+        added << document.addObject(object);
     }
-    m_editor->apply(document, i18n("Paste"), last);
+    m_editor->apply(document, i18n("Paste"), added);
     m_view->setFocus();
 }
 
 void MainWindow::positionObject(Qt::Alignment alignment)
 {
-    const int index = m_editor->selection();
-    if (index < 0) {
+    // The selection moves as one block; locked objects stay.
+    LabelDocument document = m_editor->document();
+    QList<int> movable;
+    QRectF around;
+    for (const int index : m_editor->selectedObjects()) {
+        const ObjectBase &base = objectBase(document.objects.at(index));
+        if (!base.locked) {
+            movable << index;
+            around = around.isNull() ? base.bounds : around.united(base.bounds);
+        }
+    }
+    if (movable.isEmpty()) {
         return;
     }
-    LabelDocument document = m_editor->document();
-    ObjectFactory::alignOnLabel(document.objects[index], document, alignment);
+    LabelObject block = ShapeObject();
+    objectBase(block).bounds = around;
+    ObjectFactory::alignOnLabel(block, document, alignment);
+    const QPointF delta = objectBase(block).bounds.topLeft() - around.topLeft();
+    for (const int index : std::as_const(movable)) {
+        objectBase(document.objects[index]).bounds.translate(delta);
+    }
     m_editor->apply(document, i18n("Position Object"));
+}
+
+void MainWindow::alignObjects(Qt::Alignment alignment)
+{
+    LabelDocument document = m_editor->document();
+    if (Arrange::align(document, m_editor->selectedObjects(), alignment)) {
+        m_editor->apply(document, i18n("Align Objects"));
+    }
+}
+
+void MainWindow::distributeObjects(Qt::Orientation orientation)
+{
+    LabelDocument document = m_editor->document();
+    if (Arrange::distribute(document, m_editor->selectedObjects(), orientation)) {
+        m_editor->apply(document, i18n("Distribute Objects"));
+    }
+}
+
+void MainWindow::groupObjects()
+{
+    LabelDocument document = m_editor->document();
+    Arrange::group(document, m_editor->selectedObjects());
+    m_editor->apply(document, i18n("Group Objects"), Arrange::withGroups(document, m_editor->selectedObjects()));
+}
+
+void MainWindow::ungroupObjects()
+{
+    LabelDocument document = m_editor->document();
+    Arrange::ungroup(document, m_editor->selectedObjects());
+    m_editor->apply(document, i18n("Ungroup Objects"));
+}
+
+void MainWindow::setObjectsLocked(bool locked)
+{
+    LabelDocument document = m_editor->document();
+    Arrange::setLocked(document, m_editor->selectedObjects(), locked);
+    m_editor->apply(document, locked ? i18n("Lock Objects") : i18n("Unlock Objects"));
+}
+
+void MainWindow::selectAllObjects()
+{
+    QList<int> all;
+    for (int i = 0; i < m_editor->document().objects.size(); ++i) {
+        all << i;
+    }
+    m_editor->setSelectedObjects(all, m_editor->selection());
 }
 
 void MainWindow::setOrientation(PaperOrientation orientation)
@@ -171,22 +247,86 @@ void MainWindow::setOrientation(PaperOrientation orientation)
 
 void MainWindow::raiseObject()
 {
-    const int index = m_editor->selection();
-    if (index < 0) {
+    // The selected objects go on top, in the order they were in.
+    const QList<int> selected = m_editor->selectedObjects();
+    if (selected.isEmpty()) {
         return;
     }
     LabelDocument document = m_editor->document();
-    document.moveObject(index, int(document.objects.size() - 1));
-    m_editor->apply(document, i18n("Bring to Front"), int(document.objects.size() - 1));
+    const int last = int(document.objects.size() - 1);
+    for (auto it = selected.crbegin(); it != selected.crend(); ++it) {
+        document.moveObject(*it, last - int(it - selected.crbegin()));
+    }
+    QList<int> moved;
+    for (int i = 0; i < selected.size(); ++i) {
+        moved << last - int(selected.size()) + 1 + i;
+    }
+    m_editor->apply(document, i18n("Bring to Front"), moved);
 }
 
 void MainWindow::lowerObject()
 {
-    const int index = m_editor->selection();
-    if (index < 0) {
+    const QList<int> selected = m_editor->selectedObjects();
+    if (selected.isEmpty()) {
         return;
     }
     LabelDocument document = m_editor->document();
-    document.moveObject(index, 0);
-    m_editor->apply(document, i18n("Send to Back"), 0);
+    for (int i = 0; i < selected.size(); ++i) {
+        document.moveObject(selected.at(i), i);
+    }
+    QList<int> moved;
+    for (int i = 0; i < selected.size(); ++i) {
+        moved << i;
+    }
+    m_editor->apply(document, i18n("Send to Back"), moved);
+}
+
+void MainWindow::setupArrangeActions()
+{
+    KActionCollection *actions = actionCollection();
+
+    QAction *selectAll = KStandardAction::selectAll(this, &MainWindow::selectAllObjects, actions);
+    // On the label only: Ctrl+A in the address book selects its entries.
+    selectAll->setShortcutContext(Qt::WidgetWithChildrenShortcut);
+    m_view->addAction(selectAll);
+
+    // Lining the selected objects up with each other.
+    const auto addAlign = [&](const QString &name, const QString &text, const QString &icon, Qt::Alignment alignment) {
+        QAction *action = actions->addAction(name, this, [this, alignment]() {
+            alignObjects(alignment);
+        });
+        action->setText(text);
+        action->setIcon(QIcon::fromTheme(icon));
+    };
+    addAlign(u"arrange_align_left"_s, i18n("Left Edges"), u"align-horizontal-left"_s, Qt::AlignLeft);
+    addAlign(u"arrange_align_hcenter"_s, i18n("Centres Horizontally"), u"align-horizontal-center"_s, Qt::AlignHCenter);
+    addAlign(u"arrange_align_right"_s, i18n("Right Edges"), u"align-horizontal-right"_s, Qt::AlignRight);
+    addAlign(u"arrange_align_top"_s, i18n("Top Edges"), u"align-vertical-top"_s, Qt::AlignTop);
+    addAlign(u"arrange_align_vcenter"_s, i18n("Centres Vertically"), u"align-vertical-center"_s, Qt::AlignVCenter);
+    addAlign(u"arrange_align_bottom"_s, i18n("Bottom Edges"), u"align-vertical-bottom"_s, Qt::AlignBottom);
+
+    QAction *horizontal = actions->addAction(u"arrange_distribute_horizontal"_s, this, [this]() {
+        distributeObjects(Qt::Horizontal);
+    });
+    horizontal->setText(i18n("Distribute Horizontally"));
+    horizontal->setIcon(QIcon::fromTheme(u"distribute-horizontal-gaps"_s));
+    QAction *vertical = actions->addAction(u"arrange_distribute_vertical"_s, this, [this]() {
+        distributeObjects(Qt::Vertical);
+    });
+    vertical->setText(i18n("Distribute Vertically"));
+    vertical->setIcon(QIcon::fromTheme(u"distribute-vertical-gaps"_s));
+
+    QAction *group = actions->addAction(u"arrange_group"_s, this, &MainWindow::groupObjects);
+    group->setText(i18n("Group"));
+    group->setIcon(QIcon::fromTheme(u"object-group"_s));
+    actions->setDefaultShortcut(group, QKeySequence(Qt::CTRL | Qt::Key_G));
+    QAction *ungroup = actions->addAction(u"arrange_ungroup"_s, this, &MainWindow::ungroupObjects);
+    ungroup->setText(i18n("Ungroup"));
+    ungroup->setIcon(QIcon::fromTheme(u"object-ungroup"_s));
+    actions->setDefaultShortcut(ungroup, QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_G));
+
+    m_lock = new KToggleAction(QIcon::fromTheme(u"object-locked"_s), i18n("Lock Position and Size"), this);
+    m_lock->setToolTip(i18n("Locked objects cannot be moved or resized"));
+    actions->addAction(u"arrange_lock"_s, m_lock);
+    connect(m_lock, &QAction::triggered, this, &MainWindow::setObjectsLocked);
 }

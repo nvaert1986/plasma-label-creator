@@ -5,6 +5,44 @@
 
 # Changelog
 
+## Unreleased
+
+### Designing
+
+- **Several objects at once**: Ctrl or Shift and a click adds an object to
+  the selection or takes it out again; dragging over empty space selects
+  the objects inside the band; Edit > Select All. Dragging, the arrow keys,
+  Delete, Cut, Copy, Paste, Duplicate, Bring to Front, Send to Back,
+  Position on Label and the format toolbar then work on all of them.
+- **Align and distribute** (Layout > Align Objects): line the selected
+  objects up along their left, right, top or bottom edges or their centres,
+  or space three or more evenly across or down.
+- **Groups** (Layout > Group, Ctrl+G; Ungroup, Ctrl+Shift+G): grouped
+  objects select, move and line up as one. Groups are saved in the label
+  file's own group field.
+- **Lock Position and Size** (Layout menu): a locked object cannot be
+  dragged, resized or moved by the arrow keys or Align; it shows a padlock.
+  Other objects line up with it.
+- **Text that wraps** (Format > Wrap Text, or "Wrap long lines" in the
+  properties): long lines break at spaces to the box's width, and words too
+  long for a line break inside. With Shrink to Fit or Always Fit the text
+  takes the largest size at which its wrapped lines fit the box.
+- Locks and wrapping are kept in the `.label` file's comment, which other
+  label software ignores.
+
+### Printers
+
+- **Altec wrap labels** (Wikkellabels, Gekleurde Wikkellabels,
+  Twistlabels) from the catalogue show their printable white strip: the
+  rest of the label is shaded on the canvas. The strip's length comes from
+  Altec's article codes; it is placed at the end that leaves the printer
+  first.
+
+### Other
+
+- The desktop entry now says the program supports LabelManager and ZPL
+  printers too.
+
 ## 0.2.0 (2026-10-29)
 
 ### Printing from data
