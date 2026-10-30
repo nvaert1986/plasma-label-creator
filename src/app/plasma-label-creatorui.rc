@@ -4,7 +4,7 @@
     SPDX-License-Identifier: CC0-1.0
 -->
 <!DOCTYPE gui>
-<gui name="plasma-label-creator" version="14"
+<gui name="plasma-label-creator" version="15"
      xmlns="http://www.kde.org/standards/kxmlgui/1.0"
      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
      xsi:schemaLocation="http://www.kde.org/standards/kxmlgui/1.0 http://www.kde.org/standards/kxmlgui/1.0/kxmlgui.xsd">
@@ -133,6 +133,7 @@
             <Action name="data_source"/>
             <Action name="data_insert_field"/>
             <Action name="data_questions"/>
+            <Action name="data_calculated"/>
             <Separator/>
             <Action name="data_remove"/>
         </Menu>

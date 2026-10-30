@@ -25,6 +25,8 @@ add_library(labelcreatorcore STATIC
     labelrenderer.h
     recentlayouts.cpp
     recentlayouts.h
+    sharedcounter.cpp
+    sharedcounter.h
     tapelayout.cpp
     tapelayout.h
     units.h

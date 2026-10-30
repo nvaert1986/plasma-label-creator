@@ -21,6 +21,9 @@ void MainWindow::setupDataActions()
     QAction *questions = actions->addAction(u"data_questions"_s, this, &MainWindow::editQuestions);
     questions->setText(i18n("Print-Time &Questions…"));
     questions->setIcon(QIcon::fromTheme(u"help-contents"_s));
+    QAction *calculated = actions->addAction(u"data_calculated"_s, this, &MainWindow::editCalculatedFields);
+    calculated->setText(i18n("&Calculated Fields…"));
+    calculated->setIcon(QIcon::fromTheme(u"accessories-calculator"_s));
     QAction *remove = actions->addAction(u"data_remove"_s, this, [this]() {
         LabelDocument document = m_editor->document();
         document.dataSource = DataSource();
@@ -58,6 +61,17 @@ QStringList MainWindow::availableFields()
     for (const PrintQuestion &question : m_editor->document().questions) {
         if (!fields.contains(question.name)) {
             fields << question.name;
+        }
+    }
+    for (const CalculatedField &field : m_editor->document().calculated) {
+        if (!fields.contains(field.name)) {
+            fields << field.name;
+        }
+    }
+    // When printing, unless the data has its own.
+    for (const QString &name : {u"Date"_s, u"Time"_s, u"Now"_s}) {
+        if (!fields.contains(name, Qt::CaseInsensitive)) {
+            fields << name;
         }
     }
     return fields;
@@ -186,6 +200,26 @@ void MainWindow::editDataSource()
     }
     updateDataRows();
     m_printBar->choosePrintRows();
+}
+
+void MainWindow::editCalculatedFields()
+{
+    // Shown worked out for the first row, the answers last given, or the
+    // questions' defaults.
+    QHash<QString, QString> sample;
+    for (const PrintQuestion &question : m_editor->document().questions) {
+        sample.insert(question.name, m_answers.value(question.name, question.defaultValue));
+    }
+    if (ensureDataLoaded(true) && m_dataTable && !m_dataTable->rows.isEmpty()) {
+        sample.insert(m_dataTable->values(m_dataRows.isEmpty() ? 0 : m_dataRows.constFirst()));
+    }
+    CalculatedFieldsDialog dialog(m_editor->document().calculated, sample, this);
+    if (dialog.exec() != QDialog::Accepted || dialog.fields() == m_editor->document().calculated) {
+        return;
+    }
+    LabelDocument document = m_editor->document();
+    document.calculated = dialog.fields();
+    m_editor->apply(document, i18n("Change Calculated Fields"));
 }
 
 void MainWindow::editQuestions()

@@ -64,13 +64,13 @@ void MainWindow::useAddress(const QString &address)
     statusBar()->showMessage(i18n("Add an address object to the label to put the address on it."), 5000);
 }
 
-void MainWindow::advanceCounters(int printedLabels)
+void MainWindow::advanceCounters(int printedLabels, const QHash<int, int> &sharedNext)
 {
     LabelDocument document = m_editor->document();
     bool counted = false;
-    for (LabelObject &object : document.objects) {
-        if (auto *counter = std::get_if<CounterObject>(&object)) {
-            counter->current += printedLabels * counter->increment;
+    for (int i = 0; i < document.objects.size(); ++i) {
+        if (auto *counter = std::get_if<CounterObject>(&document.objects[i])) {
+            counter->current = sharedNext.value(i, counter->current + printedLabels * counter->increment);
             counted = true;
         }
     }

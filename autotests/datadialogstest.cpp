@@ -134,6 +134,29 @@ private Q_SLOTS:
         QCOMPARE(dialog.renamed(), (QHash<QString, QString>{{u"Photo"_s, u"Product photo"_s}, {u"Old"_s, QString()}}));
     }
 
+    void calculatedFieldsShowAnExample()
+    {
+        CalculatedFieldsDialog dialog({{u"Code"_s, u"{Prefix}-{Serial|pad:4}"_s}}, {{u"Prefix"_s, u"AB"_s}, {u"Serial"_s, u"12"_s}}, nullptr);
+        dialog.show();
+        QVERIFY(QTest::qWaitForWindowExposed(&dialog));
+        auto *table = dialog.findChild<QTableWidget *>();
+        QCOMPARE(table->item(0, 2)->text(), u"AB-0012"_s);
+        // A second field builds on the first, and follows its changes.
+        for (QPushButton *button : dialog.findChildren<QPushButton *>()) {
+            if (button->text().contains(u"Add"_s)) {
+                button->click();
+            }
+        }
+        table->item(1, 0)->setText(u"{Short}"_s);
+        table->item(1, 1)->setText(u"{Code|right:4}"_s);
+        QCOMPARE(table->item(1, 2)->text(), u"0012"_s);
+        table->item(0, 1)->setText(u"{Prefix}{Serial|pad:5}"_s);
+        QCOMPARE(table->item(1, 2)->text(), u"0012"_s);
+        QCOMPARE(table->item(0, 2)->text(), u"AB00012"_s);
+        grab(&dialog, u"calculated"_s);
+        QCOMPARE(dialog.fields(), (QList<CalculatedField>{{u"Code"_s, u"{Prefix}{Serial|pad:5}"_s}, {u"Short"_s, u"{Code|right:4}"_s}}));
+    }
+
     void questionsAreEdited()
     {
         PrintQuestion question;

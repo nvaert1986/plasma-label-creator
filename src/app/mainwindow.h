@@ -13,7 +13,9 @@
 #include <KXmlGuiWindow>
 
 #include <functional>
+#include <memory>
 #include <optional>
+#include <vector>
 
 class KFontAction;
 class KFontSizeAction;
@@ -25,6 +27,10 @@ class PrintBar;
 class QLabel;
 class QSlider;
 class Sidebar;
+namespace LabelCreator
+{
+class SharedCounter;
+}
 
 class MainWindow : public KXmlGuiWindow
 {
@@ -92,8 +98,17 @@ private:
     void insert(LabelCreator::LabelObject object, std::optional<QPointF> at = std::nullopt);
     /** Puts @p address in the label's first address object, as DLS does. */
     void useAddress(const QString &address);
-    /** After printing, counters continue where the print run stopped. */
-    void advanceCounters(int printedLabels);
+    /**
+     * After printing, counters continue where the print run stopped; shared
+     * counters (by object index) at the value written to their file.
+     */
+    void advanceCounters(int printedLabels, const QHash<int, int> &sharedNext = {});
+    /**
+     * Sets the shared counters in @p labels to the values in their files;
+     * with @p locks, locks the files first and keeps them locked there.
+     * False, with the reason shown, when a file cannot be locked or read.
+     */
+    bool useSharedCounters(QList<LabelCreator::LabelDocument> &labels, std::vector<std::unique_ptr<LabelCreator::SharedCounter>> *locks);
     void editObject(int index);
     void deleteObject();
     void duplicateObject();
@@ -142,6 +157,7 @@ private:
     /** Chooses the data source and the rows to print. */
     void editDataSource();
     void editQuestions();
+    void editCalculatedFields();
     /** Puts {name} in the selected object, or a new text object with it. */
     void insertField(const QString &name);
     /** The fields the label can use: the data's columns, then the questions. */

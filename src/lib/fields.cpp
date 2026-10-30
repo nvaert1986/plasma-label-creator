@@ -5,6 +5,7 @@
 
 #include "fields.h"
 
+#include <QLocale>
 #include <QRegularExpression>
 
 #include <functional>
@@ -48,6 +49,198 @@ void scan(const QString &text, const std::function<void(const QString &)> &liter
     literal(pending);
 }
 
+// A field's value, and the date it stands for when it is one.
+struct Value {
+    QString text;
+    std::optional<QDateTime> when;
+    bool withTime = false;
+};
+
+// Dates as they come from data: the user's short format, ISO, or day first.
+std::optional<QDateTime> parseDate(const QString &text)
+{
+    const QString trimmed = text.trimmed();
+    if (trimmed.isEmpty()) {
+        return std::nullopt;
+    }
+    const QLocale locale;
+    for (const QString &format : {locale.dateTimeFormat(QLocale::ShortFormat), locale.dateFormat(QLocale::ShortFormat)}) {
+        if (const QDateTime when = locale.toDateTime(trimmed, format); when.isValid()) {
+            return when;
+        }
+    }
+    if (const QDateTime when = QDateTime::fromString(trimmed, Qt::ISODate); when.isValid()) {
+        return when;
+    }
+    for (const QString &format : {u"yyyy-MM-dd"_s, u"dd-MM-yyyy"_s, u"d-M-yyyy"_s, u"dd/MM/yyyy"_s, u"d/M/yyyy"_s, u"dd.MM.yyyy"_s}) {
+        if (const QDate date = QDate::fromString(trimmed, format); date.isValid()) {
+            return QDateTime(date, QTime(0, 0));
+        }
+    }
+    return std::nullopt;
+}
+
+QString showDate(const QDateTime &when, bool withTime)
+{
+    const QLocale locale;
+    return withTime ? locale.toString(when, QLocale::ShortFormat) : locale.toString(when.date(), QLocale::ShortFormat);
+}
+
+std::optional<Value> lookUp(const QString &name, const QHash<QString, QString> &values, const QDateTime &now)
+{
+    if (const auto it = values.constFind(name); it != values.constEnd()) {
+        return Value{*it, {}, false};
+    }
+    for (auto it = values.constBegin(); it != values.constEnd(); ++it) {
+        if (it.key().compare(name, Qt::CaseInsensitive) == 0) {
+            return Value{it.value(), {}, false};
+        }
+    }
+    // When printing, unless the data has a field of that name.
+    if (name.compare(u"Date"_s, Qt::CaseInsensitive) == 0) {
+        return Value{showDate(now, false), now, false};
+    }
+    if (name.compare(u"Time"_s, Qt::CaseInsensitive) == 0) {
+        return Value{QLocale().toString(now.time(), QLocale::ShortFormat), now, true};
+    }
+    if (name.compare(u"Now"_s, Qt::CaseInsensitive) == 0) {
+        return Value{showDate(now, true), now, true};
+    }
+    return std::nullopt;
+}
+
+// {Name+30}, {Name-1y}: moved by days, weeks, months or years, or a number added to.
+std::optional<Value> offset(Value value, QChar sign, int amount, QChar unit)
+{
+    const int signedAmount = sign == u'-' ? -amount : amount;
+    if (unit.isNull()) {
+        bool number = false;
+        const qlonglong n = value.text.trimmed().toLongLong(&number);
+        if (number && !value.when) {
+            // Keeps leading zeros: 0041 + 1 is 0042.
+            const QString digits = value.text.trimmed();
+            QString result = QString::number(n + signedAmount);
+            const bool zeros = digits.startsWith(u'0') && digits.size() > 1;
+            if (zeros && !result.startsWith(u'-')) {
+                result = result.rightJustified(digits.size(), u'0');
+            }
+            return Value{result, {}, false};
+        }
+        unit = u'd';
+    }
+    if (!value.when) {
+        value.when = parseDate(value.text);
+        value.withTime = value.when && value.when->time() != QTime(0, 0);
+    }
+    if (!value.when) {
+        return std::nullopt;
+    }
+    QDateTime when = *value.when;
+    switch (unit.toLower().unicode()) {
+    case 'd':
+        when = when.addDays(signedAmount);
+        break;
+    case 'w':
+        when = when.addDays(7 * qint64(signedAmount));
+        break;
+    case 'm':
+        when = when.addMonths(signedAmount);
+        break;
+    case 'y':
+        when = when.addYears(signedAmount);
+        break;
+    default:
+        return std::nullopt;
+    }
+    return Value{showDate(when, value.withTime), when, value.withTime};
+}
+
+std::optional<Value> applyFilter(Value value, const QString &filter)
+{
+    const qsizetype colon = filter.indexOf(u':');
+    const QString name = filter.left(colon).trimmed().toLower();
+    const QString argument = colon < 0 ? QString() : filter.mid(colon + 1);
+    const QStringList arguments = argument.split(u':');
+    const auto number = [&arguments](int i, int fallback) {
+        bool ok = false;
+        const int n = i < arguments.size() ? arguments.at(i).trimmed().toInt(&ok) : fallback;
+        return ok || i >= arguments.size() ? n : -1;
+    };
+    QString &text = value.text;
+    if (name == u"upper"_s) {
+        text = text.toUpper();
+    } else if (name == u"lower"_s) {
+        text = text.toLower();
+    } else if (name == u"trim"_s) {
+        text = text.trimmed();
+    } else if (name == u"left"_s && number(0, -1) >= 0) {
+        text = text.left(number(0, 0));
+    } else if (name == u"right"_s && number(0, -1) >= 0) {
+        text = text.right(number(0, 0));
+    } else if (name == u"mid"_s && number(0, -1) >= 1) {
+        text = text.mid(number(0, 1) - 1, arguments.size() > 1 ? number(1, -1) : -1);
+    } else if (name == u"pad"_s && number(0, -1) >= 0) {
+        const QChar fill = arguments.size() > 1 && !arguments.at(1).isEmpty() ? arguments.at(1).at(0) : u'0';
+        text = text.rightJustified(number(0, 0), fill);
+    } else if (name == u"date"_s && !argument.isEmpty()) {
+        const std::optional<QDateTime> when = value.when ? value.when : parseDate(text);
+        if (!when) {
+            return std::nullopt;
+        }
+        text = QLocale().toString(*when, argument);
+    } else if (name == u"replace"_s && !arguments.isEmpty() && !arguments.constFirst().isEmpty()) {
+        text = text.replace(arguments.at(0), arguments.value(1));
+    } else if (name == u"default"_s) {
+        if (text.trimmed().isEmpty()) {
+            text = argument;
+        }
+    } else {
+        return std::nullopt; // a typing mistake shows on the label
+    }
+    if (name != u"date"_s) {
+        value.when.reset();
+    }
+    return value;
+}
+
+// The name a field's expression starts from: {Serial+1|pad:6} -> Serial.
+QString baseName(const QString &expression, QChar *sign = nullptr, int *amount = nullptr, QChar *unit = nullptr)
+{
+    static const QRegularExpression withOffset(u"^(.*?)\\s*([+-])\\s*(\\d+)\\s*([dwmyDWMY]?)$"_s);
+    const QString head = expression.section(u'|', 0, 0).trimmed();
+    const QRegularExpressionMatch match = withOffset.match(head);
+    if (!match.hasMatch() || match.captured(1).isEmpty()) {
+        return head;
+    }
+    if (sign) {
+        *sign = match.captured(2).at(0);
+        *amount = match.captured(3).toInt();
+        *unit = match.captured(4).isEmpty() ? QChar() : match.captured(4).at(0);
+    }
+    return match.captured(1).trimmed();
+}
+
+std::optional<QString> evaluate(const QString &expression, const QHash<QString, QString> &values, const QDateTime &now)
+{
+    const QStringList parts = expression.split(u'|');
+    // A name of its own first, so a column called "A-1" is still found.
+    std::optional<Value> value = lookUp(parts.constFirst().trimmed(), values, now);
+    if (!value) {
+        QChar sign;
+        int amount = 0;
+        QChar unit;
+        const QString name = baseName(expression, &sign, &amount, &unit);
+        if (sign.isNull() || !(value = lookUp(name, values, now))) {
+            return std::nullopt;
+        }
+        value = offset(*value, sign, amount, unit);
+    }
+    for (qsizetype i = 1; i < parts.size() && value; ++i) {
+        value = applyFilter(*value, parts.at(i));
+    }
+    return value ? std::optional(value->text) : std::nullopt;
+}
+
 // Calls @p change on every text of the label that can hold fields.
 void forEachText(LabelDocument &document, const std::function<void(QString &)> &change)
 {
@@ -82,7 +275,8 @@ QStringList used(const QString &text)
     scan(
         text,
         [](const QString &) {},
-        [&names](const QString &name) {
+        [&names](const QString &expression) {
+            const QString name = baseName(expression);
             if (!names.contains(name)) {
                 names << name;
             }
@@ -104,7 +298,7 @@ QStringList used(const LabelDocument &document)
     return names;
 }
 
-QString fill(const QString &text, const QHash<QString, QString> &values)
+QString fill(const QString &text, const QHash<QString, QString> &values, const QDateTime &now)
 {
     QString result;
     scan(
@@ -112,27 +306,28 @@ QString fill(const QString &text, const QHash<QString, QString> &values)
         [&result](const QString &part) {
             result += part;
         },
-        [&result, &values](const QString &name) {
-            if (const auto it = values.constFind(name); it != values.constEnd()) {
-                result += *it;
-                return;
-            }
-            for (auto it = values.constBegin(); it != values.constEnd(); ++it) {
-                if (it.key().compare(name, Qt::CaseInsensitive) == 0) {
-                    result += it.value();
-                    return;
-                }
-            }
-            result += u'{' + name + u'}';
+        [&result, &values, &now](const QString &expression) {
+            result += evaluate(expression, values, now).value_or(u'{' + expression + u'}');
         });
     return result;
 }
 
-LabelDocument fill(const LabelDocument &document, const QHash<QString, QString> &values)
+QHash<QString, QString> withCalculated(const LabelDocument &document, const QHash<QString, QString> &values, const QDateTime &now)
 {
+    // In order: each can use the ones before it.
+    QHash<QString, QString> all = values;
+    for (const CalculatedField &field : document.calculated) {
+        all.insert(field.name, fill(field.expression, all, now));
+    }
+    return all;
+}
+
+LabelDocument fill(const LabelDocument &document, const QHash<QString, QString> &values, const QDateTime &now)
+{
+    const QHash<QString, QString> all = withCalculated(document, values, now);
     LabelDocument filled = document;
-    forEachText(filled, [&values](QString &text) {
-        text = fill(text, values);
+    forEachText(filled, [&all, &now](QString &text) {
+        text = fill(text, all, now);
     });
     // An address's line fonts follow its lines, which a field may add.
     for (LabelObject &object : filled.objects) {

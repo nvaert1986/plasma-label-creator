@@ -96,6 +96,27 @@ private:
     QLineEdit *m_pattern;
 };
 
+/**
+ * Edits the label's calculated fields: a name and a text with fields, each
+ * shown worked out for @p sample (a data row, the answers last given).
+ */
+class CalculatedFieldsDialog : public QDialog
+{
+    Q_OBJECT
+
+public:
+    CalculatedFieldsDialog(const QList<LabelCreator::CalculatedField> &fields, const QHash<QString, QString> &sample, QWidget *parent = nullptr);
+
+    QList<LabelCreator::CalculatedField> fields() const;
+
+private:
+    void addRow(const LabelCreator::CalculatedField &field);
+    void updateResults();
+
+    QTableWidget *m_table;
+    QHash<QString, QString> m_sample;
+};
+
 /** Asks the questions when printing; OK only once every answer passes its rules. */
 class AnswersDialog : public QDialog
 {

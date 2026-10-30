@@ -306,6 +306,9 @@ QJsonObject objectExtensions(const LabelObject &object)
     if (base.angle != 0) {
         o[u"angle"_s] = base.angle;
     }
+    if (const auto *counter = std::get_if<CounterObject>(&object); counter && !counter->sharedFile.isEmpty()) {
+        o[u"counterFile"_s] = counter->sharedFile;
+    }
     return o;
 }
 
@@ -319,6 +322,9 @@ void applyObjectExtensions(LabelObject &object, const QJsonObject &o)
     if (TextObject *text = textOf(object)) {
         text->wrap = o[u"wrap"_s].toBool();
     }
+    if (auto *counter = std::get_if<CounterObject>(&object)) {
+        counter->sharedFile = o[u"counterFile"_s].toString();
+    }
 }
 
 bool hasObjectExtensions(const LabelDocument &document)
@@ -331,7 +337,7 @@ bool hasObjectExtensions(const LabelDocument &document)
 bool hasExtensions(const LabelDocument &document)
 {
     return !document.questions.isEmpty() || document.dataSource.kind != DataSource::Kind::None || !document.layers.isEmpty()
-        || hasObjectExtensions(document);
+        || !document.calculated.isEmpty() || hasObjectExtensions(document);
 }
 
 QString extensionsJson(const LabelDocument &document)
@@ -366,6 +372,13 @@ QString extensionsJson(const LabelDocument &document)
             }
         }
         root[u"objects"_s] = objects;
+    }
+    if (!document.calculated.isEmpty()) {
+        QJsonArray calculated;
+        for (const CalculatedField &field : document.calculated) {
+            calculated.append(QJsonObject{{u"name"_s, field.name}, {u"expression"_s, field.expression}});
+        }
+        root[u"calculated"_s] = calculated;
     }
     if (!document.layers.isEmpty()) {
         QJsonArray layers;
@@ -441,6 +454,13 @@ void readExtensions(const QByteArray &data, LabelDocument &document, QStringList
             continue;
         }
         applyObjectExtensions(document.objects[at], o);
+    }
+    for (const QJsonValue &value : root[u"calculated"_s].toArray()) {
+        const QJsonObject c = value.toObject();
+        const CalculatedField field{c[u"name"_s].toString(), c[u"expression"_s].toString()};
+        if (!field.name.isEmpty()) {
+            document.calculated << field;
+        }
     }
     for (const QJsonValue &value : root[u"layers"_s].toArray()) {
         const QJsonObject l = value.toObject();

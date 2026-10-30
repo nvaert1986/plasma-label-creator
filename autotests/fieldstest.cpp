@@ -7,6 +7,7 @@
 #include "labelformat.h"
 
 #include <QBuffer>
+#include <QLocale>
 #include <QTest>
 
 using namespace LabelCreator;
@@ -84,6 +85,65 @@ private Q_SLOTS:
         document.objects << address;
         const LabelDocument filled = Fields::fill(document, {{u"Address"_s, u"Jan\nStraat 1\n1234 AB Ergens"_s}});
         QCOMPARE(std::get<AddressObject>(filled.objects.at(0)).lineFonts.size(), 3);
+    }
+
+    void worksThingsOut_data()
+    {
+        QTest::addColumn<QString>("text");
+        QTest::addColumn<QString>("expected");
+        // Printed on 30 October 2026 at 14:05.
+        QTest::newRow("date") << u"{Date}"_s << u"30-10-2026"_s;
+        QTest::newRow("best before") << u"{Date+30}"_s << u"29-11-2026"_s;
+        QTest::newRow("weeks back") << u"{Date - 2w}"_s << u"16-10-2026"_s;
+        QTest::newRow("months") << u"{Date+3m|date:yyMMdd}"_s << u"270130"_s;
+        QTest::newRow("a date field") << u"{Installed+1y}"_s << u"29-10-2027"_s;
+        QTest::newRow("its own format") << u"{Installed|date:d MMMM yyyy}"_s << u"29 oktober 2026"_s;
+        QTest::newRow("time") << u"{Time}"_s << u"14:05"_s;
+        QTest::newRow("number") << u"{Serial+1}"_s << u"0043"_s;
+        QTest::newRow("pad") << u"{Count|pad:6}"_s << u"000007"_s;
+        QTest::newRow("pad with") << u"{Count|pad:4:*}"_s << u"***7"_s;
+        QTest::newRow("parts") << u"{Name|left:3}-{Name|right:2}-{Name|mid:5:2}"_s << u"SRV-01-HV"_s;
+        QTest::newRow("case") << u"{Name|lower|replace:srv:host}"_s << u"host-hv01"_s;
+        QTest::newRow("default") << u"{Empty|default:n/a}"_s << u"n/a"_s;
+        QTest::newRow("a column called A-1") << u"{A-1}"_s << u"exact"_s;
+        QTest::newRow("unknown filter stays") << u"{Name|shout}"_s << u"{Name|shout}"_s;
+        QTest::newRow("not a date stays") << u"{Name+1m}"_s << u"{Name+1m}"_s;
+        QTest::newRow("unknown stays") << u"{Missing+1}"_s << u"{Missing+1}"_s;
+    }
+
+    void worksThingsOut()
+    {
+        QFETCH(QString, text);
+        QFETCH(QString, expected);
+        const QLocale before;
+        QLocale::setDefault(QLocale(u"nl_NL"_s));
+        const QHash<QString, QString> values = {{u"Installed"_s, u"29-10-2026"_s},
+                                                {u"Serial"_s, u"0042"_s},
+                                                {u"Count"_s, u"7"_s},
+                                                {u"Name"_s, u"SRV-HV01"_s},
+                                                {u"Empty"_s, QString()},
+                                                {u"A-1"_s, u"exact"_s}};
+        const QString result = Fields::fill(text, values, QDateTime(QDate(2026, 10, 30), QTime(14, 5)));
+        QLocale::setDefault(before);
+        QCOMPARE(result, expected);
+    }
+
+    void calculatedFieldsBuildOnEachOther()
+    {
+        LabelDocument document = labelWith(u"{Code} until {BestBefore}"_s);
+        document.calculated = {{u"Code"_s, u"{Prefix}-{Serial|pad:6}"_s}, {u"BestBefore"_s, u"{Date+30|date:yyyy-MM-dd}"_s}, {u"Short"_s, u"{Code|right:6}"_s}};
+        const QDateTime now(QDate(2026, 10, 30), QTime(9, 0));
+        const LabelDocument filled = Fields::fill(document, {{u"Prefix"_s, u"AB"_s}, {u"Serial"_s, u"123"_s}}, now);
+        QCOMPARE(textOf(filled), u"AB-000123 until 2026-11-29"_s);
+        QCOMPARE(Fields::withCalculated(document, {{u"Prefix"_s, u"AB"_s}, {u"Serial"_s, u"123"_s}}, now).value(u"Short"_s), u"000123"_s);
+        QCOMPARE(Fields::used(u"{Serial+1|pad:6} {Date - 1w}"_s), (QStringList{u"Serial"_s, u"Date"_s}));
+
+        // Kept in the file.
+        QBuffer buffer;
+        buffer.setData(LabelWriter::toByteArray(document));
+        buffer.open(QIODevice::ReadOnly);
+        LabelReader reader;
+        QCOMPARE(reader.read(&buffer)->calculated, document.calculated);
     }
 
     void checksAnswers()

@@ -28,6 +28,7 @@
 #include "propertiesdialog.h"
 #include "recentlayoutsmenu.h"
 #include "rulerwidget.h"
+#include "sharedcounter.h"
 #include "sidebar.h"
 #include "tapelayout.h"
 #include "units.h"

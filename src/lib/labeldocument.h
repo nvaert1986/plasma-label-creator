@@ -263,6 +263,12 @@ struct CounterObject : ObjectBase {
     int increment = 1;
     int formatWidth = 1; // minimum number of digits
     bool useLeadingZeros = false;
+    /**
+     * A file holding the next value, shared by the computers that print this
+     * label (see SharedCounter); empty for a counter of this label only. Not
+     * in DLS's format: kept in the settings comment.
+     */
+    QString sharedFile;
 
     /** The text for the label printed @p step labels after the current one. */
     QString text(int step = 0) const;
@@ -409,6 +415,17 @@ struct DataSource {
 };
 
 /**
+ * A field worked out from others when printing, such as {BestBefore} from
+ * {Date+30|date:dd-MM-yyyy}. Not in DLS's format: kept in the settings
+ * comment.
+ */
+struct CalculatedField {
+    QString name;
+    QString expression; // a text with fields, as on the label
+    bool operator==(const CalculatedField &) const = default;
+};
+
+/**
  * A layer of objects that show, print and move as it says. Not in DLS's
  * format: kept in the settings comment.
  */
@@ -445,6 +462,7 @@ struct LabelDocument {
     QList<PrintQuestion> questions;
     DataSource dataSource;
     QList<Layer> layers;
+    QList<CalculatedField> calculated; // worked out in this order
 
     /**
      * Adds @p object and returns its index. On tape it gets a cell of its

@@ -136,8 +136,49 @@ void MainWindow::print()
     }
 }
 
-void MainWindow::printLabels(const QList<LabelDocument> &labels)
+bool MainWindow::useSharedCounters(QList<LabelDocument> &labels, std::vector<std::unique_ptr<SharedCounter>> *locks)
 {
+    QHash<QString, int> values; // per file
+    const LabelDocument &document = m_editor->document();
+    for (int i = 0; i < document.objects.size(); ++i) {
+        const auto *counter = std::get_if<CounterObject>(&document.objects.at(i));
+        if (!counter || counter->sharedFile.isEmpty()) {
+            continue;
+        }
+        if (!values.contains(counter->sharedFile)) {
+            auto shared = std::make_unique<SharedCounter>(counter->sharedFile);
+            if (locks && !shared->lock()) {
+                KMessageBox::error(this, shared->errorString());
+                return false;
+            }
+            const auto value = shared->read(counter->current);
+            if (!value) {
+                KMessageBox::error(this, shared->errorString());
+                return false;
+            }
+            values.insert(counter->sharedFile, *value);
+            if (locks) {
+                locks->push_back(std::move(shared));
+            }
+        }
+        for (LabelDocument &label : labels) {
+            if (auto *printed = std::get_if<CounterObject>(&label.objects[i])) {
+                printed->current = values.value(counter->sharedFile);
+            }
+        }
+    }
+    return true;
+}
+
+void MainWindow::printLabels(const QList<LabelDocument> &prepared)
+{
+    // Shared counters stay locked from reading their files until the next
+    // values are written, so two computers never print the same numbers.
+    QList<LabelDocument> labels = prepared;
+    std::vector<std::unique_ptr<SharedCounter>> locks;
+    if (!useSharedCounters(labels, &locks)) {
+        return;
+    }
     const QString printerName = m_printBar->printerName();
     LabelPrinter printer(printerName, m_printBar->printerDriver());
 
@@ -149,12 +190,30 @@ void MainWindow::printLabels(const QList<LabelDocument> &labels)
         KMessageBox::error(this, printer.errorString());
         return;
     }
+    QHash<int, int> sharedNext;
+    QStringList written;
+    for (int i = 0; i < labels.constFirst().objects.size(); ++i) {
+        const auto *counter = std::get_if<CounterObject>(&labels.constFirst().objects.at(i));
+        if (!counter || counter->sharedFile.isEmpty()) {
+            continue;
+        }
+        const int next = counter->current + printer.printedLabels() * counter->increment;
+        sharedNext.insert(i, next);
+        if (written.contains(counter->sharedFile)) {
+            continue;
+        }
+        written << counter->sharedFile;
+        SharedCounter file(counter->sharedFile);
+        if (!file.write(next)) {
+            KMessageBox::error(this, i18n("The labels were printed, but the next counter value could not be saved:\n%1", file.errorString()));
+        }
+    }
     // Kept as it was printed, before counters move on.
     QString recentError;
     if (!m_recentLayouts.add(m_editor->document(), m_editor->fileName(), &recentError)) {
         qWarning("Could not keep the label in the recently used layouts: %s", qPrintable(recentError));
     }
-    advanceCounters(printer.printedLabels());
+    advanceCounters(printer.printedLabels(), sharedNext);
     // What was printed is the best guess of the labels in the printer.
     settings().writeEntry("Paper", m_editor->document().paperName);
     QString message = i18np("Sent one label to %2 as job %3.", "Sent %1 labels to %2 as job %3.", printer.printedLabels(), printerName, job);
@@ -170,9 +229,15 @@ void MainWindow::printPreview()
     if (!labels) {
         return;
     }
+    // With the shared counters' values as they are now; printing reads
+    // them again, locked.
+    QList<LabelDocument> previewed = *labels;
+    if (!useSharedCounters(previewed, nullptr)) {
+        return;
+    }
     LabelPrinter printer(m_printBar->printerName(), m_printBar->printerDriver());
     QApplication::setOverrideCursor(Qt::WaitCursor);
-    const QList<QImage> pages = printer.pages(*labels, printOptions());
+    const QList<QImage> pages = printer.pages(previewed, printOptions());
     QApplication::restoreOverrideCursor();
     if (pages.isEmpty()) {
         KMessageBox::error(this, printer.errorString());

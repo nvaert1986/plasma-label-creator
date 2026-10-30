@@ -307,6 +307,108 @@ QList<int> DataSourceDialog::selectedRows() const
     return rows;
 }
 
+CalculatedFieldsDialog::CalculatedFieldsDialog(const QList<CalculatedField> &fields, const QHash<QString, QString> &sample, QWidget *parent)
+    : QDialog(parent)
+    , m_sample(sample)
+{
+    setWindowTitle(i18n("Calculated Fields"));
+    auto *layout = new QVBoxLayout(this);
+    auto *intro = new QLabel(i18n("<p>A calculated field is worked out when printing, from other fields, and is used on the label as "
+                                  "<b>{Name}</b>, like a column. Each can use the ones above it.</p>"
+                                  "<p><b>{Date}</b>, <b>{Time}</b> and <b>{Now}</b> are when printing. <b>{Date+30}</b> or "
+                                  "<b>{Installed+1y}</b> moves a date by days, weeks (w), months (m) or years (y); <b>{Serial+1}</b> "
+                                  "adds to a number. After a <b>|</b>: upper, lower, trim, left:3, right:4, mid:2:3, pad:6, "
+                                  "date:dd-MM-yyyy, replace:old:new, default:text. "
+                                  "For example <b>{Date+30|date:dd-MM-yyyy}</b> or <b>{Prefix}-{Serial|pad:6}</b>.</p>"),
+                             this);
+    intro->setWordWrap(true);
+    intro->setTextFormat(Qt::RichText);
+    layout->addWidget(intro);
+
+    m_table = new QTableWidget(0, 3, this);
+    m_table->setHorizontalHeaderLabels({i18n("Name"), i18n("Worked out from"), i18n("Example")});
+    m_table->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
+    m_table->verticalHeader()->hide();
+    m_table->setSelectionBehavior(QAbstractItemView::SelectRows);
+    m_table->setSelectionMode(QAbstractItemView::SingleSelection);
+    layout->addWidget(m_table, 1);
+    for (const CalculatedField &field : fields) {
+        addRow(field);
+    }
+    connect(m_table, &QTableWidget::itemChanged, this, [this](QTableWidgetItem *item) {
+        if (item->column() != 2) {
+            updateResults();
+        }
+    });
+    updateResults();
+
+    auto *buttons = new QHBoxLayout;
+    auto *add = new QPushButton(QIcon::fromTheme(u"list-add"_s), i18n("Add"), this);
+    auto *remove = new QPushButton(QIcon::fromTheme(u"list-remove"_s), i18n("Remove"), this);
+    connect(add, &QPushButton::clicked, this, [this]() {
+        addRow({i18n("Field%1", m_table->rowCount() + 1), u"{Date}"_s});
+        updateResults();
+        m_table->setCurrentCell(m_table->rowCount() - 1, 0);
+        m_table->editItem(m_table->item(m_table->rowCount() - 1, 0));
+    });
+    connect(remove, &QPushButton::clicked, this, [this]() {
+        if (m_table->currentRow() >= 0) {
+            m_table->removeRow(m_table->currentRow());
+            updateResults();
+        }
+    });
+    buttons->addWidget(add);
+    buttons->addWidget(remove);
+    buttons->addStretch();
+    layout->addLayout(buttons);
+
+    auto *box = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
+    connect(box, &QDialogButtonBox::accepted, this, &QDialog::accept);
+    connect(box, &QDialogButtonBox::rejected, this, &QDialog::reject);
+    layout->addWidget(box);
+    resize(640, 420);
+}
+
+void CalculatedFieldsDialog::addRow(const CalculatedField &field)
+{
+    const QSignalBlocker blocker(m_table);
+    const int row = m_table->rowCount();
+    m_table->insertRow(row);
+    m_table->setItem(row, 0, new QTableWidgetItem(field.name));
+    m_table->setItem(row, 1, new QTableWidgetItem(field.expression));
+    auto *example = new QTableWidgetItem;
+    example->setFlags(Qt::ItemIsEnabled);
+    m_table->setItem(row, 2, example);
+}
+
+void CalculatedFieldsDialog::updateResults()
+{
+    const QSignalBlocker blocker(m_table);
+    QHash<QString, QString> values = m_sample;
+    for (int row = 0; row < m_table->rowCount(); ++row) {
+        const QString name = m_table->item(row, 0)->text().trimmed();
+        const QString result = Fields::fill(m_table->item(row, 1)->text(), values);
+        m_table->item(row, 2)->setText(result);
+        if (!name.isEmpty()) {
+            values.insert(name, result);
+        }
+    }
+}
+
+QList<CalculatedField> CalculatedFieldsDialog::fields() const
+{
+    // Fields are written {Name}: names need something, and no braces.
+    QList<CalculatedField> fields;
+    for (int row = 0; row < m_table->rowCount(); ++row) {
+        QString name = m_table->item(row, 0)->text().trimmed();
+        name.remove(u'{').remove(u'}');
+        if (!name.isEmpty()) {
+            fields << CalculatedField{name, m_table->item(row, 1)->text()};
+        }
+    }
+    return fields;
+}
+
 QuestionsDialog::QuestionsDialog(const QList<PrintQuestion> &questions, QWidget *parent)
     : QDialog(parent)
     , m_questions(questions)

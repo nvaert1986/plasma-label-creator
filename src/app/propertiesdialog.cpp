@@ -467,6 +467,27 @@ bool editObjectProperties(QWidget *parent, LabelObject &object, TapeCell *cell)
         });
         auto *font = new FontEditor(counter->font);
         auto *horizontal = horizontalAlignmentCombo(counter->layout.horizontalAlignment);
+        // Counting on with other computers: the next value kept in a file.
+        auto *sharedFile = new QLineEdit(counter->sharedFile);
+        sharedFile->setPlaceholderText(i18n("Only on this label"));
+        sharedFile->setToolTip(i18n("A file, on a network share say, that keeps the next value for every computer printing this label. "
+                                    "It is locked while printing, so no two computers print the same number."));
+        auto *browse = new QPushButton(QIcon::fromTheme(u"document-open"_s), QString());
+        browse->setToolTip(i18n("Choose the file"));
+        QObject::connect(browse, &QPushButton::clicked, sharedFile, [sharedFile]() {
+            const QString file = QFileDialog::getSaveFileName(sharedFile,
+                                                              i18n("Shared Counter File"),
+                                                              sharedFile->text(),
+                                                              i18n("Counter files (*.counter);;All files (*)"),
+                                                              nullptr,
+                                                              QFileDialog::DontConfirmOverwrite);
+            if (!file.isEmpty()) {
+                sharedFile->setText(file);
+            }
+        });
+        auto *sharedRow = new QHBoxLayout;
+        sharedRow->addWidget(sharedFile, 1);
+        sharedRow->addWidget(browse);
         form->addRow(i18n("Text before:"), preText);
         form->addRow(i18n("Text after:"), postText);
         form->addRow(i18n("Start value:"), start);
@@ -475,6 +496,7 @@ bool editObjectProperties(QWidget *parent, LabelObject &object, TapeCell *cell)
         form->addRow(i18n("Increment:"), increment);
         form->addRow(i18n("Minimum digits:"), width);
         form->addRow(QString(), zeros);
+        form->addRow(i18n("Shared with other computers:"), sharedRow);
         form->addRow(i18n("Font:"), font);
         form->addRow(i18n("Alignment:"), horizontal);
         applySpecific = [=]() {
@@ -485,6 +507,7 @@ bool editObjectProperties(QWidget *parent, LabelObject &object, TapeCell *cell)
             counter->increment = increment->value();
             counter->formatWidth = width->value();
             counter->useLeadingZeros = zeros->isChecked();
+            counter->sharedFile = sharedFile->text().trimmed();
             counter->font = font->font();
             counter->layout.horizontalAlignment = comboValue<HorizontalAlignment>(horizontal);
         };

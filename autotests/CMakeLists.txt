@@ -12,6 +12,7 @@ set(tests
     labelprintertest
     labelrenderertest
     recentlayoutstest
+    sharedcountertest
     zplprintertest
     unitstest
 )
