@@ -28,6 +28,10 @@ add_executable(plasma-label-creator
     labelview.cpp
     labelview.h
     mainwindow.cpp
+    mainwindow_data.cpp
+    mainwindow_format.cpp
+    mainwindow_objects.cpp
+    mainwindow_print.cpp
     mainwindow.h
     objectfactory.cpp
     objectfactory.h
