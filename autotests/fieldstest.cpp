@@ -99,6 +99,9 @@ private Q_SLOTS:
         QTest::newRow("a date field") << u"{Installed+1y}"_s << u"29-10-2027"_s;
         QTest::newRow("its own format") << u"{Installed|date:d MMMM yyyy}"_s << u"29 oktober 2026"_s;
         QTest::newRow("time") << u"{Time}"_s << u"14:05"_s;
+        QTest::newRow("hours later") << u"{Time+2h}"_s << u"16:05"_s;
+        QTest::newRow("a time field in hours") << u"{Start+1h}"_s << u"09:30"_s;
+        QTest::newRow("now and later") << u"{Now+1h}"_s << u"30-10-2026 15:05"_s;
         QTest::newRow("number") << u"{Serial+1}"_s << u"0043"_s;
         QTest::newRow("pad") << u"{Count|pad:6}"_s << u"000007"_s;
         QTest::newRow("pad with") << u"{Count|pad:4:*}"_s << u"***7"_s;
@@ -122,10 +125,21 @@ private Q_SLOTS:
                                                 {u"Count"_s, u"7"_s},
                                                 {u"Name"_s, u"SRV-HV01"_s},
                                                 {u"Empty"_s, QString()},
-                                                {u"A-1"_s, u"exact"_s}};
+                                                {u"A-1"_s, u"exact"_s},
+                                                {u"Start"_s, u"08:30"_s}};
         const QString result = Fields::fill(text, values, QDateTime(QDate(2026, 10, 30), QTime(14, 5)));
         QLocale::setDefault(before);
         QCOMPARE(result, expected);
+    }
+
+    void twoDigitYearsAreThisCentury()
+    {
+        // en_US writes short dates 10/30/26: 2026, not 1926.
+        const QLocale before;
+        QLocale::setDefault(QLocale(u"en_US"_s));
+        const QString result = Fields::fill(u"{Installed+1y|date:yyyy-MM-dd}"_s, {{u"Installed"_s, u"10/30/26"_s}});
+        QLocale::setDefault(before);
+        QCOMPARE(result, u"2027-10-30"_s);
     }
 
     void calculatedFieldsBuildOnEachOther()

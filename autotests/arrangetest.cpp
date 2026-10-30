@@ -169,6 +169,14 @@ private Q_SLOTS:
         QCOMPARE(objectBase(read->objects.at(0)).layer, u"Product photo"_s);
         QVERIFY(!objectBase(read->objects.at(3)).printed);
         QVERIFY(objectBase(read->objects.at(2)).printed);
+
+        // A layer the file does not list: the object is on the label itself.
+        QByteArray unlisted = LabelWriter::toByteArray(document);
+        unlisted.replace("\"layers\"", "\"nolayers\"");
+        QBuffer second;
+        second.setData(unlisted);
+        second.open(QIODevice::ReadOnly);
+        QVERIFY(objectBase(reader.read(&second)->objects.at(0)).layer.isEmpty());
     }
 
     void objectsAtAnAngleLineUpByWhatShows()

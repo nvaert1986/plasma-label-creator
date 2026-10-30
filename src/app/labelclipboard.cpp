@@ -144,6 +144,12 @@ QList<LabelObject> objectsToPaste(const QMimeData *data, const LabelDocument &do
     for (LabelObject &object : objects) {
         ObjectBase &base = objectBase(object);
         base.name = ObjectFactory::copyName(target, base.name);
+        // From another label's layer this label does not have: on the label itself.
+        if (!std::any_of(document.layers.cbegin(), document.layers.cend(), [&base](const Layer &layer) {
+                return layer.name == base.layer;
+            })) {
+            base.layer.clear();
+        }
         if (base.groupId && *base.groupId >= 0) {
             if (!groups.contains(*base.groupId)) {
                 groups.insert(*base.groupId, nextGroup++);

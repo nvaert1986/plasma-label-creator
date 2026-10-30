@@ -460,16 +460,22 @@ private Q_SLOTS:
     void rotatingTheLabelPrintsTheSame_data()
     {
         QTest::addColumn<QString>("fileName");
-        QTest::newRow("landscape address") << u"address.label"_s;
-        QTest::newRow("portrait, every object") << u"mixed.label"_s;
-        QTest::newRow("counter, date, curved text") << u"variable.label"_s;
-        QTest::newRow("tape with cells") << u"tape.label"_s;
+        QTest::addColumn<qreal>("angle");
+        QTest::newRow("landscape address") << u"address.label"_s << 0.0;
+        QTest::newRow("portrait, every object") << u"mixed.label"_s << 0.0;
+        QTest::newRow("every object at an angle") << u"mixed.label"_s << 20.0;
+        QTest::newRow("counter, date, curved text") << u"variable.label"_s << 0.0;
+        QTest::newRow("tape with cells") << u"tape.label"_s << 0.0;
     }
 
     void rotatingTheLabelPrintsTheSame()
     {
         QFETCH(QString, fileName);
+        QFETCH(qreal, angle);
         LabelDocument original = readFixture(fileName);
+        for (LabelObject &object : original.objects) {
+            objectBase(object).angle = angle;
+        }
         TapeLayout::layout(original);
         // The paper as the label feeds, in points.
         PaperSize paper;

@@ -316,7 +316,7 @@ CalculatedFieldsDialog::CalculatedFieldsDialog(const QList<CalculatedField> &fie
     auto *intro = new QLabel(i18n("<p>A calculated field is worked out when printing, from other fields, and is used on the label as "
                                   "<b>{Name}</b>, like a column. Each can use the ones above it.</p>"
                                   "<p><b>{Date}</b>, <b>{Time}</b> and <b>{Now}</b> are when printing. <b>{Date+30}</b> or "
-                                  "<b>{Installed+1y}</b> moves a date by days, weeks (w), months (m) or years (y); <b>{Serial+1}</b> "
+                                  "<b>{Installed+1y}</b> moves a date by days, weeks (w), months (m), years (y) or hours (h); <b>{Serial+1}</b> "
                                   "adds to a number. After a <b>|</b>: upper, lower, trim, left:3, right:4, mid:2:3, pad:6, "
                                   "date:dd-MM-yyyy, replace:old:new, default:text. "
                                   "For example <b>{Date+30|date:dd-MM-yyyy}</b> or <b>{Prefix}-{Serial|pad:6}</b>.</p>"),

@@ -152,7 +152,11 @@ bool MainWindow::useSharedCounters(QList<LabelDocument> &labels, std::vector<std
         }
         if (!values.contains(counter->sharedFile)) {
             auto shared = std::make_unique<SharedCounter>(counter->sharedFile);
-            if (locks && !shared->lock()) {
+            // Another computer may be printing: it is waited for a while.
+            QApplication::setOverrideCursor(Qt::WaitCursor);
+            const bool locked = !locks || shared->lock();
+            QApplication::restoreOverrideCursor();
+            if (!locked) {
                 KMessageBox::error(this, shared->errorString());
                 return false;
             }

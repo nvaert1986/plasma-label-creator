@@ -23,8 +23,10 @@ namespace LabelCreator
  * A field can also work something out:
  * - {Date}, {Time} and {Now}: when printing, unless a column or question
  *   has that name;
- * - {Date+30}, {Installed-1y}: a date moved by days (d, the default),
- *   weeks (w), months (m) or years (y); {Serial+1}: a number added to;
+ * - {Date+30}, {Installed-1y}, {Time+2h}: a date or time moved by days
+ *   (d, the default), weeks (w), months (m), years (y) or hours (h); dates
+ *   with two-digit years are taken as the 50 years either side of now;
+ *   {Serial+1}: a number added to;
  * - filters after a |, one after another: upper, lower, trim, left:N,
  *   right:N, mid:start:N (from 1), pad:N (zeros in front, or pad:N:c with
  *   c), date:format (such as dd-MM-yyyy or yyMMdd), replace:old:new and

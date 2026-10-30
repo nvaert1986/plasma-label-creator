@@ -505,6 +505,14 @@ private Q_SLOTS:
         QCOMPARE(objectBase(pasted.at(1)).bounds, objectBase(document.objects.at(1)).bounds.translated(144, 144));
         QCOMPARE(objectBase(pasted.at(0)).groupId, std::optional<int>(1));
         QCOMPARE(objectBase(pasted.at(1)).groupId, std::optional<int>(1));
+
+        // A layer the label has stays; one it has not is left off.
+        document.layers = {{u"Photo"_s, true, false, false}};
+        objectBase(document.objects[0]).layer = u"Photo"_s;
+        std::unique_ptr<QMimeData> layered(LabelClipboard::mimeData({document.objects.at(0)}, document));
+        QCOMPARE(objectBase(LabelClipboard::objectsToPaste(layered.get(), document).at(0)).layer, u"Photo"_s);
+        LabelDocument other = addressLabel();
+        QVERIFY(objectBase(LabelClipboard::objectsToPaste(layered.get(), other).at(0)).layer.isEmpty());
     }
 
     void arrowKeysNudge()

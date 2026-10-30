@@ -488,6 +488,8 @@ void readExtensions(const QByteArray &data, LabelDocument &document, QStringList
             document.layers << layer;
         }
     }
+    // Objects on a layer the file does not list are on the label itself.
+    document.changeLayers(document.layers, {});
     const QJsonObject s = root[u"dataSource"_s].toObject();
     const QString type = s[u"type"_s].toString();
     DataSource &source = document.dataSource;

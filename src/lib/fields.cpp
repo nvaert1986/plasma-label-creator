@@ -49,67 +49,86 @@ void scan(const QString &text, const std::function<void(const QString &)> &liter
     literal(pending);
 }
 
-// A field's value, and the date it stands for when it is one.
+// A field's value, and the moment it stands for when it is a date or time.
 struct Value {
+    enum class Shows {
+        Date,
+        Time,
+        DateTime,
+    };
     QString text;
     std::optional<QDateTime> when;
-    bool withTime = false;
+    Shows shows = Shows::Date;
 };
 
-// Dates as they come from data: the user's short format, ISO, or day first.
-std::optional<QDateTime> parseDate(const QString &text)
+QString show(const QDateTime &when, Value::Shows shows)
+{
+    const QLocale locale;
+    switch (shows) {
+    case Value::Shows::Date:
+        return locale.toString(when.date(), QLocale::ShortFormat);
+    case Value::Shows::Time:
+        return locale.toString(when.time(), QLocale::ShortFormat);
+    case Value::Shows::DateTime:
+        break;
+    }
+    return locale.toString(when, QLocale::ShortFormat);
+}
+
+// Dates and times as they come from data: the user's short format, ISO, or
+// day first; a time alone is today's.
+std::optional<Value> parseDate(const QString &text)
 {
     const QString trimmed = text.trimmed();
     if (trimmed.isEmpty()) {
         return std::nullopt;
     }
     const QLocale locale;
-    for (const QString &format : {locale.dateTimeFormat(QLocale::ShortFormat), locale.dateFormat(QLocale::ShortFormat)}) {
-        if (const QDateTime when = locale.toDateTime(trimmed, format); when.isValid()) {
-            return when;
+    // Two-digit years (10/30/26) are this century or the end of the last.
+    const int baseYear = QDate::currentDate().year() - 50;
+    if (const QDateTime when = locale.toDateTime(trimmed, locale.dateTimeFormat(QLocale::ShortFormat), baseYear); when.isValid()) {
+        return Value{trimmed, when, Value::Shows::DateTime};
+    }
+    if (const QDate date = locale.toDate(trimmed, locale.dateFormat(QLocale::ShortFormat), baseYear); date.isValid()) {
+        return Value{trimmed, QDateTime(date, QTime(0, 0)), Value::Shows::Date};
+    }
+    for (const QString &format : {locale.timeFormat(QLocale::ShortFormat), u"HH:mm"_s, u"H:mm"_s, u"HH:mm:ss"_s}) {
+        if (const QTime time = locale.toTime(trimmed, format); time.isValid()) {
+            return Value{trimmed, QDateTime(QDate::currentDate(), time), Value::Shows::Time};
         }
     }
     if (const QDateTime when = QDateTime::fromString(trimmed, Qt::ISODate); when.isValid()) {
-        return when;
+        return Value{trimmed, when, trimmed.contains(u'T') ? Value::Shows::DateTime : Value::Shows::Date};
     }
     for (const QString &format : {u"yyyy-MM-dd"_s, u"dd-MM-yyyy"_s, u"d-M-yyyy"_s, u"dd/MM/yyyy"_s, u"d/M/yyyy"_s, u"dd.MM.yyyy"_s}) {
         if (const QDate date = QDate::fromString(trimmed, format); date.isValid()) {
-            return QDateTime(date, QTime(0, 0));
+            return Value{trimmed, QDateTime(date, QTime(0, 0)), Value::Shows::Date};
         }
     }
     return std::nullopt;
-}
-
-QString showDate(const QDateTime &when, bool withTime)
-{
-    const QLocale locale;
-    return withTime ? locale.toString(when, QLocale::ShortFormat) : locale.toString(when.date(), QLocale::ShortFormat);
 }
 
 std::optional<Value> lookUp(const QString &name, const QHash<QString, QString> &values, const QDateTime &now)
 {
     if (const auto it = values.constFind(name); it != values.constEnd()) {
-        return Value{*it, {}, false};
+        return Value{*it, {}, {}};
     }
     for (auto it = values.constBegin(); it != values.constEnd(); ++it) {
         if (it.key().compare(name, Qt::CaseInsensitive) == 0) {
-            return Value{it.value(), {}, false};
+            return Value{it.value(), {}, {}};
         }
     }
     // When printing, unless the data has a field of that name.
-    if (name.compare(u"Date"_s, Qt::CaseInsensitive) == 0) {
-        return Value{showDate(now, false), now, false};
-    }
-    if (name.compare(u"Time"_s, Qt::CaseInsensitive) == 0) {
-        return Value{QLocale().toString(now.time(), QLocale::ShortFormat), now, true};
-    }
-    if (name.compare(u"Now"_s, Qt::CaseInsensitive) == 0) {
-        return Value{showDate(now, true), now, true};
+    for (const auto &[builtIn, shows] : {std::pair(u"Date"_s, Value::Shows::Date), std::pair(u"Time"_s, Value::Shows::Time), std::pair(u"Now"_s, Value::Shows::DateTime)}) {
+        if (name.compare(builtIn, Qt::CaseInsensitive) == 0) {
+            return Value{show(now, shows), now, shows};
+        }
     }
     return std::nullopt;
 }
 
-// {Name+30}, {Name-1y}: moved by days, weeks, months or years, or a number added to.
+// {Name+30}, {Name-1y}, {Time+2h}: moved by days, weeks, months, years or
+// hours, or a number added to.
 std::optional<Value> offset(Value value, QChar sign, int amount, QChar unit)
 {
     const int signedAmount = sign == u'-' ? -amount : amount;
@@ -124,16 +143,16 @@ std::optional<Value> offset(Value value, QChar sign, int amount, QChar unit)
             if (zeros && !result.startsWith(u'-')) {
                 result = result.rightJustified(digits.size(), u'0');
             }
-            return Value{result, {}, false};
+            return Value{result, {}, {}};
         }
         unit = u'd';
     }
     if (!value.when) {
-        value.when = parseDate(value.text);
-        value.withTime = value.when && value.when->time() != QTime(0, 0);
-    }
-    if (!value.when) {
-        return std::nullopt;
+        const std::optional<Value> parsed = parseDate(value.text);
+        if (!parsed) {
+            return std::nullopt;
+        }
+        value = *parsed;
     }
     QDateTime when = *value.when;
     switch (unit.toLower().unicode()) {
@@ -149,10 +168,13 @@ std::optional<Value> offset(Value value, QChar sign, int amount, QChar unit)
     case 'y':
         when = when.addYears(signedAmount);
         break;
+    case 'h':
+        when = when.addSecs(3600 * qint64(signedAmount));
+        break;
     default:
         return std::nullopt;
     }
-    return Value{showDate(when, value.withTime), when, value.withTime};
+    return Value{show(when, value.shows), when, value.shows};
 }
 
 std::optional<Value> applyFilter(Value value, const QString &filter)
@@ -183,7 +205,7 @@ std::optional<Value> applyFilter(Value value, const QString &filter)
         const QChar fill = arguments.size() > 1 && !arguments.at(1).isEmpty() ? arguments.at(1).at(0) : u'0';
         text = text.rightJustified(number(0, 0), fill);
     } else if (name == u"date"_s && !argument.isEmpty()) {
-        const std::optional<QDateTime> when = value.when ? value.when : parseDate(text);
+        const std::optional<QDateTime> when = value.when ? value.when : parseDate(text).value_or(Value()).when;
         if (!when) {
             return std::nullopt;
         }
@@ -206,7 +228,7 @@ std::optional<Value> applyFilter(Value value, const QString &filter)
 // The name a field's expression starts from: {Serial+1|pad:6} -> Serial.
 QString baseName(const QString &expression, QChar *sign = nullptr, int *amount = nullptr, QChar *unit = nullptr)
 {
-    static const QRegularExpression withOffset(u"^(.*?)\\s*([+-])\\s*(\\d+)\\s*([dwmyDWMY]?)$"_s);
+    static const QRegularExpression withOffset(u"^(.*?)\\s*([+-])\\s*(\\d+)\\s*([dwmyhDWMYH]?)$"_s);
     const QString head = expression.section(u'|', 0, 0).trimmed();
     const QRegularExpressionMatch match = withOffset.match(head);
     if (!match.hasMatch() || match.captured(1).isEmpty()) {
