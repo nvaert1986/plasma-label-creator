@@ -34,9 +34,8 @@ See `CHANGELOG.md` under "Unreleased" for the details.
 
 ## Next session
 
-Version 0.3.0 is on GitHub (Niels tested it). Start from what Niels
-finds next; then the hands-on checks
-under "Bug review" and the printer tests below.
+Version 0.3.0 is released and tested. Next: the hands-on checks under
+"Bug review" and the printer tests below.
 
 ## Third bug review (2026-10-30, 0.3.0)
 
