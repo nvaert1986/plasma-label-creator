@@ -8,6 +8,20 @@
 What is done is described in the README; this lists what is left. The
 designer comes first; the section "Later" at the end is low priority.
 
+## Done since 0.2.0 (not released yet)
+
+See `CHANGELOG.md` under "Unreleased" for the details.
+
+- [x] Select several objects at once: Ctrl/Shift-click, a band over empty
+  space, Select All.
+- [x] Align them to each other and distribute them evenly.
+- [x] Group and ungroup; lock position and size.
+- [x] Text that wraps within its box.
+- [x] Printable strips for Altec's catalogue wrap labels (which end is not
+  yet confirmed, see Testing on real printers).
+- [x] The desktop entry mentions LabelManager and ZPL printers.
+- [x] `mainwindow.cpp` split by topic.
+
 ## Next: look for bugs
 
 The 0.2.0 features and the unreleased designer work (multi-select, align,
