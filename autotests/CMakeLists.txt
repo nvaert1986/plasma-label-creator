@@ -7,6 +7,7 @@ set(tests
     barcodetest
     clipartlibrarytest
     fieldstest
+    gs1test
     labelformattest
     labelkindstest
     labelprintertest
@@ -69,6 +70,7 @@ if(BUILD_APP)
         ${CMAKE_SOURCE_DIR}/src/app/datadialogs.cpp
         ${CMAKE_SOURCE_DIR}/src/app/datareader.cpp
         ${CMAKE_SOURCE_DIR}/src/app/layersdialog.cpp
+        ${CMAKE_SOURCE_DIR}/src/app/gs1dialog.cpp
         LINK_LIBRARIES labelcreatorcore Qt6::Test Qt6::Widgets Qt6::Sql KF6::Archive KF6::I18n
         TEST_NAME datadialogstest)
     target_include_directories(datadialogstest PRIVATE ${CMAKE_SOURCE_DIR}/src/app)
@@ -84,6 +86,7 @@ if(BUILD_APP)
     ecm_add_test(propertiesdialogtest.cpp
         ${CMAKE_SOURCE_DIR}/src/app/objectfactory.cpp
         ${CMAKE_SOURCE_DIR}/src/app/propertiesdialog.cpp
+        ${CMAKE_SOURCE_DIR}/src/app/gs1dialog.cpp
         LINK_LIBRARIES labelcreatorcore Qt6::Test Qt6::Widgets KF6::I18n KF6::WidgetsAddons
         TEST_NAME propertiesdialogtest)
 

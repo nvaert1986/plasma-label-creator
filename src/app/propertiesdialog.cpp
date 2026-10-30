@@ -5,6 +5,8 @@
 
 #include "propertiesdialog.h"
 
+#include "gs1dialog.h"
+
 #include "units.h"
 
 #include <KLocalizedString>
@@ -350,6 +352,26 @@ bool editObjectProperties(QWidget *parent, LabelObject &object, TapeCell *cell)
         }
         type->setCurrentIndex(type->findData(barcode->type));
         auto *data = new QLineEdit(barcode->text);
+        // GS1 data built from application identifiers, for the types that take it.
+        auto *buildGs1 = new QPushButton(QIcon::fromTheme(u"view-barcode"_s), i18n("Build…"));
+        buildGs1->setToolTip(i18n("Build GS1 data from application identifiers, with each value checked"));
+        const auto takesGs1 = [type]() {
+            const QString chosen = type->currentData().toString();
+            return chosen == u"GS1_128"_s || chosen == u"GS1DataMatrix"_s || chosen == u"GS1DataBarExpanded"_s;
+        };
+        buildGs1->setEnabled(takesGs1());
+        QObject::connect(type, &QComboBox::currentIndexChanged, buildGs1, [buildGs1, takesGs1]() {
+            buildGs1->setEnabled(takesGs1());
+        });
+        QObject::connect(buildGs1, &QPushButton::clicked, data, [data]() {
+            Gs1Dialog builder(data->text(), data->window());
+            if (builder.exec() == QDialog::Accepted) {
+                data->setText(builder.data());
+            }
+        });
+        auto *dataRow = new QHBoxLayout;
+        dataRow->addWidget(data, 1);
+        dataRow->addWidget(buildGs1);
         auto *barSize = enumCombo({{i18n("Small"), int(BarcodeSize::Small)}, {i18n("Medium"), int(BarcodeSize::Medium)}, {i18n("Large"), int(BarcodeSize::Large)}},
                                   int(barcode->size));
         auto *textPosition = enumCombo({{i18n("Below"), int(BarcodeTextPosition::Bottom)},
@@ -359,7 +381,7 @@ bool editObjectProperties(QWidget *parent, LabelObject &object, TapeCell *cell)
         auto *font = new FontEditor(barcode->textFont);
         auto *alignment = horizontalAlignmentCombo(barcode->horizontalAlignment);
         form->addRow(i18n("Type:"), type);
-        form->addRow(i18n("Data:"), data);
+        form->addRow(i18n("Data:"), dataRow);
         form->addRow(i18n("Size:"), barSize);
         form->addRow(i18n("Text:"), textPosition);
         form->addRow(i18n("Text font:"), font);

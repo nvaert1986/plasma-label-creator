@@ -15,6 +15,8 @@ add_executable(plasma-label-creator
     customlabels.h
     dragsupport.cpp
     dragsupport.h
+    gs1dialog.cpp
+    gs1dialog.h
     inlinetexteditor.cpp
     inlinetexteditor.h
     labelclipboard.cpp

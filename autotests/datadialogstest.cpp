@@ -4,6 +4,7 @@
 */
 
 #include "datadialogs.h"
+#include "gs1dialog.h"
 #include "layersdialog.h"
 
 #include <QDialogButtonBox>
@@ -155,6 +156,30 @@ private Q_SLOTS:
         QCOMPARE(table->item(0, 2)->text(), u"AB00012"_s);
         grab(&dialog, u"calculated"_s);
         QCOMPARE(dialog.fields(), (QList<CalculatedField>{{u"Code"_s, u"{Prefix}{Serial|pad:5}"_s}, {u"Short"_s, u"{Code|right:4}"_s}}));
+    }
+
+    void gs1DataIsBuiltAndChecked()
+    {
+        Gs1Dialog dialog(u"[01]09501101530003[10]{Batch}"_s, nullptr);
+        dialog.show();
+        QVERIFY(QTest::qWaitForWindowExposed(&dialog));
+        auto *table = dialog.findChild<QTableWidget *>();
+        QCOMPARE(table->rowCount(), 2);
+        QPushButton *ok = dialog.findChild<QDialogButtonBox *>()->button(QDialogButtonBox::Ok);
+        QVERIFY(ok->isEnabled());
+
+        // An expiry date not written YYMMDD keeps OK off until it is.
+        dialog.addElement({u"17"_s, u"31-12-26"_s});
+        QVERIFY(!ok->isEnabled());
+        auto *expiry = qobject_cast<QLineEdit *>(table->cellWidget(2, 1));
+        expiry->setText(u"261231"_s);
+        QVERIFY(ok->isEnabled());
+
+        // A GTIN without its check digit gets it.
+        qobject_cast<QLineEdit *>(table->cellWidget(0, 1))->setText(u"0950110153000"_s);
+        QVERIFY(table->item(0, 2)->text().contains(u"check digit 3 added"_s));
+        grab(&dialog, u"gs1"_s);
+        QCOMPARE(dialog.data(), u"[01]09501101530003[10]{Batch}[17]261231"_s);
     }
 
     void questionsAreEdited()

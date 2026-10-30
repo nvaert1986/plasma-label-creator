@@ -13,6 +13,8 @@ add_library(labelcreatorcore STATIC
     clipartlibrary.cpp
     clipartlibrary.h
     fields.cpp
+    gs1.cpp
+    gs1.h
     labeldocument.cpp
     labeldocument.h
     labelformat.cpp
