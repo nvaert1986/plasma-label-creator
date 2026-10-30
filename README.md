@@ -33,7 +33,10 @@ Altec, Zebra Technologies or KDE e.V. See [Trademarks](#trademarks).
   text directly on the label, format it from the toolbar, drag objects in
   from the Insert tab or from Dolphin.
 - **Arrange objects**: select several at once, align and distribute them,
-  group them, lock them in place. Text can wrap within its box.
+  group them, lock them in place, turn them to any angle, put them on
+  layers. Text can wrap within its box; objects can be left out of print.
+- **Calculated fields** and date offsets, filters and shared counters;
+  a **GS1 builder** for GS1-128 and GS1 Data Matrix data.
 - **Barcodes** (zint): Code 128, Code 39, Codabar, 2 of 5, ITF-14, EAN,
   UPC, QR Code, PDF417, POSTNET, PLANET and Intelligent Mail, and also Data
   Matrix, Aztec, MaxiCode, Micro QR, Code 93, Code 11, MSI Plessey,

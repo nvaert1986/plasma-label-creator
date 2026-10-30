@@ -32,8 +32,30 @@
   long for a line break inside. With Shrink to Fit or Always Fit the text
   takes the largest size at which its wrapped lines fit the box. Editing
   the text on the label wraps the same way.
-- Locks and wrapping are kept in the `.label` file's comment, which other
-  label software ignores.
+- **Layers** (Layout > Layers…): each shown or hidden on screen, printed
+  or not, locked or not; Layout > Move to Layer. Objects not on a layer
+  are on the label itself.
+- **Do Not Print** (Layout menu): an object only to design with, such as a
+  picture of the product; drawn faded, left out when printing and
+  exporting.
+- **Any angle** (Angle in an object's properties): turns the whole object
+  about its centre, on top of its quarter-turn Rotation. Other label
+  software shows it without the angle.
+- **Calculated fields** (Data > Calculated Fields…): fields worked out when
+  printing, such as `{Prefix}-{Serial|pad:6}`, used like columns.
+- **More in fields**: `{Date}`, `{Time}` and `{Now}`; date offsets
+  (`{Date+30}`, `{Installed+1y}`, also w and m); `{Serial+1}`; filters
+  after a `|`: upper, lower, trim, left, right, mid, pad, date:format,
+  replace, default. `{Date+30|date:dd-MM-yyyy}` gives a best-before date.
+- **Shared counters**: a counter can keep its next value in a file, on a
+  network share say, so computers printing the same label count on from
+  each other; the file is locked while printing.
+- **GS1 builder** (Build… next to a GS1 barcode's data): application
+  identifiers and values in a table, each checked (length, digits, dates,
+  check digits; a missing check digit is added).
+- Locks, wrapping, layers, angles, calculated fields and shared counter
+  files are kept in the `.label` file's comment, which other label
+  software ignores.
 
 ### Printers
 

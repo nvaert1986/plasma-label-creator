@@ -21,6 +21,11 @@ See `CHANGELOG.md` under "Unreleased" for the details.
   yet confirmed, see Testing on real printers).
 - [x] The desktop entry mentions LabelManager and ZPL printers.
 - [x] `mainwindow.cpp` split by topic.
+- [x] Layers (shown, printed, locked) and objects that do not print.
+- [x] Objects turned to any angle.
+- [x] Calculated fields, date offsets and filters in fields, counters
+  shared between computers.
+- [x] GS1 builder for GS1-128, GS1 Data Matrix and GS1 DataBar Expanded.
 
 ## Bug review (2026-10-30)
 
@@ -38,21 +43,15 @@ Still to do by hand, in the running app:
   with the screen and the print preview.
 - [ ] Print from a database with a password (SQL Server over ODBC, say):
   the password is asked once per database and again after a wrong one.
+- [ ] Try layers, Do Not Print, the Angle box, calculated fields, the GS1
+  builder; print a label with a turned object and a non-printing one.
+- [ ] Shared counter: two computers printing the same label with one
+  counter file on a share count on without repeats.
 
 ## Designer
 
-- [ ] **Calculated fields**: joining fields and text, parts of a field,
-  date offsets (best before = today + 30 days), counters shared between
-  computers.
-- [ ] **GS1 builder**: compose GS1-128 and GS1 Data Matrix data from a list
-  of application identifiers, with their formats checked, instead of
-  typing `[AI]` brackets by hand.
-- [ ] **Free rotation** of objects at any angle (the `.label` format only
-  has quarter turns: needs an extension, kept in the settings comment).
 - [ ] **Several labels across a roll**, and continuous rolls with a set
-  length (Altec and other ZPL printers).
-- [ ] **Layers and non-printing objects**, such as a picture of the product
-  to design on that does not print.
+  length (Altec and other ZPL printers). Next up; see HANDOFF.md.
 
 Harder, after the items above:
 
