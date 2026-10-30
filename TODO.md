@@ -34,8 +34,8 @@ See `CHANGELOG.md` under "Unreleased" for the details.
 
 ## Next session
 
-Version 0.3.0 is committed locally, not pushed (0.2.0 is the last on
-GitHub). Start from what Niels finds in the app; then the hands-on checks
+Version 0.3.0 is on GitHub (Niels tested it). Start from what Niels
+finds next; then the hands-on checks
 under "Bug review" and the printer tests below.
 
 ## Third bug review (2026-10-30, 0.3.0)
