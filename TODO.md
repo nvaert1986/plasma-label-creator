@@ -28,6 +28,9 @@ See `CHANGELOG.md` under "Unreleased" for the details.
 - [x] GS1 builder for GS1-128, GS1 Data Matrix and GS1 DataBar Expanded.
 - [x] Several labels across a roll, and continuous rolls with a set length
   (printers that take any label size: Altec, Zebra).
+- [x] Turning objects with the mouse (rotate handle, Shift for 15° steps,
+  resize handles on turned objects), Turn Left/Right 15°, an angle box.
+- [x] Toolbars rearranged into two rows with new Insert and Arrange bars.
 
 ## Next session
 
@@ -62,26 +65,18 @@ Still to do by hand, in the running app:
   with the screen and the print preview.
 - [ ] Print from a database with a password (SQL Server over ODBC, say):
   the password is asked once per database and again after a wrong one.
-- [ ] Try layers, Do Not Print, the Angle box, calculated fields, the GS1
-  builder; print a label with a turned object and a non-printing one.
+- [ ] Try layers, Do Not Print, turning with the mouse and the angle box,
+  calculated fields, the GS1 builder; print a label with a turned object
+  and a non-printing one.
+- [ ] The new toolbars on the real desktop (Breeze, your font size): both
+  rows fit at 1280 px offscreen; at 1000 px Fit to Page runs over.
 - [ ] Shared counter: two computers printing the same label with one
   counter file on a share count on without repeats.
 
 ## Designer
 
-- [ ] **Turn objects with the mouse** (Medium): a rotate handle above a
-  selected object, joined by a short line; dragging turns it about its
-  centre with the angle shown by the cursor, Shift snaps to 15°, one undo
-  step per drag. No handle on locked objects, locked layers or tape.
-  While turned, the resize handles work along the object's own sides.
-  Uses the existing Angle setting: files and printing stay as they are.
-- [ ] **Turn Left 15° / Turn Right 15°** in the Format menu, with
-  shortcuts (Ctrl+[ and Ctrl+]). (Easy)
-- [ ] **An angle box in the format toolbar** for the selected objects.
-  (Easy)
-
-The other Medium designer items are done (see "Done since 0.2.0"). Left
-after these, all Hard:
+The Medium designer items are done (see "Done since 0.2.0"). Left, all
+Hard:
 
 - [ ] **The printer's own fonts and barcodes, and labels stored on the
   printer**: send ZPL text and barcode commands instead of an image, and

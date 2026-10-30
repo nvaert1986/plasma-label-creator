@@ -256,6 +256,33 @@ void MainWindow::setObjectsPrinted(bool printed)
     m_editor->apply(document, printed ? i18n("Print Objects") : i18n("Do Not Print Objects"));
 }
 
+void MainWindow::turnObjects(qreal degrees)
+{
+    LabelDocument document = m_editor->document();
+    bool turned = false;
+    for (const int index : m_editor->selectedObjects()) {
+        if (!document.isLocked(index)) {
+            ObjectBase &base = objectBase(document.objects[index]);
+            base.angle = normalisedAngle(base.angle + degrees);
+            turned = true;
+        }
+    }
+    if (turned) {
+        m_editor->apply(document, degrees > 0 ? i18n("Turn Left") : i18n("Turn Right"));
+    }
+}
+
+void MainWindow::setObjectsAngle(qreal degrees)
+{
+    LabelDocument document = m_editor->document();
+    for (const int index : m_editor->selectedObjects()) {
+        if (!document.isLocked(index)) {
+            objectBase(document.objects[index]).angle = normalisedAngle(degrees);
+        }
+    }
+    m_editor->apply(document, i18n("Set Angle"));
+}
+
 void MainWindow::editRollLayout()
 {
     const LabelDocument &current = m_editor->document();
@@ -374,6 +401,27 @@ void MainWindow::setupArrangeActions()
     vertical->setText(i18n("Distribute Vertically"));
     vertical->setIcon(QIcon::fromTheme(u"distribute-vertical-gaps"_s));
 
+    // One button on the arrange toolbar for lining up and spreading out.
+    auto *alignMenu = new KActionMenu(QIcon::fromTheme(u"align-horizontal-left"_s), i18n("Align Objects"), this);
+    alignMenu->setPopupMode(QToolButton::InstantPopup);
+    for (const QString &name : {u"arrange_align_left"_s,
+                                u"arrange_align_hcenter"_s,
+                                u"arrange_align_right"_s,
+                                QString(),
+                                u"arrange_align_top"_s,
+                                u"arrange_align_vcenter"_s,
+                                u"arrange_align_bottom"_s,
+                                QString(),
+                                u"arrange_distribute_horizontal"_s,
+                                u"arrange_distribute_vertical"_s}) {
+        if (name.isEmpty()) {
+            alignMenu->addSeparator();
+        } else {
+            alignMenu->addAction(actions->action(name));
+        }
+    }
+    actions->addAction(u"arrange_align_menu"_s, alignMenu);
+
     QAction *group = actions->addAction(u"arrange_group"_s, this, &MainWindow::groupObjects);
     group->setText(i18n("Group"));
     group->setIcon(QIcon::fromTheme(u"object-group"_s));
@@ -382,6 +430,34 @@ void MainWindow::setupArrangeActions()
     ungroup->setText(i18n("Ungroup"));
     ungroup->setIcon(QIcon::fromTheme(u"object-ungroup"_s));
     actions->setDefaultShortcut(ungroup, QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_G));
+
+    // Turning the selected objects: 15 degrees at a time, or to an angle.
+    QAction *turnLeft = actions->addAction(u"object_turn_left"_s, this, [this]() {
+        turnObjects(15);
+    });
+    turnLeft->setText(i18n("Turn Left 15°"));
+    turnLeft->setIcon(QIcon::fromTheme(u"object-rotate-left"_s));
+    actions->setDefaultShortcut(turnLeft, QKeySequence(Qt::CTRL | Qt::Key_BracketLeft));
+    QAction *turnRight = actions->addAction(u"object_turn_right"_s, this, [this]() {
+        turnObjects(-15);
+    });
+    turnRight->setText(i18n("Turn Right 15°"));
+    turnRight->setIcon(QIcon::fromTheme(u"object-rotate-right"_s));
+    actions->setDefaultShortcut(turnRight, QKeySequence(Qt::CTRL | Qt::Key_BracketRight));
+    m_angle = new QDoubleSpinBox(this);
+    m_angle->setRange(-180, 180);
+    m_angle->setDecimals(1);
+    m_angle->setSingleStep(5);
+    m_angle->setWrapping(true);
+    m_angle->setSuffix(i18nc("degrees", "°"));
+    m_angle->setToolTip(i18n("Angle of the selected objects, counter-clockwise"));
+    // Applied when typed in and confirmed, or stepped: not at every digit.
+    m_angle->setKeyboardTracking(false);
+    connect(m_angle, &QDoubleSpinBox::valueChanged, this, &MainWindow::setObjectsAngle);
+    auto *angle = new QWidgetAction(this);
+    angle->setText(i18n("Angle"));
+    angle->setDefaultWidget(m_angle);
+    actions->addAction(u"object_angle"_s, angle);
 
     QAction *roll = actions->addAction(u"label_roll"_s, this, &MainWindow::editRollLayout);
     roll->setText(i18n("&Roll Layout…"));

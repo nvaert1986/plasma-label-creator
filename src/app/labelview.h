@@ -112,13 +112,15 @@ private:
         Bottom,
         BottomLeft,
         Left,
+        Rotate, // above the top edge: turns the object
     };
 
     const LabelCreator::LabelDocument &shownDocument() const;
     QPointF toTwips(const QPointF &widgetPos) const;
     QRectF toWidget(const QRectF &twips) const;
     QPolygonF toWidget(const QPolygonF &twips) const;
-    QList<QRectF> handleRects(const QRectF &bounds) const;
+    /** The handles of @p object in widget pixels, turned with it, by Handle. */
+    QList<QRectF> handleRects(const LabelCreator::ObjectBase &object) const;
     Handle handleAt(const QPointF &pos) const;
     int objectAt(const QPointF &pos) const;
     void updateFitZoom();
@@ -145,6 +147,11 @@ private:
     QPointF m_pressTwips;
     Handle m_dragHandle = NoHandle;
     bool m_dragMoved = false;
+    // Turning: the angle the object had, the mouse's angle about its centre
+    // when pressed, and where to show the angle while turning.
+    qreal m_dragStartAngle = 0;
+    qreal m_pressAngle = 0;
+    std::optional<QPointF> m_angleShownAt;
 
     // An ongoing rubber band, in widget pixels, and what was selected before
     // it when it adds to the selection.

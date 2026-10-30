@@ -487,6 +487,71 @@ private Q_SLOTS:
         QCOMPARE(editor.selection(), 0);
     }
 
+    void objectsTurnWithTheMouse()
+    {
+        LabelDocument document = addressLabel();
+        document.objects.clear();
+        ShapeObject bar;
+        bar.bounds = QRectF(1600, 500, 1200, 300);
+        document.objects << bar;
+        LabelEditor editor;
+        editor.reset(document);
+        editor.setSelection(0);
+        LabelView view(&editor);
+        view.resize(900, 500);
+        view.show();
+        QVERIFY(QTest::qWaitForWindowExposed(&view));
+        view.setZoom(1.0);
+        const auto widget = [&](const QPointF &twips) {
+            return view.labelOrigin() + twips * view.scale();
+        };
+        // The rotate handle sits 24 pixels above the top edge's middle.
+        const QPointF centre = widget(bar.bounds.center());
+        const QPoint handle = (widget(QPointF(bar.bounds.center().x(), bar.bounds.top())) - QPointF(0, 24)).toPoint();
+        const qreal reach = centre.y() - handle.y();
+        // Dragged round to the left of the centre, a little off: Shift snaps
+        // it to a quarter turn counter-clockwise.
+        const QPoint left = (centre + QPointF(-reach, 2)).toPoint();
+        QTest::mousePress(&view, Qt::LeftButton, {}, handle);
+        QTest::mouseMove(&view, (centre + QPointF(-reach / 2, -reach / 2)).toPoint());
+        QTest::mouseMove(&view, left);
+        QMouseEvent shiftMove(QEvent::MouseMove, QPointF(left), view.mapToGlobal(QPointF(left)), Qt::NoButton, Qt::LeftButton, Qt::ShiftModifier);
+        QCoreApplication::sendEvent(&view, &shiftMove);
+        QTest::mouseRelease(&view, Qt::LeftButton, Qt::ShiftModifier, left);
+        QCOMPARE(objectBase(editor.document().objects.at(0)).angle, 90.0);
+        QCOMPARE(objectBase(editor.document().objects.at(0)).bounds, bar.bounds); // turned, not moved
+        QCOMPARE(editor.undoStack()->count(), 1);
+        QCOMPARE(editor.undoStack()->text(0), u"Turn Object"_s);
+
+        // Turned a quarter, its right side is on top: dragging that handle
+        // up makes the bar longer, its left side (now at the bottom) stays.
+        const ObjectBase &turned = objectBase(editor.document().objects.at(0));
+        const QPolygonF before = objectOutline(turned);
+        const QPoint right = widget(objectTurn(turned).map(QPointF(turned.bounds.right(), turned.bounds.center().y()))).toPoint();
+        QTest::mousePress(&view, Qt::LeftButton, {}, right);
+        QTest::mouseMove(&view, right + QPoint(0, -20));
+        QTest::mouseMove(&view, right + QPoint(0, -40));
+        QTest::mouseRelease(&view, Qt::LeftButton, {}, right + QPoint(0, -40));
+        const ObjectBase &longer = objectBase(editor.document().objects.at(0));
+        QVERIFY(qAbs(longer.bounds.width() - (1200 + 40 / view.scale())) < 2);
+        QCOMPARE(longer.bounds.height(), 300.0);
+        // The bottom side (its left side, turned) did not move.
+        const QPolygonF after = objectOutline(longer);
+        const auto lowest = [](const QPolygonF &outline) {
+            qreal y = outline.constFirst().y();
+            for (const QPointF &point : outline) {
+                y = std::max(y, point.y());
+            }
+            return y;
+        };
+        QVERIFY(qAbs(lowest(after) - lowest(before)) < 1);
+
+        LabelDocument shown = editor.document();
+        objectBase(shown.objects[0]).angle = 30;
+        editor.apply(shown, u"Turn"_s);
+        grab(&view, u"turned"_s);
+    }
+
     void severalObjectsCopyWithTheirGroup()
     {
         LabelDocument document = addressLabel();

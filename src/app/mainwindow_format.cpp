@@ -135,6 +135,20 @@ void MainWindow::setupFormatActions()
         }),
     };
 
+    // The toolbar has room for one button per direction: a drop-down
+    // showing the alignment chosen.
+    const auto alignmentMenu = [&](const QString &name, const QString &text, const QList<KToggleAction *> &choices) {
+        auto *menu = new KActionMenu(choices.constFirst()->icon(), text, this);
+        menu->setPopupMode(QToolButton::InstantPopup);
+        for (KToggleAction *choice : choices) {
+            menu->addAction(choice);
+        }
+        actions->addAction(name, menu);
+        return menu;
+    };
+    m_horizontalMenu = alignmentMenu(u"format_halign"_s, i18n("Horizontal Alignment"), m_horizontalAlignment);
+    m_verticalMenu = alignmentMenu(u"format_valign"_s, i18n("Vertical Alignment"), m_verticalAlignment);
+
     // How text fills its box, DLS's "Text Fit".
     auto *fit = new QActionGroup(this);
     m_fitModes = {
@@ -337,4 +351,15 @@ void MainWindow::updateFormatActions()
             m_verticalAlignment.at(i)->setEnabled(vertical.has_value());
             m_verticalAlignment.at(i)->setChecked(vertical == verticals.at(i));
         }
+        // The drop-downs show the alignment chosen.
+        const auto showChosen = [](KActionMenu *menu, const QList<KToggleAction *> &choices, bool enabled) {
+            menu->setEnabled(enabled);
+            for (KToggleAction *choice : choices) {
+                if (choice->isChecked()) {
+                    menu->setIcon(choice->icon());
+                }
+            }
+        };
+        showChosen(m_horizontalMenu, m_horizontalAlignment, horizontal.has_value());
+        showChosen(m_verticalMenu, m_verticalAlignment, vertical.has_value());
     }

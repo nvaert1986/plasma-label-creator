@@ -4,7 +4,7 @@
     SPDX-License-Identifier: CC0-1.0
 -->
 <!DOCTYPE gui>
-<gui name="plasma-label-creator" version="16"
+<gui name="plasma-label-creator" version="17"
      xmlns="http://www.kde.org/standards/kxmlgui/1.0"
      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
      xsi:schemaLocation="http://www.kde.org/standards/kxmlgui/1.0 http://www.kde.org/standards/kxmlgui/1.0/kxmlgui.xsd">
@@ -122,6 +122,9 @@
             <Action name="arrange_ungroup"/>
             <Action name="arrange_lock"/>
             <Separator/>
+            <Action name="object_turn_left"/>
+            <Action name="object_turn_right"/>
+            <Separator/>
             <Action name="edit_raise"/>
             <Action name="edit_lower"/>
             <Separator/>
@@ -159,15 +162,14 @@
         <Action name="edit_undo"/>
         <Action name="edit_redo"/>
         <Separator/>
+        <Action name="file_print"/>
+    </ToolBar>
+    <ToolBar name="insertToolBar">
+        <text>Insert Toolbar</text>
         <Action name="insert_address"/>
         <Action name="insert_text"/>
         <Action name="insert_barcode"/>
         <Action name="insert_image"/>
-        <Separator/>
-        <Action name="label_rotate"/>
-        <Action name="view_zoom_to_page"/>
-        <Separator/>
-        <Action name="file_print"/>
     </ToolBar>
     <ToolBar name="formatToolBar" iconText="icononly" newline="true">
         <text>Format Toolbar</text>
@@ -180,18 +182,30 @@
         <Action name="format_italic"/>
         <Action name="format_underline"/>
         <Action name="format_strikeout"/>
+        <Separator/>
         <Action name="format_inverted"/>
         <Action name="format_wrap"/>
-        <Separator/>
-        <Action name="format_align_left"/>
-        <Action name="format_align_center"/>
-        <Action name="format_align_right"/>
-        <Separator/>
-        <Action name="format_valign_top"/>
-        <Action name="format_valign_middle"/>
-        <Action name="format_valign_bottom"/>
+        <Action name="format_halign"/>
+        <Action name="format_valign"/>
         <Separator/>
         <Action name="edit_properties"/>
+    </ToolBar>
+    <ToolBar name="arrangeToolBar" iconText="icononly">
+        <text>Arrange Toolbar</text>
+        <Action name="arrange_align_menu"/>
+        <Action name="arrange_group"/>
+        <Action name="arrange_ungroup"/>
+        <Action name="arrange_lock"/>
+        <Separator/>
+        <Action name="object_turn_left"/>
+        <Action name="object_angle"/>
+        <Action name="object_turn_right"/>
+        <Separator/>
+        <Action name="edit_raise"/>
+        <Action name="edit_lower"/>
+        <Separator/>
+        <Action name="label_rotate"/>
+        <Action name="view_fit_to_page"/>
     </ToolBar>
     <Menu name="object_popup">
         <Action name="edit_properties"/>
@@ -230,6 +244,8 @@
         <Action name="arrange_group"/>
         <Action name="arrange_ungroup"/>
         <Action name="arrange_lock"/>
+        <Action name="object_turn_left"/>
+        <Action name="object_turn_right"/>
         <Separator/>
         <Action name="edit_raise"/>
         <Action name="edit_lower"/>

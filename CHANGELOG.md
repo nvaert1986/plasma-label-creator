@@ -41,6 +41,18 @@
 - **Any angle** (Angle in an object's properties): turns the whole object
   about its centre, on top of its quarter-turn Rotation. Other label
   software shows it without the angle.
+- **Turning with the mouse**: a selected object has a round handle above
+  its top edge; dragging it turns the object, with the angle shown by the
+  pointer, and Shift turns in steps of 15°. A turned object keeps its
+  resize handles, which work along its own sides.
+- **Turn Left 15° / Turn Right 15°** (Layout menu, Ctrl+[ and Ctrl+]) and
+  an angle box on the new Arrange toolbar.
+- **Toolbars rearranged** to fit a smaller window: the main toolbar and a
+  new Insert toolbar on the first row; the Format toolbar (alignment now
+  one drop-down button each, a narrower font list) and a new Arrange
+  toolbar (Align Objects, Group, Lock, turning, order, Rotate Label, Fit
+  to Page) on the second. A layout saved by an earlier version is
+  replaced once. The window starts at 1280 × 800.
 - **Calculated fields** (Data > Calculated Fields…): fields worked out when
   printing, such as `{Prefix}-{Serial|pad:6}`, used like columns.
 - **More in fields**: `{Date}`, `{Time}` and `{Now}`; date and time
@@ -78,6 +90,7 @@
 
 ### Fixed
 
+- The toolbar's Fit to Page button was missing (a wrong action name).
 - Print Preview followed by Print asked the print-time questions again and
   re-read the data; it now prints what was previewed.
 - A database password given for one database was tried on another one,

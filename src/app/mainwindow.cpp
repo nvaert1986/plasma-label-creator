@@ -64,8 +64,20 @@ MainWindow::MainWindow(QWidget *parent)
 
     setupActions();
     // First-run size; setupGUI() restores the user's own size after that.
-    resize(1000, 650);
+    resize(1280, 800);
+    // The toolbars were laid out anew (layout 2): forget where the old ones
+    // were put, once, or they keep sharing one row.
+    constexpr int ToolBarLayout = 2;
+    if (settings().readEntry("ToolBarLayout", 1) < ToolBarLayout) {
+        KSharedConfig::openStateConfig()->group(u"MainWindow"_s).deleteEntry("State");
+        settings().writeEntry("ToolBarLayout", ToolBarLayout);
+    }
     setupGUI(Default, QStringLiteral("plasma-label-creatorui.rc"));
+    // The font list is as wide as its longest name: narrower leaves room on
+    // the format toolbar.
+    if (QWidget *list = toolBar(u"formatToolBar"_s)->widgetForAction(m_fontFamily)) {
+        list->setMaximumWidth(180);
+    }
 
     connect(m_editor, &LabelEditor::documentChanged, this, &MainWindow::updateStatus);
     connect(m_editor, &LabelEditor::documentChanged, this, &MainWindow::updateActions);
@@ -753,6 +765,7 @@ void MainWindow::updateActions()
                                 u"arrange_align_bottom"_s}) {
         actionCollection()->action(name)->setEnabled(movable && units >= 2);
     }
+    actionCollection()->action(u"arrange_align_menu"_s)->setEnabled(movable && units >= 2);
     actionCollection()->action(u"arrange_distribute_horizontal"_s)->setEnabled(movable && units >= 3);
     actionCollection()->action(u"arrange_distribute_vertical"_s)->setEnabled(movable && units >= 3);
     actionCollection()->action(u"arrange_group"_s)->setEnabled(units >= 2);
@@ -762,6 +775,16 @@ void MainWindow::updateActions()
     actionCollection()->action(u"arrange_ungroup"_s)->setEnabled(grouped);
     actionCollection()->action(u"edit_select_all"_s)->setEnabled(!document.objects.isEmpty());
     m_lock->setEnabled(selected && !tape);
+    // Turning: the current object's angle; locked objects do not turn.
+    const bool turnable = !tape && Arrange::canMove(document, selection);
+    for (const QString &name : {u"object_turn_left"_s, u"object_turn_right"_s}) {
+        actionCollection()->action(name)->setEnabled(turnable);
+    }
+    m_angle->setEnabled(turnable);
+    {
+        const QSignalBlocker blocker(m_angle);
+        m_angle->setValue(m_editor->selection() >= 0 ? objectBase(document.objects.at(m_editor->selection())).angle : 0);
+    }
     m_noPrint->setEnabled(selected);
     m_noPrint->setChecked(selected && std::none_of(selection.cbegin(), selection.cend(), [&document](int index) {
                               return objectBase(document.objects.at(index)).printed;

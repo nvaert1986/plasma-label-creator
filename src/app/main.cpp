@@ -59,6 +59,10 @@ int main(int argc, char *argv[])
     // For development: LABELCREATOR_SCREENSHOT=file.png saves a picture of the
     // window and quits, which works on the offscreen platform too.
     if (qEnvironmentVariableIsSet("LABELCREATOR_SCREENSHOT")) {
+        // LABELCREATOR_SCREENSHOT_SIZE=1920x1080 pictures the window at that size.
+        if (const QStringList size = qEnvironmentVariable("LABELCREATOR_SCREENSHOT_SIZE").split(u'x'); size.size() == 2) {
+            window->resize(size.at(0).toInt(), size.at(1).toInt());
+        }
         window->showScreenshotTab(qEnvironmentVariableIntValue("LABELCREATOR_SCREENSHOT_TAB"));
         if (qEnvironmentVariableIsSet("LABELCREATOR_SCREENSHOT_SELECT")) {
             window->selectForScreenshot(qEnvironmentVariableIntValue("LABELCREATOR_SCREENSHOT_SELECT"));

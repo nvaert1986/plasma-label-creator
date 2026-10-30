@@ -17,6 +17,7 @@
 #include <optional>
 #include <vector>
 
+class KActionMenu;
 class KFontAction;
 class KFontSizeAction;
 class KRecentFilesAction;
@@ -24,6 +25,7 @@ class KToggleAction;
 class LabelEditor;
 class LabelView;
 class PrintBar;
+class QDoubleSpinBox;
 class QLabel;
 class QSlider;
 class Sidebar;
@@ -127,6 +129,10 @@ private:
     void ungroupObjects();
     void setObjectsLocked(bool locked);
     void setObjectsPrinted(bool printed);
+    /** Turns the selected objects that can move by @p degrees, counter-clockwise. */
+    void turnObjects(qreal degrees);
+    /** Sets the selected objects that can move to @p degrees. */
+    void setObjectsAngle(qreal degrees);
     void editLayers();
     void editRollLayout();
     /** Puts the selected objects on layer @p name; empty for the label itself. */
@@ -213,8 +219,12 @@ private:
     KToggleAction *m_landscape = nullptr;
     KToggleAction *m_lock = nullptr;
     KToggleAction *m_noPrint = nullptr;
+    QDoubleSpinBox *m_angle = nullptr; // in the arrange toolbar
     QAction *m_paste = nullptr;
     bool m_followPrinter = false; // the user chose another printer; the label type follows
     QList<KToggleAction *> m_horizontalAlignment; // left, centre, right
+    // On the format toolbar: one button each, showing the alignment chosen.
+    KActionMenu *m_horizontalMenu = nullptr;
+    KActionMenu *m_verticalMenu = nullptr;
     QList<KToggleAction *> m_verticalAlignment; // top, middle, bottom
 };

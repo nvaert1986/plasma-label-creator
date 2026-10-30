@@ -19,6 +19,7 @@
 #include <QDropEvent>
 #include <QIcon>
 #include <QKeyEvent>
+#include <QLocale>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPainterPath>
@@ -38,6 +39,14 @@ namespace
 
 constexpr int Margin = 32; // pixels around the label
 constexpr qreal HandleSize = 7; // pixels
+constexpr qreal RotateReach = 24; // pixels from the top edge to the rotate handle
+constexpr qreal SnapAngle = 15; // degrees, with Shift
+
+// The angle of @p v, counter-clockwise from the right, in degrees; y is down.
+qreal angleOf(const QPointF &v)
+{
+    return qRadiansToDegrees(std::atan2(-v.y(), v.x()));
+}
 constexpr qreal MinimumSize = 72; // twips, 1/20 inch
 constexpr qreal MinimumZoom = 0.25;
 constexpr qreal MaximumZoom = 8.0;
@@ -323,9 +332,11 @@ QPolygonF LabelView::toWidget(const QPolygonF &twips) const
     return widget;
 }
 
-QList<QRectF> LabelView::handleRects(const QRectF &bounds) const
+QList<QRectF> LabelView::handleRects(const ObjectBase &object) const
 {
-    const QRectF r = toWidget(bounds);
+    // The box's corners and the middles of its sides, then the rotate handle
+    // above the top edge, all turned with the object.
+    const QRectF &r = object.bounds;
     const QList<QPointF> points = {
         r.topLeft(),
         QPointF(r.center().x(), r.top()),
@@ -335,10 +346,13 @@ QList<QRectF> LabelView::handleRects(const QRectF &bounds) const
         QPointF(r.center().x(), r.bottom()),
         r.bottomLeft(),
         QPointF(r.left(), r.center().y()),
+        QPointF(r.center().x(), r.top() - RotateReach / scale()),
     };
+    const QTransform turn = objectTurn(object);
     QList<QRectF> rects;
     for (const QPointF &point : points) {
-        rects << QRectF(point - QPointF(HandleSize / 2, HandleSize / 2), QSizeF(HandleSize, HandleSize));
+        const QPointF widget = labelOrigin() + turn.map(point) * scale();
+        rects << QRectF(widget - QPointF(HandleSize / 2, HandleSize / 2), QSizeF(HandleSize, HandleSize));
     }
     return rects;
 }
@@ -347,13 +361,13 @@ LabelView::Handle LabelView::handleAt(const QPointF &pos) const
 {
     const int selection = m_editor->selection();
     // On tape, cells place and size the objects. Only a single object that
-    // is not locked or at an angle (whose sides are not the box's) has handles.
-    if (selection < 0 || shownDocument().tape || m_editor->selectedObjects().size() != 1 || shownDocument().isLocked(selection)
-        || objectBase(shownDocument().objects.at(selection)).angle != 0) {
+    // is not locked has handles.
+    if (selection < 0 || shownDocument().tape || m_editor->selectedObjects().size() != 1 || shownDocument().isLocked(selection)) {
         return NoHandle;
     }
-    const QList<QRectF> rects = handleRects(objectBase(shownDocument().objects.at(selection)).bounds);
-    for (int i = 0; i < rects.size(); ++i) {
+    const QList<QRectF> rects = handleRects(objectBase(shownDocument().objects.at(selection)));
+    // The rotate handle first: it may lie over the object's box.
+    for (int i = rects.size() - 1; i >= 0; --i) {
         if (rects.at(i).adjusted(-2, -2, 2, 2).contains(pos)) {
             return Handle(i);
         }
@@ -476,12 +490,30 @@ void LabelView::paintEvent(QPaintEvent *)
             }
         }
     }
-    if (selected.size() == 1 && !document.tape && !document.isLocked(selected.constFirst()) && objectBase(document.objects.at(selected.constFirst())).angle == 0) {
+    if (selected.size() == 1 && !document.tape && !document.isLocked(selected.constFirst())) {
+        const QList<QRectF> handles = handleRects(objectBase(document.objects.at(selected.constFirst())));
+        painter.setRenderHint(QPainter::Antialiasing, true);
         painter.setPen(QPen(highlight, 1));
+        painter.drawLine(handles.at(Top).center(), handles.at(Rotate).center());
         painter.setBrush(palette().color(QPalette::Base));
-        for (const QRectF &handle : handleRects(objectBase(document.objects.at(selected.constFirst())).bounds)) {
-            painter.drawRect(handle);
+        for (int i = 0; i < Rotate; ++i) {
+            painter.drawRect(handles.at(i));
         }
+        painter.setBrush(highlight);
+        painter.drawEllipse(handles.at(Rotate).adjusted(-1, -1, 1, 1));
+        painter.setRenderHint(QPainter::Antialiasing, false);
+    }
+
+    // The angle by the mouse while turning.
+    if (m_angleShownAt && m_dragDocument && m_dragIndex >= 0 && m_dragIndex < document.objects.size()) {
+        const QString text = i18nc("angle in degrees", "%1°", QLocale().toString(objectBase(document.objects.at(m_dragIndex)).angle, 'f', 0));
+        const QRectF box = painter.fontMetrics().boundingRect(text).adjusted(-4, -2, 4, 2);
+        const QRectF at = box.translated(*m_angleShownAt + QPointF(16, 16) - box.topLeft());
+        painter.setPen(Qt::NoPen);
+        painter.setBrush(palette().color(QPalette::ToolTipBase));
+        painter.drawRect(at);
+        painter.setPen(palette().color(QPalette::ToolTipText));
+        painter.drawText(at, Qt::AlignCenter, text);
     }
 
     if (m_rubberBand) {
@@ -568,6 +600,8 @@ void LabelView::mousePressEvent(QMouseEvent *event)
     // The object under the mouse leads, unless it is locked.
     m_dragIndex = m_dragIndices.contains(selection) ? selection : m_dragIndices.constFirst();
     m_dragStartBounds = objectBase(m_dragStart.objects.at(m_dragIndex)).bounds;
+    m_dragStartAngle = objectBase(m_dragStart.objects.at(m_dragIndex)).angle;
+    m_pressAngle = angleOf(event->position() - toWidget(m_dragStartBounds).center());
     m_pressTwips = toTwips(event->position());
     m_dragMoved = false;
 }
@@ -590,19 +624,34 @@ void LabelView::mouseMoveEvent(QMouseEvent *event)
     }
     if (!m_dragDocument) {
         const Handle handle = handleAt(event->position());
-        if (handle == TopLeft || handle == BottomRight) {
-            setCursor(Qt::SizeFDiagCursor);
-        } else if (handle == TopRight || handle == BottomLeft) {
-            setCursor(Qt::SizeBDiagCursor);
-        } else if (handle == Top || handle == Bottom) {
-            setCursor(Qt::SizeVerCursor);
-        } else if (handle == Left || handle == Right) {
-            setCursor(Qt::SizeHorCursor);
+        if (handle == Rotate) {
+            setCursor(Qt::OpenHandCursor);
+        } else if (handle != NoHandle) {
+            // The resize cursor nearest the handle's direction from the
+            // centre, which turns with the object.
+            const ObjectBase &base = objectBase(m_editor->document().objects.at(m_editor->selection()));
+            const qreal direction = std::fmod(angleOf(handleRects(base).at(handle).center() - toWidget(base.bounds).center()) + 360.0, 180.0);
+            static const Qt::CursorShape shapes[] = {Qt::SizeHorCursor, Qt::SizeBDiagCursor, Qt::SizeVerCursor, Qt::SizeFDiagCursor};
+            setCursor(shapes[int(std::round(direction / 45)) % 4]);
         } else {
             const int index = objectAt(event->position());
             const bool movable = index >= 0 && !m_editor->document().tape && !m_editor->document().isLocked(index);
             setCursor(movable ? Qt::SizeAllCursor : Qt::ArrowCursor);
         }
+        return;
+    }
+
+    // Turning: the object follows the mouse round its centre.
+    if (m_dragHandle == Rotate) {
+        qreal angle = m_dragStartAngle + angleOf(event->position() - toWidget(m_dragStartBounds).center()) - m_pressAngle;
+        if (event->modifiers() & Qt::ShiftModifier) {
+            angle = std::round(angle / SnapAngle) * SnapAngle;
+        }
+        angle = normalisedAngle(angle);
+        objectBase(m_dragDocument->objects[m_dragIndex]).angle = std::abs(angle) < 0.05 ? 0 : angle;
+        m_dragMoved = true;
+        m_angleShownAt = event->position();
+        update();
         return;
     }
 
@@ -612,36 +661,65 @@ void LabelView::mouseMoveEvent(QMouseEvent *event)
     }
     m_dragMoved = true;
 
-    QRectF bounds = m_dragStartBounds;
-    switch (m_dragHandle) {
-    case NoHandle:
-        bounds.translate(delta);
-        break;
-    case TopLeft:
-        bounds.setTopLeft(bounds.topLeft() + delta);
-        break;
-    case Top:
-        bounds.setTop(bounds.top() + delta.y());
-        break;
-    case TopRight:
-        bounds.setTopRight(bounds.topRight() + delta);
-        break;
-    case Right:
-        bounds.setRight(bounds.right() + delta.x());
-        break;
-    case BottomRight:
-        bounds.setBottomRight(bounds.bottomRight() + delta);
-        break;
-    case Bottom:
-        bounds.setBottom(bounds.bottom() + delta.y());
-        break;
-    case BottomLeft:
-        bounds.setBottomLeft(bounds.bottomLeft() + delta);
-        break;
-    case Left:
-        bounds.setLeft(bounds.left() + delta.x());
-        break;
+    // The handle's side or corner follows the mouse.
+    const auto resized = [this](QRectF r, const QPointF &d) {
+        switch (m_dragHandle) {
+        case NoHandle:
+            r.translate(d);
+            break;
+        case TopLeft:
+            r.setTopLeft(r.topLeft() + d);
+            break;
+        case Top:
+            r.setTop(r.top() + d.y());
+            break;
+        case TopRight:
+            r.setTopRight(r.topRight() + d);
+            break;
+        case Right:
+            r.setRight(r.right() + d.x());
+            break;
+        case BottomRight:
+            r.setBottomRight(r.bottomRight() + d);
+            break;
+        case Bottom:
+            r.setBottom(r.bottom() + d.y());
+            break;
+        case BottomLeft:
+            r.setBottomLeft(r.bottomLeft() + d);
+            break;
+        case Left:
+            r.setLeft(r.left() + d.x());
+            break;
+        case Rotate:
+            break;
+        }
+        return r;
+    };
+    const auto keepThin = [this](QRectF r) {
+        // Objects already thinner than the minimum, such as lines, keep their
+        // thickness instead of jumping to it.
+        r = r.normalized();
+        r.setWidth(std::max(r.width(), std::min(MinimumSize, m_dragStartBounds.width())));
+        r.setHeight(std::max(r.height(), std::min(MinimumSize, m_dragStartBounds.height())));
+        return r;
+    };
+
+    // At an angle the sides are the object's own: resize in its turned
+    // frame, and move the box so the side across from the handle stays.
+    if (m_dragHandle != NoHandle && m_dragStartAngle != 0) {
+        QTransform turn;
+        turn.rotate(-m_dragStartAngle);
+        const QSizeF size = m_dragStartBounds.size();
+        const QRectF local = keepThin(resized(QRectF(QPointF(-size.width() / 2, -size.height() / 2), size), turn.inverted().map(delta)));
+        QRectF bounds(QPointF(0, 0), local.size());
+        bounds.moveCenter(m_dragStartBounds.center() + turn.map(local.center()));
+        objectBase(m_dragDocument->objects[m_dragIndex]).bounds = bounds;
+        update();
+        return;
     }
+
+    QRectF bounds = resized(m_dragStartBounds, delta);
     // Edges that move go onto the grid; Alt places freely.
     if (m_snapToGrid && !(event->modifiers() & Qt::AltModifier)) {
         const auto snap = [this](qreal value) {
@@ -664,11 +742,7 @@ void LabelView::mouseMoveEvent(QMouseEvent *event)
             }
         }
     }
-    bounds = bounds.normalized();
-    // Objects already thinner than the minimum, such as lines, keep their
-    // thickness instead of jumping to it.
-    bounds.setWidth(std::max(bounds.width(), std::min(MinimumSize, m_dragStartBounds.width())));
-    bounds.setHeight(std::max(bounds.height(), std::min(MinimumSize, m_dragStartBounds.height())));
+    bounds = keepThin(bounds);
 
     if (m_dragHandle == NoHandle) {
         // Everything moves as far as the object under the mouse.
@@ -697,8 +771,11 @@ void LabelView::mouseReleaseEvent(QMouseEvent *event)
     }
     const LabelDocument result = *m_dragDocument;
     m_dragDocument.reset();
+    m_angleShownAt.reset();
     if (m_dragMoved) {
-        const QString description = m_dragHandle != NoHandle ? i18n("Resize Object") : (m_dragIndices.size() > 1 ? i18n("Move Objects") : i18n("Move Object"));
+        const QString description = m_dragHandle == Rotate ? i18n("Turn Object")
+            : m_dragHandle != NoHandle                    ? i18n("Resize Object")
+                                                          : (m_dragIndices.size() > 1 ? i18n("Move Objects") : i18n("Move Object"));
         m_editor->apply(result, description, m_editor->selectedObjects());
     }
     update();

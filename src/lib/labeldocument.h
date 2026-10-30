@@ -13,6 +13,7 @@
 #include <QList>
 #include <QMarginsF>
 #include <QPainterPath>
+#include <QTransform>
 #include <QRectF>
 #include <QString>
 
@@ -320,8 +321,12 @@ using LabelObject =
     std::variant<TextObject, AddressObject, BarcodeObject, ImageObject, ShapeObject, CounterObject, DateTimeObject, CircularTextObject, UnknownObject>;
 
 const ObjectBase &objectBase(const LabelObject &object);
+/** Turns points of the object's box by its angle about the box's centre, on the canvas. */
+QTransform objectTurn(const ObjectBase &object);
 /** The object's box as turned by its angle, on the canvas. */
 QPolygonF objectOutline(const ObjectBase &object);
+/** @p degrees as an angle from -180 up to 180. */
+qreal normalisedAngle(qreal degrees);
 ObjectBase &objectBase(LabelObject &object);
 
 /** How long a tape cell is along its parent's direction (DLS's LengthMode). */

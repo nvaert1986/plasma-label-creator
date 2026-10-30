@@ -45,6 +45,7 @@
 #include <KSharedConfig>
 #include <KStandardAction>
 #include <KToggleAction>
+#include <KToolBar>
 #include <KXMLGUIFactory>
 #include <QAction>
 #include <QActionGroup>
@@ -55,6 +56,7 @@
 #include <QDialogButtonBox>
 #include <QDir>
 #include <QDoubleSpinBox>
+#include <QWidgetAction>
 #include <QFile>
 #include <QFileDialog>
 #include <QFileInfo>

@@ -118,14 +118,30 @@ QString DateTimeObject::text(const QDateTime &when) const
     return preText + result + postText;
 }
 
-QPolygonF objectOutline(const ObjectBase &object)
+QTransform objectTurn(const ObjectBase &object)
 {
     // Counter-clockwise on screen is a negative angle with y downwards.
     QTransform turn;
     turn.translate(object.bounds.center().x(), object.bounds.center().y());
     turn.rotate(-object.angle);
     turn.translate(-object.bounds.center().x(), -object.bounds.center().y());
-    return turn.map(QPolygonF(object.bounds));
+    return turn;
+}
+
+QPolygonF objectOutline(const ObjectBase &object)
+{
+    return objectTurn(object).map(QPolygonF(object.bounds));
+}
+
+qreal normalisedAngle(qreal degrees)
+{
+    degrees = std::fmod(degrees, 360.0);
+    if (degrees > 180) {
+        degrees -= 360;
+    } else if (degrees <= -180) {
+        degrees += 360;
+    }
+    return degrees;
 }
 
 const ObjectBase &objectBase(const LabelObject &object)
