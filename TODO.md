@@ -35,7 +35,10 @@ Done for layers, angles, calculated fields, shared counters, the GS1
 builder and roll layouts: two-digit years in field dates (read as 1926),
 `{Time}` offsets (hours added), stale layer names from files and pastes,
 no wait cursor while waiting for a shared counter; tests added for Rotate
-Label with objects at an angle. Clean rebuild without warnings.
+Label with objects at an angle. Clean rebuild without warnings. clang-tidy
+(bugprone, performance, clang-analyzer) over all sources: 49 findings, 25
+fixed; the 24 left are checked: optionals guarded by an earlier test,
+positive-only rounding of bar widths, and Qt-parented objects.
 
 ## Bug review (2026-10-30)
 

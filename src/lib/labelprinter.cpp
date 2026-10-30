@@ -664,6 +664,9 @@ int LabelPrinter::print(const QList<LabelDocument> &labels, const Options &optio
         return 0;
     }
     const auto paper = paperFor(labels.constFirst());
+    if (!paper) {
+        return 0; // pages() found it, so this does not happen
+    }
 
     char fileName[1024];
     const int fd = cupsTempFd(fileName, sizeof(fileName));

@@ -437,7 +437,7 @@ void readExtensions(const QByteArray &data, LabelDocument &document, QStringList
         warnings << u"Ignoring this program's settings in the file: %1"_s.arg(error.errorString());
         return;
     }
-    for (const QJsonValue &value : root[u"questions"_s].toArray()) {
+    for (const auto &value : root[u"questions"_s].toArray()) {
         const QJsonObject q = value.toObject();
         PrintQuestion question;
         question.name = q[u"name"_s].toString();
@@ -458,7 +458,7 @@ void readExtensions(const QByteArray &data, LabelDocument &document, QStringList
         }
     }
     // Objects were read in the order the file lists them.
-    for (const QJsonValue &value : root[u"objects"_s].toArray()) {
+    for (const auto &value : root[u"objects"_s].toArray()) {
         const QJsonObject o = value.toObject();
         const int at = o[u"at"_s].toInt(-1);
         if (at < 0 || at >= document.objects.size()) {
@@ -470,14 +470,14 @@ void readExtensions(const QByteArray &data, LabelDocument &document, QStringList
     document.roll.across = std::clamp(roll[u"across"_s].toInt(1), 1, 20);
     document.roll.gapMm = std::clamp(roll[u"gap"_s].toDouble(), 0.0, 100.0);
     document.roll.continuous = roll[u"continuous"_s].toBool();
-    for (const QJsonValue &value : root[u"calculated"_s].toArray()) {
+    for (const auto &value : root[u"calculated"_s].toArray()) {
         const QJsonObject c = value.toObject();
         const CalculatedField field{c[u"name"_s].toString(), c[u"expression"_s].toString()};
         if (!field.name.isEmpty()) {
             document.calculated << field;
         }
     }
-    for (const QJsonValue &value : root[u"layers"_s].toArray()) {
+    for (const auto &value : root[u"layers"_s].toArray()) {
         const QJsonObject l = value.toObject();
         Layer layer;
         layer.name = l[u"name"_s].toString();

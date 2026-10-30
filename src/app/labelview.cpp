@@ -403,9 +403,11 @@ void LabelView::paintEvent(QPaintEvent *)
         }
         const QSizeF canvas = document.canvasSize();
         QPolygonF points;
-        for (qreal y = 0; y <= canvas.height(); y += step) {
-            for (qreal x = 0; x <= canvas.width(); x += step) {
-                points << labelOrigin() + QPointF(x, y) * scale();
+        const int columns = int(canvas.width() / step);
+        const int rows = int(canvas.height() / step);
+        for (int row = 0; row <= rows; ++row) {
+            for (int column = 0; column <= columns; ++column) {
+                points << labelOrigin() + QPointF(column * step, row * step) * scale();
             }
         }
         painter.setPen(QPen(QColor(0, 0, 0, 90), 1.5));

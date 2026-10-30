@@ -229,7 +229,7 @@ std::optional<Value> applyFilter(Value value, const QString &filter)
 QString baseName(const QString &expression, QChar *sign = nullptr, int *amount = nullptr, QChar *unit = nullptr)
 {
     static const QRegularExpression withOffset(u"^(.*?)\\s*([+-])\\s*(\\d+)\\s*([dwmyhDWMYH]?)$"_s);
-    const QString head = expression.section(u'|', 0, 0).trimmed();
+    QString head = expression.section(u'|', 0, 0).trimmed();
     const QRegularExpressionMatch match = withOffset.match(head);
     if (!match.hasMatch() || match.captured(1).isEmpty()) {
         return head;
@@ -252,7 +252,11 @@ std::optional<QString> evaluate(const QString &expression, const QHash<QString, 
         int amount = 0;
         QChar unit;
         const QString name = baseName(expression, &sign, &amount, &unit);
-        if (sign.isNull() || !(value = lookUp(name, values, now))) {
+        if (sign.isNull()) {
+            return std::nullopt;
+        }
+        value = lookUp(name, values, now);
+        if (!value) {
             return std::nullopt;
         }
         value = offset(*value, sign, amount, unit);

@@ -243,15 +243,12 @@ void MainWindow::setSelectedAlignment(std::optional<HorizontalAlignment> horizon
         std::visit(
             [&](auto &o) {
                 using T = std::decay_t<decltype(o)>;
-                if constexpr (std::is_same_v<T, TextObject> || std::is_same_v<T, AddressObject>) {
+                if constexpr (std::is_same_v<T, TextObject> || std::is_same_v<T, AddressObject> || std::is_same_v<T, ImageObject>) {
                     o.horizontalAlignment = horizontal.value_or(o.horizontalAlignment);
                     o.verticalAlignment = vertical.value_or(o.verticalAlignment);
                 } else if constexpr (std::is_same_v<T, CounterObject> || std::is_same_v<T, DateTimeObject>) {
                     o.layout.horizontalAlignment = horizontal.value_or(o.layout.horizontalAlignment);
                     o.layout.verticalAlignment = vertical.value_or(o.layout.verticalAlignment);
-                } else if constexpr (std::is_same_v<T, ImageObject>) {
-                    o.horizontalAlignment = horizontal.value_or(o.horizontalAlignment);
-                    o.verticalAlignment = vertical.value_or(o.verticalAlignment);
                 } else if constexpr (std::is_same_v<T, BarcodeObject>) {
                     o.horizontalAlignment = horizontal.value_or(o.horizontalAlignment);
                 } else if constexpr (std::is_same_v<T, CircularTextObject>) {

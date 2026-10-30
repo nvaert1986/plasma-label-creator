@@ -29,7 +29,8 @@ QList<PaperSize> all()
         if (!file.open(QIODevice::ReadOnly)) {
             return list;
         }
-        for (const QJsonValue &value : QJsonDocument::fromJson(file.readAll()).array()) {
+        const QJsonArray entries = QJsonDocument::fromJson(file.readAll()).array();
+        for (const auto &value : entries) {
             const QJsonObject label = value.toObject();
             const QString product = label.value("product"_L1).toString();
             const qreal width = label.value("width"_L1).toDouble();

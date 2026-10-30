@@ -196,7 +196,8 @@ void Gs1Dialog::update()
             right = false;
         } else {
             const auto *typed = qobject_cast<QLineEdit *>(m_table->cellWidget(row, Value));
-            const bool added = typed && typed->text().trimmed() != all.at(row).value;
+            // Only a listed identifier with a check digit gets one added.
+            const bool added = id && typed && typed->text().trimmed() != all.at(row).value;
             check->setText(added ? i18n("%1; check digit %2 added", id->format(), all.at(row).value.back())
                                  : (id ? id->format() : i18n("Not listed: only its characters are checked")));
             check->setIcon(QIcon::fromTheme(u"dialog-ok"_s));

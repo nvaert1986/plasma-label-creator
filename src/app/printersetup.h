@@ -34,6 +34,6 @@ void addQueue(QObject *context,
               const QString &deviceUri,
               const QString &ppdName,
               const QString &description,
-              std::function<void(const QString &error)> done);
+              const std::function<void(const QString &error)> &done);
 
 } // namespace PrinterSetup

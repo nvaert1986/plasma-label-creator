@@ -71,10 +71,10 @@ struct RackMarkers {
     LabelFont font;
 };
 
-LabelDocument cableWrap(LabelDocument base, const CableWrap &kind);
-LabelDocument cableFlag(LabelDocument base, const CableFlag &kind);
-LabelDocument ports(LabelDocument base, const Ports &kind);
-LabelDocument rackMarkers(LabelDocument base, const RackMarkers &kind);
+LabelDocument cableWrap(const LabelDocument &base, const CableWrap &kind);
+LabelDocument cableFlag(const LabelDocument &base, const CableFlag &kind);
+LabelDocument ports(const LabelDocument &base, const Ports &kind);
+LabelDocument rackMarkers(const LabelDocument &base, const RackMarkers &kind);
 
 /** The text of port @p index (from 0, in tape order) of @p kind. */
 QString portText(const Ports &kind, int index);

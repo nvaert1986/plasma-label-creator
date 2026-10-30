@@ -53,7 +53,7 @@ QList<RecentLayout> RecentLayouts::readIndex() const
     QList<RecentLayout> layouts;
     const QDir directory(m_directory);
     const QJsonArray entries = QJsonDocument::fromJson(readAll(directory.filePath(IndexName))).array();
-    for (const QJsonValue &value : entries) {
+    for (const auto &value : entries) {
         const QJsonObject entry = value.toObject();
         RecentLayout layout;
         layout.title = entry.value("title"_L1).toString();

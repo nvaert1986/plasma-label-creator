@@ -98,7 +98,7 @@ qreal lineHeight(const LabelFont &font)
 
 } // namespace
 
-LabelDocument cableWrap(LabelDocument base, const CableWrap &kind)
+LabelDocument cableWrap(const LabelDocument &base, const CableWrap &kind)
 {
     const qreal circumference = std::max(twips(10), twips(M_PI * kind.diameterMm));
     const qreal pitch = lineHeight(kind.font) * 1.4;
@@ -124,7 +124,7 @@ LabelDocument cableWrap(LabelDocument base, const CableWrap &kind)
     return document;
 }
 
-LabelDocument cableFlag(LabelDocument base, const CableFlag &kind)
+LabelDocument cableFlag(const LabelDocument &base, const CableFlag &kind)
 {
     const qreal around = twips(M_PI * kind.diameterMm);
     if (base.tape) {
@@ -167,7 +167,7 @@ QString portText(const Ports &kind, int index)
     return text;
 }
 
-LabelDocument ports(LabelDocument base, const Ports &kind)
+LabelDocument ports(const LabelDocument &base, const Ports &kind)
 {
     const int count = std::max(1, kind.count);
     const qreal pitch = twips(kind.pitchMm);
@@ -210,7 +210,7 @@ LabelDocument ports(LabelDocument base, const Ports &kind)
     return document;
 }
 
-LabelDocument rackMarkers(LabelDocument base, const RackMarkers &kind)
+LabelDocument rackMarkers(const LabelDocument &base, const RackMarkers &kind)
 {
     const int first = std::min(kind.firstUnit, kind.lastUnit);
     const int last = std::max(kind.firstUnit, kind.lastUnit);

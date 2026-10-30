@@ -109,7 +109,7 @@ public:
         m_original = font;
     }
 
-    LabelFont font() const
+    LabelFont labelFont() const
     {
         LabelFont font = m_original;
         // Keep the stored family if the user did not pick another one, even
@@ -332,7 +332,7 @@ bool editObjectProperties(QWidget *parent, LabelObject &object, TapeCell *cell)
             text->useFullFontHeight = fullHeight->isChecked();
             text->wrap = wrap->isChecked();
             const QString newText = edit->toPlainText();
-            const LabelFont newFont = font->font();
+            const LabelFont newFont = font->labelFont();
             if (newText != originalText || !(newFont == originalFont)) {
                 const QColor color = text->spans.isEmpty() ? QColor(Qt::black) : text->spans.constFirst().color;
                 text->spans = {{newText, newFont, color}};
@@ -391,7 +391,7 @@ bool editObjectProperties(QWidget *parent, LabelObject &object, TapeCell *cell)
             barcode->text = data->text();
             barcode->size = comboValue<BarcodeSize>(barSize);
             barcode->textPosition = comboValue<BarcodeTextPosition>(textPosition);
-            barcode->textFont = font->font();
+            barcode->textFont = font->labelFont();
             barcode->horizontalAlignment = comboValue<HorizontalAlignment>(alignment);
         };
     } else if (auto *image = std::get_if<ImageObject>(&object)) {
@@ -530,7 +530,7 @@ bool editObjectProperties(QWidget *parent, LabelObject &object, TapeCell *cell)
             counter->formatWidth = width->value();
             counter->useLeadingZeros = zeros->isChecked();
             counter->sharedFile = sharedFile->text().trimmed();
-            counter->font = font->font();
+            counter->font = font->labelFont();
             counter->layout.horizontalAlignment = comboValue<HorizontalAlignment>(horizontal);
         };
     } else if (auto *date = std::get_if<DateTimeObject>(&object)) {
@@ -572,7 +572,7 @@ bool editObjectProperties(QWidget *parent, LabelObject &object, TapeCell *cell)
             date->culture = culture->text().trimmed();
             date->preText = preText->text();
             date->postText = postText->text();
-            date->font = font->font();
+            date->font = font->labelFont();
             date->layout.horizontalAlignment = comboValue<HorizontalAlignment>(horizontal);
         };
     } else if (auto *curved = std::get_if<CircularTextObject>(&object)) {
@@ -604,7 +604,7 @@ bool editObjectProperties(QWidget *parent, LabelObject &object, TapeCell *cell)
             curved->circleAlignment = comboValue<CircleAlignment>(start);
             curved->startAngle = angle->value();
             curved->textAlignment = comboValue<HorizontalAlignment>(alignment);
-            curved->font = font->font();
+            curved->font = font->labelFont();
         };
     }
 

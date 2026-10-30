@@ -27,7 +27,7 @@ constexpr int Timeout = 5 * 60 * 1000;
 
 // Calls a cups-pk-helper method, which answers with an error text that is
 // empty on success, then continues with @p next.
-void call(QObject *context, const QString &method, const QVariantList &arguments, std::function<void(const QString &error)> next)
+void call(QObject *context, const QString &method, const QVariantList &arguments, const std::function<void(const QString &error)> &next)
 {
     QDBusMessage message = QDBusMessage::createMethodCall(Service, u"/"_s, Service, method);
     message.setArguments(arguments);
@@ -64,7 +64,7 @@ void addQueue(QObject *context,
               const QString &deviceUri,
               const QString &ppdName,
               const QString &description,
-              std::function<void(const QString &error)> done)
+              const std::function<void(const QString &error)> &done)
 {
     call(context, u"PrinterAdd"_s, {name, deviceUri, ppdName, description, QString()}, [context, name, done](const QString &error) {
         if (!error.isEmpty()) {
