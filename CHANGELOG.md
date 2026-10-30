@@ -13,7 +13,11 @@
   the selection or takes it out again; dragging over empty space selects
   the objects inside the band; Edit > Select All. Dragging, the arrow keys,
   Delete, Cut, Copy, Paste, Duplicate, Bring to Front, Send to Back,
-  Position on Label and the format toolbar then work on all of them.
+  Position on Label and the format toolbar then work on all of them. Undo
+  and redo bring the selection back with the change.
+- **Copy and paste several objects**, also between windows: they keep
+  their places to each other, and other programs get their texts, one per
+  line. Pasted or duplicated groups become new groups.
 - **Align and distribute** (Layout > Align Objects): line the selected
   objects up along their left, right, top or bottom edges or their centres,
   or space three or more evenly across or down.
@@ -26,7 +30,8 @@
 - **Text that wraps** (Format > Wrap Text, or "Wrap long lines" in the
   properties): long lines break at spaces to the box's width, and words too
   long for a line break inside. With Shrink to Fit or Always Fit the text
-  takes the largest size at which its wrapped lines fit the box.
+  takes the largest size at which its wrapped lines fit the box. Editing
+  the text on the label wraps the same way.
 - Locks and wrapping are kept in the `.label` file's comment, which other
   label software ignores.
 
@@ -36,12 +41,16 @@
   Twistlabels) from the catalogue show their printable white strip: the
   rest of the label is shaded on the canvas. The strip's length comes from
   Altec's article codes; it is placed at the end that leaves the printer
-  first.
+  first, which is still to be confirmed on paper.
 
 ### Other
 
 - The desktop entry now says the program supports LabelManager and ZPL
   printers too.
+- The main window's code is split into files by topic (files, format,
+  data, objects, printing); no change in use.
+- New tests for arranging objects, selecting several on the canvas,
+  wrapping text and the Altec wrap labels.
 
 ## 0.2.0 (2026-10-29)
 
