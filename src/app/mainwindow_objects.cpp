@@ -173,10 +173,11 @@ void MainWindow::positionObject(Qt::Alignment alignment)
     QList<int> movable;
     QRectF around;
     for (const int index : m_editor->selectedObjects()) {
-        const ObjectBase &base = objectBase(document.objects.at(index));
         if (!document.isLocked(index)) {
+            // What shows: an object at an angle reaches beyond its box.
+            const QRectF bounds = objectOutline(objectBase(document.objects.at(index))).boundingRect();
             movable << index;
-            around = around.isNull() ? base.bounds : around.united(base.bounds);
+            around = around.isNull() ? bounds : around.united(bounds);
         }
     }
     if (movable.isEmpty()) {

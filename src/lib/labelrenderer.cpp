@@ -797,7 +797,9 @@ void LabelRenderer::paintObject(QPainter *painter, const LabelObject &object)
     // Work in a box centred on the origin, turned and mirrored as the object
     // is; a quarter turn swaps its width and height.
     painter->translate(base.bounds.center());
-    painter->rotate(rotationDegrees(base.rotation));
+    // The object's own angle turns its box; its quarter turn, inside the
+    // box, turns what it shows. Both counter-clockwise.
+    painter->rotate(-base.angle + rotationDegrees(base.rotation));
     if (base.mirrored) {
         painter->scale(-1, 1);
     }

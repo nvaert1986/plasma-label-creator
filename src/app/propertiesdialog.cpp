@@ -236,12 +236,22 @@ bool editObjectProperties(QWidget *parent, LabelObject &object, TapeCell *cell)
                                 {i18n("180°"), int(Rotation::Rotation180)},
                                 {i18n("90° clockwise"), int(Rotation::Rotation270)}},
                                int(base.rotation));
+    // Any angle, turning the whole object; other label software shows the
+    // object without it.
+    auto *angle = new QDoubleSpinBox;
+    angle->setRange(-180, 180);
+    angle->setDecimals(1);
+    angle->setSingleStep(5);
+    angle->setSuffix(i18nc("degrees", "°"));
+    angle->setToolTip(i18n("Turns the whole object about its centre, counter-clockwise; negative values turn it clockwise"));
+    angle->setValue(base.angle);
     auto *mirrored = new QCheckBox(i18n("Mirror"));
     mirrored->setChecked(base.mirrored);
     generalForm->addRow(i18n("Name:"), name);
     generalForm->addRow(i18n("Position (x, y):"), position);
     generalForm->addRow(i18n("Size (w, h):"), size);
     generalForm->addRow(i18n("Rotation:"), rotation);
+    generalForm->addRow(i18n("Angle:"), angle);
     generalForm->addRow(QString(), mirrored);
 
     // On tape, the object's cell places and sizes it; the cell is set here.
@@ -593,6 +603,9 @@ bool editObjectProperties(QWidget *parent, LabelObject &object, TapeCell *cell)
         cell->borderWidth = Units::pointsToTwips(border->value());
     }
     base.rotation = comboValue<Rotation>(rotation);
+    if (std::abs(angle->value() - base.angle) > 0.05) { // shown to 0.1 degree
+        base.angle = angle->value();
+    }
     base.mirrored = mirrored->isChecked();
     if (applySpecific) {
         applySpecific();

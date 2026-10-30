@@ -314,6 +314,15 @@ QRectF LabelView::toWidget(const QRectF &twips) const
     return QRectF(labelOrigin() + twips.topLeft() * scale(), twips.size() * scale());
 }
 
+QPolygonF LabelView::toWidget(const QPolygonF &twips) const
+{
+    QPolygonF widget;
+    for (const QPointF &point : twips) {
+        widget << labelOrigin() + point * scale();
+    }
+    return widget;
+}
+
 QList<QRectF> LabelView::handleRects(const QRectF &bounds) const
 {
     const QRectF r = toWidget(bounds);
@@ -338,8 +347,9 @@ LabelView::Handle LabelView::handleAt(const QPointF &pos) const
 {
     const int selection = m_editor->selection();
     // On tape, cells place and size the objects. Only a single object that
-    // is not locked has handles.
-    if (selection < 0 || shownDocument().tape || m_editor->selectedObjects().size() != 1 || shownDocument().isLocked(selection)) {
+    // is not locked or at an angle (whose sides are not the box's) has handles.
+    if (selection < 0 || shownDocument().tape || m_editor->selectedObjects().size() != 1 || shownDocument().isLocked(selection)
+        || objectBase(shownDocument().objects.at(selection)).angle != 0) {
         return NoHandle;
     }
     const QList<QRectF> rects = handleRects(objectBase(shownDocument().objects.at(selection)).bounds);
@@ -358,7 +368,13 @@ int LabelView::objectAt(const QPointF &pos) const
     // Topmost first; thin lines get some slack so they can be grabbed.
     const qreal slack = 3 / scale();
     for (qsizetype i = objects.size() - 1; i >= 0; --i) {
-        if (shownDocument().isSelectable(int(i)) && objectBase(objects.at(i)).bounds.adjusted(-slack, -slack, slack, slack).contains(twips)) {
+        if (!shownDocument().isSelectable(int(i))) {
+            continue;
+        }
+        const ObjectBase &base = objectBase(objects.at(i));
+        const bool hit = base.angle == 0 ? base.bounds.adjusted(-slack, -slack, slack, slack).contains(twips)
+                                         : objectOutline(base).containsPoint(twips, Qt::OddEvenFill);
+        if (hit) {
             return int(i);
         }
     }
@@ -415,7 +431,7 @@ void LabelView::paintEvent(QPaintEvent *)
     painter.setPen(QPen(QColor(0, 0, 0, 50), 0, Qt::DotLine));
     for (int i = 0; i < document.objects.size(); ++i) {
         if (document.isShown(i)) {
-            painter.drawRect(toWidget(objectBase(document.objects.at(i)).bounds));
+            painter.drawPolygon(toWidget(objectOutline(objectBase(document.objects.at(i)))));
         }
     }
 
@@ -431,18 +447,19 @@ void LabelView::paintEvent(QPaintEvent *)
         const ObjectBase &base = objectBase(document.objects.at(index));
         painter.setBrush(Qt::NoBrush);
         painter.setPen(QPen(highlight, index == m_editor->selection() ? 1.5 : 1));
-        painter.drawRect(toWidget(base.bounds));
+        painter.drawPolygon(toWidget(objectOutline(base)));
         if (Arrange::isGrouped(document, index) && !groupsDrawn.contains(*base.groupId)) {
             groupsDrawn << *base.groupId;
             QRectF around;
             for (const int member : Arrange::withGroups(document, {index})) {
-                around = around.isNull() ? objectBase(document.objects.at(member)).bounds : around.united(objectBase(document.objects.at(member)).bounds);
+                const QRectF bounds = objectOutline(objectBase(document.objects.at(member))).boundingRect();
+                around = around.isNull() ? bounds : around.united(bounds);
             }
             painter.setPen(QPen(highlight, 1, Qt::DashLine));
             painter.drawRect(toWidget(around).adjusted(-3, -3, 3, 3));
         }
         if (base.locked) {
-            const QRectF frame = toWidget(base.bounds);
+            const QRectF frame = toWidget(objectOutline(base)).boundingRect();
             const QRectF padlock(frame.right() - 14, frame.top() + 2, 12, 12);
             const QIcon icon = QIcon::fromTheme(u"object-locked"_s);
             if (!icon.isNull()) {
@@ -457,7 +474,7 @@ void LabelView::paintEvent(QPaintEvent *)
             }
         }
     }
-    if (selected.size() == 1 && !document.tape && !document.isLocked(selected.constFirst())) {
+    if (selected.size() == 1 && !document.tape && !document.isLocked(selected.constFirst()) && objectBase(document.objects.at(selected.constFirst())).angle == 0) {
         painter.setPen(QPen(highlight, 1));
         painter.setBrush(palette().color(QPalette::Base));
         for (const QRectF &handle : handleRects(objectBase(document.objects.at(selected.constFirst())).bounds)) {
@@ -561,7 +578,7 @@ void LabelView::mouseMoveEvent(QMouseEvent *event)
         QList<int> enclosed;
         const auto &objects = m_editor->document().objects;
         for (int i = 0; i < objects.size(); ++i) {
-            if (m_editor->document().isSelectable(i) && band.contains(objectBase(objects.at(i)).bounds)) {
+            if (m_editor->document().isSelectable(i) && band.contains(objectOutline(objectBase(objects.at(i))).boundingRect())) {
                 enclosed << i;
             }
         }

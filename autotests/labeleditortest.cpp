@@ -461,6 +461,32 @@ private Q_SLOTS:
         QCOMPARE(editor.selectedObjects(), QList<int>{0});
     }
 
+    void objectsAtAnAngleAreHitWhereTheyShow()
+    {
+        LabelDocument document = addressLabel();
+        document.objects.clear();
+        ShapeObject bar;
+        bar.bounds = QRectF(1000, 600, 1600, 200);
+        bar.angle = 45;
+        document.objects << bar;
+        LabelEditor editor;
+        editor.reset(document);
+        LabelView view(&editor);
+        view.resize(800, 400);
+        view.show();
+        QVERIFY(QTest::qWaitForWindowExposed(&view));
+        view.setZoom(1.0);
+        const auto at = [&](const QPointF &twips) {
+            return (view.labelOrigin() + twips * view.scale()).toPoint();
+        };
+        // Inside the box but off the turned bar: nothing; on the bar above
+        // the box: the bar.
+        QTest::mouseClick(&view, Qt::LeftButton, {}, at(QPointF(1050, 650)));
+        QCOMPARE(editor.selection(), -1);
+        QTest::mouseClick(&view, Qt::LeftButton, {}, at(QPointF(2200, 300)));
+        QCOMPARE(editor.selection(), 0);
+    }
+
     void severalObjectsCopyWithTheirGroup()
     {
         LabelDocument document = addressLabel();

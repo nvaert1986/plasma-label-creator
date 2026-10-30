@@ -162,6 +162,12 @@ struct ObjectBase {
     QString layer;
     /** False for an object only to design with, such as a picture of the product. */
     bool printed = true;
+    /**
+     * Turns the whole object, box and all, this many degrees counter-clockwise
+     * (-180 to 180) about its centre, on top of its quarter turn. Not in DLS's
+     * format, which shows the object without it: kept in the settings comment.
+     */
+    qreal angle = 0;
 
     bool operator==(const ObjectBase &) const = default;
 };
@@ -308,6 +314,8 @@ using LabelObject =
     std::variant<TextObject, AddressObject, BarcodeObject, ImageObject, ShapeObject, CounterObject, DateTimeObject, CircularTextObject, UnknownObject>;
 
 const ObjectBase &objectBase(const LabelObject &object);
+/** The object's box as turned by its angle, on the canvas. */
+QPolygonF objectOutline(const ObjectBase &object);
 ObjectBase &objectBase(LabelObject &object);
 
 /** How long a tape cell is along its parent's direction (DLS's LengthMode). */

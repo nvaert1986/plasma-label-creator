@@ -303,6 +303,9 @@ QJsonObject objectExtensions(const LabelObject &object)
     if (!base.printed) {
         o[u"print"_s] = false;
     }
+    if (base.angle != 0) {
+        o[u"angle"_s] = base.angle;
+    }
     return o;
 }
 
@@ -312,6 +315,7 @@ void applyObjectExtensions(LabelObject &object, const QJsonObject &o)
     base.locked = o[u"locked"_s].toBool();
     base.layer = o[u"layer"_s].toString();
     base.printed = o[u"print"_s].toBool(true);
+    base.angle = std::clamp(o[u"angle"_s].toDouble(), -180.0, 180.0);
     if (TextObject *text = textOf(object)) {
         text->wrap = o[u"wrap"_s].toBool();
     }

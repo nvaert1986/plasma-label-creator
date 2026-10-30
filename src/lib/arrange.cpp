@@ -31,8 +31,9 @@ QList<Unit> unitsOf(const LabelDocument &document, const QList<int> &indices)
         Unit unit;
         unit.members = isGrouped(document, index) ? withGroups(document, {index}) : QList<int>{index};
         for (const int member : std::as_const(unit.members)) {
-            const ObjectBase &base = objectBase(document.objects.at(member));
-            unit.bounds = unit.bounds.isNull() ? base.bounds : unit.bounds.united(base.bounds);
+            // What shows: an object at an angle reaches beyond its box.
+            const QRectF bounds = objectOutline(objectBase(document.objects.at(member))).boundingRect();
+            unit.bounds = unit.bounds.isNull() ? bounds : unit.bounds.united(bounds);
             unit.locked = unit.locked || document.isLocked(member);
             done << member;
         }

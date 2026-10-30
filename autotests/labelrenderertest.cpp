@@ -273,6 +273,40 @@ private Q_SLOTS:
         QCOMPARE(screen.renderImage(document, Dpi).pixelColor(toDots(box.bounds).center()), QColor(Qt::white));
     }
 
+    void objectsTurnToAnyAngle()
+    {
+        ShapeObject bar;
+        bar.shapeType = ShapeType::Rectangle;
+        bar.fillColor = Qt::black;
+        bar.bounds = QRectF(1000, 1000, 1200, 100);
+        LabelDocument document = singleObject(bar);
+        LabelRenderer renderer(LabelRenderer::Mode::Print);
+        const QRect flat = inkBounds(renderer.renderImage(document, Dpi));
+        QVERIFY(flat.width() > flat.height() * 8);
+
+        // At 45 degrees the bar is about as high as it is wide, rising to the
+        // right (counter-clockwise), centred where it was.
+        objectBase(document.objects[0]).angle = 45;
+        const QImage image = renderer.renderImage(document, Dpi);
+        const QRect turned = inkBounds(image);
+        QVERIFY2(qAbs(turned.width() - turned.height()) <= 2, qPrintable(u"%1 x %2"_s.arg(turned.width()).arg(turned.height())));
+        QVERIFY(qAbs(turned.center().x() - flat.center().x()) <= 2 && qAbs(turned.center().y() - flat.center().y()) <= 2);
+        // On the rising diagonal, not on the falling one.
+        const int quarterWidth = turned.width() / 4;
+        const int quarterHeight = turned.height() / 4;
+        QCOMPARE(image.pixelColor(turned.right() - quarterWidth, turned.top() + quarterHeight).lightness() < 128, true);
+        QCOMPARE(image.pixelColor(turned.left() + quarterWidth, turned.top() + quarterHeight).lightness() < 128, false);
+
+        // The angle turns the box: with a quarter turn as well, the content
+        // is laid out across the box as before, then the box turns.
+        LabelDocument quarter = document;
+        objectBase(quarter.objects[0]).angle = 0;
+        objectBase(quarter.objects[0]).rotation = Rotation::Rotation180;
+        QCOMPARE(inkBounds(renderer.renderImage(quarter, Dpi)), flat);
+        objectBase(quarter.objects[0]).angle = 45;
+        QCOMPARE(inkBounds(renderer.renderImage(quarter, Dpi)), turned);
+    }
+
     void wordsTooWideBreakInside()
     {
         const QRectF bounds(200, 200, 400, 1400);

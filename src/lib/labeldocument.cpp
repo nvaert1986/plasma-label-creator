@@ -11,6 +11,7 @@
 #include "units.h"
 
 #include <QLocale>
+#include <QTransform>
 
 #include <cmath>
 
@@ -115,6 +116,16 @@ QString DateTimeObject::text(const QDateTime &when) const
         result = result.isEmpty() ? time : result + u' ' + time;
     }
     return preText + result + postText;
+}
+
+QPolygonF objectOutline(const ObjectBase &object)
+{
+    // Counter-clockwise on screen is a negative angle with y downwards.
+    QTransform turn;
+    turn.translate(object.bounds.center().x(), object.bounds.center().y());
+    turn.rotate(-object.angle);
+    turn.translate(-object.bounds.center().x(), -object.bounds.center().y());
+    return turn.map(QPolygonF(object.bounds));
 }
 
 const ObjectBase &objectBase(const LabelObject &object)

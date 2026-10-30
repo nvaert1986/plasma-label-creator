@@ -117,6 +117,7 @@ private:
     const LabelCreator::LabelDocument &shownDocument() const;
     QPointF toTwips(const QPointF &widgetPos) const;
     QRectF toWidget(const QRectF &twips) const;
+    QPolygonF toWidget(const QPolygonF &twips) const;
     QList<QRectF> handleRects(const QRectF &bounds) const;
     Handle handleAt(const QPointF &pos) const;
     int objectAt(const QPointF &pos) const;

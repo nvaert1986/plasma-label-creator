@@ -171,6 +171,28 @@ private Q_SLOTS:
         QVERIFY(objectBase(read->objects.at(2)).printed);
     }
 
+    void objectsAtAnAngleLineUpByWhatShows()
+    {
+        // A 400 x 400 box turned 45 degrees reaches about 83 beyond its sides.
+        LabelDocument document = labelWith({{1000, 0, 400, 400}, {0, 1000, 400, 400}});
+        objectBase(document.objects[0]).angle = 45;
+        const QRectF shown = objectOutline(objectBase(document.objects.at(0))).boundingRect();
+        QVERIFY(qAbs(shown.width() - 400 * std::sqrt(2.0)) < 0.01);
+        QVERIFY(Arrange::align(document, {0, 1}, Qt::AlignLeft));
+        QVERIFY(qAbs(objectOutline(objectBase(document.objects.at(0))).boundingRect().left()) < 0.01);
+        QCOMPARE(boundsOf(document, 1).left(), 0.0);
+
+        // Kept in the file.
+        QBuffer buffer;
+        buffer.setData(LabelWriter::toByteArray(document));
+        buffer.open(QIODevice::ReadOnly);
+        LabelReader reader;
+        const auto read = reader.read(&buffer);
+        QVERIFY2(read, qPrintable(reader.errorString()));
+        QCOMPARE(objectBase(read->objects.at(0)).angle, 45.0);
+        QCOMPARE(objectBase(read->objects.at(1)).angle, 0.0);
+    }
+
     void lockAndWrapAreSaved()
     {
         LabelDocument document = labelWith({{100, 100, 200, 100}, {500, 300, 400, 200}});
