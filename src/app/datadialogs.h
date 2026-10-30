@@ -63,6 +63,7 @@ private:
     QTableWidget *m_rows;
     std::optional<DataTable> m_table;
     QList<int> m_initialSelection;
+    bool m_tickAll = false; // after a new load, every row is ticked
 };
 
 /** Edits the questions asked when printing, each with its input rules. */

@@ -18,6 +18,9 @@ bool isGrouped(const LabelDocument &document, int index);
 /** @p indices and every other member of their groups, sorted. */
 QList<int> withGroups(const LabelDocument &document, const QList<int> &indices);
 
+/** How many things @p indices are that move as one: groups and objects on their own. */
+int unitCount(const LabelDocument &document, const QList<int> &indices);
+
 /** Whether any of @p indices can be moved: some are not locked. */
 bool canMove(const LabelDocument &document, const QList<int> &indices);
 
@@ -41,6 +44,15 @@ int group(LabelDocument &document, const QList<int> &indices);
 
 /** Takes @p indices, and every member of their groups, out of their groups. */
 void ungroup(LabelDocument &document, const QList<int> &indices);
+
+/**
+ * Moves @p indices on top of the other objects, keeping their order among
+ * themselves; returns where each one is now, in the order of @p indices.
+ */
+QList<int> bringToFront(LabelDocument &document, const QList<int> &indices);
+
+/** As bringToFront(), below the other objects. */
+QList<int> sendToBack(LabelDocument &document, const QList<int> &indices);
 
 /** Locks or unlocks @p indices against moving and resizing. */
 void setLocked(LabelDocument &document, const QList<int> &indices, bool locked);

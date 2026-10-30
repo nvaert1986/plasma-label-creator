@@ -79,6 +79,7 @@ private Q_SLOTS:
         QVERIFY(Arrange::isGrouped(document, 0));
         QVERIFY(!Arrange::isGrouped(document, 2));
         QCOMPARE(Arrange::withGroups(document, {1}), (QList<int>{0, 1}));
+        QCOMPARE(Arrange::unitCount(document, {0, 1, 2}), 2);
         // DLS writes -1 for no group.
         objectBase(document.objects[2]).groupId = -1;
         QCOMPARE(Arrange::withGroups(document, {2}), (QList<int>{2}));
@@ -117,6 +118,23 @@ private Q_SLOTS:
         QCOMPARE(boundsOf(document, 1).top(), 500.0);
     }
 
+    void reorderingKeepsTheOrderAmongThem()
+    {
+        LabelDocument document = labelWith({{0, 0, 10, 10}, {1, 0, 10, 10}, {2, 0, 10, 10}, {3, 0, 10, 10}, {4, 0, 10, 10}});
+        const auto lefts = [&document]() {
+            QList<int> result;
+            for (int i = 0; i < document.objects.size(); ++i) {
+                result << int(boundsOf(document, i).left());
+            }
+            return result;
+        };
+        // Given in any order, with a repeat: positions come back for each.
+        QCOMPARE(Arrange::sendToBack(document, {4, 1, 4}), (QList<int>{1, 0, 1}));
+        QCOMPARE(lefts(), (QList<int>{1, 4, 0, 2, 3}));
+        QCOMPARE(Arrange::bringToFront(document, {0, 2}), (QList<int>{3, 4}));
+        QCOMPARE(lefts(), (QList<int>{4, 2, 3, 1, 0}));
+    }
+
     void lockAndWrapAreSaved()
     {
         LabelDocument document = labelWith({{100, 100, 200, 100}, {500, 300, 400, 200}});
@@ -141,6 +159,32 @@ private Q_SLOTS:
         QVERIFY(objectBase(read->objects.at(1)).locked);
         QVERIFY(std::get<TextObject>(read->objects.at(2)).wrap);
         QCOMPARE(Arrange::withGroups(*read, {0}), (QList<int>{0, 1}));
+
+        // On tape the file lists objects as the cells hold them, which need
+        // not be their order on the label: the flags follow the objects.
+        LabelDocument tape;
+        tape.tape = TapeLabel();
+        tape.tape->width = 680;
+        for (const QString &name : {u"A"_s, u"B"_s, u"C"_s}) {
+            TextObject t;
+            t.name = name;
+            t.spans = {{name, LabelFont(), Qt::black}};
+            tape.addObject(t);
+        }
+        tape.moveCell(0, 1); // B, A, C along the tape
+        Arrange::setLocked(tape, {0}, true);
+        std::get<TextObject>(tape.objects[2]).wrap = true;
+        buffer.close();
+        buffer.setData(LabelWriter::toByteArray(tape));
+        buffer.open(QIODevice::ReadOnly);
+        const auto readTape = reader.read(&buffer);
+        QVERIFY2(readTape, qPrintable(reader.errorString()));
+        QCOMPARE(readTape->objects.size(), 3);
+        for (const LabelObject &object : readTape->objects) {
+            const QString name = objectBase(object).name;
+            QCOMPARE(objectBase(object).locked, name == u"A"_s);
+            QCOMPARE(std::get<TextObject>(object).wrap, name == u"C"_s);
+        }
 
         // Without them, no comment.
         QVERIFY(!LabelWriter::toByteArray(labelWith({{0, 0, 10, 10}})).contains("<!--"));

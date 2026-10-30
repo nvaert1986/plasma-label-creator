@@ -67,7 +67,7 @@ LabelPrinter::Options MainWindow::printOptions() const
 std::optional<QList<LabelDocument>> MainWindow::labelsToPrint()
 {
     if (m_printBar->printerName().isEmpty()) {
-        KMessageBox::error(this, i18n("No printer was found. Connect a DYMO LabelWriter or add one in the system's printer settings first."));
+        KMessageBox::error(this, i18n("No printer was found. Connect a label printer or add one in the system's printer settings first."));
         return std::nullopt;
     }
     if (!confirmLabelFitsPrinter()) {
@@ -131,15 +131,18 @@ std::optional<QList<LabelDocument>> MainWindow::labelsToPrint()
 
 void MainWindow::print()
 {
-    const auto labels = labelsToPrint();
-    if (!labels) {
-        return;
+    if (const auto labels = labelsToPrint()) {
+        printLabels(*labels);
     }
+}
+
+void MainWindow::printLabels(const QList<LabelDocument> &labels)
+{
     const QString printerName = m_printBar->printerName();
     LabelPrinter printer(printerName, m_printBar->printerDriver());
 
     QApplication::setOverrideCursor(Qt::WaitCursor);
-    const int job = printer.print(*labels, printOptions());
+    const int job = printer.print(labels, printOptions());
     QApplication::restoreOverrideCursor();
 
     if (job == 0) {
@@ -176,8 +179,9 @@ void MainWindow::printPreview()
         return;
     }
     PrintPreviewDialog dialog(pages, printer.resolution(), m_printBar->printerName(), printer.warnings(), this);
+    // What was previewed, without asking the questions again.
     if (dialog.exec() == QDialog::Accepted) {
-        print();
+        printLabels(*labels);
     }
 }
 

@@ -99,6 +99,10 @@ private Q_SLOTS:
             }
         }
         QCOMPARE(dialog.selectedRows(), (QList<int>{0, 1, 2}));
+
+        // None ticked before: none ticked now.
+        DataSourceDialog none(source, DataReader::read(source), {}, nullptr);
+        QCOMPARE(none.selectedRows(), QList<int>());
     }
 
     void questionsAreEdited()

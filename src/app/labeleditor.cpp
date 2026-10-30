@@ -96,11 +96,13 @@ void LabelEditor::apply(const LabelDocument &document, const QString &descriptio
     apply(document, description, *selection >= 0 ? QList<int>{*selection} : QList<int>());
 }
 
-void LabelEditor::apply(const LabelDocument &original, const QString &description, const QList<int> &selection)
+void LabelEditor::apply(const LabelDocument &original, const QString &description, const QList<int> &selection, int current)
 {
     LabelDocument document = original;
     TapeLayout::layout(document);
-    const int current = selection.contains(m_selection) ? m_selection : (selection.isEmpty() ? -1 : selection.constLast());
+    if (!selection.contains(current)) {
+        current = selection.contains(m_selection) ? m_selection : (selection.isEmpty() ? -1 : selection.constLast());
+    }
     if (document == m_document) {
         setSelectedObjects(selection, current);
         return;
@@ -189,8 +191,14 @@ void LabelEditor::setSelectedObjects(const QList<int> &indices, int current)
         }
     }
     std::sort(selected.begin(), selected.end());
+    // Without a current one given, the last one given (clicked last) is.
     if (!selected.contains(current)) {
-        current = selected.isEmpty() ? -1 : (indices.isEmpty() || !selected.contains(indices.constLast()) ? selected.constLast() : indices.constLast());
+        current = -1;
+        for (auto it = indices.crbegin(); it != indices.crend() && current < 0; ++it) {
+            if (selected.contains(*it)) {
+                current = *it;
+            }
+        }
     }
     if (selected != m_selected || current != m_selection) {
         m_selected = selected;

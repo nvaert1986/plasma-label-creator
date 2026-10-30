@@ -251,7 +251,7 @@ void DataSourceDialog::load()
         return;
     }
     m_table = table;
-    m_initialSelection.clear(); // a new load ticks every row
+    m_tickAll = true; // a new load ticks every row
     showTable();
 }
 
@@ -274,7 +274,7 @@ void DataSourceDialog::showTable()
     for (int row = 0; row < m_table->rows.size(); ++row) {
         auto *tick = new QTableWidgetItem;
         tick->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
-        tick->setCheckState(m_initialSelection.isEmpty() || m_initialSelection.contains(row) ? Qt::Checked : Qt::Unchecked);
+        tick->setCheckState(m_tickAll || m_initialSelection.contains(row) ? Qt::Checked : Qt::Unchecked);
         m_rows->setItem(row, 0, tick);
         for (int column = 0; column < m_table->columns.size(); ++column) {
             m_rows->setItem(row, column + 1, new QTableWidgetItem(m_table->rows.at(row).value(column)));

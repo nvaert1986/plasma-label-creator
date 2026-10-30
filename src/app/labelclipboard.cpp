@@ -58,8 +58,18 @@ namespace LabelClipboard
 
 QMimeData *mimeData(const QList<LabelObject> &objects, const LabelDocument &document)
 {
+    // A label holding just the objects. On tape they get cells of their
+    // own: the document's cells point at its other objects.
     LabelDocument holder = document;
-    holder.objects = objects;
+    holder.objects.clear();
+    holder.questions.clear();
+    holder.dataSource = DataSource();
+    if (holder.tape) {
+        holder.tape->root = TapeCell();
+    }
+    for (const LabelObject &object : objects) {
+        holder.addObject(object);
+    }
     auto *data = new QMimeData;
     data->setData(ObjectsMimeType, LabelWriter::toByteArray(holder));
     QStringList texts;

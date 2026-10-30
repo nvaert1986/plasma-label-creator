@@ -43,6 +43,25 @@
   Altec's article codes; it is placed at the end that leaves the printer
   first, which is still to be confirmed on paper.
 
+### Fixed
+
+- Print Preview followed by Print asked the print-time questions again and
+  re-read the data; it now prints what was previewed.
+- A database password given for one database was tried on another one,
+  and a wrong password was not asked for again.
+- Database queries now run in a transaction that is rolled back, read-only
+  where the database supports it (PostgreSQL, MySQL/MariaDB, ODBC), so even
+  a function called by a `SELECT` cannot change anything.
+- Comments on cells in OpenDocument spreadsheets, and phonetic hints in
+  Excel texts, no longer end up in the printed value.
+- With no rows ticked, Data > Data Source… showed every row ticked again.
+- Copying several objects of a tape label pasted the wrong objects.
+- After Bring to Front or Send to Back with several objects selected, the
+  properties and the format toolbar could follow the wrong object.
+- Escape now ends a selection band.
+- Wrapping text was slow to draw for long texts (about 35 ms per paint, now
+  about 5 ms), which made dragging stutter.
+
 ### Other
 
 - The desktop entry now says the program supports LabelManager and ZPL

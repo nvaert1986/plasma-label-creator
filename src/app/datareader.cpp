@@ -206,7 +206,8 @@ std::optional<QList<QStringList>> readXlsx(const QString &fileName, const QStrin
         return std::nullopt;
     }
 
-    // Texts are kept once, in the shared strings.
+    // Texts are kept once, in the shared strings; phonetic hints (rPh, for
+    // Japanese) are not part of the text.
     QStringList shared;
     QXmlStreamReader strings(zipEntry(zip, u"xl/sharedStrings.xml"_s));
     QString current;
@@ -214,6 +215,8 @@ std::optional<QList<QStringList>> readXlsx(const QString &fileName, const QStrin
         strings.readNext();
         if (strings.isStartElement() && strings.name() == "si"_L1) {
             current.clear();
+        } else if (strings.isStartElement() && strings.name() == "rPh"_L1) {
+            strings.skipCurrentElement();
         } else if (strings.isStartElement() && strings.name() == "t"_L1) {
             current += strings.readElementText();
         } else if (strings.isEndElement() && strings.name() == "si"_L1) {
@@ -339,7 +342,9 @@ std::optional<QList<QStringList>> readOds(const QString &fileName, const QString
                     const QString endName = xml.name().toString();
                     while (!(xml.isEndElement() && xml.name() == endName) && !xml.atEnd()) {
                         xml.readNext();
-                        if (xml.isStartElement() && xml.name() == "p"_L1) {
+                        if (xml.isStartElement() && xml.name() == "annotation"_L1) {
+                            xml.skipCurrentElement(); // a comment on the cell
+                        } else if (xml.isStartElement() && xml.name() == "p"_L1) {
                             if (paragraphs++ > 0) {
                                 text += u'\n';
                             }
@@ -416,10 +421,22 @@ std::optional<DataTable> readDatabase(const DataSource &source, const QString &p
         if (source.driver == u"QSQLITE"_s) {
             database.setConnectOptions(u"QSQLITE_OPEN_READONLY"_s);
         }
+        if (source.driver == u"QODBC"_s) {
+            database.setConnectOptions(u"SQL_ATTR_ACCESS_MODE=SQL_MODE_READ_ONLY"_s);
+        }
         if (!database.open()) {
             fail(errorString, i18n("Could not connect to the database: %1", database.lastError().text()));
         } else {
+            // A SELECT can still call a function that writes: where the
+            // database allows it the session only reads, and whatever the
+            // query did is rolled back, never committed.
             QSqlQuery query(database);
+            if (source.driver == u"QPSQL"_s) {
+                query.exec(u"SET SESSION CHARACTERISTICS AS TRANSACTION READ ONLY"_s);
+            } else if (source.driver == u"QMYSQL"_s || source.driver == u"QMARIADB"_s) {
+                query.exec(u"SET SESSION TRANSACTION READ ONLY"_s);
+            }
+            const bool inTransaction = database.transaction();
             query.setForwardOnly(true);
             if (!query.exec(source.query)) {
                 fail(errorString, i18n("The query failed: %1", query.lastError().text()));
@@ -445,6 +462,10 @@ std::optional<DataTable> readDatabase(const DataSource &source, const QString &p
                     table.rows << row;
                 }
                 result = table;
+            }
+            query.finish();
+            if (inTransaction) {
+                database.rollback();
             }
         }
         database.close();

@@ -728,6 +728,11 @@ void LabelView::keyPressEvent(QKeyEvent *event)
         moveSelection(QPointF(0, step), i18n("Move Object"));
         break;
     case Qt::Key_Escape:
+        // Also ends a rubber band, which would select again on the next move.
+        if (m_rubberBand) {
+            m_rubberBand.reset();
+            update();
+        }
         m_editor->setSelection(-1);
         break;
     case Qt::Key_Return:

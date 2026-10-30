@@ -247,38 +247,27 @@ void MainWindow::setOrientation(PaperOrientation orientation)
 
 void MainWindow::raiseObject()
 {
-    // The selected objects go on top, in the order they were in.
-    const QList<int> selected = m_editor->selectedObjects();
-    if (selected.isEmpty()) {
-        return;
-    }
-    LabelDocument document = m_editor->document();
-    const int last = int(document.objects.size() - 1);
-    for (auto it = selected.crbegin(); it != selected.crend(); ++it) {
-        document.moveObject(*it, last - int(it - selected.crbegin()));
-    }
-    QList<int> moved;
-    for (int i = 0; i < selected.size(); ++i) {
-        moved << last - int(selected.size()) + 1 + i;
-    }
-    m_editor->apply(document, i18n("Bring to Front"), moved);
+    reorderSelected(i18n("Bring to Front"), &Arrange::bringToFront);
 }
 
 void MainWindow::lowerObject()
 {
-    const QList<int> selected = m_editor->selectedObjects();
+    reorderSelected(i18n("Send to Back"), &Arrange::sendToBack);
+}
+
+void MainWindow::reorderSelected(const QString &description, QList<int> (*reorder)(LabelDocument &, const QList<int> &))
+{
+    // The selected objects keep their order among themselves; the current
+    // object is followed to where it went.
+    QList<int> selected = m_editor->selectedObjects();
     if (selected.isEmpty()) {
         return;
     }
+    selected << m_editor->selection();
     LabelDocument document = m_editor->document();
-    for (int i = 0; i < selected.size(); ++i) {
-        document.moveObject(selected.at(i), i);
-    }
-    QList<int> moved;
-    for (int i = 0; i < selected.size(); ++i) {
-        moved << i;
-    }
-    m_editor->apply(document, i18n("Send to Back"), moved);
+    QList<int> moved = reorder(document, selected);
+    const int current = moved.takeLast();
+    m_editor->apply(document, description, moved, current);
 }
 
 void MainWindow::setupArrangeActions()

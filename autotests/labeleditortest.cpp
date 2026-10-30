@@ -383,6 +383,13 @@ private Q_SLOTS:
         QCOMPARE(editor.selectedObjects(), (QList<int>{0, 1}));
         QCOMPARE(editor.undoStack()->count(), 2);
 
+        // Escape ends a band: moving on selects nothing.
+        QTest::mousePress(&view, Qt::LeftButton, {}, QPoint(2, 2));
+        QTest::keyClick(&view, Qt::Key_Escape);
+        QTest::mouseMove(&view, end);
+        QTest::mouseRelease(&view, Qt::LeftButton, {}, end);
+        QCOMPARE(editor.selectedObjects(), QList<int>());
+
         // A group selects as one.
         LabelDocument grouped = editor.document();
         objectBase(grouped.objects[1]).groupId = 0;
@@ -393,6 +400,29 @@ private Q_SLOTS:
         QCOMPARE(editor.selection(), 1);
         QTest::mouseClick(&view, Qt::LeftButton, Qt::ControlModifier, centreOf(0));
         grab(&view, u"multiselect"_s);
+    }
+
+    void someObjectsOfATapeCopy()
+    {
+        // On tape the cells say which object goes where; a copy of some of
+        // the objects must still hold those objects.
+        LabelDocument tape;
+        tape.tape = TapeLabel();
+        tape.tape->width = 680;
+        for (const QString &name : {u"A"_s, u"B"_s, u"C"_s}) {
+            TextObject text;
+            text.name = name;
+            text.spans = {{name, LabelFont(), Qt::black}};
+            tape.addObject(text);
+        }
+        tape.moveCell(0, 1); // cells no longer in object order: B, A, C
+        std::unique_ptr<QMimeData> data(LabelClipboard::mimeData({tape.objects.at(0), tape.objects.at(2)}, tape));
+        LabelDocument empty = addressLabel();
+        empty.objects.clear();
+        const QList<LabelObject> pasted = LabelClipboard::objectsToPaste(data.get(), empty);
+        QCOMPARE(pasted.size(), 2);
+        QCOMPARE(objectBase(pasted.at(0)).name, u"A"_s);
+        QCOMPARE(objectBase(pasted.at(1)).name, u"C"_s);
     }
 
     void severalObjectsCopyWithTheirGroup()

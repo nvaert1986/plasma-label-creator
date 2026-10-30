@@ -115,9 +115,13 @@ private:
     void setOrientation(LabelCreator::PaperOrientation orientation);
     void raiseObject();
     void lowerObject();
+    /** Moves the selected objects in the drawing order with @p reorder (from Arrange). */
+    void reorderSelected(const QString &description, QList<int> (*reorder)(LabelCreator::LabelDocument &, const QList<int> &));
     void changePaper(const LabelCreator::PaperSize &paper);
     void rotateLabel();
     void print();
+    /** Sends @p labels, made by labelsToPrint(), to the printer. */
+    void printLabels(const QList<LabelCreator::LabelDocument> &labels);
     /** Shows the pages print() would send, and prints them if asked. */
     void printPreview();
     /** Saves the label as a PDF (vector, for sharing) or a PNG at the printer's resolution. */
@@ -179,7 +183,10 @@ private:
     LabelCreator::DataSource m_dataTableSource;
     QList<int> m_dataRows;
     QHash<QString, QString> m_answers;
+    // The database password given last, kept in memory only, for the
+    // database (driver, host, database, user) it was given for.
     QString m_databasePassword;
+    QStringList m_databasePasswordFor;
     QList<KToggleAction *> m_fitModes; // none, shrink to fit, always fit
     KToggleAction *m_portrait = nullptr;
     KToggleAction *m_landscape = nullptr;

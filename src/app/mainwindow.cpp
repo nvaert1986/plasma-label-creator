@@ -740,19 +740,10 @@ void MainWindow::updateActions()
 
     // Lining up and spreading out: what moves are groups and objects on their own.
     const LabelDocument &document = m_editor->document();
-    QList<int> units;
-    bool grouped = false;
-    for (const int index : selection) {
-        if (Arrange::isGrouped(document, index)) {
-            grouped = true;
-            const int id = *objectBase(document.objects.at(index)).groupId;
-            if (!units.contains(-2 - id)) {
-                units << -2 - id;
-            }
-        } else {
-            units << index;
-        }
-    }
+    const int units = Arrange::unitCount(document, selection);
+    const bool grouped = std::any_of(selection.cbegin(), selection.cend(), [&document](int index) {
+        return Arrange::isGrouped(document, index);
+    });
     const bool movable = !tape && Arrange::canMove(document, selection);
     for (const QString &name : {u"arrange_align_left"_s,
                                 u"arrange_align_hcenter"_s,
@@ -760,11 +751,14 @@ void MainWindow::updateActions()
                                 u"arrange_align_top"_s,
                                 u"arrange_align_vcenter"_s,
                                 u"arrange_align_bottom"_s}) {
-        actionCollection()->action(name)->setEnabled(movable && units.size() >= 2);
+        actionCollection()->action(name)->setEnabled(movable && units >= 2);
     }
-    actionCollection()->action(u"arrange_distribute_horizontal"_s)->setEnabled(movable && units.size() >= 3);
-    actionCollection()->action(u"arrange_distribute_vertical"_s)->setEnabled(movable && units.size() >= 3);
-    actionCollection()->action(u"arrange_group"_s)->setEnabled(units.size() >= 2);
+    actionCollection()->action(u"arrange_distribute_horizontal"_s)->setEnabled(movable && units >= 3);
+    actionCollection()->action(u"arrange_distribute_vertical"_s)->setEnabled(movable && units >= 3);
+    actionCollection()->action(u"arrange_group"_s)->setEnabled(units >= 2);
+    const bool several = selection.size() > 1;
+    actionCollection()->action(u"edit_delete"_s)->setText(several ? i18n("Delete Objects") : i18n("Delete Object"));
+    actionCollection()->action(u"edit_duplicate"_s)->setText(several ? i18n("Duplicate Objects") : i18n("Duplicate Object"));
     actionCollection()->action(u"arrange_ungroup"_s)->setEnabled(grouped);
     actionCollection()->action(u"edit_select_all"_s)->setEnabled(!document.objects.isEmpty());
     m_lock->setEnabled(selected && !tape);

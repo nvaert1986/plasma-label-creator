@@ -5,6 +5,9 @@
 
 #include "datareader.h"
 
+#include <KLocalizedString>
+#include <KZip>
+
 #include <QLocale>
 #include <QSqlDatabase>
 #include <QSqlQuery>
@@ -26,6 +29,21 @@ DataSource fileSource(const QString &name, const QString &sheet = {})
     return source;
 }
 
+// Writes a zip file at @p fileName holding @p entries (path, contents).
+bool writeZip(const QString &fileName, const QList<std::pair<QString, QByteArray>> &entries)
+{
+    KZip zip(fileName);
+    if (!zip.open(QIODevice::WriteOnly)) {
+        return false;
+    }
+    for (const auto &[path, contents] : entries) {
+        if (!zip.writeFile(path, contents)) {
+            return false;
+        }
+    }
+    return zip.close();
+}
+
 } // namespace
 
 class DataReaderTest : public QObject
@@ -35,6 +53,7 @@ class DataReaderTest : public QObject
 private Q_SLOTS:
     void initTestCase()
     {
+        KLocalizedString::setApplicationDomain("plasma-label-creator");
         // Dates come out in the user's short format.
         QLocale::setDefault(QLocale(u"nl_NL"_s));
     }
@@ -115,6 +134,43 @@ private Q_SLOTS:
         QCOMPARE(table->rows.at(0), (QStringList{u"SRV-HV01"_s, u"Rack  A\nU12"_s, u"29-10-2026"_s}));
         QCOMPARE(table->rows.at(3), (QStringList{QString(), QString(), u"3,5"_s}));
         QCOMPARE(DataReader::read(fileSource(u"assets.ods"_s, u"Second"_s), {}, &error)->columns, (QStringList{u"Other"_s}));
+    }
+
+    void cellTextIsOnlyWhatTheCellShows()
+    {
+        // Comments on OpenDocument cells and phonetic hints in Excel texts
+        // are not part of the value.
+        QTemporaryDir dir;
+        const QString ods = dir.filePath(u"comment.ods"_s);
+        QVERIFY(writeZip(ods,
+                         {{u"content.xml"_s,
+                           "<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" "
+                           "xmlns:table=\"urn:oasis:names:tc:opendocument:xmlns:table:1.0\" xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\">"
+                           "<office:body><office:spreadsheet><table:table table:name=\"S\">"
+                           "<table:table-row><table:table-cell office:value-type=\"string\"><office:annotation><text:p>check this</text:p></office:annotation>"
+                           "<text:p>Name</text:p></table:table-cell></table:table-row>"
+                           "<table:table-row><table:table-cell office:value-type=\"string\"><text:p>SRV-HV01</text:p></table:table-cell></table:table-row>"
+                           "</table:table></office:spreadsheet></office:body></office:document-content>"}}));
+        QString error;
+        DataSource source;
+        source.kind = DataSource::Kind::File;
+        source.fileName = ods;
+        auto table = DataReader::read(source, {}, &error);
+        QVERIFY2(table, qPrintable(error));
+        QCOMPARE(table->columns, QStringList{u"Name"_s});
+
+        const QString xlsx = dir.filePath(u"phonetic.xlsx"_s);
+        QVERIFY(writeZip(xlsx,
+                         {{u"xl/workbook.xml"_s, "<workbook xmlns:r=\"r\"><sheets><sheet name=\"S\" r:id=\"rId1\"/></sheets></workbook>"},
+                          {u"xl/_rels/workbook.xml.rels"_s, "<Relationships><Relationship Id=\"rId1\" Target=\"worksheets/sheet1.xml\"/></Relationships>"},
+                          {u"xl/sharedStrings.xml"_s, "<sst><si><t>Name</t></si><si><r><t>東京</t></r><rPh sb=\"0\" eb=\"2\"><t>トウキョウ</t></rPh></si></sst>"},
+                          {u"xl/worksheets/sheet1.xml"_s,
+                           "<worksheet><sheetData><row r=\"1\"><c r=\"A1\" t=\"s\"><v>0</v></c></row>"
+                           "<row r=\"2\"><c r=\"A2\" t=\"s\"><v>1</v></c></row></sheetData></worksheet>"}}));
+        source.fileName = xlsx;
+        table = DataReader::read(source, {}, &error);
+        QVERIFY2(table, qPrintable(error));
+        QCOMPARE(table->rows.value(0), QStringList{u"東京"_s});
     }
 
     void readsADatabase()

@@ -22,28 +22,22 @@ See `CHANGELOG.md` under "Unreleased" for the details.
 - [x] The desktop entry mentions LabelManager and ZPL printers.
 - [x] `mainwindow.cpp` split by topic.
 
-## Next: look for bugs
+## Bug review (2026-10-30)
 
-The 0.2.0 features and the unreleased designer work (multi-select, align,
-distribute, group, lock, wrapping text) look fine in use and pass their
-tests. Before building more, review and try them on purpose to be sure:
+Done: the code since 0.2.0 and the 0.2.0 data and printing code were
+reviewed, and the bugs found are fixed with tests (see `CHANGELOG.md`,
+"Fixed"). Checked: labels from other label software write GroupID -1, so
+they never group by accident; groups, locks and wrapping survive saving,
+reopening, copy and paste, also on tape labels with reordered cells.
 
-- [ ] **Review the changes since 0.2.0** (`git diff 4705b7f..`) for
-  correctness: selection indices after undo, redo, delete and reorder;
-  drags, rubber band and Escape or undo in the middle of them; tape labels
-  with several objects selected (delete, paste, raise, cells).
-- [ ] **Groups in existing files**: check that labels made by other label
-  software never get grouped by accident (their GroupID values), and that
-  groups survive save, reopen, copy, paste and Rotate Label.
-- [ ] **Locked and wrapping flags**: kept per object through save and
-  reopen, on tape labels too, and after reordering objects.
-- [ ] **Wrapping text**: speed with long texts (the fit size is searched on
-  every paint), Rotate Label, fields filled at print time, address objects,
-  editing on the label, print equals preview.
-- [ ] **Align and distribute** with locked objects at the ends, groups
-  mixed with single objects, and objects partly off the label.
-- [ ] **Everything else since 0.1.0**: printing from data, questions, print
-  preview, export, grid and snapping, white on black, barcodes.
+Still to do by hand, in the running app:
+
+- [ ] Try multi-select, align, distribute, group, lock and wrapping text
+  on real labels, with undo and redo in between.
+- [ ] Print a label with wrapped text and grouped objects, and compare it
+  with the screen and the print preview.
+- [ ] Print from a database with a password (SQL Server over ODBC, say):
+  the password is asked once per database and again after a wrong one.
 
 ## Designer
 

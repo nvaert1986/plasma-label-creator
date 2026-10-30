@@ -114,7 +114,9 @@ bool MainWindow::ensureDataLoaded(bool quiet)
     if (m_dataTable && m_dataTableSource == source) {
         return true;
     }
-    QString password = m_databasePassword;
+    // Another database's password is no use for this one.
+    const QStringList database = {source.driver, source.host, source.database, source.user};
+    QString password = m_databasePasswordFor == database ? m_databasePassword : QString();
     if (source.kind == DataSource::Kind::Database && !source.user.isEmpty() && password.isEmpty()) {
         if (quiet) {
             return false;
@@ -130,6 +132,11 @@ bool MainWindow::ensureDataLoaded(bool quiet)
     const auto table = DataReader::read(source, password, &error);
     QApplication::restoreOverrideCursor();
     if (!table) {
+        // A wrong password is asked for again next time.
+        if (source.kind == DataSource::Kind::Database) {
+            m_databasePassword.clear();
+            m_databasePasswordFor.clear();
+        }
         if (!quiet) {
             KMessageBox::error(this, i18n("The data could not be read:\n%1", error));
         }
@@ -137,6 +144,7 @@ bool MainWindow::ensureDataLoaded(bool quiet)
     }
     if (source.kind == DataSource::Kind::Database) {
         m_databasePassword = password;
+        m_databasePasswordFor = database;
     }
     m_dataTable = table;
     m_dataTableSource = source;

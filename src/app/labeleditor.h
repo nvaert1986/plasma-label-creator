@@ -33,8 +33,12 @@ public:
      * selects @p selection (-1 for none); by default the selection stays.
      */
     void apply(const LabelCreator::LabelDocument &document, const QString &description, std::optional<int> selection = std::nullopt);
-    /** As apply(), selecting @p selection afterwards. */
-    void apply(const LabelCreator::LabelDocument &document, const QString &description, const QList<int> &selection);
+    /**
+     * As apply(), selecting @p selection afterwards. The current object stays
+     * if it is among them, unless @p current names another one: needed when
+     * the change moves objects to other indices.
+     */
+    void apply(const LabelCreator::LabelDocument &document, const QString &description, const QList<int> &selection, int current = -1);
 
     QString fileName() const;
     bool isModified() const;

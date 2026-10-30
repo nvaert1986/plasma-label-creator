@@ -84,6 +84,11 @@ QList<int> withGroups(const LabelDocument &document, const QList<int> &indices)
     return result;
 }
 
+int unitCount(const LabelDocument &document, const QList<int> &indices)
+{
+    return int(unitsOf(document, indices).size());
+}
+
 bool canMove(const LabelDocument &document, const QList<int> &indices)
 {
     return std::any_of(indices.cbegin(), indices.cend(), [&document](int index) {
@@ -171,6 +176,49 @@ void ungroup(LabelDocument &document, const QList<int> &indices)
     for (const int index : withGroups(document, indices)) {
         objectBase(document.objects[index]).groupId = -1;
     }
+}
+
+namespace
+{
+
+// Moves @p indices to @p first, first + 1, ... in drawing order.
+QList<int> moveTogether(LabelDocument &document, const QList<int> &indices, bool toFront)
+{
+    QList<int> sorted;
+    for (const int index : indices) {
+        if (index >= 0 && index < document.objects.size() && !sorted.contains(index)) {
+            sorted << index;
+        }
+    }
+    std::sort(sorted.begin(), sorted.end());
+    const int first = toFront ? int(document.objects.size() - sorted.size()) : 0;
+    // Moving from the far end first leaves the indices still to move unchanged.
+    if (toFront) {
+        for (qsizetype i = sorted.size() - 1; i >= 0; --i) {
+            document.moveObject(sorted.at(i), first + int(i));
+        }
+    } else {
+        for (qsizetype i = 0; i < sorted.size(); ++i) {
+            document.moveObject(sorted.at(i), first + int(i));
+        }
+    }
+    QList<int> now;
+    for (const int index : indices) {
+        now << (sorted.contains(index) ? first + int(sorted.indexOf(index)) : -1);
+    }
+    return now;
+}
+
+} // namespace
+
+QList<int> bringToFront(LabelDocument &document, const QList<int> &indices)
+{
+    return moveTogether(document, indices, true);
+}
+
+QList<int> sendToBack(LabelDocument &document, const QList<int> &indices)
+{
+    return moveTogether(document, indices, false);
 }
 
 void setLocked(LabelDocument &document, const QList<int> &indices, bool locked)
