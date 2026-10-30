@@ -29,6 +29,14 @@ See `CHANGELOG.md` under "Unreleased" for the details.
 - [x] Several labels across a roll, and continuous rolls with a set length
   (printers that take any label size: Altec, Zebra).
 
+## Second bug review (2026-10-30, evening)
+
+Done for layers, angles, calculated fields, shared counters, the GS1
+builder and roll layouts: two-digit years in field dates (read as 1926),
+`{Time}` offsets (hours added), stale layer names from files and pastes,
+no wait cursor while waiting for a shared counter; tests added for Rotate
+Label with objects at an angle. Clean rebuild without warnings.
+
 ## Bug review (2026-10-30)
 
 Done: the code since 0.2.0 and the 0.2.0 data and printing code were

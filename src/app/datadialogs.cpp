@@ -397,11 +397,12 @@ void CalculatedFieldsDialog::updateResults()
 
 QList<CalculatedField> CalculatedFieldsDialog::fields() const
 {
-    // Fields are written {Name}: names need something, and no braces.
+    // Fields are written {Name|filter}: names need something, and no braces
+    // or bars.
     QList<CalculatedField> fields;
     for (int row = 0; row < m_table->rowCount(); ++row) {
         QString name = m_table->item(row, 0)->text().trimmed();
-        name.remove(u'{').remove(u'}');
+        name.remove(u'{').remove(u'}').remove(u'|');
         if (!name.isEmpty()) {
             fields << CalculatedField{name, m_table->item(row, 1)->text()};
         }

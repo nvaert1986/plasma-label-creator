@@ -12,6 +12,23 @@ using MainWindowPrivate::settings;
 
 // Editing objects: inserting, deleting, copying, placing and ordering them.
 
+namespace
+{
+
+// The objects of @p indices that can be selected: shown, on a layer that is not locked.
+QList<int> selectable(const LabelDocument &document, const QList<int> &indices)
+{
+    QList<int> result;
+    for (const int index : indices) {
+        if (document.isSelectable(index)) {
+            result << index;
+        }
+    }
+    return result;
+}
+
+} // namespace
+
 void MainWindow::insertObject(ObjectFactory::Kind kind, std::optional<QPointF> at)
 {
     QByteArray imageData;
@@ -269,13 +286,7 @@ void MainWindow::editLayers()
     LabelDocument document = m_editor->document();
     document.changeLayers(dialog.layers(), dialog.renamed());
     // Objects on a layer that no longer shows or can be edited are not selected.
-    QList<int> selection;
-    for (const int index : m_editor->selectedObjects()) {
-        if (document.isSelectable(index)) {
-            selection << index;
-        }
-    }
-    m_editor->apply(document, i18n("Change Layers"), selection);
+    m_editor->apply(document, i18n("Change Layers"), selectable(document, m_editor->selectedObjects()));
 }
 
 void MainWindow::moveToLayer(const QString &name)
@@ -284,24 +295,16 @@ void MainWindow::moveToLayer(const QString &name)
     for (const int index : m_editor->selectedObjects()) {
         objectBase(document.objects[index]).layer = name;
     }
-    QList<int> selection;
-    for (const int index : m_editor->selectedObjects()) {
-        if (document.isSelectable(index)) {
-            selection << index;
-        }
-    }
-    m_editor->apply(document, i18n("Move to Layer"), selection);
+    m_editor->apply(document, i18n("Move to Layer"), selectable(document, m_editor->selectedObjects()));
 }
 
 void MainWindow::selectAllObjects()
 {
     QList<int> all;
     for (int i = 0; i < m_editor->document().objects.size(); ++i) {
-        if (m_editor->document().isSelectable(i)) {
-            all << i;
-        }
+        all << i;
     }
-    m_editor->setSelectedObjects(all, m_editor->selection());
+    m_editor->setSelectedObjects(selectable(m_editor->document(), all), m_editor->selection());
 }
 
 void MainWindow::setOrientation(PaperOrientation orientation)

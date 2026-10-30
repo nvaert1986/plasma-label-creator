@@ -43,8 +43,9 @@
   software shows it without the angle.
 - **Calculated fields** (Data > Calculated Fields…): fields worked out when
   printing, such as `{Prefix}-{Serial|pad:6}`, used like columns.
-- **More in fields**: `{Date}`, `{Time}` and `{Now}`; date offsets
-  (`{Date+30}`, `{Installed+1y}`, also w and m); `{Serial+1}`; filters
+- **More in fields**: `{Date}`, `{Time}` and `{Now}`; date and time
+  offsets (`{Date+30}`, `{Installed+1y}`, `{Time+2h}`, also w and m);
+  dates with two-digit years count as this century; `{Serial+1}`; filters
   after a `|`: upper, lower, trim, left, right, mid, pad, date:format,
   replace, default. `{Date+30|date:dd-MM-yyyy}` gives a best-before date.
 - **Shared counters**: a counter can keep its next value in a file, on a
