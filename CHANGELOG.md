@@ -95,6 +95,11 @@
 - Wrapping text was slow to draw for long texts (about 35 ms per paint, now
   about 5 ms), which made dragging stutter.
 
+### Requirements
+
+- Qt 6.7 or newer (was 6.6), for reading two-digit years in dates.
+- INSTALL.md describes checking the code with clang-tidy.
+
 ### Other
 
 - The desktop entry now says the program supports LabelManager and ZPL

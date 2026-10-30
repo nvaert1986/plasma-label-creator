@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.22)
 
 project(plasma-label-creator VERSION 0.2.0 LANGUAGES CXX)
 
-set(QT_MIN_VERSION "6.6.0")
+set(QT_MIN_VERSION "6.7.0") # QLocale::toDate with a base year for two-digit years
 set(KF_MIN_VERSION "6.0.0")
 set(KDE_COMPILERSETTINGS_LEVEL "6.0")
 set(CMAKE_CXX_STANDARD 20)

@@ -111,12 +111,13 @@ for those, make the label size with Layout > Custom Label Size….
 
 ## Requirements
 
-- Linux with Qt 6.6 or newer and KDE Frameworks 6, a C++20 compiler,
+- Linux with Qt 6.7 or newer and KDE Frameworks 6, a C++20 compiler,
   CMake 3.22 or newer, zint, CUPS and libudev. Developed and tested on
   Gentoo with Qt 6.11, KDE Frameworks 6.29, zint 2.16, CUPS 2.4 and
   GCC 15.
 - To print: CUPS with DYMO's driver for DYMO printers, or CUPS's own Zebra
-  ZPL driver for Altec and Zebra printers.
+  ZPL driver for Altec and Zebra printers (also for labels across the roll
+  and continuous rolls).
 - Optional: DYMO's clip art is not included. If you own DYMO Label
   Software, the Clip Art panel can import it from your own copy of
   `DYMO.DLS.dll`; it stays on your computer.

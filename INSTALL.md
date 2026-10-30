@@ -22,9 +22,9 @@ been tried; if one does not, please report it.
 | Ninja (or make) | any | 1.13 |
 | C++ compiler with C++20 support | GCC or Clang with C++20 | GCC 15.3 |
 | Extra CMake Modules (ECM) | 6.0 | 6.29 |
-| Qt 6: Core, Gui, Network | 6.6 | 6.11 |
-| Qt 6: Widgets, PrintSupport, DBus, Sql (application) | 6.6 | 6.11 |
-| Qt 6: Test (only for the tests) | 6.6 | 6.11 |
+| Qt 6: Core, Gui, Network | 6.7 | 6.11 |
+| Qt 6: Widgets, PrintSupport, DBus, Sql (application) | 6.7 | 6.11 |
+| Qt 6: Test (only for the tests) | 6.7 | 6.11 |
 | KDE Frameworks 6: Archive, ConfigWidgets, CoreAddons, Crash, I18n, IconThemes, WidgetsAddons, XmlGui | 6.0 | 6.29 |
 | zint, with its CMake package files | any 2.x that installs them | 2.16 |
 | CUPS library and headers | 2.x | 2.4 |
@@ -98,7 +98,10 @@ These are needed at run time, not to build.
 | cups-pk-helper | the "Set Up Printer" button | `net-print/cups-pk-helper` | `cups-pk-helper` | `cups-pk-helper` | `cups-pk-helper` |
 
 ZPL printers (Altec ATP, Zebra) need nothing extra: CUPS's own "Zebra ZPL
-Label Printer" driver is used.
+Label Printer" driver is used (its filter, `rastertolabel`, comes with
+CUPS). Labels across the roll and continuous rolls need that driver: it
+takes any label size, and its "Media Tracking" option is set to Continuous
+for continuous rolls.
 
 ## Building
 
@@ -117,6 +120,27 @@ can run them from there without installing.
 The tests need no display and no printers. A few that compare against a
 real DYMO Label Software installation or real labels skip themselves when
 those are not there.
+
+### For development
+
+Optional, to check the code as it was checked here:
+
+| Tool | Tested | Gentoo |
+|---|---|---|
+| clang-tidy and run-clang-tidy | LLVM 22 | `llvm-core/clang` |
+
+The build's compile commands carry a GCC-only flag
+(`-mno-direct-extern-access`) that clang stops on: run clang-tidy on a copy
+of `build/compile_commands.json` without it, in parallel:
+
+```sh
+cmake -S . -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+mkdir -p /tmp/tidy
+sed 's/ -mno-direct-extern-access//' build/compile_commands.json > /tmp/tidy/compile_commands.json
+run-clang-tidy -j "$(nproc)" -quiet -p /tmp/tidy \
+    -checks='-*,bugprone-*,performance-*,clang-analyzer-*' "$PWD/src/"
+ctest --test-dir build -j "$(nproc)" --output-on-failure
+```
 
 ### Build options
 

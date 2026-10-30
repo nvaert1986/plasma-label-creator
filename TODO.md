@@ -29,6 +29,12 @@ See `CHANGELOG.md` under "Unreleased" for the details.
 - [x] Several labels across a roll, and continuous rolls with a set length
   (printers that take any label size: Altec, Zebra).
 
+## Next session
+
+Niels is trying the app (started 2026-10-30 from the commit after
+`60fa89e`). Start from his findings; then the hands-on checks under "Bug
+review" and the printer tests below. Nothing since 0.2.0 is pushed.
+
 ## Second bug review (2026-10-30, evening)
 
 Done for layers, angles, calculated fields, shared counters, the GS1
