@@ -6,6 +6,7 @@
 #include "labeleditor.h"
 
 #include "labelformat.h"
+#include "labelversions.h"
 #include "tapelayout.h"
 
 #include <algorithm>
@@ -151,8 +152,15 @@ bool LabelEditor::load(const QString &fileName, QString *errorString, QStringLis
     return true;
 }
 
-bool LabelEditor::save(const QString &fileName, QString *errorString)
+bool LabelEditor::save(const QString &fileName, QString *errorString, bool keepVersion)
 {
+    // A version that cannot be kept does not stop the saving.
+    if (keepVersion) {
+        QString versionError;
+        if (!LabelVersions().keep(fileName, LabelVersions::DefaultKeep, &versionError)) {
+            qWarning("%s", qPrintable(versionError));
+        }
+    }
     if (!LabelWriter::writeFile(m_document, fileName, errorString)) {
         return false;
     }

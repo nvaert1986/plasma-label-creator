@@ -32,6 +32,7 @@ bool allowedInPrintOnly(const QString &name)
                                         u"file_quit"_s,
                                         u"layout_recent"_s,
                                         u"data_choose_rows"_s,
+                                        u"file_print_history"_s,
                                         u"view_zoom_in"_s,
                                         u"view_zoom_out"_s,
                                         u"view_fit_to_page"_s,
@@ -48,6 +49,15 @@ void MainWindow::setupPrintOnlyActions()
     m_printOnlyAction->setToolTip(i18n("Choose a label from a folder, fill in its form and print, without editing it"));
     actions->addAction(u"file_print_only"_s, m_printOnlyAction);
     connect(m_printOnlyAction, &QAction::triggered, this, &MainWindow::setPrintOnly);
+
+    QAction *versions = actions->addAction(u"file_versions"_s, this, &MainWindow::showVersions);
+    versions->setText(i18n("&Versions…"));
+    versions->setIcon(QIcon::fromTheme(u"document-revert"_s));
+    versions->setToolTip(i18n("Earlier versions of this label, kept each time it was saved over"));
+    QAction *history = actions->addAction(u"file_print_history"_s, this, &MainWindow::showPrintHistory);
+    history->setText(i18n("Print &History…"));
+    history->setIcon(QIcon::fromTheme(u"view-history"_s));
+    history->setToolTip(i18n("What was printed, when and where; open a label as printed or print it again"));
 
     QAction *rows = actions->addAction(u"data_choose_rows"_s, this, &MainWindow::chooseRows);
     rows->setText(i18n("Choose Rows…"));
@@ -200,4 +210,96 @@ void MainWindow::chooseRows()
     updateDataRows();
     m_printBar->choosePrintRows();
     updatePrintOnlyPreview();
+}
+
+void MainWindow::showVersions()
+{
+    const QString fileName = m_editor->fileName();
+    if (fileName.isEmpty()) {
+        KMessageBox::information(this, i18n("Versions are kept each time a label is saved over. This label has not been saved yet."));
+        return;
+    }
+    VersionsDialog dialog(fileName, LabelVersions().versions(fileName), this);
+    if (dialog.exec() != QDialog::Accepted || dialog.chosenVersion().isEmpty()) {
+        return;
+    }
+    LabelReader reader;
+    const auto version = reader.readFile(dialog.chosenVersion());
+    if (!version) {
+        KMessageBox::error(this, i18n("The version could not be read: %1", reader.errorString()));
+        return;
+    }
+    // On the canvas as a change: undo brings back what was there.
+    m_editor->apply(*version, i18n("Restore Version"), -1);
+}
+
+void MainWindow::showPrintHistory()
+{
+    PrintHistory history;
+    PrintHistoryDialog dialog(history.records(), this);
+    if (dialog.exec() != QDialog::Accepted) {
+        return;
+    }
+    const PrintRecord record = dialog.chosenRecord();
+    switch (dialog.action()) {
+    case PrintHistoryDialog::Action::None:
+        return;
+    case PrintHistoryDialog::Action::Clear:
+        history.clear();
+        return;
+    case PrintHistoryDialog::Action::Open: {
+        if (!maybeSave()) {
+            return;
+        }
+        QString error;
+        const auto label = history.label(record, &error);
+        if (!label) {
+            KMessageBox::error(this, i18n("The label as printed could not be read: %1", error));
+            return;
+        }
+        // As printed; saved where the user wants it.
+        m_editor->reset(*label);
+        m_answers.insert(record.answers);
+        statusBar()->showMessage(i18n("The label %1 as printed on %2.", record.title, QLocale().toString(record.when, QLocale::ShortFormat)), 10000);
+        return;
+    }
+    case PrintHistoryDialog::Action::PrintAgain:
+        printAgain(record);
+        return;
+    }
+}
+
+void MainWindow::printAgain(const PrintRecord &record)
+{
+    if (!maybeSave()) {
+        return;
+    }
+    QString error;
+    const auto label = PrintHistory().label(record, &error);
+    if (!label) {
+        KMessageBox::error(this, i18n("The label as printed could not be read: %1", error));
+        return;
+    }
+    // The same labels: each data row printed then, with the answers given then.
+    QList<LabelDocument> labels;
+    if (record.rows.isEmpty()) {
+        labels << filled(*label, record.answers);
+    }
+    for (QHash<QString, QString> values : record.rows) {
+        values.insert(record.answers);
+        labels << filled(*label, values);
+    }
+    const QString printer = m_printBar->printerName();
+    if (KMessageBox::questionTwoActions(this,
+                                        i18np("Print the label %2 again on %3?", "Print the %1 labels of %2 again on %3?", labels.size(), record.title, printer),
+                                        i18n("Print Again"),
+                                        KGuiItem(i18n("Print"), u"document-print"_s),
+                                        KStandardGuiItem::cancel())
+        != KMessageBox::PrimaryAction) {
+        return;
+    }
+    m_editor->reset(*label);
+    m_answers.insert(record.answers);
+    m_printedRows = record.rows;
+    printLabels(labels);
 }

@@ -44,7 +44,12 @@ public:
     bool isModified() const;
 
     bool load(const QString &fileName, QString *errorString, QStringList *warnings = nullptr);
-    bool save(const QString &fileName, QString *errorString);
+    /**
+     * Saves to @p fileName. The file it saves over is kept as a version
+     * first (see LabelVersions), unless @p keepVersion is false: for saving
+     * only counters that moved on.
+     */
+    bool save(const QString &fileName, QString *errorString, bool keepVersion = true);
 
     /**
      * The current object: the one selected last, which properties, editing

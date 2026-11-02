@@ -102,6 +102,7 @@ std::optional<QList<LabelDocument>> MainWindow::labelsToPrint()
     }
 
     QList<LabelDocument> labels;
+    m_printedRows.clear();
     if (m_printBar->printRows()) {
         // One label per ticked row, with the row's values and the answers.
         if (!ensureDataLoaded()) {
@@ -113,6 +114,7 @@ std::optional<QList<LabelDocument>> MainWindow::labelsToPrint()
         }
         for (const int row : std::as_const(m_dataRows)) {
             QHash<QString, QString> values = m_dataTable->values(row);
+            m_printedRows << values;
             values.insert(answers);
             labels << filled(document, values);
         }
@@ -232,12 +234,27 @@ void MainWindow::printLabels(const QList<LabelDocument> &prepared)
     if (!m_recentLayouts.add(m_editor->document(), m_editor->fileName(), &recentError)) {
         qWarning("Could not keep the label in the recently used layouts: %s", qPrintable(recentError));
     }
+    PrintRecord record;
+    record.when = QDateTime::currentDateTime();
+    record.source = m_editor->fileName();
+    record.title = record.source.isEmpty() ? m_editor->document().paperName : QFileInfo(record.source).fileName();
+    record.printer = printerName;
+    record.labels = printer.printedLabels();
+    record.job = job;
+    for (const PrintQuestion &question : m_editor->document().questions) {
+        record.answers.insert(question.name, m_answers.value(question.name));
+    }
+    record.rows = m_printedRows;
+    QString historyError;
+    if (!PrintHistory().add(record, m_editor->document(), &historyError)) {
+        qWarning("Could not write the print history: %s", qPrintable(historyError));
+    }
     advanceCounters(printer.printedLabels(), sharedNext);
     // In print-only mode the label keeps its counters itself: nobody will
     // save it by hand.
     if (m_printOnly && m_editor->isModified() && !m_editor->fileName().isEmpty()) {
         QString saveError;
-        if (!m_editor->save(m_editor->fileName(), &saveError)) {
+        if (!m_editor->save(m_editor->fileName(), &saveError, false)) {
             KMessageBox::error(this, i18n("The counters could not be saved in the label:\n%1", saveError));
         }
     }

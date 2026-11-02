@@ -7,6 +7,7 @@
 #include "datadialogs.h"
 #include "gs1dialog.h"
 #include "labelformat.h"
+#include "historydialogs.h"
 #include "layersdialog.h"
 #include "printonlypanel.h"
 #include "rolllayoutdialog.h"
@@ -366,6 +367,57 @@ private Q_SLOTS:
         QVERIFY(!dialog.findChild<QLineEdit *>()->isVisible()); // the file name
         QCOMPARE(dialog.selectedRows(), QList<int>{1});
         QCOMPARE(dialog.source(), source);
+    }
+
+    void versionsAndHistoryAreShown()
+    {
+        QTemporaryDir dir;
+        LabelDocument label;
+        label.paperOutline.addRect(QRectF(0, 0, 1581, 5040));
+        const QString older = dir.filePath(u"older.label"_s);
+        const QString newer = dir.filePath(u"newer.label"_s);
+        QVERIFY(LabelWriter::writeFile(label, older));
+        QVERIFY(LabelWriter::writeFile(label, newer));
+        const QDateTime now = QDateTime::currentDateTime();
+        VersionsDialog versions(dir.filePath(u"rack.label"_s), {{newer, now}, {older, now.addDays(-1)}}, nullptr);
+        versions.show();
+        QVERIFY(QTest::qWaitForWindowExposed(&versions));
+        QCOMPARE(versions.chosenVersion(), newer);
+        versions.findChild<QListWidget *>()->setCurrentRow(1);
+        QCOMPARE(versions.chosenVersion(), older);
+        grab(&versions, u"versions"_s);
+
+        PrintRecord first;
+        first.when = now.addSecs(-60);
+        first.title = u"rack.label"_s;
+        first.printer = u"Altec"_s;
+        first.labels = 3;
+        first.rows = {{{u"Name"_s, u"SRV-HV01"_s}}};
+        PrintRecord second = first;
+        second.when = now;
+        second.title = u"batch.label"_s;
+        second.answers = {{u"Batch"_s, u"1234"_s}};
+        second.rows.clear();
+        PrintHistoryDialog history({second, first}, nullptr);
+        history.show();
+        QVERIFY(QTest::qWaitForWindowExposed(&history));
+        auto *table = history.findChild<QTableWidget *>();
+        QCOMPARE(table->rowCount(), 2);
+        QCOMPARE(table->item(0, 4)->text(), u"Batch: 1234"_s);
+        // Searching also finds the data rows' values.
+        history.findChild<QLineEdit *>()->setText(u"hv01"_s);
+        QVERIFY(table->isRowHidden(0));
+        QVERIFY(!table->isRowHidden(1));
+        history.findChild<QLineEdit *>()->clear();
+        grab(&history, u"history"_s);
+        table->selectRow(1);
+        for (QPushButton *button : history.findChildren<QPushButton *>()) {
+            if (button->text().contains(u"Again"_s)) {
+                button->click();
+            }
+        }
+        QCOMPARE(history.action(), PrintHistoryDialog::Action::PrintAgain);
+        QCOMPARE(history.chosenRecord(), first);
     }
 
     void questionsAreEdited()

@@ -8,6 +8,7 @@
 #include "labelclipboard.h"
 #include "inlinetexteditor.h"
 #include "labeleditor.h"
+#include "labelversions.h"
 #include "labelview.h"
 #include "objectfactory.h"
 #include "printpreviewdialog.h"
@@ -23,6 +24,7 @@
 #include <QPushButton>
 #include <QMimeData>
 #include <QSignalSpy>
+#include <QStandardPaths>
 #include <QTemporaryDir>
 #include <QTest>
 
@@ -59,6 +61,8 @@ private Q_SLOTS:
     void initTestCase()
     {
         KLocalizedString::setApplicationDomain("plasma-label-creator");
+        // Versions of saved labels go to a test folder, not the user's.
+        QStandardPaths::setTestModeEnabled(true);
     }
 
     void newLabelsAreLandscapeWhenLong()
@@ -148,6 +152,18 @@ private Q_SLOTS:
         QCOMPARE(reopened.document().objects, editor.document().objects);
         QCOMPARE(reopened.document().canvasSize(), editor.document().canvasSize());
         QCOMPARE(reopened.fileName(), fileName);
+
+        // Saving over it keeps what it was; saving counters only does not.
+        LabelVersions versions;
+        const qsizetype before = versions.versions(fileName).size();
+        changed.objects.removeLast();
+        editor.apply(changed, u"Remove"_s);
+        QVERIFY(editor.save(fileName, &error));
+        QCOMPARE(versions.versions(fileName).size(), before + 1);
+        editor.apply(addressLabel(), u"Again"_s);
+        QVERIFY(editor.save(fileName, &error, false));
+        QCOMPARE(versions.versions(fileName).size(), before + 1);
+        QVERIFY(LabelVersions::defaultDirectory().contains(u"qttest"_s)); // not the user's
     }
 
     void dragMovesTheObject()

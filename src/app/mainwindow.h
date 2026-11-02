@@ -8,6 +8,7 @@
 #include "datareader.h"
 #include "labelprinter.h"
 #include "objectfactory.h"
+#include "printhistory.h"
 #include "recentlayouts.h"
 
 #include <KXmlGuiWindow>
@@ -177,6 +178,11 @@ private:
     void editCalculatedFields();
     /** Ticks the data rows to print, without changing where they come from. */
     void chooseRows();
+    /** Earlier versions of the label: shown, and one restored if chosen. */
+    void showVersions();
+    void showPrintHistory();
+    /** Prints @p record's labels again, with its answers and rows. */
+    void printAgain(const LabelCreator::PrintRecord &record);
     void setupPrintOnlyActions();
     /** In print-only mode, turns off every action that edits. */
     void keepEditingOff();
@@ -229,6 +235,8 @@ private:
     LabelCreator::DataSource m_dataTableSource;
     QList<int> m_dataRows;
     QHash<QString, QString> m_answers;
+    // The data rows of the labels labelsToPrint() made last, for the print history.
+    QList<QHash<QString, QString>> m_printedRows;
     // The database password given last, kept in memory only, for the
     // database (driver, host, database, user) it was given for.
     QString m_databasePassword;

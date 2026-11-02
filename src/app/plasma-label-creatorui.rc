@@ -4,7 +4,7 @@
     SPDX-License-Identifier: CC0-1.0
 -->
 <!DOCTYPE gui>
-<gui name="plasma-label-creator" version="18"
+<gui name="plasma-label-creator" version="19"
      xmlns="http://www.kde.org/standards/kxmlgui/1.0"
      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
      xsi:schemaLocation="http://www.kde.org/standards/kxmlgui/1.0 http://www.kde.org/standards/kxmlgui/1.0/kxmlgui.xsd">
@@ -12,7 +12,9 @@
         <Menu name="file">
             <Action name="layout_recent" append="open_merge"/>
             <Action name="file_export" append="save_merge"/>
+            <Action name="file_print_history" append="print_merge"/>
             <Action name="file_print_only" append="print_merge"/>
+            <Action name="file_versions" append="save_merge"/>
         </Menu>
         <Menu name="edit">
             <Action name="edit_delete" append="edit_paste_merge"/>
@@ -217,6 +219,7 @@
         <Separator/>
         <Action name="data_choose_rows"/>
         <Separator/>
+        <Action name="file_print_history"/>
         <Action name="file_print_preview"/>
         <Action name="file_print"/>
     </ToolBar>

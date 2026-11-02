@@ -25,6 +25,10 @@ add_library(labelcreatorcore STATIC
     labelprinter.h
     labelrenderer.cpp
     labelrenderer.h
+    labelversions.cpp
+    labelversions.h
+    printhistory.cpp
+    printhistory.h
     recentlayouts.cpp
     recentlayouts.h
     sharedcounter.cpp
