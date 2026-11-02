@@ -8,6 +8,7 @@
 #include "gs1dialog.h"
 #include "labelformat.h"
 #include "historydialogs.h"
+#include "exportdialog.h"
 #include "layersdialog.h"
 #include "settingsdialog.h"
 #include "printerstatusdialog.h"
@@ -15,6 +16,7 @@
 #include "rolllayoutdialog.h"
 
 #include <QDialogButtonBox>
+#include <QRadioButton>
 #include <KSharedConfig>
 #include <KConfigGroup>
 #include <QStandardPaths>
@@ -501,6 +503,26 @@ private Q_SLOTS:
         dialog.button(QDialogButtonBox::Apply)->click();
         QCOMPARE(applied.size(), 1);
         KSharedConfig::openConfig()->deleteGroup(u"Settings"_s);
+    }
+
+    void exportChoosesFormatAndOutline()
+    {
+        QTemporaryDir dir;
+        ExportDialog dialog(dir.filePath(u"rack.pdf"_s), false, nullptr);
+        dialog.show();
+        QVERIFY(QTest::qWaitForWindowExposed(&dialog));
+        QVERIFY(!dialog.png());
+        QVERIFY(!dialog.outline());
+        // PNG: the file name follows.
+        dialog.findChildren<QRadioButton *>().at(1)->setChecked(true);
+        QVERIFY(dialog.png());
+        QCOMPARE(dialog.fileName(), dir.filePath(u"rack.png"_s));
+        dialog.findChild<QCheckBox *>()->setChecked(true);
+        QVERIFY(dialog.outline());
+        grab(&dialog, u"export"_s);
+        // No extension typed: the format's.
+        dialog.findChild<QLineEdit *>()->setText(dir.filePath(u"proof"_s));
+        QCOMPARE(dialog.fileName(), dir.filePath(u"proof.png"_s));
     }
 
     void questionsAreEdited()

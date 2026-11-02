@@ -19,6 +19,8 @@ add_executable(plasma-label-creator
     customlabels.h
     dragsupport.cpp
     dragsupport.h
+    exportdialog.cpp
+    exportdialog.h
     gs1dialog.cpp
     gs1dialog.h
     historydialogs.cpp

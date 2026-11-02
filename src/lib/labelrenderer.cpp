@@ -589,6 +589,11 @@ void LabelRenderer::setDateTime(const QDateTime &when)
     m_dateTime = when;
 }
 
+void LabelRenderer::setOutline(bool outline)
+{
+    m_outline = outline;
+}
+
 void LabelRenderer::setCounterStep(int step)
 {
     m_counterStep = step;
@@ -658,18 +663,24 @@ void LabelRenderer::paint(QPainter *painter, const LabelDocument &laidOut)
     painter->setRenderHint(QPainter::TextAntialiasing, preview);
     painter->setRenderHint(QPainter::SmoothPixmapTransform, preview);
 
+    // The outline is stored as the paper feeds; DLS lays landscape labels
+    // out with the leading edge on the left: paper (x, y) is canvas
+    // (y, width - x).
+    QTransform toCanvas;
+    if (document.orientation == PaperOrientation::Landscape) {
+        toCanvas.translate(0, document.paperSize().width());
+        toCanvas.rotate(-90);
+    }
+    const QPainterPath outline = toCanvas.map(document.paperOutline);
     if (preview) {
-        // The outline is stored as the paper feeds; DLS lays landscape labels
-        // out with the leading edge on the left: paper (x, y) is canvas
-        // (y, width - x).
-        QTransform toCanvas;
-        if (document.orientation == PaperOrientation::Landscape) {
-            toCanvas.translate(0, document.paperSize().width());
-            toCanvas.rotate(-90);
-        }
         painter->setPen(QPen(QColor(160, 160, 160), 0));
         painter->setBrush(Qt::white);
-        painter->drawPath(toCanvas.map(document.paperOutline));
+        painter->drawPath(outline);
+    }
+    // A proof: nothing beyond the label's shape, which is drawn after.
+    const bool proof = !preview && m_outline && !outline.isEmpty();
+    if (proof) {
+        painter->setClipPath(outline, Qt::IntersectClip);
     }
 
     for (int i = 0; i < document.objects.size(); ++i) {
@@ -705,6 +716,15 @@ void LabelRenderer::paint(QPainter *painter, const LabelDocument &laidOut)
         borders(document.tape->root);
     }
     painter->restore();
+
+    if (proof) {
+        painter->save();
+        painter->setRenderHint(QPainter::Antialiasing, true);
+        painter->setPen(QPen(QColor(160, 160, 160), 10)); // twips: half a point
+        painter->setBrush(Qt::NoBrush);
+        painter->drawPath(outline);
+        painter->restore();
+    }
 }
 
 qreal LabelRenderer::naturalLength(const LabelObject &object, qreal across, bool horizontal) const

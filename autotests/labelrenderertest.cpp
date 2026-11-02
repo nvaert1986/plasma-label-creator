@@ -307,6 +307,32 @@ private Q_SLOTS:
         QCOMPARE(inkBounds(renderer.renderImage(quarter, Dpi)), turned);
     }
 
+    void exportsCanShowTheLabelsOutline()
+    {
+        // A label with rounded corners, filled black to its very edges.
+        LabelDocument document;
+        document.paperOutline.addRoundedRect(QRectF(0, 0, 2000, 1200), 300, 300);
+        ShapeObject fill;
+        fill.shapeType = ShapeType::Rectangle;
+        fill.fillColor = Qt::black;
+        fill.bounds = QRectF(0, 0, 2000, 1200);
+        document.objects << fill;
+        LabelRenderer renderer(LabelRenderer::Mode::Print);
+        const QImage plain = renderer.renderImage(document, Dpi);
+        // As it prints: square, the corner too.
+        QVERIFY(plain.pixelColor(2, 2).lightness() < 128);
+
+        renderer.setOutline(true);
+        const QImage proof = renderer.renderImage(document, Dpi);
+        QCOMPARE(proof.size(), plain.size());
+        // Nothing beyond the rounded corner; inside, as before.
+        QVERIFY(proof.pixelColor(2, 2).lightness() > 200);
+        QVERIFY(proof.pixelColor(proof.width() / 2, proof.height() / 2).lightness() < 128);
+        // The outline itself is grey, not black.
+        const QColor edge = proof.pixelColor(proof.width() / 2, 0);
+        QVERIFY2(edge.lightness() > 100 && edge.lightness() < 220, qPrintable(edge.name()));
+    }
+
     void wordsTooWideBreakInside()
     {
         const QRectF bounds(200, 200, 400, 1400);

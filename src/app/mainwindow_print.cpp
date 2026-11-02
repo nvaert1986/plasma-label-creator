@@ -374,24 +374,26 @@ void MainWindow::printPreview()
 
 void MainWindow::exportLabel()
 {
-    const QString pdfFilter = i18n("PDF document (*.pdf)");
-    const QString pngFilter = i18n("PNG image at the printer's resolution (*.png)");
-    QString filter = pdfFilter;
+    // Named after the label, in the folder and format used last.
     const QString base = m_editor->fileName().isEmpty() ? i18n("Label") : QFileInfo(m_editor->fileName()).completeBaseName();
-    QString fileName = QFileDialog::getSaveFileName(this, i18n("Export Label"), base + u".pdf"_s, pdfFilter + u";;"_s + pngFilter, &filter);
-    if (fileName.isEmpty()) {
+    const QString folder = settings().readEntry("ExportFolder", m_editor->fileName().isEmpty() ? QDir::homePath() : QFileInfo(m_editor->fileName()).absolutePath());
+    const QString suffix = settings().readEntry("ExportFormat", u"pdf"_s);
+    ExportDialog dialog(QDir(folder).filePath(base + u'.' + suffix), settings().readEntry("ExportOutline", false), this);
+    if (dialog.exec() != QDialog::Accepted) {
         return;
     }
-    const bool png = filter == pngFilter || fileName.endsWith(u".png"_s, Qt::CaseInsensitive);
-    if (QFileInfo(fileName).suffix().isEmpty()) {
-        fileName += png ? u".png"_s : u".pdf"_s;
-    }
+    const QString fileName = dialog.fileName();
+    const bool png = dialog.png();
+    settings().writeEntry("ExportFolder", QFileInfo(fileName).absolutePath());
+    settings().writeEntry("ExportFormat", png ? u"png"_s : u"pdf"_s);
+    settings().writeEntry("ExportOutline", dialog.outline());
 
-    // As on the canvas, tape laid out to its length; no outline, nothing
-    // that only shows on screen.
+    // As on the canvas, tape laid out to its length; nothing that only shows
+    // on screen, and the label's outline only when asked for.
     LabelDocument document = m_editor->document();
     TapeLayout::layout(document);
     LabelRenderer renderer(LabelRenderer::Mode::Print);
+    renderer.setOutline(dialog.outline());
     qreal dpi = 300;
     if (!m_printBar->printerName().isEmpty()) {
         LabelPrinter printer(m_printBar->printerName(), m_printBar->printerDriver());

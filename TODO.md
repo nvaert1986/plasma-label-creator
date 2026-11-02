@@ -40,11 +40,14 @@ See `CHANGELOG.md` under "Unreleased" for the details.
 - [x] Printer warnings in the print bar and a Printer Status window.
 - [x] Settings > Configure Plasma Label Creator (designing, printing,
   print-only mode with a lock, history and versions).
+- [x] Print preview fitted on opening, landscape labels as on the canvas.
+- [x] Export with the label's outline (rounded corners) as a proof.
 
 ## Next session
 
 Version 0.3.0 is released and tested. Since then: print-only mode, forms,
-versions, print history and printer status, not released yet. Next: try
+versions, print history, printer status, settings and export with the
+label's outline, not released yet. Next: try
 those (checks under "Bug review"), then the printer tests below.
 
 ## Third bug review (2026-10-30, 0.3.0)

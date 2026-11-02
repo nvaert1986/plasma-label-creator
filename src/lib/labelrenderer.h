@@ -46,6 +46,12 @@ public:
     void setDateTime(const QDateTime &when);
     /** Which label of a print run this is: counters advance by this many steps. */
     void setCounterStep(int step);
+    /**
+     * In Print mode, also draws the label's outline (its die-cut shape, such
+     * as rounded corners) as a thin grey line, with nothing outside it: a
+     * proof of the label as it will look. For exports, never for printing.
+     */
+    void setOutline(bool outline);
 
     /** Paints the label with the painter's coordinates in twips. */
     void paint(QPainter *painter, const LabelDocument &document);
@@ -84,6 +90,7 @@ private:
     qreal m_printerResolution = 300;
     QDateTime m_dateTime;
     int m_counterStep = 0;
+    bool m_outline = false; // a proof, for exports
     QStringList m_warnings;
 };
 

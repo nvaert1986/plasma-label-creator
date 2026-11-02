@@ -13,6 +13,7 @@
 #include "arrange.h"
 #include "customlabels.h"
 #include "datadialogs.h"
+#include "exportdialog.h"
 #include "fields.h"
 #include "labelclipboard.h"
 #include "labelformat.h"

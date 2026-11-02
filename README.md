@@ -89,7 +89,8 @@ Altec, Zebra Technologies or KDE e.V. See [Trademarks](#trademarks).
 - **Print preview**: the pages exactly as the printer receives them, dot
   for dot, stepping through a run where counters or addresses change.
 - **Export** a label as a PDF (vector, the label's own size) or as a PNG at
-  the printer's resolution.
+  the printer's resolution, optionally with the label's outline (rounded
+  corners too) for a proof.
 - **Recently used layouts**: every printed label, with a thumbnail.
 - **`plasma-label-creator-render`**: a command-line tool that renders a
   label to PNG or PDF, prints it, or shows what a printer would receive.
@@ -166,6 +167,9 @@ plasma-label-creator-render label.label --queue LabelMANAGER-450 --paper-image p
 
 # Ask a ZPL printer on the network what it is and what is loaded
 plasma-label-creator-render --zpl-info 192.0.2.10
+
+# A PDF proof with the label's outline
+plasma-label-creator-render --outline label.label proof.pdf
 ```
 
 `plasma-label-creator-render --help` lists every option.

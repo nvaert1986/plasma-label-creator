@@ -81,6 +81,7 @@ int main(int argc, char *argv[])
     parser.addVersionOption();
     const QCommandLineOption dpiOption(u"dpi"_s, u"Resolution of the image (default 300, the LabelWriter head)."_s, u"dpi"_s, u"300"_s);
     const QCommandLineOption printOption(u"print"_s, u"Render as for the printer: no antialiasing, no outline."_s);
+    const QCommandLineOption outlineOption(u"outline"_s, u"With --print or a PDF: draw the label's outline, a proof of how it will look."_s);
     const QCommandLineOption infoOption(u"info"_s, u"List the paper and the objects."_s);
     const QCommandLineOption resaveOption(u"resave"_s, u"Write the label back out to <file>, to check round trips."_s, u"file"_s);
     const QCommandLineOption listPrintersOption(u"list-printers"_s, u"List the CUPS queues and their DYMO paper sizes."_s);
@@ -97,6 +98,7 @@ int main(int argc, char *argv[])
                                            u"host"_s);
     parser.addOptions({dpiOption,
                        printOption,
+                       outlineOption,
                        infoOption,
                        resaveOption,
                        listPrintersOption,
@@ -268,9 +270,10 @@ int main(int argc, char *argv[])
     }
 
     if (arguments.size() == 2 && arguments.at(1).endsWith(u".pdf"_s, Qt::CaseInsensitive)) {
-        // A PDF is the label as it is, without the outline: always print mode.
+        // A PDF is the label as it prints: print mode, the outline only when asked.
         LabelRenderer renderer(LabelRenderer::Mode::Print);
         renderer.setPrinterResolution(dpi);
+        renderer.setOutline(parser.isSet(outlineOption));
         if (!renderer.writePdf(*document, arguments.at(1), QFileInfo(arguments.at(0)).completeBaseName())) {
             err << arguments.at(1) << ": could not write the PDF\n";
             return 3;
@@ -280,6 +283,7 @@ int main(int argc, char *argv[])
         }
     } else if (arguments.size() == 2) {
         LabelRenderer renderer(parser.isSet(printOption) ? LabelRenderer::Mode::Print : LabelRenderer::Mode::Preview);
+        renderer.setOutline(parser.isSet(outlineOption));
         const QImage image = renderer.renderImage(*document, dpi);
         for (const QString &warning : renderer.warnings()) {
             err << "warning: " << warning << '\n';

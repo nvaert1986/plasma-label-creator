@@ -35,6 +35,11 @@
   printing it asks "Print Anyway?" when something is wrong. Printer
   Status... shows every label printer's queue and state, refreshed every
   ten seconds. `plasma-label-creator-render --list-printers` shows them too.
+- **Export with the label's outline**: File > Export... asks for the file,
+  PDF or PNG, and "Show the label's outline" for a proof: the label's shape
+  (rounded corners too) drawn in grey and the content clipped to it. The
+  folder, format and choice are remembered. `plasma-label-creator-render
+  --outline` does the same for PDF and `--print` PNG.
 
 ### Settings
 
