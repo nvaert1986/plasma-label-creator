@@ -125,6 +125,8 @@ void MainWindow::setPrintOnly(bool printOnly)
         m_printOnlyAction->setChecked(printOnly);
     }
     m_view->setReadOnly(printOnly);
+    // The address book is hidden: its checked addresses do not print either.
+    m_printBar->setCheckedAddresses(printOnly ? 0 : int(m_sidebar->addressBook()->checkedAddresses().size()));
     m_sidebar->setVisible(!printOnly);
     m_printOnlyPanel->setVisible(printOnly);
     // The panel shown gets the side's room; the label the rest.
@@ -308,5 +310,11 @@ void MainWindow::printAgain(const PrintRecord &record)
     m_editor->reset(*label);
     m_answers.insert(record.answers);
     m_printedRows = record.rows;
+    // The checks of any print: the label suits the printer, the printer is ready.
+    if (!confirmLabelFitsPrinter()) {
+        return;
+    }
+    m_reprintTitle = record.title;
     printLabels(labels);
+    m_reprintTitle.clear();
 }

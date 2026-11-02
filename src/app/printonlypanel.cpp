@@ -131,7 +131,12 @@ void PrintOnlyPanel::listLabels()
     }
     const QFileInfoList files = QDir(m_folder).entryInfoList({u"*.label"_s}, QDir::Files | QDir::Readable, QDir::Name | QDir::IgnoreCase);
     for (const QFileInfo &file : files) {
-        auto *item = new QListWidgetItem(thumbnail(file.absoluteFilePath()), file.completeBaseName(), m_labels);
+        // Drawn again only when the file changed (counters saved after printing).
+        auto cached = m_thumbnails.constFind(file.absoluteFilePath());
+        if (cached == m_thumbnails.constEnd() || cached->first != file.lastModified()) {
+            cached = m_thumbnails.insert(file.absoluteFilePath(), {file.lastModified(), thumbnail(file.absoluteFilePath())});
+        }
+        auto *item = new QListWidgetItem(cached->second, file.completeBaseName(), m_labels);
         item->setData(Qt::UserRole, file.absoluteFilePath());
         item->setToolTip(file.absoluteFilePath());
     }

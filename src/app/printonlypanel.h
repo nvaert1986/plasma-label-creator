@@ -8,7 +8,9 @@
 #include "datareader.h"
 #include "labeldocument.h"
 
+#include <QDateTime>
 #include <QHash>
+#include <QIcon>
 #include <QPointer>
 #include <QWidget>
 
@@ -62,5 +64,7 @@ private:
     QGroupBox *m_answersBox;
     QVBoxLayout *m_answersLayout;
     QPointer<AnswersForm> m_form;
+    // Pictures already drawn, by file, with the time the file had then.
+    QHash<QString, std::pair<QDateTime, QIcon>> m_thumbnails;
     QLabel *m_problem;
 };

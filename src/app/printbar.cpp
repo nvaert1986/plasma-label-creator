@@ -398,14 +398,17 @@ void PrintBar::detectLabels()
         if (printerName() != name) {
             return;
         }
-        // The label types follow the labels loaded: only when those changed.
-        const QSizeF before = m_zplInfo && m_zplPrinter == name ? m_zplInfo->labelSizeMm() : QSizeF();
+        // The label types follow the labels loaded: only when those changed,
+        // or the printer started or stopped answering. A printer that keeps
+        // not answering changes nothing.
+        const bool answered = m_zplInfo && m_zplPrinter == name;
+        const QSizeF before = answered ? m_zplInfo->labelSizeMm() : QSizeF();
         m_detecting.clear();
         m_zplInfo = *result;
         m_zplPrinter = name;
         m_zplError = *error;
         updatePrinterStatus(m_zplError);
-        if (!m_zplInfo || m_zplInfo->labelSizeMm() != before) {
+        if (m_zplInfo.has_value() != answered || (m_zplInfo && m_zplInfo->labelSizeMm() != before)) {
             reloadPaperSizes();
         }
     });

@@ -262,7 +262,9 @@ void MainWindow::printLabels(const QList<LabelDocument> &prepared)
     PrintRecord record;
     record.when = QDateTime::currentDateTime();
     record.source = m_editor->fileName();
-    record.title = record.source.isEmpty() ? m_editor->document().paperName : QFileInfo(record.source).fileName();
+    record.title = !record.source.isEmpty() ? QFileInfo(record.source).fileName()
+        : !m_reprintTitle.isEmpty()         ? m_reprintTitle
+                                            : m_editor->document().paperName;
     record.printer = printerName;
     record.labels = printer.printedLabels();
     record.job = job;

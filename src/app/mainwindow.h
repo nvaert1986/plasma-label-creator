@@ -240,6 +240,8 @@ private:
     QHash<QString, QString> m_answers;
     // The data rows of the labels labelsToPrint() made last, for the print history.
     QList<QHash<QString, QString>> m_printedRows;
+    // While printing again from the history: the label's name then.
+    QString m_reprintTitle;
     // The database password given last, kept in memory only, for the
     // database (driver, host, database, user) it was given for.
     QString m_databasePassword;
