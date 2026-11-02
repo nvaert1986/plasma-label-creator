@@ -50,6 +50,7 @@ Version 0.3.0 is released and tested. Since then: print-only mode, forms,
 versions, print history, printer status, settings and export with the
 label's outline, not released yet. Next: try
 those (checks under "Bug review"), then the printer tests below.
+After that, bringing the web version up to date (see "Web version").
 
 ## Third bug review (2026-10-30, 0.3.0)
 
@@ -165,6 +166,39 @@ Hard:
 
 Nothing open.
 
+## Web version: the desktop app's features
+
+The web version has about what the first release had (designing, label
+types per printer, labels of a kind, `.label` and `.rhino` files, printing
+through the browser), plus sign-in, users, and printers, label sizes and
+labels kept per user. The aim is to bring it close to the desktop app, one
+phase at a time, each with its own tests. Not everything can follow: a
+browser cannot reach CUPS or talk to a printer directly.
+
+- [ ] **Phase 1, the 0.2.0 features**: a label for each row of a CSV, text,
+  Excel or ODS file; fields; pictures from data; print-time questions; grid
+  and snapping; white on black; Rotate Label turning the objects; the
+  barcodes added in 0.2.0; print preview; PDF and PNG export (with the
+  label's outline); the address book. (Medium; the barcodes are cheap, zint
+  already runs in the browser; Excel and ODS need a reader, PDF a library.)
+- [ ] **Phase 2, the 0.3.0 designer**: selecting several objects, align
+  and distribute, group, lock, wrapped text, layers and Do Not Print, free
+  angles and turning with the mouse, calculated fields, the GS1 builder,
+  labels across and continuous rolls. (Medium-Hard; working with several
+  objects at once on the canvas is most of it.)
+- [ ] **Phase 3, for operators**: print-only page, data-entry forms,
+  versions of labels, print history, shared counters, settings. (Medium;
+  simpler than on the desktop, as the server already knows the users: the
+  versions and history can be per user and shared, see "Later".)
+- [ ] **Phase 4, databases** as a data source (SQL Server and others),
+  queried by the server: read-only, with care for who may use which
+  database and where its password is kept. (Medium)
+- [ ] **Phase 5, printers**, only where it can be done: the server asking a
+  ZPL printer on the network about its labels and status, if it can reach
+  it. A CUPS queue's state, LabelWriters plugged in over USB and printing
+  without the browser's print dialog would need a small helper program on
+  each computer. (Hard; left out unless needed.)
+
 ## Later (low priority)
 
 Beyond the designer: printing for operators, automation, and managing
@@ -184,8 +218,10 @@ In the desktop app:
 
 In the web version's server, used by both apps:
 
-- [ ] **Versions** of saved labels, to compare and restore. (Easy-Medium)
-- [ ] **Print history**: who printed which label, version and how many.
+- [ ] **Versions** of saved labels, shared by everyone using them, to compare
+  and restore (the desktop app keeps them per computer). (Easy-Medium)
+- [ ] **Print history** for everyone (the desktop app keeps one per
+  computer): who printed which label, version and how many.
   (Easy-Medium)
 - [ ] **Roles and permissions**: designers, approvers, operators; labels per
   group. (Medium)
