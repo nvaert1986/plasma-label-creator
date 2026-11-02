@@ -52,8 +52,8 @@ See `CHANGELOG.md` under "Unreleased" for the details.
 Version 0.3.0 is released and tested. Since then: print-only mode, forms,
 versions, print history, printer status, settings, export with the
 label's outline, DYMO's label ids and the automation service, not released
-yet. Next: try
-those (checks under "Bug review"), then the printer tests below.
+yet. Next: try those (checks under "Bug review"), then the printer tests
+below.
 After that, bringing the web version up to date (see "Web version").
 
 ## Third bug review (2026-10-30, 0.3.0)
@@ -108,6 +108,16 @@ Still to do by hand, in the running app:
   versions next to the label on a share.
 - [ ] Shared counter: two computers printing the same label with one
   counter file on a share count on without repeats.
+- [ ] Export: PDF and PNG with and without the outline; a name without
+  folder or extension; a folder that no longer exists.
+- [ ] DYMO's label ids: a new 30252/99010 label saved has `<Id>Address`;
+  an older file saved again gets it too; DYMO's software opens both.
+- [ ] Automation service: start and stop it from Settings > Automation,
+  start at log-in; a CSV dropped in a watched folder prints a label per
+  row (counters count on in the label, the print shows in the history); a
+  bad job lands in `failed/` with the reason; a request over HTTP with
+  `curl` (and without the token: refused); a stopped queue is refused
+  unless `printAnyway`. Needs a real test print.
 
 ## Designer
 
