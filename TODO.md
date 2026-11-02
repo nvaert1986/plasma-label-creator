@@ -42,6 +42,7 @@ See `CHANGELOG.md` under "Unreleased" for the details.
   print-only mode with a lock, history and versions).
 - [x] Print preview fitted on opening, landscape labels as on the canvas.
 - [x] Export with the label's outline (rounded corners) as a proof.
+- [x] `printbar.cpp` split by topic (bar, printers, status).
 
 ## Next session
 
@@ -162,7 +163,7 @@ Hard:
 
 ## Code
 
-- [ ] Split `printbar.cpp`; it has grown large (`mainwindow.cpp` is split).
+Nothing open.
 
 ## Later (low priority)
 

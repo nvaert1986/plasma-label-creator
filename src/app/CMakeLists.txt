@@ -49,6 +49,8 @@ add_executable(plasma-label-creator
     objectfactory.cpp
     objectfactory.h
     printbar.cpp
+    printbar_printers.cpp
+    printbar_status.cpp
     printonlypanel.cpp
     printonlypanel.h
     printerstatusdialog.cpp

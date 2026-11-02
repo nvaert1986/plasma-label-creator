@@ -80,6 +80,8 @@
 ### Other
 
 - The about text names all supported printers.
+- The print bar's code is split into files by topic (the bar, printers,
+  printer status); no change in use.
 
 ## 0.3.0 (2026-10-30)
 
