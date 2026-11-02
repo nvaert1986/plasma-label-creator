@@ -53,7 +53,6 @@ private:
 
     QString m_settingsFile;
     LabelCreator::AutomationSettings m_settings;
-    LabelCreator::PrintEnvironment m_environment;
     QFileSystemWatcher *m_watcher;
     QTimer *m_reloadTimer;
     QTimer *m_scanTimer;

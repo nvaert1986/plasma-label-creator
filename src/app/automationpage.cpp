@@ -59,6 +59,22 @@ QWidget *withBrowse(QLineEdit *edit, const std::function<void()> &browse)
     return row;
 }
 
+// A program for a desktop entry's Exec: quoted when it needs to be, and
+// then escaped as any value is (backslashes doubled), and % as %%.
+QString execQuoted(QString program)
+{
+    static const QString reserved = u" \t\n\"'\\><~|&;$*?#()`"_s;
+    if (std::any_of(program.cbegin(), program.cend(), [](QChar c) {
+            return reserved.contains(c);
+        })) {
+        for (const QChar c : {u'\\', u'"', u'`', u'$'}) {
+            program.replace(c, u'\\' + QString(c));
+        }
+        program = u'"' + program + u'"';
+    }
+    return program.replace(u'\\', u"\\\\"_s).replace(u'%', u"%%"_s);
+}
+
 // The printers, with @p none first for "no printer chosen".
 void fillPrinters(QComboBox *combo, const QString &none, const QString &current)
 {
@@ -335,7 +351,8 @@ bool AutomationPage::save(QString *errorString)
     const AutomationSettings current = settings();
     // Unchanged: not written, so a running service is left alone.
     if (current != AutomationSettings::load(m_settingsFile) || !QFileInfo::exists(m_settingsFile)) {
-        if ((!current.folders.isEmpty() || current.http || QFileInfo::exists(m_settingsFile)) && !current.save(m_settingsFile, errorString)) {
+        // Nothing set and no file yet: no file is needed.
+        if ((current != AutomationSettings() || QFileInfo::exists(m_settingsFile)) && !current.save(m_settingsFile, errorString)) {
             return false;
         }
     }
@@ -351,7 +368,7 @@ bool AutomationPage::save(QString *errorString)
             return false;
         }
         file.write("[Desktop Entry]\nType=Application\nName=Plasma Label Creator automation\nIcon=document-print\nNoDisplay=true\nExec=");
-        file.write(serviceProgram().toUtf8());
+        file.write(execQuoted(serviceProgram()).toUtf8());
         file.write("\nX-KDE-autostart-phase=2\n");
         if (!file.commit()) {
             if (errorString) {

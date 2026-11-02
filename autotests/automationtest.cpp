@@ -176,6 +176,37 @@ private Q_SLOTS:
         QCOMPARE(defaults->value(u"Packed"_s), QDate::currentDate().toString(u"dd-MM-yyyy"_s));
         QCOMPARE(defaults->value(u"Fragile"_s), u"No"_s);
 
+        // As the form starts when nothing is given: a drop-down on its first
+        // choice (empty when optional), a number on its default within its
+        // range, a date that is not one on today.
+        PrintQuestion size;
+        size.name = u"Size"_s;
+        size.kind = PrintQuestion::Kind::Choice;
+        size.choices = {u"S"_s, u"M"_s};
+        PrintQuestion colour = size;
+        colour.name = u"Colour"_s;
+        colour.required = false;
+        PrintQuestion count;
+        count.name = u"Count"_s;
+        count.kind = PrintQuestion::Kind::Number;
+        count.defaultValue = u"75"_s;
+        count.maximum = 50;
+        PrintQuestion due;
+        due.name = u"Due"_s;
+        due.kind = PrintQuestion::Kind::Date;
+        due.defaultValue = u"next week"_s;
+        LabelDocument form = labelWith(u"x"_s);
+        form.questions = {size, colour, count, due};
+        const auto started = Automation::answers(form, {});
+        QVERIFY(started);
+        QCOMPARE(started->value(u"Size"_s), u"S"_s);
+        QCOMPARE(started->value(u"Colour"_s), QString());
+        QCOMPARE(started->value(u"Count"_s), u"50"_s);
+        QCOMPARE(started->value(u"Due"_s), QDate::currentDate().toString(QLocale().dateFormat(QLocale::ShortFormat)));
+        // Given, a choice must be one of them, and 1,234 is not 1234.
+        QVERIFY(!Automation::answers(form, {{u"Size"_s, u"XL"_s}}));
+        QVERIFY(!Automation::answers(form, {{u"Count"_s, u"1,234"_s}}));
+
         // The question's rules still hold.
         QVERIFY(!Automation::answers(document, {}, &error)); // Lot is needed
         QVERIFY(error.contains(u"Lot"_s));

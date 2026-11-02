@@ -432,33 +432,59 @@ std::optional<QHash<QString, QString>> answers(const LabelDocument &document, co
         const QString label = question.prompt.isEmpty() ? question.name : question.prompt;
         switch (question.kind) {
         case PrintQuestion::Kind::Text:
-        case PrintQuestion::Kind::Choice:
             break;
-        case PrintQuestion::Kind::Number:
-            if (!answer.isEmpty()) {
-                bool ok = false;
-                double number = QLocale().toDouble(answer, &ok);
+        case PrintQuestion::Kind::Choice:
+            // Not given: what the form starts on, the default if it is one
+            // of the choices, else the first (an empty one when optional).
+            if (!answered && question.choicesColumn.isEmpty() && !question.choices.contains(answer)) {
+                answer = question.required ? question.choices.value(0) : QString();
+            }
+            break;
+        case PrintQuestion::Kind::Number: {
+            bool ok = false;
+            double number = 0;
+            if (answered) {
+                // Programs write 2.5; people may write 2,5 as their language does.
+                number = QLocale::c().toDouble(answer.trimmed(), &ok);
                 if (!ok) {
-                    number = QLocale::c().toDouble(answer, &ok);
+                    QLocale local;
+                    local.setNumberOptions(QLocale::RejectGroupSeparator);
+                    number = local.toDouble(answer.trimmed(), &ok);
                 }
-                if (!ok) {
+                if (!ok && !answer.trimmed().isEmpty()) {
                     fail(errorString, u"%1: not a number."_s.arg(label));
                     return std::nullopt;
                 }
-                answer = QLocale().toString(number, 'f', question.decimals);
+            } else {
+                // As the form starts: the default, kept within the range.
+                number = QLocale().toDouble(answer);
+                if (question.minimum != 0 || question.maximum != 0) {
+                    number = std::clamp(number, question.minimum, std::max(question.minimum, question.maximum));
+                }
+                ok = true;
             }
+            answer = ok ? QLocale().toString(number, 'f', question.decimals) : QString();
             break;
+        }
         case PrintQuestion::Kind::Date: {
-            // Today unless set, as the form does.
-            const QDate date = answer.isEmpty() ? QDate::currentDate() : readDate(question, answer);
-            if (!date.isValid()) {
+            // Today unless set, as the form does; a date given must be one.
+            QDate date = answer.trimmed().isEmpty() ? QDate() : readDate(question, answer.trimmed());
+            if (!date.isValid() && answered && !answer.trimmed().isEmpty()) {
                 fail(errorString, u"%1: not a date (%2, or yyyy-MM-dd)."_s.arg(label, question.dateFormat.isEmpty() ? QLocale().dateFormat(QLocale::ShortFormat) : question.dateFormat));
                 return std::nullopt;
+            }
+            if (!date.isValid()) {
+                date = QDate::currentDate();
             }
             answer = writeDate(question, date);
             break;
         }
         case PrintQuestion::Kind::Check: {
+            if (!answered) {
+                // The form ticks it only for the ticked text.
+                answer = answer == checkedText(question) ? checkedText(question) : uncheckedText(question);
+                break;
+            }
             const QString lower = answer.trimmed().toLower();
             if (answer == checkedText(question) || lower == u"true"_s || lower == u"1"_s || lower == u"yes"_s) {
                 answer = checkedText(question);

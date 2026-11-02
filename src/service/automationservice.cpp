@@ -97,8 +97,6 @@ void AutomationService::reload()
         qWarning("%s", qPrintable(error));
         return;
     }
-    m_environment = PrintEnvironment::fromAppConfig();
-    m_environment.saveCounters = settings.saveCounters;
     const bool httpChanged = settings.http != m_settings.http || settings.httpNetwork != m_settings.httpNetwork || settings.httpPort != m_settings.httpPort
         || (m_http == nullptr && settings.http);
     m_settings = settings;
@@ -187,7 +185,11 @@ PrintOutcome AutomationService::print(const PrintRequest &request, const QString
     if (job.printer.isEmpty()) {
         job.printer = defaultPrinter.isEmpty() ? m_settings.printer : defaultPrinter;
     }
-    outcome = Automation::print(labelFile, job, m_environment);
+    // The app's printer settings as they are now: a print offset or a
+    // printer's model may have changed since the service started.
+    PrintEnvironment environment = PrintEnvironment::fromAppConfig();
+    environment.saveCounters = m_settings.saveCounters;
+    outcome = Automation::print(labelFile, job, environment);
     if (outcome.status == PrintOutcome::Status::Printed) {
         qInfo("%s: %s", qPrintable(QFileInfo(labelFile).fileName()), qPrintable(outcome.message));
     } else {

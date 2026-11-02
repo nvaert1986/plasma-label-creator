@@ -199,6 +199,10 @@ session, run it as a systemd user service:
 copies. A CSV file dropped in it prints a label for each row, its first
 line naming the fields; a JSON file is a print job as below. Printed files
 move to `printed/`, others to `failed/` with the reason in a `.txt` file.
+A file is printed once it has stopped changing for two seconds; programs
+that write slowly should write it under another name (`job.csv.part`) and
+rename it when done. Counters count on in the label file, so do not keep a
+label the service prints open in the app and save it there.
 
 **Over HTTP** (with Qt HTTP Server). From this computer only, or from the
 network; every request carries the token shown in the settings. Labels are
