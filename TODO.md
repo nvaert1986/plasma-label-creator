@@ -32,7 +32,7 @@ See `CHANGELOG.md` under "Unreleased" for the details.
   resize handles on turned objects), Turn Left/Right 15°, an angle box.
 - [x] Toolbars rearranged into two rows with new Insert and Arrange bars.
 
-## Done since 0.3.0 (not released yet)
+## Done in 0.4.0
 
 - [x] Print-only mode, with a "Label Printing" launcher entry.
 - [x] Data-entry forms: drop-downs, numbers, dates, check boxes, lookups.
@@ -50,11 +50,10 @@ See `CHANGELOG.md` under "Unreleased" for the details.
 
 ## Next session
 
-Version 0.3.0 is released and tested. Since then: print-only mode, forms,
-versions, print history, printer status, settings, export with the
-label's outline, DYMO's label ids and the automation service, not released
-yet. Next: try those (checks under "Bug review"), then the printer tests
-below.
+Version 0.4.0: print-only mode, forms, versions, print history, printer
+status, settings, export with the label's outline, DYMO's label ids and
+the automation service. Next: try those (checks under "Bug review"), then
+the printer tests below.
 After that, bringing the web version up to date (see "Web version").
 
 ## Third bug review (2026-10-30, 0.3.0)
