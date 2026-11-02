@@ -75,7 +75,8 @@ with the label's outline, DYMO's label ids and the automation service.
 Next: the checks under "Bug review" (with a first real test print through
 the automation service), then the printer tests below. Without a printer:
 sheets of labels for office printers and the automation extras under
-"Later". After that, bringing the web version up to date (see "Web
+"Later", and the Plasma integration (file types, icons, Dolphin). After
+that, bringing the web version up to date (see "Web
 version"). Still to decide: whether RFID encoding stays on the list.
 
 ## Third bug review (2026-10-30, 0.3.0)
@@ -206,6 +207,35 @@ Hard:
 ## Code
 
 Nothing open.
+
+## Plasma integration
+
+Today Plasma knows the app only by its launcher entry: `.label`, `.ABX` and
+`.rhino` files are plain XML to it, shown with an XML icon and opened in a
+text editor.
+
+- [ ] **File types** for `.label` (DieCutLabel, ContinuousLabel), `.ABX`
+  (AddressBook) and `.rhino` files, as shared MIME info recognised by the
+  XML root, so other `.label` files are not claimed. The desktop entries
+  list them (`MimeType=`): Dolphin then names and opens them as labels.
+  (Easy)
+- [ ] **Launcher entry extras**: actions on right-click ("Print-Only Mode",
+  "New Label") and search keywords (label, DYMO, Zebra, Altec, barcode) for
+  KRunner and the launcher. (Easy)
+- [ ] **Its own icons**: an original SVG for the app and one for Label
+  Printing, installed in the hicolor theme, instead of the generic printer
+  icons. (Easy-Medium)
+- [ ] **AppStream metadata** (description, screenshots, releases from
+  0.4.0 on) for Discover and other software centres, checked with
+  `appstreamcli validate`, with a reverse-DNS app id
+  (`io.github.nvaert1986.PlasmaLabelCreator`) for the desktop entries and
+  `setDesktopFileName`. Launchers pinned under the old name are pinned
+  again once. (Easy)
+- [ ] **"Print Label" in Dolphin's right-click menu** for `.label` files: open
+  it in print-only mode, or print it on the default printer. (Easy)
+- [ ] **Thumbnails in Dolphin**: a picture of each label instead of an
+  icon, drawn by the app's own renderer, as a KIO thumbnail plugin that is
+  built only when KIO is found. (Medium)
 
 ## Web version: the desktop app's features
 
