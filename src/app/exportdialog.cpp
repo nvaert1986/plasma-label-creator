@@ -9,6 +9,7 @@
 #include <KMessageBox>
 
 #include <QCheckBox>
+#include <QDir>
 #include <QDialogButtonBox>
 #include <QFileDialog>
 #include <QFileInfo>
@@ -23,6 +24,7 @@ using namespace Qt::Literals::StringLiterals;
 
 ExportDialog::ExportDialog(const QString &fileName, bool outline, QWidget *parent)
     : QDialog(parent)
+    , m_folder(QFileInfo(fileName).absolutePath())
 {
     setWindowTitle(i18n("Export Label"));
     auto *form = new QFormLayout(this);
@@ -53,6 +55,7 @@ ExportDialog::ExportDialog(const QString &fileName, bool outline, QWidget *paren
     m_export->setDefault(true);
     connect(buttons, &QDialogButtonBox::accepted, this, &ExportDialog::accept);
     connect(buttons, &QDialogButtonBox::rejected, this, &QDialog::reject);
+    connect(m_file, &QLineEdit::textEdited, this, &ExportDialog::followFileName);
     connect(m_file, &QLineEdit::textChanged, this, [this]() {
         m_export->setEnabled(!m_file->text().trimmed().isEmpty());
     });
@@ -64,7 +67,13 @@ ExportDialog::ExportDialog(const QString &fileName, bool outline, QWidget *paren
 QString ExportDialog::fileName() const
 {
     QString name = m_file->text().trimmed();
-    if (QFileInfo(name).suffix().isEmpty()) {
+    if (name == u"~"_s || name.startsWith(u"~/"_s)) {
+        name = QDir::homePath() + name.mid(1);
+    }
+    name = QDir(m_folder).absoluteFilePath(name);
+    // "Kabel 2.5" has no extension yet, whatever QFileInfo says.
+    const QString suffix = QFileInfo(name).suffix().toLower();
+    if (suffix != u"pdf"_s && suffix != u"png"_s) {
         name += png() ? u".png"_s : u".pdf"_s;
     }
     return name;
@@ -101,8 +110,22 @@ void ExportDialog::followFormat()
     }
 }
 
+void ExportDialog::followFileName()
+{
+    const QString suffix = QFileInfo(m_file->text().trimmed()).suffix().toLower();
+    if (suffix == u"pdf"_s || suffix == u"png"_s) {
+        // The name is right already: no rewriting it while it is typed.
+        const QSignalBlocker blocker(m_pdf);
+        (suffix == u"png"_s ? m_png : m_pdf)->setChecked(true);
+    }
+}
+
 void ExportDialog::accept()
 {
+    if (QFileInfo(fileName()).isDir()) {
+        KMessageBox::error(this, i18n("%1 is a folder. Type a name for the file.", fileName()), i18n("Export Label"));
+        return;
+    }
     if (QFileInfo::exists(fileName())
         && KMessageBox::warningContinueCancel(this,
                                               i18n("%1 already exists. Replace it?", QFileInfo(fileName()).fileName()),

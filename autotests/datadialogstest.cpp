@@ -523,6 +523,14 @@ private Q_SLOTS:
         // No extension typed: the format's.
         dialog.findChild<QLineEdit *>()->setText(dir.filePath(u"proof"_s));
         QCOMPARE(dialog.fileName(), dir.filePath(u"proof.png"_s));
+        // A dot in the name is not an extension; a name alone goes in the folder.
+        dialog.findChild<QLineEdit *>()->setText(u"Kabel 2.5"_s);
+        QCOMPARE(dialog.fileName(), dir.filePath(u"Kabel 2.5.png"_s));
+        // An extension typed chooses the format, and the name stays as typed.
+        QTest::keyClicks(dialog.findChild<QLineEdit *>(), u".pdf"_s);
+        QVERIFY(!dialog.png());
+        QCOMPARE(dialog.findChild<QLineEdit *>()->text(), u"Kabel 2.5.pdf"_s);
+        QCOMPARE(dialog.fileName(), dir.filePath(u"Kabel 2.5.pdf"_s));
     }
 
     void questionsAreEdited()

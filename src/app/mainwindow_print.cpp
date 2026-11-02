@@ -376,8 +376,12 @@ void MainWindow::exportLabel()
 {
     // Named after the label, in the folder and format used last.
     const QString base = m_editor->fileName().isEmpty() ? i18n("Label") : QFileInfo(m_editor->fileName()).completeBaseName();
-    const QString folder = settings().readEntry("ExportFolder", m_editor->fileName().isEmpty() ? QDir::homePath() : QFileInfo(m_editor->fileName()).absolutePath());
-    const QString suffix = settings().readEntry("ExportFormat", u"pdf"_s);
+    const QString labelFolder = m_editor->fileName().isEmpty() ? QDir::homePath() : QFileInfo(m_editor->fileName()).absolutePath();
+    QString folder = settings().readEntry("ExportFolder", labelFolder);
+    if (!QFileInfo(folder).isDir()) {
+        folder = labelFolder; // removed since, or on a drive not mounted now
+    }
+    const QString suffix = settings().readEntry("ExportFormat", QString()) == u"png"_s ? u"png"_s : u"pdf"_s;
     ExportDialog dialog(QDir(folder).filePath(base + u'.' + suffix), settings().readEntry("ExportOutline", false), this);
     if (dialog.exec() != QDialog::Accepted) {
         return;
