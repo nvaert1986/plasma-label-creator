@@ -86,6 +86,11 @@ public:
     /** The grid's spacing in twips. */
     void setGridSpacing(qreal twips);
     qreal gridSpacing() const;
+    /** The arrow keys' steps (Shift for the large one), in twips. */
+    void setNudgeSteps(qreal step, qreal largeStep);
+    /** The step Shift turns objects by while turning, in degrees. */
+    void setTurnStep(qreal degrees);
+
     /** @p value on the nearest multiple of @p spacing. */
     static qreal snapped(qreal value, qreal spacing);
 
@@ -172,6 +177,9 @@ private:
     QList<int> m_rubberBase;
 
     bool m_readOnly = false;
+    qreal m_nudgeStep = 20; // twips, one point
+    qreal m_largeNudgeStep = 144; // twips, 1/10 inch
+    qreal m_turnStep = 15; // degrees
     std::optional<LabelCreator::LabelDocument> m_shownDocument; // while read-only
     QRectF m_printArea;
     bool m_gridVisible = false;

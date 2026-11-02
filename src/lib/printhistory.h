@@ -44,8 +44,9 @@ public:
 
     /** print-history in the app's data folder. */
     static QString defaultDirectory();
-    /** The history keeps this many prints; older ones go. */
+    /** The history keeps this many prints by default; older ones go. */
     static constexpr int MaxRecords = 5000;
+    void setMaxRecords(int count);
 
     /** Adds @p record, keeping @p label as printed (its labelCopy is set here). */
     bool add(PrintRecord record, const LabelDocument &label, QString *errorString = nullptr);
@@ -58,6 +59,7 @@ private:
     QString historyFile() const;
 
     QString m_directory;
+    int m_maxRecords = MaxRecords;
 };
 
 } // namespace LabelCreator

@@ -36,6 +36,34 @@
   Status... shows every label printer's queue and state, refreshed every
   ten seconds. `plasma-label-creator-render --list-printers` shows them too.
 
+### Settings
+
+- **Settings > Configure Plasma Label Creator…**:
+  - Designing: the font of new text, the arrow keys' steps (and with
+    Shift), the turning step (Shift while turning, Turn Left/Right), the
+    tape a LabelManager label starts with, rulers in millimetres or inches.
+  - Printing: whether and how often network printers are asked, the
+    warning before printing to a printer that is not ready, the copies a
+    print starts with, the gap between Altec labels across, the length
+    continuous rolls start at, how long to wait for a shared counter.
+  - Print-only mode: the folder it starts in, saving counters in the
+    label, and locking the app to print-only mode with no way back.
+  - History: versions kept per label (or none), versions next to the label
+    in a `.versions` folder instead of the app's data folder, prints kept
+    in the history (or none), recently used layouts kept.
+- Only settings that differ from the defaults are written. An administrator
+  can fix any of them with KDE's Kiosk (`Key[$i]=value` in the `[Settings]`
+  group of `plasma-label-creatorrc`); the window then shows them locked.
+
+### Fixed
+
+- Print Again checks that the label suits the printer and the printer is
+  ready, as any print, and keeps the label's name in the history.
+- A network printer that keeps not answering no longer reloads the label
+  types every 30 seconds.
+- Print-only mode no longer offers printing the hidden address book's
+  checked addresses, and redraws a label's picture only when it changed.
+
 ### Other
 
 - The about text names all supported printers.

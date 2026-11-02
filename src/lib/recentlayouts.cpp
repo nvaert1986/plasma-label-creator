@@ -43,6 +43,11 @@ RecentLayouts::RecentLayouts(const QString &directory)
 {
 }
 
+void RecentLayouts::setMaxLayouts(int count)
+{
+    m_maxLayouts = count;
+}
+
 QString RecentLayouts::defaultDirectory()
 {
     return QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + u"/recent-layouts"_s;
@@ -151,7 +156,7 @@ bool RecentLayouts::add(const LabelDocument &document, const QString &sourceFile
     }
 
     layouts.prepend(layout);
-    while (layouts.size() > MaxLayouts) {
+    while (layouts.size() > std::max(1, m_maxLayouts)) {
         const RecentLayout oldest = layouts.takeLast();
         QFile::remove(oldest.fileName);
         QFile::remove(oldest.thumbnail);

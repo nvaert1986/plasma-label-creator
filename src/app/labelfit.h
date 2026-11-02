@@ -40,11 +40,12 @@ Problem check(const LabelCreator::LabelDocument &document,
 /**
  * The label type to start with: @p lastPaper if offered, else one that fits
  * the loaded labels, else @p fallback if offered, else the first offered,
- * else @p fallback.
+ * else @p fallback; on a tape printer, @p tapeMm wide tape.
  */
 LabelCreator::PaperSize startingPaper(const QList<LabelCreator::PaperSize> &offered,
                                       const QString &lastPaper,
                                       std::optional<qreal> loadedLengthMm,
-                                      const LabelCreator::PaperSize &fallback);
+                                      const LabelCreator::PaperSize &fallback,
+                                      int tapeMm = 12);
 
 } // namespace LabelFit

@@ -50,6 +50,8 @@ public:
      * only counters that moved on.
      */
     bool save(const QString &fileName, QString *errorString, bool keepVersion = true);
+    /** How many versions saving keeps (0: none), and whether next to the label. */
+    void setVersions(int keep, bool nextToLabel);
 
     /**
      * The current object: the one selected last, which properties, editing
@@ -78,5 +80,7 @@ private:
     QUndoStack m_undoStack;
     QString m_fileName;
     int m_selection = -1;
+    int m_versionsKept = 20;
+    bool m_versionsNextToLabel = false;
     QList<int> m_selected; // sorted; contains m_selection when that is >= 0
 };

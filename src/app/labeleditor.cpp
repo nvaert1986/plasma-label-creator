@@ -155,9 +155,10 @@ bool LabelEditor::load(const QString &fileName, QString *errorString, QStringLis
 bool LabelEditor::save(const QString &fileName, QString *errorString, bool keepVersion)
 {
     // A version that cannot be kept does not stop the saving.
-    if (keepVersion) {
+    if (keepVersion && m_versionsKept > 0) {
+        LabelVersions versions = m_versionsNextToLabel ? LabelVersions::nextToLabels() : LabelVersions();
         QString versionError;
-        if (!LabelVersions().keep(fileName, LabelVersions::DefaultKeep, &versionError)) {
+        if (!versions.keep(fileName, m_versionsKept, &versionError)) {
             qWarning("%s", qPrintable(versionError));
         }
     }
@@ -168,6 +169,12 @@ bool LabelEditor::save(const QString &fileName, QString *errorString, bool keepV
     m_undoStack.setClean();
     Q_EMIT fileNameChanged();
     return true;
+}
+
+void LabelEditor::setVersions(int keep, bool nextToLabel)
+{
+    m_versionsKept = keep;
+    m_versionsNextToLabel = nextToLabel;
 }
 
 int LabelEditor::selection() const

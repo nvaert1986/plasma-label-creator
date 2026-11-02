@@ -16,6 +16,10 @@
 namespace ObjectFactory
 {
 
+/** The font new texts, addresses, counters and dates get; Arial 12 unless set. */
+void setTextFont(const LabelCreator::LabelFont &font);
+LabelCreator::LabelFont textFont();
+
 enum class Kind {
     Text,
     Address,

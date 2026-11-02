@@ -85,6 +85,19 @@ private Q_SLOTS:
             return paper.roll.continuous;
         });
         QCOMPARE(continuous, 36);
+        // The gap and continuous length as set.
+        AltecLabels::setRollDefaults(3.5, 80);
+        const QList<PaperSize> adjusted = AltecLabels::all();
+        const auto twoAcrossNow = std::find_if(adjusted.cbegin(), adjusted.cend(), [](const PaperSize &paper) {
+            return paper.roll.across == 2;
+        });
+        QCOMPARE(twoAcrossNow->roll.gapMm, 3.5);
+        const auto continuousNow = std::find_if(adjusted.cbegin(), adjusted.cend(), [](const PaperSize &paper) {
+            return paper.roll.continuous;
+        });
+        QVERIFY(qAbs(continuousNow->size.height() - 80 * 72 / 25.4) < 0.01);
+        AltecLabels::setRollDefaults(AltecLabels::DefaultGapMm, AltecLabels::ContinuousLengthMm);
+
         // Not offered as fitting the measured labels.
         for (const PaperSize &paper : AltecLabels::fitting(catalogue, 50)) {
             QVERIFY(!paper.roll.continuous);
@@ -118,6 +131,8 @@ private Q_SLOTS:
         tape12.tape = 12;
         QCOMPARE(LabelFit::startingPaper({tape6, tape12}, u"gone"_s, std::nullopt, Dymo30252).name, tape12.name);
         QCOMPARE(LabelFit::startingPaper({tape6, tape12}, tape6.name, std::nullopt, Dymo30252).name, tape6.name);
+        // Or the tape set in the settings.
+        QCOMPARE(LabelFit::startingPaper({tape6, tape12}, u"gone"_s, std::nullopt, Dymo30252, 6).name, tape6.name);
     }
 
     void keepsCustomSizes()

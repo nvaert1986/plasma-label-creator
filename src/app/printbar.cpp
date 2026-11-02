@@ -353,12 +353,23 @@ const PrinterInfo *PrintBar::currentPrinter() const
     return nullptr;
 }
 
+void PrintBar::setStatusPolling(bool askPrinters, int seconds)
+{
+    m_askPrinters = askPrinters;
+    m_statusTimer->setInterval(std::max(5, seconds) * 1000);
+}
+
+void PrintBar::setDefaultCopies(int copies)
+{
+    m_copies->setValue(std::clamp(copies, m_copies->minimum(), m_copies->maximum()));
+}
+
 void PrintBar::refreshStatus()
 {
     const QString name = printerName();
     m_queueStatus = name.isEmpty() ? QueueStatus() : LabelPrinter::queueStatus(name);
     const PrinterInfo *printer = currentPrinter();
-    if (printer && printer->speaksZpl() && Zpl::networkAddress(printer->deviceUri)) {
+    if (m_askPrinters && printer && printer->speaksZpl() && Zpl::networkAddress(printer->deviceUri)) {
         if (m_detecting.isEmpty()) {
             detectLabels(); // shows the status when the printer answers
         }
@@ -433,7 +444,9 @@ void PrintBar::updatePrinterStatus(const QString &error)
         lines << problems.join(u", "_s);
     }
     const PrinterInfo *printer = currentPrinter();
-    const bool network = printer && printer->speaksZpl() && Zpl::networkAddress(printer->deviceUri);
+    // A network printer not asked on its own has nothing to say until asked.
+    const bool network = printer && printer->speaksZpl() && Zpl::networkAddress(printer->deviceUri)
+        && (m_askPrinters || m_zplInfo || !m_detecting.isEmpty());
     QString tooltip;
     if (network && !m_zplInfo && !m_detecting.isEmpty()) {
         lines << i18n("Asking the printer which labels are loaded…");

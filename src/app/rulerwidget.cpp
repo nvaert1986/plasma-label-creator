@@ -15,6 +15,21 @@
 
 using namespace LabelCreator;
 
+namespace
+{
+bool imperialRulers = false;
+}
+
+void RulerWidget::setInches(bool inches)
+{
+    imperialRulers = inches;
+}
+
+bool RulerWidget::inches()
+{
+    return imperialRulers;
+}
+
 RulerWidget::RulerWidget(Qt::Orientation orientation, LabelView *view, QWidget *parent)
     : QWidget(parent)
     , m_orientation(orientation)
@@ -71,28 +86,35 @@ void RulerWidget::paintEvent(QPaintEvent *)
         band(along(selection.topLeft()), along(selection.bottomRight()), highlight);
     }
 
-    // Ticks every millimetre from the label's corner, numbered per centimetre.
-    const qreal pixelsPerMm = m_view->scale() * Units::mmToTwips(1);
-    if (pixelsPerMm <= 0) {
+    // Ticks from the label's corner: every millimetre, numbered per
+    // centimetre, or every eighth of an inch, numbered per inch.
+    const bool imperial = inches();
+    const qreal pixelsPerTick = m_view->scale() * (imperial ? Units::TwipsPerInch / 8 : Units::mmToTwips(1));
+    if (pixelsPerTick <= 0) {
         return;
     }
-    const int step = pixelsPerMm < 2.5 ? 5 : 1; // too dense to tell apart otherwise
+    const int perNumber = imperial ? 8 : 10;
+    // Too dense to tell apart: every fifth millimetre, or every half inch.
+    const int step = pixelsPerTick >= 2.5 ? 1 : (imperial ? 4 : 5);
     QFont font = painter.font();
     font.setPixelSize(9);
     painter.setFont(font);
     painter.setPen(pal.color(QPalette::WindowText));
-    const int first = int(std::floor(-start / pixelsPerMm));
-    const int last = int(std::ceil((length - start) / pixelsPerMm));
-    for (int mm = first - first % step; mm <= last; mm += step) {
-        const qreal position = start + mm * pixelsPerMm;
-        const int tick = mm % 10 == 0 ? Thickness - 2 : (mm % 5 == 0 ? Thickness / 2 : Thickness / 4);
+    const int first = int(std::floor(-start / pixelsPerTick));
+    const int last = int(std::ceil((length - start) / pixelsPerTick));
+    for (int tick = first - first % step; tick <= last; tick += step) {
+        const qreal position = start + tick * pixelsPerTick;
+        const bool numbered = tick % perNumber == 0;
+        const bool middle = tick % (perNumber / 2) == 0;
+        const bool quarter = imperial && tick % 2 == 0;
+        const int size = numbered ? Thickness - 2 : (middle ? Thickness / 2 : (quarter ? Thickness / 3 : Thickness / 4));
         if (horizontal) {
-            painter.drawLine(QPointF(position, height() - tick), QPointF(position, height()));
+            painter.drawLine(QPointF(position, height() - size), QPointF(position, height()));
         } else {
-            painter.drawLine(QPointF(width() - tick, position), QPointF(width(), position));
+            painter.drawLine(QPointF(width() - size, position), QPointF(width(), position));
         }
-        if (mm % 10 == 0) {
-            const QString number = QString::number(mm / 10);
+        if (numbered) {
+            const QString number = QString::number(tick / perNumber);
             if (horizontal) {
                 painter.drawText(QPointF(position + 2, 10), number);
             } else {

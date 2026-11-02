@@ -107,6 +107,12 @@ void MainWindow::setPrintOnlyFolder(const QString &folder)
 
 void MainWindow::setPrintOnly(bool printOnly)
 {
+    // Locked to printing by the settings: no way back.
+    if (!printOnly && m_settings.lockPrintOnly) {
+        const QSignalBlocker blocker(m_printOnlyAction);
+        m_printOnlyAction->setChecked(true);
+        return;
+    }
     if (printOnly && !m_printOnly) {
         // Which designer toolbars were showing, to show them again after,
         // also when the app is closed in print-only mode.
@@ -140,8 +146,11 @@ void MainWindow::setPrintOnly(bool printOnly)
 
     if (printOnly) {
         if (m_printOnlyPanel->folder().isEmpty()) {
-            const QString folder = m_editor->fileName().isEmpty() ? settings().readEntry("PrintOnlyFolder", QDir::homePath())
-                                                                  : QFileInfo(m_editor->fileName()).absolutePath();
+            // The folder set in the settings, else the one used last, else
+            // the label's own.
+            const QString folder = !m_settings.printOnlyFolder.isEmpty() ? m_settings.printOnlyFolder
+                : m_editor->fileName().isEmpty()                          ? settings().readEntry("PrintOnlyFolder", QDir::homePath())
+                                                                          : QFileInfo(m_editor->fileName()).absolutePath();
             m_printOnlyPanel->setFolder(folder);
         }
         m_printOnlyPanel->setCurrentLabel(m_editor->fileName());
@@ -174,6 +183,9 @@ void MainWindow::keepEditingOff()
     }
     // The angle box is a widget of its own.
     m_angle->setEnabled(false);
+    if (m_settings.lockPrintOnly) {
+        m_printOnlyAction->setEnabled(false);
+    }
 }
 
 void MainWindow::updatePrintOnlyForm()

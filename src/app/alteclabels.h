@@ -21,6 +21,9 @@ constexpr qreal ContinuousLengthMm = 50;
 /** The gap between labels across, which Altec does not give, in millimetres. */
 constexpr qreal DefaultGapMm = 2;
 
+/** The gap between labels across and the continuous rolls' starting length, in millimetres. */
+void setRollDefaults(qreal acrossGapMm, qreal continuousLengthMm);
+
 /** Every label, as custom sizes grouped by product. */
 QList<LabelCreator::PaperSize> all();
 

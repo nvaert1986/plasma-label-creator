@@ -40,7 +40,6 @@ namespace
 constexpr int Margin = 32; // pixels around the label
 constexpr qreal HandleSize = 7; // pixels
 constexpr qreal RotateReach = 24; // pixels from the top edge to the rotate handle
-constexpr qreal SnapAngle = 15; // degrees, with Shift
 
 // The angle of @p v, counter-clockwise from the right, in degrees; y is down.
 qreal angleOf(const QPointF &v)
@@ -51,8 +50,6 @@ constexpr qreal MinimumSize = 72; // twips, 1/20 inch
 constexpr qreal MinimumZoom = 0.25;
 constexpr qreal MaximumZoom = 8.0;
 constexpr qreal ZoomStep = 1.25;
-constexpr qreal NudgeStep = 20; // twips, one point
-constexpr qreal LargeNudgeStep = 144; // twips, 1/10 inch
 
 } // namespace
 
@@ -154,6 +151,17 @@ void LabelView::setReadOnly(bool readOnly)
     }
     setAcceptDrops(!readOnly);
     update();
+}
+
+void LabelView::setNudgeSteps(qreal step, qreal largeStep)
+{
+    m_nudgeStep = step;
+    m_largeNudgeStep = largeStep;
+}
+
+void LabelView::setTurnStep(qreal degrees)
+{
+    m_turnStep = degrees > 0 ? degrees : 15;
 }
 
 bool LabelView::isReadOnly() const
@@ -689,7 +697,7 @@ void LabelView::mouseMoveEvent(QMouseEvent *event)
     if (m_dragHandle == Rotate) {
         qreal angle = m_dragStartAngle + angleOf(event->position() - toWidget(m_dragStartBounds).center()) - m_pressAngle;
         if (event->modifiers() & Qt::ShiftModifier) {
-            angle = std::round(angle / SnapAngle) * SnapAngle;
+            angle = std::round(angle / m_turnStep) * m_turnStep;
         }
         angle = normalisedAngle(angle);
         objectBase(m_dragDocument->objects[m_dragIndex]).angle = std::abs(angle) < 0.05 ? 0 : angle;
@@ -861,7 +869,7 @@ void LabelView::keyPressEvent(QKeyEvent *event)
         QWidget::keyPressEvent(event);
         return;
     }
-    const qreal step = event->modifiers() & Qt::ShiftModifier ? LargeNudgeStep : NudgeStep;
+    const qreal step = event->modifiers() & Qt::ShiftModifier ? m_largeNudgeStep : m_nudgeStep;
     switch (event->key()) {
     case Qt::Key_Left:
         moveSelection(QPointF(-step, 0), i18n("Move Object"));

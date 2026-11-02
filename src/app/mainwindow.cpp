@@ -159,10 +159,15 @@ MainWindow::MainWindow(QWidget *parent)
     m_sidebar->setPaperSizes(m_printBar->paperSizes());
     m_printBar->setCheckedAddresses(int(m_sidebar->addressBook()->checkedAddresses().size()));
 
+    applySettings(AppSettings::load());
+    m_printBar->setDefaultCopies(m_settings.copies);
     m_printBar->selectStartupPrinter(settings().readEntry("Printer", QString()));
     newLabel();
-    // Closed in print-only mode last time: the designer's toolbars come back.
-    if (settings().readEntry("PrintOnly", false)) {
+    if (m_settings.lockPrintOnly) {
+        // Kept to printing: print-only mode, and no way back.
+        setPrintOnly(true);
+    } else if (settings().readEntry("PrintOnly", false)) {
+        // Closed in print-only mode last time: the designer's toolbars come back.
         setPrintOnly(false);
     }
 }
@@ -232,6 +237,7 @@ void MainWindow::setupActions()
     exportAction->setText(i18n("&Export as PDF or Image…"));
     exportAction->setIcon(QIcon::fromTheme(u"document-export"_s));
     KStandardAction::quit(qApp, &QApplication::closeAllWindows, actions);
+    KStandardAction::preferences(this, &MainWindow::configure, actions);
 
     QUndoStack *undoStack = m_editor->undoStack();
     QAction *undo = KStandardAction::undo(undoStack, &QUndoStack::undo, actions);
@@ -561,7 +567,11 @@ void MainWindow::newLabel()
 
 PaperSize MainWindow::startingPaper() const
 {
-    return LabelFit::startingPaper(m_printBar->paperSizes(), settings().readEntry("Paper", FallbackPaper.name), m_printBar->loadedLabelLengthMm(), FallbackPaper);
+    return LabelFit::startingPaper(m_printBar->paperSizes(),
+                                   settings().readEntry("Paper", FallbackPaper.name),
+                                   m_printBar->loadedLabelLengthMm(),
+                                   FallbackPaper,
+                                   m_settings.tapeMm);
 }
 
 void MainWindow::editTapeLength()

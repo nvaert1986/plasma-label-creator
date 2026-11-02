@@ -9,6 +9,8 @@ add_executable(plasma-label-creator
     alteclabels.h
     answersform.cpp
     answersform.h
+    appsettings.cpp
+    appsettings.h
     clipartpanel.cpp
     clipartpanel.h
     customlabels.cpp
@@ -61,6 +63,8 @@ add_executable(plasma-label-creator
     recentlayoutsmenu.h
     rulerwidget.cpp
     rulerwidget.h
+    settingsdialog.cpp
+    settingsdialog.h
     sidebar.cpp
     sidebar.h
     usbwatcher.cpp

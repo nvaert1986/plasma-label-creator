@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "appsettings.h"
 #include "datareader.h"
 #include "labelprinter.h"
 #include "objectfactory.h"
@@ -182,6 +183,10 @@ private:
     void showVersions();
     void showPrintHistory();
     void showPrinterStatus();
+    /** Settings > Configure Plasma Label Creator. */
+    void configure();
+    /** Uses @p settings everywhere they matter, from now on. */
+    void applySettings(const AppSettings &settings);
     /** Warns when the printer or its queue reports a problem; false to stop. */
     bool confirmPrinterReady();
     /** Prints @p record's labels again, with its answers and rows. */
@@ -213,6 +218,7 @@ private:
     void openRecentLayout(const LabelCreator::RecentLayout &layout);
 
     LabelCreator::RecentLayouts m_recentLayouts;
+    AppSettings m_settings;
     LabelEditor *m_editor;
     LabelView *m_view;
     Sidebar *m_sidebar;

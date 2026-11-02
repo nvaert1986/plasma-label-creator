@@ -26,6 +26,11 @@ public:
     };
 
     explicit LabelVersions(const QString &directory = defaultDirectory());
+    /**
+     * Kept next to each label instead: in a .versions folder beside it, so
+     * they go along with the label (also on a share, for everyone).
+     */
+    static LabelVersions nextToLabels();
 
     /** versions in the app's data folder. */
     static QString defaultDirectory();
@@ -43,7 +48,7 @@ private:
     /** The folder for @p labelFile's versions: one per label, by its path. */
     QString folderFor(const QString &labelFile) const;
 
-    QString m_directory;
+    QString m_directory; // empty: next to each label
 };
 
 } // namespace LabelCreator

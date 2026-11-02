@@ -98,6 +98,11 @@ private Q_SLOTS:
         QCOMPARE(textOf(*recent.load(layouts.constFirst())), QString::number(RecentLayouts::MaxLayouts + 2));
         // The dropped ones' files are gone too: a label and a thumbnail each, plus the index.
         QCOMPARE(QDir(dir.path()).entryList(QDir::Files).size(), 2 * RecentLayouts::MaxLayouts + 1);
+
+        // Fewer when set so: the next one added trims them.
+        recent.setMaxLayouts(5);
+        QVERIFY(recent.add(label(u"last"_s), QString()));
+        QCOMPARE(recent.layouts().size(), 5);
     }
 
     void removesAndClears()

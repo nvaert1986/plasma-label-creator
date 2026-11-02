@@ -41,12 +41,28 @@ QRectF centredBox(const LabelDocument &document, qreal widthFraction, qreal heig
     return box;
 }
 
+LabelFont &newTextFont()
+{
+    static LabelFont font{u"Arial"_s, 12};
+    return font;
+}
+
 TextSpan span(const QString &text)
 {
-    return {text, LabelFont{u"Arial"_s, 12}, Qt::black};
+    return {text, newTextFont(), Qt::black};
 }
 
 } // namespace
+
+void setTextFont(const LabelFont &font)
+{
+    newTextFont() = font;
+}
+
+LabelFont textFont()
+{
+    return newTextFont();
+}
 
 QString uniqueName(const LabelDocument &document, const QString &base)
 {
@@ -118,7 +134,7 @@ LabelObject create(Kind kind, const LabelDocument &document, const QByteArray &i
         address.name = uniqueName(document, u"ADDRESS"_s);
         address.variable = true;
         address.spans = {span(u"Name\nStreet 1\n1234 AB City"_s)};
-        address.lineFonts = {LabelFont{u"Arial"_s, 12}, LabelFont{u"Arial"_s, 12}, LabelFont{u"Arial"_s, 12}};
+        address.lineFonts = {newTextFont(), newTextFont(), newTextFont()};
         address.bounds = centredBox(document, 1.0, 1.0);
         return address;
     }
@@ -144,14 +160,14 @@ LabelObject create(Kind kind, const LabelDocument &document, const QByteArray &i
     case Kind::Counter: {
         CounterObject counter;
         counter.name = uniqueName(document, u"COUNTER"_s);
-        counter.font = LabelFont{u"Arial"_s, 12};
+        counter.font = newTextFont();
         counter.bounds = centredBox(document, 0.6, 0.4);
         return counter;
     }
     case Kind::DateTime: {
         DateTimeObject date;
         date.name = uniqueName(document, u"DATETIME"_s);
-        date.font = LabelFont{u"Arial"_s, 12};
+        date.font = newTextFont();
         date.bounds = centredBox(document, 1.0, 0.4);
         return date;
     }
@@ -159,7 +175,7 @@ LabelObject create(Kind kind, const LabelDocument &document, const QByteArray &i
         CircularTextObject curved;
         curved.name = uniqueName(document, u"CIRCULARTEXT"_s);
         curved.text = u"Curved text"_s;
-        curved.font = LabelFont{u"Arial"_s, 12};
+        curved.font = newTextFont();
         curved.bounds = centredBox(document, 0.8, 0.8);
         return curved;
     }

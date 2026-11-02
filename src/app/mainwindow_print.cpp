@@ -62,6 +62,9 @@ bool MainWindow::confirmLabelFitsPrinter()
 bool MainWindow::confirmPrinterReady()
 {
     // What the queue says now, and a network printer said last.
+    if (!m_settings.warnNotReady) {
+        return true;
+    }
     m_printBar->refreshStatus();
     const QStringList problems = m_printBar->printerProblems();
     if (problems.isEmpty()) {
@@ -74,6 +77,48 @@ bool MainWindow::confirmPrinterReady()
                                               i18n("Printer Not Ready"),
                                               KGuiItem(i18n("Print Anyway"), u"document-print"_s))
         == KMessageBox::Continue;
+}
+
+void MainWindow::configure()
+{
+    SettingsDialog dialog(m_settings, this);
+    connect(&dialog, &SettingsDialog::applied, this, [this](const AppSettings &settings) {
+        settings.save();
+        applySettings(AppSettings::load()); // as saved: settings fixed by an administrator stay
+    });
+    dialog.exec();
+}
+
+void MainWindow::applySettings(const AppSettings &settings)
+{
+    const bool lockedBefore = m_settings.lockPrintOnly;
+    m_settings = settings;
+    // Designing
+    ObjectFactory::setTextFont(settings.textFont);
+    m_view->setNudgeSteps(Units::mmToTwips(settings.nudgeMm), Units::mmToTwips(settings.largeNudgeMm));
+    m_view->setTurnStep(settings.turnStep);
+    const QString step = QLocale().toString(settings.turnStep);
+    actionCollection()->action(u"object_turn_left"_s)->setText(i18nc("degrees", "Turn Left %1°", step));
+    actionCollection()->action(u"object_turn_right"_s)->setText(i18nc("degrees", "Turn Right %1°", step));
+    RulerWidget::setInches(settings.inches);
+    for (RulerWidget *ruler : findChildren<RulerWidget *>()) {
+        ruler->update();
+    }
+    // Printing
+    m_printBar->setStatusPolling(settings.askPrinters, settings.statusSeconds);
+    AltecLabels::setRollDefaults(settings.acrossGapMm, settings.continuousLengthMm);
+    m_printBar->reloadPaperSizes();
+    // History
+    m_editor->setVersions(settings.versionsKept, settings.versionsNextToLabel);
+    m_recentLayouts.setMaxLayouts(settings.recentLayoutsKept);
+    // Locked into print-only mode now; unlocked, the switch is back.
+    if (settings.lockPrintOnly && !lockedBefore && !m_printOnly) {
+        setPrintOnly(true);
+    }
+    keepEditingOff();
+    if (!settings.lockPrintOnly && m_printOnly) {
+        m_printOnlyAction->setEnabled(true);
+    }
 }
 
 void MainWindow::showPrinterStatus()
@@ -191,7 +236,7 @@ bool MainWindow::useSharedCounters(QList<LabelDocument> &labels, std::vector<std
             auto shared = std::make_unique<SharedCounter>(counter->sharedFile);
             // Another computer may be printing: it is waited for a while.
             QApplication::setOverrideCursor(Qt::WaitCursor);
-            const bool locked = !locks || shared->lock();
+            const bool locked = !locks || shared->lock(m_settings.counterWaitSeconds * 1000);
             QApplication::restoreOverrideCursor();
             if (!locked) {
                 KMessageBox::error(this, shared->errorString());
@@ -272,14 +317,18 @@ void MainWindow::printLabels(const QList<LabelDocument> &prepared)
         record.answers.insert(question.name, m_answers.value(question.name));
     }
     record.rows = m_printedRows;
-    QString historyError;
-    if (!PrintHistory().add(record, m_editor->document(), &historyError)) {
-        qWarning("Could not write the print history: %s", qPrintable(historyError));
+    if (m_settings.historyKept > 0) {
+        PrintHistory history;
+        history.setMaxRecords(m_settings.historyKept);
+        QString historyError;
+        if (!history.add(record, m_editor->document(), &historyError)) {
+            qWarning("Could not write the print history: %s", qPrintable(historyError));
+        }
     }
     advanceCounters(printer.printedLabels(), sharedNext);
     // In print-only mode the label keeps its counters itself: nobody will
     // save it by hand.
-    if (m_printOnly && m_editor->isModified() && !m_editor->fileName().isEmpty()) {
+    if (m_printOnly && m_settings.saveCounters && m_editor->isModified() && !m_editor->fileName().isEmpty()) {
         QString saveError;
         if (!m_editor->save(m_editor->fileName(), &saveError, false)) {
             KMessageBox::error(this, i18n("The counters could not be saved in the label:\n%1", saveError));

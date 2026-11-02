@@ -433,13 +433,13 @@ void MainWindow::setupArrangeActions()
 
     // Turning the selected objects: 15 degrees at a time, or to an angle.
     QAction *turnLeft = actions->addAction(u"object_turn_left"_s, this, [this]() {
-        turnObjects(15);
+        turnObjects(m_settings.turnStep);
     });
     turnLeft->setText(i18n("Turn Left 15°"));
     turnLeft->setIcon(QIcon::fromTheme(u"object-rotate-left"_s));
     actions->setDefaultShortcut(turnLeft, QKeySequence(Qt::CTRL | Qt::Key_BracketLeft));
     QAction *turnRight = actions->addAction(u"object_turn_right"_s, this, [this]() {
-        turnObjects(-15);
+        turnObjects(-m_settings.turnStep);
     });
     turnRight->setText(i18n("Turn Right 15°"));
     turnRight->setIcon(QIcon::fromTheme(u"object-rotate-right"_s));

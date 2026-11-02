@@ -38,6 +38,8 @@ See `CHANGELOG.md` under "Unreleased" for the details.
 - [x] Data-entry forms: drop-downs, numbers, dates, check boxes, lookups.
 - [x] Versions of saved labels, and the print history.
 - [x] Printer warnings in the print bar and a Printer Status window.
+- [x] Settings > Configure Plasma Label Creator (designing, printing,
+  print-only mode with a lock, history and versions).
 
 ## Next session
 
@@ -92,6 +94,9 @@ Still to do by hand, in the running app:
   Print Again with data rows.
 - [ ] Printer warnings: a paused CUPS queue, an Altec with the head open or
   out of labels; the Printer Status window.
+- [ ] Settings: each page, Restore Defaults; print-only locked (and fixed
+  with `LockPrintOnly[$i]=true` in /etc/xdg/plasma-label-creatorrc);
+  versions next to the label on a share.
 - [ ] Shared counter: two computers printing the same label with one
   counter file on a share count on without repeats.
 

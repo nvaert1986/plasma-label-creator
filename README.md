@@ -74,6 +74,10 @@ Altec, Zebra Technologies or KDE e.V. See [Trademarks](#trademarks).
 - **Find printers**: DYMO printers plugged in over USB are noticed, and one
   without a CUPS queue gets a "Set Up Printer" button. ZPL printers on the
   network are asked what they are and which labels are loaded.
+- **Settings** (Settings > Configure Plasma Label Creator…): the font of new
+  text, arrow-key and turning steps, rulers in millimetres or inches,
+  printer polling, copies, Altec roll defaults, print-only mode (also
+  locked, for operator computers), versions and history limits.
 - **Printer status**: the print bar shows a stopped queue, jobs waiting, and
   what a network ZPL printer reports (out of labels, head open, paused),
   and warns before printing; Printer Status... shows every label printer.

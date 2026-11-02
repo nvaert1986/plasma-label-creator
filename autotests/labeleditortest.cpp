@@ -642,6 +642,12 @@ private Q_SLOTS:
         QTest::keyClick(&view, Qt::Key_Down, Qt::ShiftModifier);
         const QRectF after = objectBase(editor.document().objects.at(0)).bounds;
         QCOMPARE(after.topLeft(), before.topLeft() + QPointF(20, 144));
+
+        // Steps as set.
+        view.setNudgeSteps(50, 500);
+        QTest::keyClick(&view, Qt::Key_Left);
+        QTest::keyClick(&view, Qt::Key_Up, Qt::ShiftModifier);
+        QCOMPARE(objectBase(editor.document().objects.at(0)).bounds.topLeft(), after.topLeft() + QPointF(-50, -500));
     }
 
     void droppedObjectsStayOnTheLabel()

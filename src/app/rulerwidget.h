@@ -22,6 +22,9 @@ public:
     RulerWidget(Qt::Orientation orientation, LabelView *view, QWidget *parent = nullptr);
 
     static constexpr int Thickness = 22;
+    /** Rulers in inches instead of millimetres, for every ruler. */
+    static void setInches(bool inches);
+    static bool inches();
 
     QSize sizeHint() const override;
 

@@ -174,8 +174,18 @@ and Label Printing, which starts it in print-only mode
 (`plasma-label-creator --print-only [folder]`) for people who only print.
 For a `~/.local` install, make sure `~/.local/bin` is in your `PATH`.
 
-Print-only mode, versions, the print history and printer status need
-nothing beyond the requirements above. Versions and the print history are
+Print-only mode, versions, the print history, printer status and the
+settings need nothing beyond the requirements above.
+
+To keep a computer to printing only, tick "Always start in print-only
+mode" in Settings > Configure Plasma Label Creator > Print-Only Mode. To
+stop people from changing that again, fix it with KDE's Kiosk in the
+system-wide `/etc/xdg/plasma-label-creatorrc`:
+
+```ini
+[Settings]
+LockPrintOnly[$i]=true
+``` Versions and the print history are
 kept per user in `~/.local/share/plasma-label-creator/` (`versions/`,
 `print-history/`).
 

@@ -34,7 +34,7 @@ Problem check(const LabelDocument &document, const QList<PaperSize> &offered, bo
     return Problem::None;
 }
 
-PaperSize startingPaper(const QList<PaperSize> &offered, const QString &lastPaper, std::optional<qreal> loadedLengthMm, const PaperSize &fallback)
+PaperSize startingPaper(const QList<PaperSize> &offered, const QString &lastPaper, std::optional<qreal> loadedLengthMm, const PaperSize &fallback, int tapeMm)
 {
     for (const PaperSize &candidate : offered) {
         if (candidate.name == lastPaper) {
@@ -53,9 +53,10 @@ PaperSize startingPaper(const QList<PaperSize> &offered, const QString &lastPape
             return candidate;
         }
     }
-    // Tape: 12 mm, the width a LabelManager comes with and most use.
+    // Tape: the width set, 12 mm unless told otherwise (what a LabelManager
+    // comes with and most use).
     for (const PaperSize &candidate : offered) {
-        if (candidate.tape == 12) {
+        if (candidate.tape == tapeMm) {
             return candidate;
         }
     }

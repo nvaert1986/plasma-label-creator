@@ -70,6 +70,14 @@ public:
     QStringList printerProblems() const;
     /** Asks the queue, and a network ZPL printer, how they are now. */
     void refreshStatus();
+    /**
+     * Whether network ZPL printers are asked on their own (when chosen and
+     * every @p seconds); else only with "Detect the Loaded Labels Again".
+     * The queue's state is always read from CUPS.
+     */
+    void setStatusPolling(bool askPrinters, int seconds);
+    /** The number of copies a print starts with. */
+    void setDefaultCopies(int copies);
     /** Whether the selected printer is still being asked which labels are loaded. */
     bool isDetecting() const;
     /** Whether the selected printer prints label sizes it does not list (not a DYMO). */
@@ -147,6 +155,7 @@ private:
     QAction *m_offsetAction;
     QAction *m_statusAction;
     QTimer *m_statusTimer;
+    bool m_askPrinters = true;
     LabelCreator::QueueStatus m_queueStatus;
     QString m_zplError; // why the printer did not answer last time
     UsbWatcher *m_usbWatcher;

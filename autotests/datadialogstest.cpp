@@ -9,11 +9,16 @@
 #include "labelformat.h"
 #include "historydialogs.h"
 #include "layersdialog.h"
+#include "settingsdialog.h"
 #include "printerstatusdialog.h"
 #include "printonlypanel.h"
 #include "rolllayoutdialog.h"
 
 #include <QDialogButtonBox>
+#include <KSharedConfig>
+#include <KConfigGroup>
+#include <QStandardPaths>
+#include <QFontComboBox>
 #include <QGroupBox>
 #include <QSignalSpy>
 #include <QListWidget>
@@ -451,6 +456,46 @@ private Q_SLOTS:
         QVERIFY(table->item(1, 1)->toolTip().contains(u"paused"_s));
         QVERIFY(table->item(1, 3)->text().startsWith(u"Cannot be asked"_s)); // on USB
         grab(&dialog, u"printer-status"_s);
+    }
+
+    void settingsAreKeptAndShown()
+    {
+        QStandardPaths::setTestModeEnabled(true);
+        KSharedConfig::openConfig()->deleteGroup(u"Settings"_s);
+        QCOMPARE(AppSettings::load(), AppSettings()); // nothing set: the defaults
+
+        AppSettings changed;
+        changed.textFont = {u"DejaVu Sans"_s, 10};
+        changed.turnStep = 5;
+        changed.tapeMm = 19;
+        changed.inches = true;
+        changed.askPrinters = false;
+        changed.acrossGapMm = 3.5;
+        changed.lockPrintOnly = true;
+        changed.versionsKept = 0;
+        changed.historyKept = 100;
+        changed.save();
+        QCOMPARE(AppSettings::load(), changed);
+        // Only what differs from the defaults is written.
+        const KConfigGroup group = KSharedConfig::openConfig()->group(u"Settings"_s);
+        QVERIFY(group.hasKey("TurnStep"));
+        QVERIFY(!group.hasKey("Copies"));
+
+        // The dialog shows them, restores the defaults, and hands back what is shown.
+        SettingsDialog dialog(changed, nullptr);
+        dialog.show();
+        QVERIFY(QTest::qWaitForWindowExposed(&dialog));
+        QCOMPARE(dialog.settings().turnStep, 5.0);
+        QCOMPARE(dialog.settings().tapeMm, 19);
+        QVERIFY(dialog.settings().lockPrintOnly);
+        grab(&dialog, u"settings"_s);
+        QSignalSpy applied(&dialog, &SettingsDialog::applied);
+        dialog.button(QDialogButtonBox::RestoreDefaults)->click();
+        QCOMPARE(dialog.settings().turnStep, AppSettings().turnStep);
+        QVERIFY(!dialog.settings().lockPrintOnly);
+        dialog.button(QDialogButtonBox::Apply)->click();
+        QCOMPARE(applied.size(), 1);
+        KSharedConfig::openConfig()->deleteGroup(u"Settings"_s);
     }
 
     void questionsAreEdited()

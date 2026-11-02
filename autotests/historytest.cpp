@@ -9,6 +9,7 @@
 
 #include <QDir>
 #include <QFile>
+#include <QFileInfo>
 #include <QTemporaryDir>
 #include <QTest>
 #include <QThread>
@@ -73,6 +74,34 @@ private Q_SLOTS:
         QCOMPARE(versions.versions(file).size(), 3);
         // Another label has its own.
         QVERIFY(versions.versions(labels.filePath(u"other.label"_s)).isEmpty());
+    }
+
+    void keepsVersionsNextToTheLabel()
+    {
+        QTemporaryDir labels;
+        const QString file = labels.filePath(u"rack.label"_s);
+        QVERIFY(LabelWriter::writeFile(labelWith(u"first"_s), file));
+        LabelVersions versions = LabelVersions::nextToLabels();
+        QVERIFY(versions.keep(file));
+        QVERIFY(QFileInfo::exists(labels.filePath(u".versions/rack.label"_s)));
+        QCOMPARE(versions.versions(file).size(), 1);
+        QVERIFY(versions.versions(file).constFirst().fileName.startsWith(labels.filePath(u".versions/rack.label/"_s)));
+    }
+
+    void keepsAsManyPrintsAsSet()
+    {
+        QTemporaryDir store;
+        PrintHistory history(store.path());
+        history.setMaxRecords(3);
+        PrintRecord record;
+        record.title = u"rack.label"_s;
+        for (int job = 1; job <= 8; ++job) {
+            record.job = job;
+            QVERIFY(history.add(record, labelWith(u"x"_s)));
+        }
+        // Trimmed now and then, to the last three.
+        QVERIFY(history.records().size() <= 3 + 3 / 10 + 1);
+        QCOMPARE(history.records().constFirst().job, 8);
     }
 
     void remembersPrints()

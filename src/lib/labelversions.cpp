@@ -34,6 +34,11 @@ LabelVersions::LabelVersions(const QString &directory)
 {
 }
 
+LabelVersions LabelVersions::nextToLabels()
+{
+    return LabelVersions(QString());
+}
+
 QString LabelVersions::defaultDirectory()
 {
     return QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + u"/versions"_s;
@@ -41,6 +46,10 @@ QString LabelVersions::defaultDirectory()
 
 QString LabelVersions::folderFor(const QString &labelFile) const
 {
+    if (m_directory.isEmpty()) {
+        const QFileInfo label(labelFile);
+        return label.absolutePath() + u"/.versions/"_s + label.fileName();
+    }
     // The label's path, hashed: any path makes a valid folder name.
     const QByteArray path = QFileInfo(labelFile).absoluteFilePath().toUtf8();
     return m_directory + u'/' + QString::fromLatin1(QCryptographicHash::hash(path, QCryptographicHash::Sha1).toHex());

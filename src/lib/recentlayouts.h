@@ -36,7 +36,9 @@ public:
 
     /** Where the app keeps them: recent-layouts in its data directory. */
     static QString defaultDirectory();
-    static constexpr int MaxLayouts = 20;
+    static constexpr int MaxLayouts = 20; // by default
+    /** How many are kept; older ones go when the next is added. */
+    void setMaxLayouts(int count);
     static constexpr int ThumbnailSize = 160; // pixels, the longer side
 
     /** Remembers @p document, printed from @p sourceFile (empty if unsaved). */
@@ -52,6 +54,7 @@ private:
     bool writeIndex(const QList<RecentLayout> &layouts, QString *errorString) const;
 
     QString m_directory;
+    int m_maxLayouts = MaxLayouts;
 };
 
 } // namespace LabelCreator

@@ -85,6 +85,11 @@ PrintHistory::PrintHistory(const QString &directory)
 {
 }
 
+void PrintHistory::setMaxRecords(int count)
+{
+    m_maxRecords = count;
+}
+
 QString PrintHistory::defaultDirectory()
 {
     return QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + u"/print-history"_s;
@@ -127,8 +132,9 @@ bool PrintHistory::add(PrintRecord record, const LabelDocument &label, QString *
 
     // Now and then the oldest prints go, and labels nothing refers to.
     QList<PrintRecord> all = records();
-    if (all.size() > MaxRecords + MaxRecords / 10) {
-        all = all.mid(0, MaxRecords);
+    const int keep = std::max(1, m_maxRecords);
+    if (all.size() > keep + keep / 10) {
+        all = all.mid(0, keep);
         QSaveFile trimmed(historyFile());
         if (trimmed.open(QIODevice::WriteOnly)) {
             QStringList used;

@@ -21,48 +21,69 @@ using namespace Qt::Literals::StringLiterals;
 namespace AltecLabels
 {
 
+namespace
+{
+
+qreal &gapMm()
+{
+    static qreal gap = DefaultGapMm;
+    return gap;
+}
+
+qreal &continuousLengthMm()
+{
+    static qreal length = ContinuousLengthMm;
+    return length;
+}
+
+} // namespace
+
+void setRollDefaults(qreal acrossGapMm, qreal continuousLength)
+{
+    gapMm() = acrossGapMm;
+    continuousLengthMm() = continuousLength;
+}
+
 QList<PaperSize> all()
 {
-    static const QList<PaperSize> labels = []() {
-        QList<PaperSize> list;
+    // Read once; the gap and the continuous length are applied each time,
+    // as they are set now.
+    static const QJsonArray entries = []() {
         QFile file(u":/plasma-label-creator/data/altec-labels.json"_s);
-        if (!file.open(QIODevice::ReadOnly)) {
-            return list;
-        }
-        const QJsonArray entries = QJsonDocument::fromJson(file.readAll()).array();
-        for (const auto &value : entries) {
-            const QJsonObject label = value.toObject();
-            const QString product = label.value("product"_L1).toString();
-            const qreal width = label.value("width"_L1).toDouble();
-            const bool continuous = label.value("continuous"_L1).toBool();
-            // A continuous roll gets a length to start with, changed in Roll Layout.
-            const qreal height = continuous ? ContinuousLengthMm : label.value("height"_L1).toDouble();
-            const int across = label.value("across"_L1).toInt(1);
-            QString name = label.value("round"_L1).toBool() ? i18nc("product, round label diameter", "%1 Ø %2 mm", product, width)
-                : continuous                                ? i18nc("product, roll width", "%1 %2 mm, continuous", product, width)
-                                                            : i18nc("product, label width x height", "%1 %2 × %3 mm", product, width, height);
-            if (across > 1) {
-                name = i18nc("label name, labels across the roll", "%1 (%2 across)", name, across);
-            }
-            PaperSize paper = PaperSize::custom(name, QSizeF(width, height));
-            paper.group = product;
-            paper.roll.across = across;
-            // Altec does not say how far apart labels across are: 2 mm, to
-            // be adjusted in Roll Layout.
-            paper.roll.gapMm = across > 1 ? DefaultGapMm : 0;
-            paper.roll.continuous = continuous;
-            // Wrap labels print on a white strip, the first part off the
-            // printer; the clear rest wraps over it. Altec's article codes
-            // give its length (24x12x36 mm: 12 mm of a 36 mm label).
-            const qreal strip = label.value("print"_L1).toDouble();
-            if (strip > 0 && strip < height) {
-                paper.printArea = QRectF(0, 0, width * 72.0 / Units::MmPerInch, strip * 72.0 / Units::MmPerInch);
-            }
-            list << paper;
-        }
-        return list;
+        return file.open(QIODevice::ReadOnly) ? QJsonDocument::fromJson(file.readAll()).array() : QJsonArray();
     }();
-    return labels;
+    QList<PaperSize> list;
+    for (const auto &value : entries) {
+        const QJsonObject label = value.toObject();
+        const QString product = label.value("product"_L1).toString();
+        const qreal width = label.value("width"_L1).toDouble();
+        const bool continuous = label.value("continuous"_L1).toBool();
+        // A continuous roll gets a length to start with, changed in Roll Layout.
+        const qreal height = continuous ? continuousLengthMm() : label.value("height"_L1).toDouble();
+        const int across = label.value("across"_L1).toInt(1);
+        QString name = label.value("round"_L1).toBool() ? i18nc("product, round label diameter", "%1 Ø %2 mm", product, width)
+            : continuous                                ? i18nc("product, roll width", "%1 %2 mm, continuous", product, width)
+                                                        : i18nc("product, label width x height", "%1 %2 × %3 mm", product, width, height);
+        if (across > 1) {
+            name = i18nc("label name, labels across the roll", "%1 (%2 across)", name, across);
+        }
+        PaperSize paper = PaperSize::custom(name, QSizeF(width, height));
+        paper.group = product;
+        paper.roll.across = across;
+        // Altec does not say how far apart labels across are: 2 mm unless
+        // set otherwise, to be adjusted in Roll Layout.
+        paper.roll.gapMm = across > 1 ? gapMm() : 0;
+        paper.roll.continuous = continuous;
+        // Wrap labels print on a white strip, the first part off the
+        // printer; the clear rest wraps over it. Altec's article codes
+        // give its length (24x12x36 mm: 12 mm of a 36 mm label).
+        const qreal strip = label.value("print"_L1).toDouble();
+        if (strip > 0 && strip < height) {
+            paper.printArea = QRectF(0, 0, width * 72.0 / Units::MmPerInch, strip * 72.0 / Units::MmPerInch);
+        }
+        list << paper;
+    }
+    return list;
 }
 
 bool isAltec(const QString &text)
