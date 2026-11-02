@@ -25,7 +25,7 @@ include(FeatureSummary)
 # service can link it without pulling in widgets or KDE Frameworks.
 option(BUILD_APP "Build the Plasma Label Creator desktop application (needs KDE Frameworks)" ON)
 
-find_package(Qt6 ${QT_MIN_VERSION} REQUIRED COMPONENTS Core Gui Network)
+find_package(Qt6 ${QT_MIN_VERSION} REQUIRED COMPONENTS Core Gui Network Svg)
 find_package(zint REQUIRED CONFIG)
 set_package_properties(zint PROPERTIES
     DESCRIPTION "Barcode encoding library"

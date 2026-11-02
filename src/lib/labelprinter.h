@@ -125,6 +125,15 @@ public:
          * on a LabelWriter 450 came out that much too low otherwise.
          */
         bool compensateTopMargin = true;
+        /** A ZPL printer's darkness, 1 to 30, and speed in inches per second, 1 to 12; 0 keeps the queue's. */
+        int darkness = 0;
+        int speed = 0;
+        /**
+         * The first and last labels are a header and trailer: printed once
+         * whatever the copies, not counted, and counters skip them.
+         */
+        int headerLabels = 0;
+        int trailerLabels = 0;
     };
 
     /**
@@ -277,6 +286,8 @@ private:
     bool m_customSizes = false; // the driver takes sizes it does not list
     bool m_dymoOptions = false; // one of DYMO's drivers (LabelWriter or LabelManager)
     bool m_mediaTracking = false; // CUPS's Zebra driver: continuous or gapped media
+    bool m_darkness = false; // CUPS's Zebra driver: Darkness
+    bool m_printRate = false; // CUPS's Zebra driver: zePrintRate
     int m_pagedLabels = 0; // labels on the pages pages() made last
     int m_printedLabels = 0;
     QString m_errorString;

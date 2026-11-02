@@ -342,6 +342,65 @@ private Q_SLOTS:
         qInfo("round-tripped %d files", checked);
         QVERIFY(checked > 0);
     }
+
+    void keepsWhatDlsHasNoElementFor()
+    {
+        LabelDocument document = readFixture(u"address.label"_s);
+        const PrintCondition condition{PrintCondition::Test::Equals, u"Kind"_s, u"Fragile"_s};
+        const QString textName = objectBase(document.objects[0]).name;
+        objectBase(document.objects[0]).condition = condition;
+        std::get<AddressObject>(document.objects[0]).grow = true;
+        ShapeObject star;
+        star.name = u"STAR"_s;
+        star.shapeType = ShapeType::Star;
+        star.corners = 7;
+        star.lineWidth = 20;
+        star.fillColor = Qt::black;
+        star.bounds = QRectF(200, 200, 600, 600);
+        star.anchor = {textName, Anchor::Side::Below};
+        document.objects << star;
+        ImageObject drawing;
+        drawing.name = u"LOGO"_s;
+        drawing.svgData = R"(<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><rect width="10" height="10"/></svg>)";
+        drawing.bounds = QRectF(900, 200, 400, 400);
+        document.objects << drawing;
+        document.printing = {u"Dark"_s, 22, 4};
+        document.headerLabel = u"header.label"_s;
+        document.trailerLabel = u"/labels/trailer.label"_s;
+        document.guidesX = {720, 1440};
+        document.guidesY = {360};
+        document.dataSource.kind = DataSource::Kind::File;
+        document.dataSource.fileName = u"rows.csv"_s;
+        document.dataSource.copiesColumn = u"Quantity"_s;
+        document.dataSource.labelColumn = u"Label"_s;
+
+        const QByteArray saved = LabelWriter::toByteArray(document);
+        // DLS gets a picture of the star and the drawing.
+        QCOMPARE(saved.count("<ImageObject>"), 2);
+        QVERIFY(!saved.contains("<ShapeType>Star"));
+        LabelReader reader;
+        const auto read = readBytes(saved, reader);
+        QVERIFY(read);
+        const ObjectBase &readText = objectBase(read->objects.at(0));
+        QCOMPARE(readText.condition, condition);
+        QVERIFY(std::get<AddressObject>(read->objects.at(0)).grow);
+        const auto *readStar = std::get_if<ShapeObject>(&read->objects.at(1));
+        QVERIFY(readStar);
+        QCOMPARE(readStar->shapeType, ShapeType::Star);
+        QCOMPARE(readStar->corners, 7);
+        QCOMPARE(readStar->fillColor, QColor(Qt::black));
+        QCOMPARE(readStar->anchor, star.anchor);
+        QCOMPARE(readStar->bounds, star.bounds);
+        QCOMPARE(std::get<ImageObject>(read->objects.at(2)).svgData, drawing.svgData);
+        QVERIFY(!std::get<ImageObject>(read->objects.at(2)).imageData.isEmpty()); // DLS's picture
+        QCOMPARE(read->printing, document.printing);
+        QCOMPARE(read->headerLabel, document.headerLabel);
+        QCOMPARE(read->trailerLabel, document.trailerLabel);
+        QCOMPARE(read->guidesX, document.guidesX);
+        QCOMPARE(read->guidesY, document.guidesY);
+        QCOMPARE(read->dataSource.copiesColumn, u"Quantity"_s);
+        QCOMPARE(read->dataSource.labelColumn, u"Label"_s);
+    }
 };
 
 QTEST_GUILESS_MAIN(LabelFormatTest)

@@ -15,6 +15,7 @@ set(tests
     labelrenderertest
     recentlayoutstest
     historytest
+    printruntest
     sharedcountertest
     zplprintertest
     unitstest
@@ -83,6 +84,7 @@ if(BUILD_APP)
         ${CMAKE_SOURCE_DIR}/src/app/settingsdialog.cpp
         ${CMAKE_SOURCE_DIR}/src/app/automationpage.cpp
         ${CMAKE_SOURCE_DIR}/src/app/exportdialog.cpp
+        ${CMAKE_SOURCE_DIR}/src/app/printsettingsdialog.cpp
         ${CMAKE_SOURCE_DIR}/src/app/gs1dialog.cpp
         ${CMAKE_SOURCE_DIR}/src/app/rolllayoutdialog.cpp
         LINK_LIBRARIES labelcreatorcore Qt6::Test Qt6::Widgets Qt6::Sql KF6::Archive KF6::I18n KF6::WidgetsAddons KF6::ConfigWidgets

@@ -4,7 +4,7 @@
     SPDX-License-Identifier: CC0-1.0
 -->
 <!DOCTYPE gui>
-<gui name="plasma-label-creator" version="20"
+<gui name="plasma-label-creator" version="21"
      xmlns="http://www.kde.org/standards/kxmlgui/1.0"
      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
      xsi:schemaLocation="http://www.kde.org/standards/kxmlgui/1.0 http://www.kde.org/standards/kxmlgui/1.0/kxmlgui.xsd">
@@ -28,6 +28,9 @@
             <Action name="view_show_grid"/>
             <Action name="view_snap_grid"/>
             <Action name="view_grid_spacing"/>
+            <Separator/>
+            <Action name="view_guides"/>
+            <Action name="view_clear_guides"/>
         </Menu>
         <Menu name="format">
             <text>F&amp;ormat</text>
@@ -80,12 +83,16 @@
             <Action name="insert_ellipse"/>
             <Action name="insert_hline"/>
             <Action name="insert_vline"/>
+            <Action name="insert_polygon"/>
+            <Action name="insert_star"/>
+            <Action name="insert_arrow"/>
         </Menu>
         <Menu name="layout">
             <text>&amp;Layout</text>
             <Action name="label_type"/>
             <Action name="label_custom_size"/>
             <Action name="label_roll"/>
+            <Action name="label_print_settings"/>
             <Menu name="layout_orientation" icon="object-rotate-right">
                 <text>Label &amp;Orientation</text>
                 <Action name="layout_portrait"/>

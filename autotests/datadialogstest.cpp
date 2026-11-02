@@ -14,6 +14,7 @@
 #include "settingsdialog.h"
 #include "printerstatusdialog.h"
 #include "printonlypanel.h"
+#include "printsettingsdialog.h"
 #include "rolllayoutdialog.h"
 
 #include <QDialogButtonBox>
@@ -638,6 +639,44 @@ private Q_SLOTS:
         dialog.findChild<QDialogButtonBox *>()->button(QDialogButtonBox::Ok)->click();
         QCOMPARE(dialog.questions().size(), 1);
         QCOMPARE(dialog.questions().constFirst().name, u"Lot"_s);
+    }
+
+    void printSettingsAndRowColumns()
+    {
+        QTemporaryDir dir;
+        const QString main = dir.filePath(u"main.label"_s);
+        LabelDocument document;
+        document.printing = {u"Dark"_s, 18, 0};
+        document.headerLabel = u"header.label"_s;
+        PrintSettingsDialog settings(document, main, nullptr);
+        QCOMPARE(settings.printing(), document.printing);
+        QCOMPARE(settings.headerLabel(), u"header.label"_s);
+        QCOMPARE(settings.trailerLabel(), QString());
+        for (QSpinBox *box : settings.findChildren<QSpinBox *>()) {
+            if (box->suffix().contains(u"in/s"_s)) {
+                box->setValue(3);
+            }
+        }
+        QCOMPARE(settings.printing().speed, 3);
+        grab(&settings, u"print-settings"_s);
+
+        // The columns rows take copies and labels from, offered once loaded.
+        DataTable table;
+        table.columns = {u"Serial"_s, u"Quantity"_s, u"Label"_s};
+        table.rows = {{u"1"_s, u"2"_s, u"cable"_s}};
+        DataSource source;
+        source.kind = DataSource::Kind::File;
+        source.fileName = u"rows.csv"_s;
+        source.copiesColumn = u"Quantity"_s;
+        DataSourceDialog dialog(source, table, {0}, nullptr);
+        QCOMPARE(dialog.source().copiesColumn, u"Quantity"_s);
+        QCOMPARE(dialog.source().labelColumn, QString());
+        for (QComboBox *combo : dialog.findChildren<QComboBox *>()) {
+            if (combo->itemText(0).startsWith(u"This label"_s)) {
+                combo->setCurrentIndex(combo->findData(u"Label"_s));
+            }
+        }
+        QCOMPARE(dialog.source().labelColumn, u"Label"_s);
     }
 };
 

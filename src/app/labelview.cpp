@@ -30,6 +30,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <limits>
 
 using namespace LabelCreator;
 using namespace Qt::Literals::StringLiterals;
@@ -476,6 +477,35 @@ void LabelView::paintEvent(QPaintEvent *)
         painter.drawPoints(points);
     }
 
+    // Guidelines across the whole canvas; the one being dragged stronger.
+    if (m_guidesVisible) {
+        const auto drawGuide = [&](Qt::Orientation orientation, qreal twips, bool dragged) {
+            QPen pen(dragged ? QColor(0, 120, 215) : QColor(0, 160, 220, 170), 1, dragged ? Qt::SolidLine : Qt::DashLine);
+            pen.setCosmetic(true);
+            painter.setPen(pen);
+            if (orientation == Qt::Horizontal) {
+                const qreal y = labelOrigin().y() + twips * scale();
+                painter.drawLine(QPointF(0, y), QPointF(width(), y));
+            } else {
+                const qreal x = labelOrigin().x() + twips * scale();
+                painter.drawLine(QPointF(x, 0), QPointF(x, height()));
+            }
+        };
+        for (int i = 0; i < document.guidesY.size(); ++i) {
+            if (!(m_guideDrag && m_guideDrag->orientation == Qt::Horizontal && m_guideDrag->index == i)) {
+                drawGuide(Qt::Horizontal, document.guidesY.at(i), false);
+            }
+        }
+        for (int i = 0; i < document.guidesX.size(); ++i) {
+            if (!(m_guideDrag && m_guideDrag->orientation == Qt::Vertical && m_guideDrag->index == i)) {
+                drawGuide(Qt::Vertical, document.guidesX.at(i), false);
+            }
+        }
+        if (m_guideDrag && m_guideDrag->inside) {
+            drawGuide(m_guideDrag->orientation, m_guideDrag->position, true);
+        }
+    }
+
     // Only part of the label takes print (a wrap label's strip): shade the
     // rest, outline the part.
     if (!m_printArea.isEmpty()) {
@@ -602,6 +632,14 @@ void LabelView::mousePressEvent(QMouseEvent *event)
     const LabelDocument &document = m_editor->document();
     const bool adding = event->modifiers() & (Qt::ControlModifier | Qt::ShiftModifier);
     m_dragHandle = adding ? NoHandle : handleAt(event->position());
+    // A guideline under the mouse, away from the selection's handles: moved.
+    if (m_dragHandle == NoHandle && !adding) {
+        if (const auto guide = guideAt(event->position())) {
+            m_guideDrag = guide;
+            m_guideDrag->inside = true;
+            return;
+        }
+    }
     if (m_dragHandle == NoHandle) {
         const int index = objectAt(event->position());
         if (index < 0) {
@@ -667,6 +705,10 @@ void LabelView::mouseMoveEvent(QMouseEvent *event)
     if (m_readOnly) {
         return;
     }
+    if (m_guideDrag) {
+        dragGuideTo(event->globalPosition());
+        return;
+    }
     if (m_rubberBand) {
         m_rubberBand = QRectF(m_rubberStart, event->position()).normalized();
         const QRectF band(toTwips(m_rubberBand->topLeft()), toTwips(m_rubberBand->bottomRight()));
@@ -692,6 +734,8 @@ void LabelView::mouseMoveEvent(QMouseEvent *event)
             const qreal direction = std::fmod(angleOf(handleRects(base).at(handle).center() - toWidget(base.bounds).center()) + 360.0, 180.0);
             static const Qt::CursorShape shapes[] = {Qt::SizeHorCursor, Qt::SizeBDiagCursor, Qt::SizeVerCursor, Qt::SizeFDiagCursor};
             setCursor(shapes[int(std::round(direction / 45)) % 4]);
+        } else if (const auto guide = guideAt(event->position())) {
+            setCursor(guide->orientation == Qt::Horizontal ? Qt::SplitVCursor : Qt::SplitHCursor);
         } else {
             const int index = objectAt(event->position());
             const bool movable = index >= 0 && !m_editor->document().tape && !m_editor->document().isLocked(index);
@@ -801,6 +845,39 @@ void LabelView::mouseMoveEvent(QMouseEvent *event)
             }
         }
     }
+    // Edges near a guideline go onto it.
+    const LabelDocument &guided = m_editor->document();
+    if (m_guidesVisible && !(event->modifiers() & Qt::AltModifier) && (!guided.guidesX.isEmpty() || !guided.guidesY.isEmpty())) {
+        if (m_dragHandle == NoHandle) {
+            // Whichever edge or the middle is nearest a guideline.
+            const auto nearest = [this](qreal start, qreal size, const QList<qreal> &guides) {
+                qreal best = start;
+                qreal distance = std::numeric_limits<qreal>::max();
+                for (const qreal offset : {0.0, size / 2, size}) {
+                    const qreal to = snappedToGuides(start + offset, guides) - offset;
+                    if (to != start && std::abs(to - start) < distance) {
+                        distance = std::abs(to - start);
+                        best = to;
+                    }
+                }
+                return best;
+            };
+            bounds.moveTopLeft(QPointF(nearest(bounds.left(), bounds.width(), guided.guidesX), nearest(bounds.top(), bounds.height(), guided.guidesY)));
+        } else {
+            if (m_dragHandle == TopLeft || m_dragHandle == Left || m_dragHandle == BottomLeft) {
+                bounds.setLeft(snappedToGuides(bounds.left(), guided.guidesX));
+            }
+            if (m_dragHandle == TopRight || m_dragHandle == Right || m_dragHandle == BottomRight) {
+                bounds.setRight(snappedToGuides(bounds.right(), guided.guidesX));
+            }
+            if (m_dragHandle == TopLeft || m_dragHandle == Top || m_dragHandle == TopRight) {
+                bounds.setTop(snappedToGuides(bounds.top(), guided.guidesY));
+            }
+            if (m_dragHandle == BottomLeft || m_dragHandle == Bottom || m_dragHandle == BottomRight) {
+                bounds.setBottom(snappedToGuides(bounds.bottom(), guided.guidesY));
+            }
+        }
+    }
     bounds = keepThin(bounds);
 
     if (m_dragHandle == NoHandle) {
@@ -820,6 +897,10 @@ void LabelView::mouseReleaseEvent(QMouseEvent *event)
     if (event->button() != Qt::LeftButton) {
         return;
     }
+    if (m_guideDrag) {
+        endGuideAt(event->globalPosition());
+        return;
+    }
     if (m_rubberBand) {
         m_rubberBand.reset();
         update();
@@ -836,6 +917,117 @@ void LabelView::mouseReleaseEvent(QMouseEvent *event)
             : m_dragHandle != NoHandle                    ? i18n("Resize Object")
                                                           : (m_dragIndices.size() > 1 ? i18n("Move Objects") : i18n("Move Object"));
         m_editor->apply(result, description, m_editor->selectedObjects());
+    }
+    update();
+}
+
+void LabelView::setGuidesVisible(bool visible)
+{
+    m_guidesVisible = visible;
+    update();
+}
+
+bool LabelView::guidesVisible() const
+{
+    return m_guidesVisible;
+}
+
+std::optional<LabelView::GuideDrag> LabelView::guideAt(const QPointF &widgetPos) const
+{
+    if (!m_guidesVisible) {
+        return std::nullopt;
+    }
+    // Within a few pixels, the nearest first.
+    constexpr qreal Reach = 4;
+    const LabelDocument &document = m_editor->document();
+    std::optional<GuideDrag> found;
+    qreal best = Reach + 1;
+    const QPointF at = toTwips(widgetPos);
+    for (int i = 0; i < document.guidesY.size(); ++i) {
+        const qreal distance = std::abs(document.guidesY.at(i) - at.y()) * scale();
+        if (distance <= Reach && distance < best) {
+            best = distance;
+            found = GuideDrag{Qt::Horizontal, i, document.guidesY.at(i), true};
+        }
+    }
+    for (int i = 0; i < document.guidesX.size(); ++i) {
+        const qreal distance = std::abs(document.guidesX.at(i) - at.x()) * scale();
+        if (distance <= Reach && distance < best) {
+            best = distance;
+            found = GuideDrag{Qt::Vertical, i, document.guidesX.at(i), true};
+        }
+    }
+    return found;
+}
+
+qreal LabelView::snappedToGuides(qreal value, const QList<qreal> &guides) const
+{
+    // Within eight pixels at any zoom.
+    const qreal reach = 8 / std::max(scale(), 1e-6);
+    qreal best = value;
+    qreal distance = reach;
+    for (const qreal guide : guides) {
+        if (std::abs(guide - value) <= distance) {
+            distance = std::abs(guide - value);
+            best = guide;
+        }
+    }
+    return best;
+}
+
+void LabelView::beginNewGuide(Qt::Orientation orientation)
+{
+    if (m_readOnly || !m_guidesVisible) {
+        return;
+    }
+    m_guideDrag = GuideDrag{orientation, -1, 0, false};
+}
+
+void LabelView::dragGuideTo(const QPointF &globalPos)
+{
+    if (!m_guideDrag) {
+        return;
+    }
+    const QPointF local = mapFromGlobal(globalPos);
+    const QPointF twips = toTwips(local);
+    m_guideDrag->inside = rect().contains(local.toPoint());
+    m_guideDrag->position = m_guideDrag->orientation == Qt::Horizontal ? twips.y() : twips.x();
+    update();
+}
+
+void LabelView::endGuideAt(const QPointF &globalPos)
+{
+    dragGuideTo(globalPos);
+    finishGuideDrag();
+}
+
+void LabelView::finishGuideDrag()
+{
+    if (!m_guideDrag) {
+        return;
+    }
+    const GuideDrag drag = *m_guideDrag;
+    m_guideDrag.reset();
+    LabelDocument document = m_editor->document();
+    QList<qreal> &guides = drag.orientation == Qt::Horizontal ? document.guidesY : document.guidesX;
+    // To a tenth of a millimetre, as positions are shown.
+    const qreal position = Units::mmToTwips(std::round(Units::twipsToMm(drag.position) * 10) / 10);
+    QString description;
+    if (drag.index < 0) {
+        if (drag.inside) {
+            guides << position;
+            description = i18n("Add Guideline");
+        }
+    } else if (!drag.inside) {
+        // Let go outside the canvas, on a ruler say: gone.
+        guides.removeAt(drag.index);
+        description = i18n("Remove Guideline");
+    } else if (guides.at(drag.index) != position) {
+        guides[drag.index] = position;
+        description = i18n("Move Guideline");
+    }
+    if (!description.isEmpty()) {
+        m_editor->apply(document, description);
     }
     update();
 }

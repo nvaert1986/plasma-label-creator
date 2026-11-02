@@ -82,6 +82,17 @@ public:
     /** Dots over the label at every grid point. */
     void setGridVisible(bool visible);
     bool isGridVisible() const;
+    /** Guidelines: shown, and objects snap to them (Alt places freely). */
+    void setGuidesVisible(bool visible);
+    bool guidesVisible() const;
+    /**
+     * A guideline dragged out of a ruler: across the label for the top
+     * ruler (Qt::Horizontal), down it for the left one. The ruler passes on
+     * where the mouse is; let go outside the canvas, nothing is added.
+     */
+    void beginNewGuide(Qt::Orientation orientation);
+    void dragGuideTo(const QPointF &globalPos);
+    void endGuideAt(const QPointF &globalPos);
     /** Moving and resizing put edges on the grid; holding Alt places freely. */
     void setSnapToGrid(bool snap);
     bool snapsToGrid() const;
@@ -185,6 +196,21 @@ private:
     std::optional<LabelCreator::LabelDocument> m_shownDocument; // while read-only
     QRectF m_printArea;
     bool m_gridVisible = false;
+    bool m_guidesVisible = true;
+    // A guideline being dragged: which list, which one (-1 for a new one),
+    // and where it is now, in twips on the canvas.
+    struct GuideDrag {
+        Qt::Orientation orientation = Qt::Horizontal; // Horizontal: a line across, at a height
+        int index = -1;
+        qreal position = 0;
+        bool inside = false; // over the canvas: kept on letting go
+    };
+    std::optional<GuideDrag> m_guideDrag;
+    /** The guideline within reach of @p widgetPos: its drag; nullopt for none. */
+    std::optional<GuideDrag> guideAt(const QPointF &widgetPos) const;
+    void finishGuideDrag();
+    /** @p value moved onto a guideline in @p guides within reach; as it is otherwise. */
+    qreal snappedToGuides(qreal value, const QList<qreal> &guides) const;
     bool m_snapToGrid = false;
     qreal m_gridSpacing = 113.385826771653543; // twips, 2 mm
     QPointer<InlineTextEditor> m_textEditor;

@@ -70,6 +70,9 @@ private:
     std::optional<DataTable> m_table;
     QList<int> m_initialSelection;
     QWidget *m_sourceSettings = nullptr; // where the rows come from
+    QWidget *m_rowSettings = nullptr; // what each row prints besides its values
+    QComboBox *m_copiesColumn = nullptr;
+    QComboBox *m_labelColumn = nullptr;
     bool m_tickAll = false; // after a new load, every row is ticked
 };
 

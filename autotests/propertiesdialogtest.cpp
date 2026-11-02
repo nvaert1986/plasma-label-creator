@@ -8,8 +8,11 @@
 
 #include <QApplication>
 #include <QBuffer>
+#include <QCheckBox>
+#include <QComboBox>
 #include <QDialog>
 #include <QImage>
+#include <QLineEdit>
 #include <QTest>
 #include <QTimer>
 
@@ -72,6 +75,42 @@ private Q_SLOTS:
         QCOMPARE(objectBase(object).bounds, objectBase(before).bounds);
         QCOMPARE(objectBase(object).name, objectBase(before).name);
         QVERIFY2(object == before, "an object property changed although nothing was edited");
+    }
+
+    void setsWhenItPrintsAndWhereItStays()
+    {
+        const LabelDocument document = ObjectFactory::newLabel(u"30252 Address"_s, u"w79h252"_s, QSizeF(78.96, 252));
+        LabelObject object = ObjectFactory::create(ObjectFactory::Kind::Text, document);
+        // The condition, its field and value, and the anchor, as a user picks them.
+        QTimer::singleShot(0, []() {
+            auto *dialog = qobject_cast<QDialog *>(QApplication::activeModalWidget());
+            QVERIFY(dialog);
+            for (QComboBox *combo : dialog->findChildren<QComboBox *>()) {
+                if (const int test = combo->findData(int(PrintCondition::Test::GreaterThan)); test >= 0 && combo->findText(u"Always"_s) >= 0) {
+                    combo->setCurrentIndex(test);
+                } else if (combo->isEditable() && combo->findText(u"Weight"_s) >= 0) {
+                    combo->setCurrentText(u"{Weight}"_s);
+                } else if (combo->findText(u"Below"_s) >= 0) {
+                    combo->setCurrentIndex(combo->findText(u"Below"_s));
+                }
+            }
+            for (QLineEdit *edit : dialog->findChildren<QLineEdit *>()) {
+                if (edit->placeholderText().startsWith(u"Value"_s)) {
+                    edit->setText(u"5"_s);
+                }
+            }
+            for (QCheckBox *check : dialog->findChildren<QCheckBox *>()) {
+                if (check->text().startsWith(u"Grow"_s)) {
+                    check->setChecked(true);
+                }
+            }
+            dialog->accept();
+        });
+        QVERIFY(editObjectProperties(nullptr, object, nullptr, {u"TEXT"_s, u"BARCODE"_s}, {u"Weight"_s, u"Lot"_s}));
+        const ObjectBase &base = objectBase(object);
+        QCOMPARE(base.condition, (PrintCondition{PrintCondition::Test::GreaterThan, u"Weight"_s, u"5"_s}));
+        QCOMPARE(base.anchor, (Anchor{u"BARCODE"_s, Anchor::Side::Below}));
+        QVERIFY(std::get<TextObject>(object).grow);
     }
 };
 

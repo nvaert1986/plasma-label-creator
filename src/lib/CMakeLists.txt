@@ -35,6 +35,8 @@ add_library(labelcreatorcore STATIC
     labelversions.h
     printhistory.cpp
     printhistory.h
+    printrun.cpp
+    printrun.h
     recentlayouts.cpp
     recentlayouts.h
     sharedcounter.cpp
@@ -52,6 +54,7 @@ target_link_libraries(labelcreatorcore
     PUBLIC
         Qt6::Core
         Qt6::Gui
+        Qt6::Svg
     PRIVATE
         Qt6::Network
         Cups::Cups

@@ -174,7 +174,8 @@ std::optional<QHash<QString, QString>> answers(const LabelDocument &document, co
 /**
  * The labels to print for @p request: one per row, else one, with the
  * answers and values filled in, and pictures with relative paths found
- * next to @p labelFile.
+ * next to @p labelFile; as the print run makes them (copies and label per
+ * row, header and trailer labels).
  */
 std::optional<QList<LabelDocument>> prepare(const LabelDocument &document, const QString &labelFile, const PrintRequest &request, QString *errorString = nullptr);
 

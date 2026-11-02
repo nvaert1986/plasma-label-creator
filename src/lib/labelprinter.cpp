@@ -383,6 +383,8 @@ bool LabelPrinter::load()
     m_dymoOptions = ppdFindOption(ppd, "DymoHalftoning") != nullptr;
     m_customSizes = ppd->variable_sizes && !m_dymoOptions;
     m_mediaTracking = ppdFindOption(ppd, "zeMediaTracking") != nullptr;
+    m_darkness = ppdFindOption(ppd, "Darkness") != nullptr;
+    m_printRate = ppdFindOption(ppd, "zePrintRate") != nullptr;
     const ppd_option_t *pageSize = ppdFindOption(ppd, "PageSize");
     for (int i = 0; i < ppd->num_sizes; ++i) {
         const ppd_size_t &size = ppd->sizes[i];
@@ -716,15 +718,19 @@ QList<QImage> LabelPrinter::pages(const QList<LabelDocument> &labels, const Opti
     }
     QList<QImage> pages;
     int step = 0;
-    for (const LabelDocument &label : labels) {
+    int counted = 0;
+    for (qsizetype i = 0; i < labels.size(); ++i) {
+        const LabelDocument &label = labels.at(i);
         const bool counts = std::any_of(label.objects.cbegin(), label.objects.cend(), [](const LabelObject &object) {
             return std::holds_alternative<CounterObject>(object);
         });
+        // A header or trailer label: once, and the counters skip it.
+        const bool extra = i < options.headerLabels || i >= labels.size() - options.trailerLabels;
         QImage page;
-        for (int copy = 0; copy < std::max(1, options.copies); ++copy, ++step) {
+        for (int copy = 0; copy < (extra ? 1 : std::max(1, options.copies)); ++copy) {
             if (page.isNull() || counts) {
                 QStringList warnings;
-                page = paperImage(label, single, m_resolution, &warnings, step, when, offset);
+                page = paperImage(label, single, m_resolution, &warnings, extra ? 0 : step, when, offset);
                 for (const QString &warning : std::as_const(warnings)) {
                     if (!m_warnings.contains(warning)) {
                         m_warnings << warning;
@@ -732,9 +738,13 @@ QList<QImage> LabelPrinter::pages(const QList<LabelDocument> &labels, const Opti
                 }
             }
             pages << page;
+            if (!extra) {
+                ++step;
+                ++counted;
+            }
         }
     }
-    m_pagedLabels = int(pages.size());
+    m_pagedLabels = counted;
     return roll.across > 1 ? rowsAcross(pages, *paper, m_resolution) : pages;
 }
 
@@ -791,6 +801,13 @@ int LabelPrinter::print(const QList<LabelDocument> &labels, const Options &optio
     // length. Other jobs keep the queue's setting.
     if (m_mediaTracking && paper->roll.continuous) {
         optionCount = cupsAddOption("zeMediaTracking", "Continuous", optionCount, &cupsOptions);
+    }
+    // The label's own darkness and speed, on a ZPL printer.
+    if (m_darkness && options.darkness > 0) {
+        optionCount = cupsAddOption("Darkness", QByteArray::number(std::clamp(options.darkness, 1, 30)).constData(), optionCount, &cupsOptions);
+    }
+    if (m_printRate && options.speed > 0) {
+        optionCount = cupsAddOption("zePrintRate", QByteArray::number(std::clamp(options.speed, 1, 12)).constData(), optionCount, &cupsOptions);
     }
     // DYMO's own options, for DYMO's drivers (or when converting with one here).
     if (m_dymoOptions || !m_driver.isEmpty()) {

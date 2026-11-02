@@ -102,7 +102,11 @@ void MainWindow::editObject(int index)
         return;
     }
     LabelDocument document = m_editor->document();
-    if (editObjectProperties(this, document.objects[index], document.cellOf(index))) {
+    QStringList names;
+    for (const LabelObject &other : std::as_const(document.objects)) {
+        names << objectBase(other).name;
+    }
+    if (editObjectProperties(this, document.objects[index], document.cellOf(index), names, availableFields())) {
         m_editor->apply(document, i18n("Change Object Properties"));
     }
 }
@@ -304,6 +308,22 @@ void MainWindow::editRollLayout()
     m_editor->apply(document, i18n("Change Roll Layout"));
 }
 
+void MainWindow::editPrintSettings()
+{
+    const LabelDocument &current = m_editor->document();
+    PrintSettingsDialog dialog(current, m_editor->fileName(), this);
+    if (dialog.exec() != QDialog::Accepted) {
+        return;
+    }
+    LabelDocument document = current;
+    document.printing = dialog.printing();
+    document.headerLabel = dialog.headerLabel();
+    document.trailerLabel = dialog.trailerLabel();
+    if (document.printing != current.printing || document.headerLabel != current.headerLabel || document.trailerLabel != current.trailerLabel) {
+        m_editor->apply(document, i18n("Change Print Settings"));
+    }
+}
+
 void MainWindow::editLayers()
 {
     LayersDialog dialog(m_editor->document().layers, this);
@@ -463,6 +483,10 @@ void MainWindow::setupArrangeActions()
     roll->setText(i18n("&Roll Layout…"));
     roll->setIcon(QIcon::fromTheme(u"view-split-left-right"_s));
     roll->setToolTip(i18n("Labels across the roll, or a continuous roll"));
+    QAction *printSettings = actions->addAction(u"label_print_settings"_s, this, &MainWindow::editPrintSettings);
+    printSettings->setText(i18n("&Print Settings…"));
+    printSettings->setIcon(QIcon::fromTheme(u"configure"_s));
+    printSettings->setToolTip(i18n("Darkness, speed and density for this label, and header and trailer labels"));
 
     // Layers, and objects that only help to design.
     QAction *layers = actions->addAction(u"layout_layers"_s, this, &MainWindow::editLayers);

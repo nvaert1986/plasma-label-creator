@@ -8,9 +8,11 @@
 #include <KLocalizedString>
 #include <KZip>
 
+#include <QBuffer>
 #include <QDate>
 #include <QFile>
 #include <QFileInfo>
+#include <QImageReader>
 #include <QLocale>
 #include <QRegularExpression>
 #include <QSqlDatabase>
@@ -344,14 +346,36 @@ std::optional<QList<QStringList>> readOds(const QString &fileName, const QString
     return rows;
 }
 
-std::optional<DataTable> readDatabase(const DataSource &source, const QString &password, QString *errorString)
+// Bytes from the database: a picture as a data: address an image can show;
+// anything else as text.
+QString pictureData(const QByteArray &bytes)
+{
+    QBuffer buffer;
+    buffer.setData(bytes);
+    buffer.open(QIODevice::ReadOnly);
+    const QByteArray format = QImageReader::imageFormat(&buffer);
+    const QByteArray start = bytes.left(512);
+    if (start.contains("<svg")) {
+        return u"data:image/svg+xml;base64,"_s + QString::fromLatin1(bytes.toBase64());
+    }
+    if (!format.isEmpty()) {
+        return u"data:image/%1;base64,"_s.arg(QString::fromLatin1(format)) + QString::fromLatin1(bytes.toBase64());
+    }
+    return QString::fromUtf8(bytes);
+}
+
+std::optional<DataTable> readDatabase(const DataSource &source, const QString &password, QString *errorString, const QHash<QString, QString> &parameters)
 {
     if (!QSqlDatabase::isDriverAvailable(source.driver)) {
         fail(errorString, i18n("The database driver %1 is not installed.", source.driver));
         return std::nullopt;
     }
+    // Fields in the query are bound as parameters: an answer is a value,
+    // never part of the query.
+    QStringList names;
+    const QString text = boundQuery(source.query, &names);
     // Labels can come from anyone: printing one never changes a database.
-    if (!isReadOnlyQuery(source.query)) {
+    if (!isReadOnlyQuery(text)) {
         fail(errorString, i18n("Only a query that reads is run: one SELECT (or WITH ... SELECT) statement."));
         return std::nullopt;
     }
@@ -386,7 +410,16 @@ std::optional<DataTable> readDatabase(const DataSource &source, const QString &p
             }
             const bool inTransaction = database.transaction();
             query.setForwardOnly(true);
-            if (!query.exec(source.query)) {
+            bool ran = false;
+            if (names.isEmpty()) {
+                ran = query.exec(text);
+            } else if (query.prepare(text)) {
+                for (const QString &name : std::as_const(names)) {
+                    query.addBindValue(parameters.value(name));
+                }
+                ran = query.exec();
+            }
+            if (!ran) {
                 fail(errorString, i18n("The query failed: %1", query.lastError().text()));
             } else {
                 DataTable table;
@@ -399,7 +432,11 @@ std::optional<DataTable> readDatabase(const DataSource &source, const QString &p
                     QStringList row;
                     for (int i = 0; i < record.count(); ++i) {
                         const QVariant value = query.value(i);
-                        if (value.typeId() == QMetaType::QDate) {
+                        if (value.typeId() == QMetaType::QByteArray) {
+                            // A picture stored in the database: put on the
+                            // label as an image's file, {Photo}.
+                            row << pictureData(value.toByteArray());
+                        } else if (value.typeId() == QMetaType::QDate) {
                             row << locale.toString(value.toDate(), QLocale::ShortFormat);
                         } else if (value.typeId() == QMetaType::QDateTime) {
                             row << locale.toString(value.toDateTime(), QLocale::ShortFormat);
@@ -467,14 +504,39 @@ bool isReadOnlyQuery(const QString &query)
     return start.match(bare).hasMatch() && !writes.match(bare).hasMatch();
 }
 
-std::optional<DataTable> read(const DataSource &source, const QString &password, QString *errorString)
+QStringList queryParameters(const QString &query)
+{
+    QStringList names;
+    boundQuery(query, &names);
+    names.removeDuplicates();
+    return names;
+}
+
+QString boundQuery(const QString &query, QStringList *names)
+{
+    // {Name}, '{Name}' or "{Name}": a placeholder, quotes and all.
+    static const QRegularExpression field(uR"((['"]?)\{([^{}|:]+)\}\1)"_s);
+    QString result;
+    qsizetype last = 0;
+    for (auto it = field.globalMatch(query); it.hasNext();) {
+        const QRegularExpressionMatch match = it.next();
+        result += QStringView(query).mid(last, match.capturedStart() - last);
+        result += u'?';
+        names->append(match.captured(2).trimmed());
+        last = match.capturedEnd();
+    }
+    result += QStringView(query).mid(last);
+    return result;
+}
+
+std::optional<DataTable> read(const DataSource &source, const QString &password, QString *errorString, const QHash<QString, QString> &parameters)
 {
     switch (source.kind) {
     case DataSource::Kind::None:
         fail(errorString, i18n("No data source has been chosen."));
         return std::nullopt;
     case DataSource::Kind::Database:
-        return readDatabase(source, password, errorString);
+        return readDatabase(source, password, errorString, parameters);
     case DataSource::Kind::File:
         break;
     }

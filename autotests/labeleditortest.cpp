@@ -1191,6 +1191,64 @@ private Q_SLOTS:
         QVERIFY(qAbs(twips.x() - 100 / view.scale()) < 0.01);
         QVERIFY(qAbs(twips.y() - 50 / view.scale()) < 0.01);
     }
+
+    void guidelinesAreAddedSnappedToAndRemoved()
+    {
+        LabelEditor editor;
+        editor.reset(addressLabel());
+        LabelView view(&editor);
+        view.resize(800, 400);
+        view.show();
+        QVERIFY(QTest::qWaitForWindowExposed(&view));
+        view.setZoom(1.0);
+        const auto toWidget = [&view](const QPointF &twips) {
+            return (view.labelOrigin() + twips * view.scale()).toPoint();
+        };
+
+        // Dragged out of the left ruler onto the label: a guideline down it.
+        const QPointF guideAt(1440, 0);
+        view.beginNewGuide(Qt::Vertical);
+        view.endGuideAt(view.mapToGlobal(QPointF(toWidget(guideAt))));
+        QCOMPARE(editor.document().guidesX.size(), 1);
+        const qreal guide = editor.document().guidesX.constFirst();
+        QVERIFY(std::abs(guide - 1440) < 1.5 / view.scale());
+        // Let go outside the canvas: nothing.
+        view.beginNewGuide(Qt::Horizontal);
+        view.endGuideAt(view.mapToGlobal(QPointF(-20, -20)));
+        QVERIFY(editor.document().guidesY.isEmpty());
+
+        // An object dragged near it snaps its left edge onto it.
+        const QRectF before = objectBase(editor.document().objects.at(0)).bounds;
+        const QPoint start = toWidget(before.center());
+        const qreal towards = (guide - before.left()) * view.scale() + 5; // five pixels past it
+        QTest::mousePress(&view, Qt::LeftButton, {}, start);
+        QTest::mouseMove(&view, start + QPoint(qRound(towards / 2), 0));
+        QTest::mouseMove(&view, start + QPoint(qRound(towards), 0));
+        QTest::mouseRelease(&view, Qt::LeftButton, {}, start + QPoint(qRound(towards), 0));
+        QCOMPARE(objectBase(editor.document().objects.at(0)).bounds.left(), guide);
+        // A picture of it, with the new shapes beside the text.
+        LabelDocument shapes = editor.document();
+        for (const auto &[type, x] : {std::pair{ShapeType::Star, 2600.0}, std::pair{ShapeType::Polygon, 3300.0}, std::pair{ShapeType::Arrow, 4000.0}}) {
+            ShapeObject shape;
+            shape.shapeType = type;
+            shape.corners = type == ShapeType::Polygon ? 6 : 5;
+            shape.fillColor = Qt::black;
+            shape.bounds = QRectF(x, 300, type == ShapeType::Arrow ? 900 : 600, 600);
+            shapes.objects << shape;
+        }
+        editor.apply(shapes, u"Shapes"_s);
+        grab(&view, u"guides-and-shapes"_s);
+        editor.undoStack()->undo();
+
+        // Dragged off the canvas: gone; and undone, back.
+        const QPoint onGuide = toWidget(QPointF(guide, editor.document().canvasSize().height() + 300));
+        QTest::mousePress(&view, Qt::LeftButton, {}, onGuide);
+        QTest::mouseMove(&view, QPoint(-30, onGuide.y()));
+        QTest::mouseRelease(&view, Qt::LeftButton, {}, QPoint(-30, onGuide.y()));
+        QVERIFY(editor.document().guidesX.isEmpty());
+        editor.undoStack()->undo();
+        QCOMPARE(editor.document().guidesX.size(), 1);
+    }
 };
 
 QTEST_MAIN(LabelEditorTest)

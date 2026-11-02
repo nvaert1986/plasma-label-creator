@@ -53,6 +53,20 @@ public:
      */
     void setOutline(bool outline);
 
+    /**
+     * @p object alone, on a transparent picture of its box at @p dpi: what a
+     * program that cannot draw it is given instead.
+     */
+    QImage objectPicture(const LabelObject &object, qreal dpi);
+    /** The outline of a polygon, star or arrow filling @p box. */
+    static QPainterPath shapePath(const ShapeObject &object, const QRectF &box);
+
+    /**
+     * @p document with text that grows to fit grown, and the objects
+     * anchored to it moved along, as it is painted; as it is without either.
+     */
+    LabelDocument grown(const LabelDocument &document) const;
+
     /** Paints the label with the painter's coordinates in twips. */
     void paint(QPainter *painter, const LabelDocument &document);
 
@@ -81,6 +95,7 @@ private:
     void paintText(QPainter *painter, const TextObject &object, const QRectF &box);
     void paintBarcode(QPainter *painter, const BarcodeObject &object, const QRectF &box);
     void paintImage(QPainter *painter, const ImageObject &object, const QRectF &box);
+    void paintImageBorder(QPainter *painter, const ImageObject &object, const QRectF &box);
     void paintShape(QPainter *painter, const ShapeObject &object, const QRectF &box);
     void paintCircularText(QPainter *painter, const CircularTextObject &object, const QRectF &box);
     void paintPlaceholder(QPainter *painter, const QRectF &box, const QString &text);

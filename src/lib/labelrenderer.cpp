@@ -9,11 +9,13 @@
 #include "tapelayout.h"
 #include "units.h"
 
+#include <QFile>
 #include <QFontMetricsF>
 #include <QHash>
 #include <QPageSize>
 #include <QPainter>
 #include <QPdfWriter>
+#include <QSvgRenderer>
 
 #include <functional>
 
@@ -655,7 +657,14 @@ void LabelRenderer::paint(QPainter *painter, const LabelDocument &laidOut)
         tapeCopy = laidOut;
         TapeLayout::layout(tapeCopy);
     }
-    const LabelDocument &document = laidOut.tape ? tapeCopy : laidOut;
+    // Text that grows to fit, and what is anchored to it.
+    const bool growing = std::any_of(laidOut.objects.cbegin(), laidOut.objects.cend(), [](const LabelObject &object) {
+        const auto *text = std::get_if<TextObject>(&object);
+        const auto *address = std::get_if<AddressObject>(&object);
+        return (text && text->grow) || (address && address->grow) || !objectBase(object).anchor.object.isEmpty();
+    });
+    const LabelDocument grownCopy = growing ? grown(laidOut.tape ? tapeCopy : laidOut) : LabelDocument();
+    const LabelDocument &document = growing ? grownCopy : laidOut.tape ? tapeCopy : laidOut;
 
     painter->save();
     const bool preview = m_mode == Mode::Preview;
@@ -725,6 +734,78 @@ void LabelRenderer::paint(QPainter *painter, const LabelDocument &laidOut)
         painter->drawPath(outline);
         painter->restore();
     }
+}
+
+LabelDocument LabelRenderer::grown(const LabelDocument &original) const
+{
+    LabelDocument document = original;
+    const qsizetype count = document.objects.size();
+    // How far each object's right and bottom edges moved by growing.
+    QList<QPointF> growth(count);
+    for (qsizetype i = 0; i < count; ++i) {
+        LabelObject &object = document.objects[i];
+        TextObject *text = std::get_if<TextObject>(&object);
+        if (!text) {
+            text = std::get_if<AddressObject>(&object);
+        }
+        // Grown along the label: not on tape (its cells size it) or turned.
+        if (!text || !text->grow || document.tape || text->rotation != Rotation::Rotation0 || text->angle != 0 || text->verticalized) {
+            continue;
+        }
+        const QRectF box = text->bounds;
+        TextBlock block;
+        if (text->wrap) {
+            block = TextWrapper(*text).blockAt(box.width(), text->useFullFontHeight);
+        } else {
+            block = measure(layoutLines(*text), text->useFullFontHeight);
+        }
+        // Never smaller than drawn: it grows as far as the text needs.
+        const qreal width = text->wrap ? box.width() : std::max(box.width(), block.width * 1.02);
+        const qreal height = std::max(box.height(), block.height);
+        const qreal wider = width - box.width();
+        const qreal taller = height - box.height();
+        // It grows away from the side it is aligned to.
+        const qreal left = text->horizontalAlignment == HorizontalAlignment::Right ? -wider
+            : text->horizontalAlignment == HorizontalAlignment::Center         ? -wider / 2
+                                                                               : 0;
+        const qreal top = text->verticalAlignment == VerticalAlignment::Bottom ? -taller : text->verticalAlignment == VerticalAlignment::Middle ? -taller / 2 : 0;
+        text->bounds = QRectF(box.x() + left, box.y() + top, width, height);
+        // Drawn at its size now that the box fits it.
+        text->fitMode = TextFitMode::None;
+        growth[i] = QPointF(left + wider, top + taller);
+    }
+
+    // Anchored objects move as far as the edge they keep to; a chain of
+    // anchors is followed, a loop is not.
+    QHash<QString, qsizetype> byName;
+    for (qsizetype i = count - 1; i >= 0; --i) {
+        byName.insert(objectBase(document.objects.at(i)).name, i);
+    }
+    QList<std::optional<QPointF>> edges(count);
+    QList<bool> visiting(count, false);
+    const std::function<QPointF(qsizetype)> edgeMoved = [&](qsizetype i) -> QPointF {
+        if (edges.at(i)) {
+            return *edges.at(i);
+        }
+        if (visiting.at(i)) {
+            return QPointF();
+        }
+        visiting[i] = true;
+        QPointF shift;
+        const Anchor &anchor = objectBase(document.objects.at(i)).anchor;
+        if (const auto to = byName.constFind(anchor.object); !anchor.object.isEmpty() && to != byName.cend() && *to != i) {
+            const QPointF moved = edgeMoved(*to);
+            shift = anchor.side == Anchor::Side::Right ? QPointF(moved.x(), 0) : QPointF(0, moved.y());
+        }
+        objectBase(document.objects[i]).bounds.translate(shift);
+        edges[i] = shift + growth.at(i);
+        visiting[i] = false;
+        return *edges.at(i);
+    };
+    for (qsizetype i = 0; i < count; ++i) {
+        edgeMoved(i);
+    }
+    return document;
 }
 
 qreal LabelRenderer::naturalLength(const LabelObject &object, qreal across, bool horizontal) const
@@ -998,15 +1079,63 @@ void LabelRenderer::paintBarcode(QPainter *painter, const BarcodeObject &object,
     painter->restore();
 }
 
+QImage LabelRenderer::objectPicture(const LabelObject &object, qreal dpi)
+{
+    const QRectF bounds = objectBase(object).bounds;
+    const qreal scale = Units::twipsToDots(1.0, dpi);
+    QImage image(QSize(std::max(1, qRound(bounds.width() * scale)), std::max(1, qRound(bounds.height() * scale))), QImage::Format_ARGB32_Premultiplied);
+    image.fill(Qt::transparent);
+    image.setDotsPerMeterX(qRound(dpi / Units::MmPerInch * 1000.0));
+    image.setDotsPerMeterY(image.dotsPerMeterX());
+    QPainter painter(&image);
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.scale(scale, scale);
+    painter.translate(-bounds.topLeft());
+    paintObject(&painter, object);
+    return image;
+}
+
 void LabelRenderer::paintImage(QPainter *painter, const ImageObject &object, const QRectF &box)
 {
-    QImage image;
-    if (object.imageLocation) {
-        if (!object.imageLocation->isEmpty()) {
-            image.load(*object.imageLocation);
+    // A picture as text in a field (from a database), a file, or the file's own.
+    QByteArray data;
+    bool loaded = false;
+    if (object.imageLocation && object.imageLocation->startsWith(u"data:"_s)) {
+        const qsizetype comma = object.imageLocation->indexOf(u',');
+        data = comma > 0 ? QByteArray::fromBase64(object.imageLocation->mid(comma + 1).toLatin1()) : QByteArray();
+        loaded = !data.isEmpty();
+    } else if (object.imageLocation) {
+        QFile file(*object.imageLocation);
+        if (!object.imageLocation->isEmpty() && file.open(QIODevice::ReadOnly)) {
+            data = file.readAll();
+            loaded = true;
         }
     } else {
-        image.loadFromData(object.imageData);
+        data = object.svgData.isEmpty() ? object.imageData : object.svgData;
+        loaded = !data.isEmpty();
+    }
+
+    // An SVG drawing stays sharp at any size and resolution.
+    const QByteArray start = data.left(512).trimmed();
+    if (start.startsWith("<svg") || start.startsWith("<?xml") || start.contains("<svg")) {
+        QSvgRenderer svg(data);
+        if (svg.isValid()) {
+            const QSizeF natural = svg.defaultSize().isEmpty() ? box.size() : QSizeF(svg.defaultSize()) * (Units::TwipsPerInch / 96.0);
+            const QSizeF size = object.scaleMode == ImageScaleMode::Fill ? box.size()
+                : object.scaleMode == ImageScaleMode::Uniform           ? natural.scaled(box.size(), Qt::KeepAspectRatio)
+                                                                        : natural;
+            painter->save();
+            painter->setClipRect(box, Qt::IntersectClip);
+            svg.setAspectRatioMode(Qt::IgnoreAspectRatio);
+            svg.render(painter, aligned(size, box, toQt(object.horizontalAlignment) | toQt(object.verticalAlignment)));
+            painter->restore();
+            paintImageBorder(painter, object, box);
+            return;
+        }
+    }
+    QImage image;
+    if (loaded) {
+        image.loadFromData(data);
     }
 
     if (!image.isNull()) {
@@ -1033,7 +1162,11 @@ void LabelRenderer::paintImage(QPainter *painter, const ImageObject &object, con
         m_warnings << u"%1: the image could not be loaded"_s.arg(object.name);
         paintPlaceholder(painter, box, object.name);
     }
+    paintImageBorder(painter, object, box);
+}
 
+void LabelRenderer::paintImageBorder(QPainter *painter, const ImageObject &object, const QRectF &box)
+{
     if (object.borderWidth > 0) {
         const qreal half = object.borderWidth / 2.0;
         painter->setPen(QPen(object.borderColor, object.borderWidth, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
@@ -1078,7 +1211,61 @@ void LabelRenderer::paintShape(QPainter *painter, const ShapeObject &object, con
     case ShapeType::Ellipse:
         painter->drawEllipse(box.adjusted(half, half, -half, -half));
         break;
+    case ShapeType::Polygon:
+    case ShapeType::Star:
+    case ShapeType::Arrow:
+    case ShapeType::DoubleArrow:
+        painter->drawPath(shapePath(object, box.adjusted(half, half, -half, -half)));
+        break;
     }
+}
+
+QPainterPath LabelRenderer::shapePath(const ShapeObject &object, const QRectF &box)
+{
+    QPolygonF points;
+    const QPointF centre = box.center();
+    const int corners = std::clamp(object.corners, 3, 24);
+    // Points round an ellipse in the box at equal angles, the first at the
+    // top; a star's every other point on a smaller one.
+    const auto around = [&](int count, qreal inner) {
+        for (int i = 0; i < count; ++i) {
+            const qreal radians = -M_PI / 2 + i * 2 * M_PI / count;
+            const qreal factor = i % 2 == 1 ? inner : 1.0;
+            points << QPointF(centre.x() + std::cos(radians) * box.width() / 2 * factor, centre.y() + std::sin(radians) * box.height() / 2 * factor);
+        }
+    };
+    switch (object.shapeType) {
+    case ShapeType::Polygon:
+        around(corners, 1.0);
+        break;
+    case ShapeType::Star:
+        around(corners * 2, 0.45);
+        break;
+    case ShapeType::Arrow: {
+        // A shaft half the box high, a head as long as the box is high.
+        const qreal head = std::min(box.height(), box.width() / 2);
+        const qreal shaft = box.height() / 4;
+        points << QPointF(box.left(), centre.y() - shaft) << QPointF(box.right() - head, centre.y() - shaft) << QPointF(box.right() - head, box.top())
+               << QPointF(box.right(), centre.y()) << QPointF(box.right() - head, box.bottom()) << QPointF(box.right() - head, centre.y() + shaft)
+               << QPointF(box.left(), centre.y() + shaft);
+        break;
+    }
+    case ShapeType::DoubleArrow: {
+        const qreal head = std::min(box.height(), box.width() / 3);
+        const qreal shaft = box.height() / 4;
+        points << QPointF(box.left(), centre.y()) << QPointF(box.left() + head, box.top()) << QPointF(box.left() + head, centre.y() - shaft)
+               << QPointF(box.right() - head, centre.y() - shaft) << QPointF(box.right() - head, box.top()) << QPointF(box.right(), centre.y())
+               << QPointF(box.right() - head, box.bottom()) << QPointF(box.right() - head, centre.y() + shaft) << QPointF(box.left() + head, centre.y() + shaft)
+               << QPointF(box.left() + head, box.bottom());
+        break;
+    }
+    default:
+        break;
+    }
+    QPainterPath path;
+    path.addPolygon(points);
+    path.closeSubpath();
+    return path;
 }
 
 void LabelRenderer::paintCircularText(QPainter *painter, const CircularTextObject &object, const QRectF &box)

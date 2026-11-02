@@ -9,6 +9,7 @@
 #include "labelformat.h"
 #include "labelprinter.h"
 #include "printhistory.h"
+#include "printrun.h"
 #include "sharedcounter.h"
 #include "tapelayout.h"
 #include "units.h"
@@ -596,41 +597,33 @@ std::optional<QHash<QString, QString>> answers(const LabelDocument &document, co
     return result;
 }
 
-std::optional<QList<LabelDocument>> prepare(const LabelDocument &document, const QString &labelFile, const PrintRequest &request, QString *errorString)
+namespace
+{
+
+std::optional<PrintRun::Run> run(const LabelDocument &document, const QString &labelFile, const PrintRequest &request, QString *errorString)
 {
     const auto given = answers(document, request.values, errorString);
     if (!given) {
         return std::nullopt;
     }
-    // Relative picture paths: next to the label, as the app finds them.
-    const QDir base = QFileInfo(labelFile).absoluteDir();
-    const auto filled = [&base](const LabelDocument &label, const QHash<QString, QString> &values) {
-        LabelDocument result = Fields::fill(label, values);
-        for (LabelObject &object : result.objects) {
-            if (auto *image = std::get_if<ImageObject>(&object); image && image->imageLocation && !image->imageLocation->isEmpty()) {
-                if (QFileInfo(*image->imageLocation).isRelative()) {
-                    image->imageLocation = base.absoluteFilePath(*image->imageLocation);
-                }
-            }
-        }
-        return result;
-    };
-    // The values on every label, then each row's, then the answers, which
-    // win as in the app.
-    QList<LabelDocument> labels;
-    if (request.rows.isEmpty()) {
-        QHash<QString, QString> values = request.values;
-        values.insert(*given);
-        labels << filled(document, values);
-        return labels;
-    }
-    for (const QHash<QString, QString> &row : request.rows) {
-        QHash<QString, QString> values = request.values;
-        values.insert(row);
-        values.insert(*given);
-        labels << filled(document, values);
-    }
-    return labels;
+    // As the app prints it: the values on every label, then each row's,
+    // then the answers; pictures next to the label.
+    PrintRun::Request run;
+    run.document = document;
+    run.labelFile = labelFile;
+    run.values = request.values;
+    run.answers = *given;
+    run.rows = request.rows;
+    run.copies = std::clamp(request.copies, 1, MaxCopies);
+    return PrintRun::make(run, errorString);
+}
+
+} // namespace
+
+std::optional<QList<LabelDocument>> prepare(const LabelDocument &document, const QString &labelFile, const PrintRequest &request, QString *errorString)
+{
+    const auto made = run(document, labelFile, request, errorString);
+    return made ? std::optional(made->labels) : std::nullopt;
 }
 
 PrintOutcome print(const QString &labelFile, const PrintRequest &request, const PrintEnvironment &environment)
@@ -695,43 +688,49 @@ PrintOutcome print(const QString &labelFile, const PrintRequest &request, const 
     }
 
     QString error;
-    auto prepared = prepare(document, labelFile, request, &error);
+    auto prepared = run(document, labelFile, request, &error);
     if (!prepared) {
         return refuse(PrintOutcome::Status::BadRequest, error);
     }
-    QList<LabelDocument> labels = *prepared;
+    QList<LabelDocument> labels = prepared->labels;
 
     // Shared counters stay locked from reading their files until the next
-    // values are written, so two computers never print the same numbers.
+    // values are written, so two computers never print the same numbers;
+    // every label of the run that shares one gets its value.
     std::vector<std::unique_ptr<SharedCounter>> locks;
     QHash<QString, int> sharedValues;
-    for (int i = 0; i < document.objects.size(); ++i) {
-        const auto *counter = std::get_if<CounterObject>(&document.objects.at(i));
-        if (!counter || counter->sharedFile.isEmpty()) {
+    for (const LabelObject &object : document.objects) {
+        const auto *counter = std::get_if<CounterObject>(&object);
+        if (!counter || counter->sharedFile.isEmpty() || sharedValues.contains(counter->sharedFile)) {
             continue;
         }
-        if (!sharedValues.contains(counter->sharedFile)) {
-            auto shared = std::make_unique<SharedCounter>(counter->sharedFile);
-            if (!shared->lock(environment.counterWaitSeconds * 1000)) {
-                return refuse(PrintOutcome::Status::Failed, shared->errorString());
-            }
-            const auto value = shared->read(counter->current);
-            if (!value) {
-                return refuse(PrintOutcome::Status::Failed, shared->errorString());
-            }
-            sharedValues.insert(counter->sharedFile, *value);
-            locks.push_back(std::move(shared));
+        auto shared = std::make_unique<SharedCounter>(counter->sharedFile);
+        if (!shared->lock(environment.counterWaitSeconds * 1000)) {
+            return refuse(PrintOutcome::Status::Failed, shared->errorString());
         }
-        for (LabelDocument &label : labels) {
-            if (auto *printed = std::get_if<CounterObject>(&label.objects[i])) {
-                printed->current = sharedValues.value(counter->sharedFile);
+        const auto value = shared->read(counter->current);
+        if (!value) {
+            return refuse(PrintOutcome::Status::Failed, shared->errorString());
+        }
+        sharedValues.insert(counter->sharedFile, *value);
+        locks.push_back(std::move(shared));
+    }
+    for (LabelDocument &label : labels) {
+        for (LabelObject &object : label.objects) {
+            if (auto *counter = std::get_if<CounterObject>(&object); counter && sharedValues.contains(counter->sharedFile)) {
+                counter->current = sharedValues.value(counter->sharedFile);
             }
         }
     }
 
     LabelPrinter::Options options;
-    options.copies = std::clamp(request.copies, 1, MaxCopies);
+    options.copies = prepared->copies;
+    options.headerLabels = prepared->headerLabels;
+    options.trailerLabels = prepared->trailerLabels;
     options.offset = environment.offsetsMm.value(printerName) * 72.0 / Units::MmPerInch;
+    options.printDensity = document.printing.density;
+    options.darkness = document.printing.darkness;
+    options.speed = document.printing.speed;
     options.jobTitle = QFileInfo(labelFile).fileName();
     const int job = printer.print(labels, options);
     if (job == 0) {

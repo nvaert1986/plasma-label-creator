@@ -31,7 +31,12 @@ Altec, Zebra Technologies or KDE e.V. See [Trademarks](#trademarks).
   to: text (also white on black), addresses, barcodes and 2D codes, images,
   clip art, lines and shapes, counters, date/time and curved text. Edit
   text directly on the label, format it from the toolbar, drag objects in
-  from the Insert tab or from Dolphin.
+  from the Insert tab or from Dolphin. Also polygons, stars, arrows and
+  SVG drawings, which other label software shows as pictures.
+- **Print conditions, growing text and anchoring**: an object prints only
+  when a field passes a test; a text box can grow to fit its text, and
+  objects anchored to it move along. Guidelines dragged out of the rulers
+  to place objects by.
 - **Arrange objects**: select several at once, align and distribute them,
   group them, lock them in place, turn them to any angle, put them on
   layers. Text can wrap within its box; objects can be left out of print.
@@ -52,11 +57,16 @@ Altec, Zebra Technologies or KDE e.V. See [Trademarks](#trademarks).
   supported too. A label's data source and print-time questions are kept in
   the file as a comment, which other label software ignores, so the file
   stays compatible.
+- **Print runs**: copies per row and a different label per row from data
+  columns, header and trailer labels around a run, and print density,
+  darkness and speed per label.
 - **Print from data**: a label for each row of a CSV file, an Excel or
   LibreOffice spreadsheet, or a database query (SQLite, ODBC for SQL Server
   and others, MySQL, PostgreSQL). Put fields on the label as `{Column}`, in
   texts, addresses, barcodes, or an image's file path for a picture per row.
   Only queries that read are run, and database passwords are never saved.
+  A query can use the answers (`WHERE Serial = {Serial}`), passed as
+  values; pictures stored in the database show on the label.
 - **Forms at print time**: questions such as a batch number, as text with
   rules (required, length, digits or letters only, a pattern), drop-down
   lists (fixed, or a column of the data), numbers, dates and check boxes.
@@ -135,7 +145,7 @@ for those, make the label size with Layout > Custom Label Size….
 
 ## Requirements
 
-- Linux with Qt 6.7 or newer and KDE Frameworks 6, a C++20 compiler,
+- Linux with Qt 6.7 or newer (with Qt SVG) and KDE Frameworks 6, a C++20 compiler,
   CMake 3.22 or newer, zint, CUPS and libudev. Developed and tested on
   Gentoo with Qt 6.11, KDE Frameworks 6.29, zint 2.16, CUPS 2.4 and
   GCC 15.

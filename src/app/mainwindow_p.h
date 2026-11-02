@@ -30,6 +30,7 @@
 #include "printonlypanel.h"
 #include "printerstatusdialog.h"
 #include "printpreviewdialog.h"
+#include "printsettingsdialog.h"
 #include "propertiesdialog.h"
 #include "recentlayoutsmenu.h"
 #include "rolllayoutdialog.h"

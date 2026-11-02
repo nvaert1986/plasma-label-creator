@@ -48,12 +48,29 @@ See `CHANGELOG.md` under "Unreleased" for the details.
   with Qt HTTP Server (optional, greyed out in the settings without it).
 - [x] Automation: network ZPL printers asked before printing; Recent Jobs.
 
+## Done since 0.4.0 (not released yet)
+
+Features found in other label software, the Easy to Medium ones:
+
+- [x] Print conditions on objects.
+- [x] Copies per row from a data column.
+- [x] Header and trailer labels around a run.
+- [x] Query parameters from the answers.
+- [x] Anchoring, and text that grows to fit.
+- [x] SVG drawings.
+- [x] Pictures from a database column.
+- [x] Polygons, stars and arrows.
+- [x] Guidelines.
+- [x] A different label per row, named in a data column.
+- [x] Print density, darkness and speed per label.
+
 ## Next session
 
 Version 0.4.0: print-only mode, forms, versions, print history, printer
 status, settings, export with the label's outline, DYMO's label ids and
-the automation service. Next: try those (checks under "Bug review"), then
-the printer tests below.
+the automation service. Since then the features under "Done since 0.4.0",
+not released yet. Next: try those (checks under "Bug review"), then the
+printer tests below.
 After that, bringing the web version up to date (see "Web version").
 
 ## Third bug review (2026-10-30, 0.3.0)
@@ -119,6 +136,13 @@ Still to do by hand, in the running app:
   `curl` (and without the token: refused); a stopped queue is refused
   unless `printAnyway`; the Altec with its head open or other labels loaded
   is refused; Recent Jobs lists it all. Needs a real test print.
+- [ ] The features since 0.4.0: a condition on an object (preview and
+  print), text that grows with an object anchored to it, guidelines from
+  both rulers, a star and an arrow in DYMO's software (a picture), an SVG
+  logo printed sharp, copies and a label per row from a CSV, header and
+  trailer labels with {Count} (counters skip them), density on the
+  LabelWriter and darkness and speed on the Altec, a query with
+  {Serial} in it, a picture stored in a database.
 
 ## Designer
 
@@ -240,6 +264,17 @@ In the desktop app:
 
 - [ ] **Open and save labels in the web version's library**, signed in with
   the same account. (Medium)
+- [ ] **Sheets of labels on office printers**: A4 and Letter sheets (Avery,
+  Herma and the like) with a catalogue of sheet layouts, printing the
+  labels of a run in rows and columns, starting at any label of a sheet
+  that was used before. (Medium-Hard)
+- [ ] **Automation: a raw TCP port**, so other systems print to the
+  service as if to a printer on port 9100, with the data as CSV or JSON.
+  (Medium)
+- [ ] **Automation: XML and fixed-width text jobs**, and a data filter
+  that maps their fields to the label's. (Medium to Hard)
+- [ ] **Automation: a database trigger** (print when rows appear) and
+  **scheduled jobs**. (Medium)
 
 In the web version's server, used by both apps:
 

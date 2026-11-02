@@ -616,6 +616,36 @@ private Q_SLOTS:
         QVERIFY(timer.elapsed() < 5000);
         QVERIFY2(error.contains(u"550"_s), qPrintable(error));
     }
+
+    void headerAndTrailerLabelsPrintOnce()
+    {
+        if (LabelPrinter::filterProgram(u"rastertolabel"_s).isEmpty() || LabelPrinter::driverFilter(u"drv:///sample.drv/zebra.ppd"_s) != u"rastertolabel"_s) {
+            QSKIP("CUPS's label drivers (rastertolabel) are not installed");
+        }
+        LabelPrinter printer(u"unused"_s, u"drv:///sample.drv/zebra.ppd"_s);
+        QVERIFY2(printer.load(), qPrintable(printer.errorString()));
+        LabelDocument label = document(PaperOrientation::Portrait, QSizeF(50 * 1440 / 25.4, 25 * 1440 / 25.4));
+        label.paperName = u"Altec 50 x 25"_s;
+        CounterObject counter;
+        counter.font = LabelFont{u"DejaVu Sans"_s, 20};
+        counter.current = 1;
+        counter.bounds = QRectF(144, 144, 2000, 800);
+        label.objects.append(counter);
+        const LabelDocument header = withBlock(document(PaperOrientation::Portrait, label.paperSize()), QRectF(72, 72, 400, 200));
+        LabelPrinter::Options options;
+        options.copies = 2;
+        options.headerLabels = 1;
+        options.trailerLabels = 1;
+        options.compensateTopMargin = false;
+        const QList<QImage> pages = printer.pages({header, label, header}, options);
+        // The header and trailer once, the label twice between them.
+        QCOMPARE(pages.size(), 4);
+        // The counters count from the first label after the header.
+        const auto paper = printer.paperFor(label);
+        QVERIFY(paper);
+        const QImage first = LabelPrinter::paperImage(label, *paper, printer.resolution(), nullptr, 0);
+        QCOMPARE(pages.at(1).convertToFormat(QImage::Format_Mono), first.convertToFormat(QImage::Format_Mono));
+    }
 };
 
 QTEST_MAIN(LabelPrinterTest)

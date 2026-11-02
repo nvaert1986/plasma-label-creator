@@ -125,7 +125,21 @@ bool MainWindow::ensureDataLoaded(bool quiet)
     if (source.kind == DataSource::Kind::None) {
         return false;
     }
-    if (m_dataTable && m_dataTableSource == source) {
+    // A query with {fields} in it: the answers last given, else the
+    // questions' defaults; other answers, other rows.
+    QHash<QString, QString> parameters;
+    if (source.kind == DataSource::Kind::Database) {
+        for (const QString &name : DataReader::queryParameters(source.query)) {
+            QString value;
+            for (const PrintQuestion &question : m_editor->document().questions) {
+                if (question.name == name) {
+                    value = question.defaultValue;
+                }
+            }
+            parameters.insert(name, m_answers.value(name, value));
+        }
+    }
+    if (m_dataTable && m_dataTableSource == source && m_dataParameters == parameters) {
         return true;
     }
     // Another database's password is no use for this one.
@@ -143,7 +157,7 @@ bool MainWindow::ensureDataLoaded(bool quiet)
     }
     QString error;
     QApplication::setOverrideCursor(Qt::WaitCursor);
-    const auto table = DataReader::read(source, password, &error);
+    const auto table = DataReader::read(source, password, &error, parameters);
     QApplication::restoreOverrideCursor();
     if (!table) {
         // A wrong password is asked for again next time.
@@ -162,6 +176,7 @@ bool MainWindow::ensureDataLoaded(bool quiet)
     }
     m_dataTable = table;
     m_dataTableSource = source;
+    m_dataParameters = parameters;
     m_dataRows.clear();
     for (int row = 0; row < table->rows.size(); ++row) {
         m_dataRows << row;
@@ -233,20 +248,16 @@ void MainWindow::editQuestions()
     m_editor->apply(document, i18n("Change Print-Time Questions"));
 }
 
-LabelDocument MainWindow::filled(const LabelDocument &document, const QHash<QString, QString> &values) const
+QString MainWindow::pictureFolder(const LabelDocument &document) const
 {
-    LabelDocument result = Fields::fill(document, values);
     // Relative picture paths: next to the data file, else next to the label.
     const DataSource &source = document.dataSource;
-    const QString base = source.kind == DataSource::Kind::File ? QFileInfo(source.fileName).absolutePath()
-        : m_editor->fileName().isEmpty()                       ? QDir::currentPath()
-                                                               : QFileInfo(m_editor->fileName()).absolutePath();
-    for (LabelObject &object : result.objects) {
-        if (auto *image = std::get_if<ImageObject>(&object); image && image->imageLocation && !image->imageLocation->isEmpty()) {
-            if (QFileInfo(*image->imageLocation).isRelative()) {
-                image->imageLocation = QDir(base).absoluteFilePath(*image->imageLocation);
-            }
-        }
-    }
-    return result;
+    return source.kind == DataSource::Kind::File ? QFileInfo(source.fileName).absolutePath()
+        : m_editor->fileName().isEmpty()         ? QDir::currentPath()
+                                                 : QFileInfo(m_editor->fileName()).absolutePath();
+}
+
+LabelDocument MainWindow::filled(const LabelDocument &document, const QHash<QString, QString> &values) const
+{
+    return PrintRun::filled(document, values, pictureFolder(document));
 }

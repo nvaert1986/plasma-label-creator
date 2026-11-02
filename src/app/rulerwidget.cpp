@@ -8,7 +8,10 @@
 #include "labelview.h"
 #include "units.h"
 
+#include <KLocalizedString>
+
 #include <QEvent>
+#include <QMouseEvent>
 #include <QPainter>
 
 #include <cmath>
@@ -41,6 +44,29 @@ RulerWidget::RulerWidget(Qt::Orientation orientation, LabelView *view, QWidget *
         setFixedHeight(Thickness);
     } else {
         setFixedWidth(Thickness);
+    }
+    setToolTip(i18n("Drag onto the label for a guideline; drag a guideline back here to remove it"));
+}
+
+void RulerWidget::mousePressEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::LeftButton) {
+        m_view->beginNewGuide(m_orientation);
+        m_view->dragGuideTo(event->globalPosition());
+    }
+}
+
+void RulerWidget::mouseMoveEvent(QMouseEvent *event)
+{
+    if (event->buttons() & Qt::LeftButton) {
+        m_view->dragGuideTo(event->globalPosition());
+    }
+}
+
+void RulerWidget::mouseReleaseEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::LeftButton) {
+        m_view->endGuideAt(event->globalPosition());
     }
 }
 

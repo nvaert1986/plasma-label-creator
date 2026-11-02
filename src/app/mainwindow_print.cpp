@@ -128,18 +128,24 @@ void MainWindow::showPrinterStatus()
     m_printBar->refreshStatus();
 }
 
-LabelPrinter::Options MainWindow::printOptions() const
+LabelPrinter::Options MainWindow::printOptions(const PrintRun::Run &run, const PrintSettings &printing) const
 {
     LabelPrinter::Options options;
     // The printer's own calibration, in its directions, in points.
     options.offset = m_printBar->printOffsetMm() * 72.0 / Units::MmPerInch;
-    options.copies = m_printBar->copies();
+    options.copies = run.copies;
+    options.headerLabels = run.headerLabels;
+    options.trailerLabels = run.trailerLabels;
     options.printQuality = m_printBar->graphicsQuality() ? u"Graphics"_s : u"Text"_s;
+    // The label's own density, darkness and speed, where it has them.
+    options.printDensity = printing.density;
+    options.darkness = printing.darkness;
+    options.speed = printing.speed;
     options.jobTitle = m_editor->fileName().isEmpty() ? i18n("Label") : QFileInfo(m_editor->fileName()).fileName();
     return options;
 }
 
-std::optional<QList<LabelDocument>> MainWindow::labelsToPrint()
+std::optional<PrintRun::Run> MainWindow::labelsToPrint()
 {
     finishEditing();
     if (m_printBar->printerName().isEmpty()) {
@@ -172,7 +178,12 @@ std::optional<QList<LabelDocument>> MainWindow::labelsToPrint()
         m_answers = answers;
     }
 
-    QList<LabelDocument> labels;
+    PrintRun::Request request;
+    request.document = document;
+    request.labelFile = m_editor->fileName();
+    request.pictureFolder = pictureFolder(document);
+    request.answers = answers;
+    request.copies = m_printBar->copies();
     m_printedRows.clear();
     if (m_printBar->printRows()) {
         // One label per ticked row, with the row's values and the answers.
@@ -184,98 +195,104 @@ std::optional<QList<LabelDocument>> MainWindow::labelsToPrint()
             return std::nullopt;
         }
         for (const int row : std::as_const(m_dataRows)) {
-            QHash<QString, QString> values = m_dataTable->values(row);
-            m_printedRows << values;
-            values.insert(answers);
-            labels << filled(document, values);
+            m_printedRows << m_dataTable->values(row);
         }
-        return labels;
+        request.rows = m_printedRows;
+    } else if (m_printBar->printAddresses()) {
+        // One label per checked address, each with the address filled in.
+        const bool hasAddress = std::any_of(document.objects.cbegin(), document.objects.cend(), [](const LabelObject &object) {
+            return std::holds_alternative<AddressObject>(object);
+        });
+        if (!hasAddress) {
+            KMessageBox::error(this, i18n("To print the checked addresses, the label needs an address object."));
+            return std::nullopt;
+        }
+        for (const QString &address : m_sidebar->addressBook()->checkedAddresses()) {
+            LabelDocument label = document;
+            for (LabelObject &object : label.objects) {
+                if (auto *target = std::get_if<AddressObject>(&object)) {
+                    const TextSpan first = target->spans.isEmpty() ? TextSpan{QString(), LabelFont(), Qt::black} : target->spans.constFirst();
+                    target->spans = {{address, first.font, first.color}};
+                    target->fitLineFonts();
+                    break;
+                }
+            }
+            request.prepared << filled(label, answers);
+        }
     }
-    if (!m_printBar->printAddresses()) {
-        return QList<LabelDocument>{filled(document, answers)};
-    }
-    // One label per checked address, each with the address filled in.
-    const bool hasAddress = std::any_of(document.objects.cbegin(), document.objects.cend(), [](const LabelObject &object) {
-        return std::holds_alternative<AddressObject>(object);
-    });
-    if (!hasAddress) {
-        KMessageBox::error(this, i18n("To print the checked addresses, the label needs an address object."));
+    QString error;
+    auto run = PrintRun::make(request, &error);
+    if (!run) {
+        KMessageBox::error(this, error);
         return std::nullopt;
     }
-    for (const QString &address : m_sidebar->addressBook()->checkedAddresses()) {
-        LabelDocument label = document;
-        for (LabelObject &object : label.objects) {
-            if (auto *target = std::get_if<AddressObject>(&object)) {
-                const TextSpan first = target->spans.isEmpty() ? TextSpan{QString(), LabelFont(), Qt::black} : target->spans.constFirst();
-                target->spans = {{address, first.font, first.color}};
-                target->fitLineFonts();
-                break;
-            }
-        }
-        labels << filled(label, answers);
-    }
-    return labels;
+    return run;
 }
 
 void MainWindow::print()
 {
-    if (const auto labels = labelsToPrint()) {
-        printLabels(*labels);
+    if (const auto run = labelsToPrint()) {
+        printLabels(*run);
     }
 }
 
-bool MainWindow::useSharedCounters(QList<LabelDocument> &labels, std::vector<std::unique_ptr<SharedCounter>> *locks)
+bool MainWindow::useSharedCounters(QList<LabelDocument> &labels, std::vector<std::unique_ptr<SharedCounter>> *locks, QHash<QString, int> *values)
 {
-    QHash<QString, int> values; // per file
-    const LabelDocument &document = m_editor->document();
-    for (int i = 0; i < document.objects.size(); ++i) {
-        const auto *counter = std::get_if<CounterObject>(&document.objects.at(i));
-        if (!counter || counter->sharedFile.isEmpty()) {
+    // The label's shared counters, read from their files (locked first when
+    // printing); every label of the run that shares one gets its value.
+    QHash<QString, int> read;
+    for (const LabelObject &object : m_editor->document().objects) {
+        const auto *counter = std::get_if<CounterObject>(&object);
+        if (!counter || counter->sharedFile.isEmpty() || read.contains(counter->sharedFile)) {
             continue;
         }
-        if (!values.contains(counter->sharedFile)) {
-            auto shared = std::make_unique<SharedCounter>(counter->sharedFile);
-            // Another computer may be printing: it is waited for a while.
-            QApplication::setOverrideCursor(Qt::WaitCursor);
-            const bool locked = !locks || shared->lock(m_settings.counterWaitSeconds * 1000);
-            QApplication::restoreOverrideCursor();
-            if (!locked) {
-                KMessageBox::error(this, shared->errorString());
-                return false;
-            }
-            const auto value = shared->read(counter->current);
-            if (!value) {
-                KMessageBox::error(this, shared->errorString());
-                return false;
-            }
-            values.insert(counter->sharedFile, *value);
-            if (locks) {
-                locks->push_back(std::move(shared));
+        auto shared = std::make_unique<SharedCounter>(counter->sharedFile);
+        // Another computer may be printing: it is waited for a while.
+        QApplication::setOverrideCursor(Qt::WaitCursor);
+        const bool locked = !locks || shared->lock(m_settings.counterWaitSeconds * 1000);
+        QApplication::restoreOverrideCursor();
+        if (!locked) {
+            KMessageBox::error(this, shared->errorString());
+            return false;
+        }
+        const auto value = shared->read(counter->current);
+        if (!value) {
+            KMessageBox::error(this, shared->errorString());
+            return false;
+        }
+        read.insert(counter->sharedFile, *value);
+        if (locks) {
+            locks->push_back(std::move(shared));
+        }
+    }
+    for (LabelDocument &label : labels) {
+        for (LabelObject &object : label.objects) {
+            if (auto *counter = std::get_if<CounterObject>(&object); counter && read.contains(counter->sharedFile)) {
+                counter->current = read.value(counter->sharedFile);
             }
         }
-        for (LabelDocument &label : labels) {
-            if (auto *printed = std::get_if<CounterObject>(&label.objects[i])) {
-                printed->current = values.value(counter->sharedFile);
-            }
-        }
+    }
+    if (values) {
+        *values = read;
     }
     return true;
 }
 
-void MainWindow::printLabels(const QList<LabelDocument> &prepared)
+void MainWindow::printLabels(const PrintRun::Run &prepared)
 {
     // Shared counters stay locked from reading their files until the next
     // values are written, so two computers never print the same numbers.
-    QList<LabelDocument> labels = prepared;
+    PrintRun::Run run = prepared;
     std::vector<std::unique_ptr<SharedCounter>> locks;
-    if (!useSharedCounters(labels, &locks)) {
+    QHash<QString, int> sharedValues;
+    if (!useSharedCounters(run.labels, &locks, &sharedValues)) {
         return;
     }
     const QString printerName = m_printBar->printerName();
     LabelPrinter printer(printerName, m_printBar->printerDriver());
 
     QApplication::setOverrideCursor(Qt::WaitCursor);
-    const int job = printer.print(labels, printOptions());
+    const int job = printer.print(run.labels, printOptions(run, m_editor->document().printing));
     QApplication::restoreOverrideCursor();
 
     if (job == 0) {
@@ -284,12 +301,13 @@ void MainWindow::printLabels(const QList<LabelDocument> &prepared)
     }
     QHash<int, int> sharedNext;
     QStringList written;
-    for (int i = 0; i < labels.constFirst().objects.size(); ++i) {
-        const auto *counter = std::get_if<CounterObject>(&labels.constFirst().objects.at(i));
+    const QList<LabelObject> &objects = m_editor->document().objects;
+    for (int i = 0; i < objects.size(); ++i) {
+        const auto *counter = std::get_if<CounterObject>(&objects.at(i));
         if (!counter || counter->sharedFile.isEmpty()) {
             continue;
         }
-        const int next = counter->current + printer.printedLabels() * counter->increment;
+        const int next = sharedValues.value(counter->sharedFile, counter->current) + printer.printedLabels() * counter->increment;
         sharedNext.insert(i, next);
         if (written.contains(counter->sharedFile)) {
             continue;
@@ -346,19 +364,19 @@ void MainWindow::printLabels(const QList<LabelDocument> &prepared)
 
 void MainWindow::printPreview()
 {
-    const auto labels = labelsToPrint();
-    if (!labels) {
+    const auto run = labelsToPrint();
+    if (!run) {
         return;
     }
     // With the shared counters' values as they are now; printing reads
     // them again, locked.
-    QList<LabelDocument> previewed = *labels;
-    if (!useSharedCounters(previewed, nullptr)) {
+    QList<LabelDocument> previewed = run->labels;
+    if (!useSharedCounters(previewed, nullptr, nullptr)) {
         return;
     }
     LabelPrinter printer(m_printBar->printerName(), m_printBar->printerDriver());
     QApplication::setOverrideCursor(Qt::WaitCursor);
-    const QList<QImage> pages = printer.pages(previewed, printOptions());
+    const QList<QImage> pages = printer.pages(previewed, printOptions(*run, m_editor->document().printing));
     QApplication::restoreOverrideCursor();
     if (pages.isEmpty()) {
         KMessageBox::error(this, printer.errorString());
@@ -369,7 +387,7 @@ void MainWindow::printPreview()
     PrintPreviewDialog dialog(pages, printer.resolution(), m_printBar->printerName(), printer.warnings(), this, turned);
     // What was previewed, without asking the questions again.
     if (dialog.exec() == QDialog::Accepted) {
-        printLabels(*labels);
+        printLabels(*run);
     }
 }
 

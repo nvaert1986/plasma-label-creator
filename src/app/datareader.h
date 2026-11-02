@@ -28,7 +28,19 @@ namespace DataReader
  * Reads @p source; @p password is for a database and never kept. Nullopt
  * and @p errorString when it cannot be read.
  */
-std::optional<DataTable> read(const LabelCreator::DataSource &source, const QString &password = {}, QString *errorString = nullptr);
+std::optional<DataTable> read(const LabelCreator::DataSource &source,
+                              const QString &password = {},
+                              QString *errorString = nullptr,
+                              const QHash<QString, QString> &parameters = {});
+
+/**
+ * The fields a database query uses, {Serial} written in it (with or
+ * without quotes round it): bound as parameters when it runs, from
+ * read()'s @p parameters, never put into the query's text.
+ */
+QStringList queryParameters(const QString &query);
+/** @p query with each field a ? placeholder; @p names gets the fields in their order. */
+QString boundQuery(const QString &query, QStringList *names);
 
 /** CSV text; a null @p delimiter is detected from the first line. */
 inline std::optional<DataTable> parseCsv(const QByteArray &data, QChar delimiter, bool firstRowNames, QString *errorString = nullptr)

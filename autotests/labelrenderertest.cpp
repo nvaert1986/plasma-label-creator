@@ -814,6 +814,76 @@ private Q_SLOTS:
         }
         QVERIFY(black >= 2); // the cell's left and right borders
     }
+
+    void textGrowsAndAnchoredObjectsFollow()
+    {
+        // A text 20 mm wide that needs more: it grows to the right, and the
+        // box anchored right of it moves as far.
+        TextObject text = textObject(u"A rather long serial number"_s, QRectF(144, 144, 1134, 400), TextFitMode::ShrinkToFit);
+        text.name = u"SERIAL"_s;
+        text.horizontalAlignment = HorizontalAlignment::Left;
+        text.grow = true;
+        ShapeObject box;
+        box.name = u"BOX"_s;
+        box.shapeType = ShapeType::Rectangle;
+        box.bounds = QRectF(1400, 144, 300, 400);
+        box.anchor = {u"SERIAL"_s, Anchor::Side::Right};
+        ShapeObject below = box;
+        below.name = u"LINE"_s;
+        below.bounds = QRectF(144, 700, 300, 100);
+        below.anchor = {u"SERIAL"_s, Anchor::Side::Below};
+        LabelDocument document = singleObject(text, QSizeF(8000, 2000));
+        document.objects << box << below;
+        const LabelDocument grown = LabelRenderer(LabelRenderer::Mode::Print).grown(document);
+        const QRectF wide = objectBase(grown.objects.at(0)).bounds;
+        QVERIFY(wide.width() > 1134);
+        QCOMPARE(wide.left(), 144.0);
+        QCOMPARE(objectBase(grown.objects.at(1)).bounds.left(), 1400 + wide.width() - 1134);
+        // It did not get taller: what is below stays.
+        QCOMPARE(objectBase(grown.objects.at(2)).bounds, below.bounds);
+        // Short text does not shrink the box.
+        std::get<TextObject>(document.objects[0]).spans.first().text = u"A1"_s;
+        QCOMPARE(objectBase(LabelRenderer(LabelRenderer::Mode::Print).grown(document).objects.at(0)).bounds, text.bounds);
+        // A loop of anchors is not followed round.
+        objectBase(document.objects[0]).anchor = {u"BOX"_s, Anchor::Side::Right};
+        LabelRenderer(LabelRenderer::Mode::Print).grown(document);
+    }
+
+    void drawsTheNewShapesAndDrawings()
+    {
+        for (const ShapeType type : {ShapeType::Polygon, ShapeType::Star, ShapeType::Arrow, ShapeType::DoubleArrow}) {
+            ShapeObject shape;
+            shape.shapeType = type;
+            shape.lineWidth = 20;
+            shape.fillColor = Qt::black;
+            shape.bounds = QRectF(144, 144, 1440, 720);
+            const QImage image = LabelRenderer(LabelRenderer::Mode::Print).renderImage(singleObject(shape), 300);
+            // Filled in the middle, nothing outside its box.
+            QCOMPARE(QColor(image.pixel(toDots(shape.bounds).center())), QColor(Qt::black));
+            QCOMPARE(QColor(image.pixel(5, 5)), QColor(Qt::white));
+        }
+        // An SVG drawing, embedded or from a database field (a data: address).
+        const QByteArray svg = R"(<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><rect width="10" height="10" fill="black"/></svg>)";
+        ImageObject drawing;
+        drawing.svgData = svg;
+        drawing.scaleMode = ImageScaleMode::Fill;
+        drawing.bounds = QRectF(144, 144, 720, 720);
+        QImage image = LabelRenderer(LabelRenderer::Mode::Print).renderImage(singleObject(drawing), 300);
+        QCOMPARE(QColor(image.pixel(toDots(drawing.bounds).center())), QColor(Qt::black));
+        drawing.svgData.clear();
+        drawing.imageLocation = u"data:image/svg+xml;base64,"_s + QString::fromLatin1(svg.toBase64());
+        image = LabelRenderer(LabelRenderer::Mode::Print).renderImage(singleObject(drawing), 300);
+        QCOMPARE(QColor(image.pixel(toDots(drawing.bounds).center())), QColor(Qt::black));
+        // What other software gets instead: a picture of the object alone.
+        ShapeObject arrow;
+        arrow.shapeType = ShapeType::Arrow;
+        arrow.fillColor = Qt::black;
+        arrow.bounds = QRectF(1000, 1000, 1440, 720);
+        const QImage picture = LabelRenderer(LabelRenderer::Mode::Print).objectPicture(arrow, 300);
+        QCOMPARE(picture.size(), QSize(300, 150));
+        QCOMPARE(qAlpha(picture.pixel(0, 0)), 0);
+        QCOMPARE(QColor(picture.pixel(150, 75)), QColor(Qt::black));
+    }
 };
 
 QTEST_MAIN(LabelRendererTest)

@@ -5,6 +5,49 @@
 
 # Changelog
 
+## Unreleased
+
+### Designing
+
+- **Print conditions**: an object prints only when a field passes a test
+  (is empty, has a value, is, is not, contains, more than, less than), set
+  under "When It Prints" in its properties. Left out of print, and faded on
+  the screen in print-only mode and the preview.
+- **Text that grows to fit**: "Grow the box to fit the text" makes a text
+  box wider (or taller when it wraps) instead of the text smaller.
+- **Anchoring**: an object can stay right of or below another, and moves
+  along as far as that one grew.
+- **Guidelines**: drag one out of a ruler onto the label, drag it back to
+  remove it; objects snap to them (Alt places freely). View > Show
+  Guidelines and Clear Guidelines. Kept in the label.
+- **Polygons, stars and arrows** (Insert menu and the Insert tab), with
+  any number of corners or points. Other label software shows them as a
+  picture.
+- **SVG drawings** as images: sharp at any size and printer resolution.
+  Other label software gets a picture of them.
+
+### Printing
+
+- **Copies per row**: a data column says how many labels each row prints
+  (empty for one, 0 for none). Data > Data Source... > Copies from column.
+- **A label per row**: a data column names the label file to print the row
+  with, next to this label; all must be for the same label type. Data >
+  Data Source... > Label from column.
+- **Header and trailer labels**, printed once before and after a run,
+  filled with the answers and {Count}, the labels in between; counters skip
+  them. Layout > Print Settings....
+- **Print density, darkness and speed per label** (Layout > Print
+  Settings...): DYMO's density; an Altec or Zebra printer's darkness (1 to
+  30) and speed (1 to 12 in/s). Empty keeps the printer's own.
+- **Query parameters**: a database query can use answers, as in
+  `WHERE Serial = {Serial}`; they are passed as values, never put in the
+  query.
+- **Pictures from a database**: an image column (BLOB) shows on the label
+  through an image whose file is the field, such as {Photo}.
+- The Print button, print preview, Print Again, print-only mode and the
+  automation service now make their labels the same way, all of the above
+  included.
+
 ## 0.4.0 (2026-11-02)
 
 ### Printing

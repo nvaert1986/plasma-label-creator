@@ -55,6 +55,13 @@ LabelDocument fill(const LabelDocument &document, const QHash<QString, QString> 
 /** @p values with the label's calculated fields added. */
 QHash<QString, QString> withCalculated(const LabelDocument &document, const QHash<QString, QString> &values, const QDateTime &now = QDateTime::currentDateTime());
 
+/**
+ * Whether @p condition holds with @p values: the field's value tested, as
+ * numbers when both sides are numbers, else as text (equals and contains
+ * ignoring case).
+ */
+bool holds(const PrintCondition &condition, const QHash<QString, QString> &values, const QDateTime &now = QDateTime::currentDateTime());
+
 /** Why @p answer does not do for @p question; nullopt if it does. */
 std::optional<QString> problem(const PrintQuestion &question, const QString &answer);
 

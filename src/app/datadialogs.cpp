@@ -151,7 +151,10 @@ DataSourceDialog::DataSourceDialog(const DataSource &source, const std::optional
     m_query->setPlaceholderText(u"SELECT Name, Location, Serial FROM Assets WHERE Active = 1"_s);
     m_query->setMaximumHeight(90);
     databaseForm->addRow(i18n("Query:"), m_query);
-    auto *readOnly = new QLabel(i18n("Only a query that reads is run (SELECT or WITH ... SELECT), so printing a label never changes the database."), databasePage);
+    auto *readOnly = new QLabel(i18n("Only a query that reads is run (SELECT or WITH ... SELECT), so printing a label never changes the database. "
+                                     "Fields in it, such as WHERE Serial = {Serial}, take the answers to the print-time questions when printing; "
+                                     "they are passed as values, so an answer can never change the query."),
+                                databasePage);
     readOnly->setWordWrap(true);
     databaseForm->addRow(QString(), readOnly);
 
@@ -187,6 +190,28 @@ DataSourceDialog::DataSourceDialog(const DataSource &source, const std::optional
     m_rows->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_rows->verticalHeader()->setVisible(false);
     layout->addWidget(m_rows, 1);
+
+    // What a row prints besides its values: how many, and with which label.
+    m_rowSettings = new QWidget(this);
+    auto *rowForm = new QFormLayout(m_rowSettings);
+    rowForm->setContentsMargins(0, 0, 0, 0);
+    const auto columnCombo = [this](const QString &current, const QString &none) {
+        auto *combo = new QComboBox(m_rowSettings);
+        combo->addItem(none, QString());
+        if (!current.isEmpty()) {
+            combo->addItem(current, current);
+            combo->setCurrentIndex(1);
+        }
+        return combo;
+    };
+    m_copiesColumn = columnCombo(source.copiesColumn, i18n("One of each row"));
+    m_copiesColumn->setToolTip(i18n("A column that says how many labels each row prints; empty means one, 0 none"));
+    m_labelColumn = columnCombo(source.labelColumn, i18n("This label for every row"));
+    m_labelColumn->setToolTip(i18n("A column that names the label file to print the row with, such as cable.label next to this label; "
+                                   "empty uses this label. All must be for the same label type."));
+    rowForm->addRow(i18n("Copies from column:"), m_copiesColumn);
+    rowForm->addRow(i18n("Label from column:"), m_labelColumn);
+    layout->addWidget(m_rowSettings);
 
     auto *buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
     connect(buttons, &QDialogButtonBox::accepted, this, &QDialog::accept);
@@ -249,6 +274,8 @@ LabelCreator::DataSource DataSourceDialog::source() const
         source.user = m_user->text().trimmed();
         source.query = m_query->toPlainText().trimmed();
     }
+    source.copiesColumn = m_copiesColumn->currentData().toString();
+    source.labelColumn = m_labelColumn->currentData().toString();
     return source;
 }
 
@@ -295,6 +322,20 @@ void DataSourceDialog::showTable()
     }
     m_rows->resizeColumnsToContents();
     m_status->setText(i18np("1 row; columns: %2", "%1 rows; columns: %2", m_table->rows.size(), m_table->columns.join(u", "_s)));
+    // The columns to take copies and labels from, the chosen ones kept.
+    for (QComboBox *combo : {m_copiesColumn, m_labelColumn}) {
+        const QString chosen = combo->currentData().toString();
+        while (combo->count() > 1) {
+            combo->removeItem(1);
+        }
+        for (const QString &column : std::as_const(m_table->columns)) {
+            combo->addItem(column, column);
+        }
+        if (!chosen.isEmpty() && combo->findData(chosen) < 0) {
+            combo->addItem(chosen, chosen);
+        }
+        combo->setCurrentIndex(std::max(0, combo->findData(chosen)));
+    }
 }
 
 void DataSourceDialog::setAllChecked(bool checked)
@@ -307,6 +348,7 @@ void DataSourceDialog::setAllChecked(bool checked)
 void DataSourceDialog::setRowsOnly(bool rowsOnly)
 {
     m_sourceSettings->setVisible(!rowsOnly);
+    m_rowSettings->setVisible(!rowsOnly);
     setWindowTitle(rowsOnly ? i18n("Rows to Print") : i18n("Data Source"));
 }
 

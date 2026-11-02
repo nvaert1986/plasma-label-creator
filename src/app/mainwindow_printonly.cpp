@@ -310,18 +310,24 @@ void MainWindow::printAgain(const PrintRecord &record)
         KMessageBox::error(this, i18n("The label as printed could not be read: %1", error));
         return;
     }
-    // The same labels: each data row printed then, with the answers given then.
-    QList<LabelDocument> labels;
-    if (record.rows.isEmpty()) {
-        labels << filled(*label, record.answers);
+    // The same labels: each data row printed then, with the answers given
+    // then, from the label as it was printed (header and trailer still found
+    // next to where it was).
+    PrintRun::Request request;
+    request.document = *label;
+    request.labelFile = record.source;
+    request.answers = record.answers;
+    request.rows = record.rows;
+    request.copies = m_printBar->copies();
+    const auto run = PrintRun::make(request, &error);
+    if (!run) {
+        KMessageBox::error(this, error);
+        return;
     }
-    for (QHash<QString, QString> values : record.rows) {
-        values.insert(record.answers);
-        labels << filled(*label, values);
-    }
+    const qsizetype count = run->labels.size() - run->headerLabels - run->trailerLabels;
     const QString printer = m_printBar->printerName();
     if (KMessageBox::questionTwoActions(this,
-                                        i18np("Print the label %2 again on %3?", "Print the %1 labels of %2 again on %3?", labels.size(), record.title, printer),
+                                        i18np("Print the label %2 again on %3?", "Print the %1 labels of %2 again on %3?", count, record.title, printer),
                                         i18n("Print Again"),
                                         KGuiItem(i18n("Print"), u"document-print"_s),
                                         KStandardGuiItem::cancel())
@@ -336,6 +342,6 @@ void MainWindow::printAgain(const PrintRecord &record)
         return;
     }
     m_reprintTitle = record.title;
-    printLabels(labels);
+    printLabels(*run);
     m_reprintTitle.clear();
 }

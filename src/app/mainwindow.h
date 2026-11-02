@@ -8,6 +8,7 @@
 #include "appsettings.h"
 #include "datareader.h"
 #include "labelprinter.h"
+#include "printrun.h"
 #include "objectfactory.h"
 #include "printhistory.h"
 #include "recentlayouts.h"
@@ -128,7 +129,9 @@ private:
      * with @p locks, locks the files first and keeps them locked there.
      * False, with the reason shown, when a file cannot be locked or read.
      */
-    bool useSharedCounters(QList<LabelCreator::LabelDocument> &labels, std::vector<std::unique_ptr<LabelCreator::SharedCounter>> *locks);
+    bool useSharedCounters(QList<LabelCreator::LabelDocument> &labels,
+                           std::vector<std::unique_ptr<LabelCreator::SharedCounter>> *locks,
+                           QHash<QString, int> *values);
     void editObject(int index);
     void deleteObject();
     void duplicateObject();
@@ -151,6 +154,7 @@ private:
     void turnObjects(qreal degrees);
     /** Sets the selected objects that can move to @p degrees. */
     void setObjectsAngle(qreal degrees);
+    void editPrintSettings();
     void editLayers();
     void editRollLayout();
     /** Puts the selected objects on layer @p name; empty for the label itself. */
@@ -164,18 +168,21 @@ private:
     void changePaper(const LabelCreator::PaperSize &paper);
     void rotateLabel();
     void print();
-    /** Sends @p labels, made by labelsToPrint(), to the printer. */
-    void printLabels(const QList<LabelCreator::LabelDocument> &labels);
+    /** Sends @p run, made by labelsToPrint(), to the printer. */
+    void printLabels(const LabelCreator::PrintRun::Run &run);
     /** Shows the pages print() would send, and prints them if asked. */
     void printPreview();
     /** Saves the label as a PDF (vector, for sharing) or a PNG at the printer's resolution. */
     void exportLabel();
     /**
-     * The labels print() sends: the label, or one per checked address.
+     * The labels print() sends: the label, one per ticked data row, or one
+     * per checked address, with a header and trailer label when it has them.
      * Empty, with the reason shown, when there is nothing to print.
      */
-    std::optional<QList<LabelCreator::LabelDocument>> labelsToPrint();
-    LabelCreator::LabelPrinter::Options printOptions() const;
+    std::optional<LabelCreator::PrintRun::Run> labelsToPrint();
+    LabelCreator::LabelPrinter::Options printOptions(const LabelCreator::PrintRun::Run &run, const LabelCreator::PrintSettings &printing) const;
+    /** Where pictures named without a folder are: next to the data file, else next to the label. */
+    QString pictureFolder(const LabelCreator::LabelDocument &document) const;
     void setupViewActions();
     void setupDataActions();
     void setupArrangeActions();
@@ -248,6 +255,7 @@ private:
     // password, kept in memory for this session only.
     std::optional<DataTable> m_dataTable;
     LabelCreator::DataSource m_dataTableSource;
+    QHash<QString, QString> m_dataParameters; // the answers a query with fields was run with
     QList<int> m_dataRows;
     QHash<QString, QString> m_answers;
     // The data rows of the labels labelsToPrint() made last, for the print history.

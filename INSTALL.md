@@ -22,7 +22,7 @@ been tried; if one does not, please report it.
 | Ninja (or make) | any | 1.13 |
 | C++ compiler with C++20 support | GCC or Clang with C++20 | GCC 15.3 |
 | Extra CMake Modules (ECM) | 6.0 | 6.29 |
-| Qt 6: Core, Gui, Network | 6.7 | 6.11 |
+| Qt 6: Core, Gui, Network, Svg | 6.7 | 6.11 |
 | Qt 6: Widgets, PrintSupport, DBus, Sql (application) | 6.7 | 6.11 |
 | Qt 6: Test (only for the tests) | 6.7 | 6.11 |
 | Qt 6: HttpServer (optional: print requests over HTTP) | 6.8 | 6.11 |
@@ -47,7 +47,7 @@ their usual package names and may need adjusting.
 
 ```sh
 emerge --ask --noreplace dev-build/cmake dev-build/ninja \
-    kde-frameworks/extra-cmake-modules dev-qt/qtbase media-libs/zint \
+    kde-frameworks/extra-cmake-modules dev-qt/qtbase dev-qt/qtsvg media-libs/zint \
     net-print/cups virtual/libudev dev-util/pkgconf \
     kde-frameworks/karchive kde-frameworks/kconfigwidgets \
     kde-frameworks/kcoreaddons kde-frameworks/kcrash kde-frameworks/ki18n \
@@ -75,7 +75,7 @@ without it.
 
 ```sh
 apt install build-essential cmake ninja-build extra-cmake-modules pkgconf \
-    qt6-base-dev libkf6archive-dev libkf6configwidgets-dev libkf6coreaddons-dev \
+    qt6-base-dev qt6-svg-dev libkf6archive-dev libkf6configwidgets-dev libkf6coreaddons-dev \
     libkf6crash-dev libkf6i18n-dev libkf6iconthemes-dev \
     libkf6widgetsaddons-dev libkf6xmlgui-dev libzint-dev libcups2-dev \
     libudev-dev
@@ -88,7 +88,7 @@ apt install libqt6sql6-sqlite libqt6sql6-odbc libqt6sql6-mysql libqt6sql6-psql
 
 ```sh
 dnf install gcc-c++ cmake ninja-build extra-cmake-modules pkgconf \
-    qt6-qtbase-devel kf6-karchive-devel kf6-kconfigwidgets-devel kf6-kcoreaddons-devel \
+    qt6-qtbase-devel qt6-qtsvg-devel kf6-karchive-devel kf6-kconfigwidgets-devel kf6-kcoreaddons-devel \
     kf6-kcrash-devel kf6-ki18n-devel kf6-kiconthemes-devel \
     kf6-kwidgetsaddons-devel kf6-kxmlgui-devel zint-devel cups-devel \
     systemd-devel
@@ -100,7 +100,7 @@ dnf install qt6-qtbase-odbc qt6-qtbase-mysql qt6-qtbase-postgresql
 **Arch Linux**
 
 ```sh
-pacman -S --needed base-devel cmake ninja extra-cmake-modules qt6-base \
+pacman -S --needed base-devel cmake ninja extra-cmake-modules qt6-base qt6-svg \
     karchive kconfigwidgets kcoreaddons kcrash ki18n kiconthemes kwidgetsaddons \
     kxmlgui zint cups systemd-libs
 pacman -S --needed qt6-httpserver   # optional: print requests over HTTP

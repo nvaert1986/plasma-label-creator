@@ -30,6 +30,10 @@ public:
 
 protected:
     void paintEvent(QPaintEvent *event) override;
+    // Dragging out of the ruler makes a guideline on the canvas.
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
     bool eventFilter(QObject *watched, QEvent *event) override;
 
 private:

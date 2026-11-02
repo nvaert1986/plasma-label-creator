@@ -206,6 +206,9 @@ Sidebar::Sidebar(QWidget *parent)
     addItem(u"draw-ellipse"_s, i18n("Ellipse"), i18n("Oval or circle"), ObjectFactory::Kind::Ellipse);
     addItem(u"draw-line"_s, i18n("Horizontal Line"), i18n("Line across the label"), ObjectFactory::Kind::HorizontalLine);
     addItem(u"draw-line"_s, i18n("Vertical Line"), i18n("Line from top to bottom"), ObjectFactory::Kind::VerticalLine);
+    addItem(u"draw-polygon"_s, i18n("Polygon"), i18n("Shape with equal sides"), ObjectFactory::Kind::Polygon);
+    addItem(u"draw-star"_s, i18n("Star"), i18n("Star with any number of points"), ObjectFactory::Kind::Star);
+    addItem(u"draw-arrow-forward"_s, i18n("Arrow"), i18n("Arrow, turned with the object"), ObjectFactory::Kind::Arrow);
     addItem(u"draw-text"_s, i18n("Curved Text"), i18n("Text along an arc or circle"), ObjectFactory::Kind::CurvedText);
 
     // Objects above, the clip art library below, as in DLS.

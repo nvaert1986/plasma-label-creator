@@ -324,6 +324,9 @@ void MainWindow::setupActions()
     addInsert(u"insert_ellipse"_s, i18n("Ellipse"), u"draw-ellipse"_s, ObjectFactory::Kind::Ellipse);
     addInsert(u"insert_hline"_s, i18n("Horizontal Line"), u"draw-line"_s, ObjectFactory::Kind::HorizontalLine);
     addInsert(u"insert_vline"_s, i18n("Vertical Line"), u"draw-line"_s, ObjectFactory::Kind::VerticalLine);
+    addInsert(u"insert_polygon"_s, i18n("Polygon"), u"draw-polygon"_s, ObjectFactory::Kind::Polygon);
+    addInsert(u"insert_star"_s, i18n("Star"), u"draw-star"_s, ObjectFactory::Kind::Star);
+    addInsert(u"insert_arrow"_s, i18n("Arrow"), u"draw-arrow-forward"_s, ObjectFactory::Kind::Arrow);
     addInsert(u"insert_counter"_s, i18n("Counter"), u"accessories-calculator"_s, ObjectFactory::Kind::Counter);
     addInsert(u"insert_datetime"_s, i18n("Date and Time"), u"view-calendar-day"_s, ObjectFactory::Kind::DateTime);
     addInsert(u"insert_curvedtext"_s, i18n("Curved Text"), u"draw-text"_s, ObjectFactory::Kind::CurvedText);
@@ -471,6 +474,28 @@ void MainWindow::setupViewActions()
         m_view->setGridSpacing(Units::mmToTwips(spacings.at(i)));
         KSharedConfig::openConfig()->group(u"View"_s).writeEntry("GridSpacingMm", spacings.at(i));
     });
+
+    // Guidelines, dragged out of the rulers; kept in the label.
+    auto *guides = new QAction(QIcon::fromTheme(u"snap-guideline"_s, QIcon::fromTheme(u"distribute-horizontal-x"_s)), i18n("Show &Guidelines"), this);
+    guides->setCheckable(true);
+    guides->setToolTip(i18n("Drag a guideline out of a ruler; objects snap to it, Alt places freely. Drag it back to the ruler to remove it."));
+    actions->addAction(u"view_guides"_s, guides);
+    guides->setChecked(view.readEntry("ShowGuides", true));
+    m_view->setGuidesVisible(guides->isChecked());
+    connect(guides, &QAction::toggled, this, [this](bool on) {
+        m_view->setGuidesVisible(on);
+        KSharedConfig::openConfig()->group(u"View"_s).writeEntry("ShowGuides", on);
+    });
+    QAction *clearGuides = actions->addAction(u"view_clear_guides"_s, this, [this]() {
+        LabelDocument document = m_editor->document();
+        if (!document.guidesX.isEmpty() || !document.guidesY.isEmpty()) {
+            document.guidesX.clear();
+            document.guidesY.clear();
+            m_editor->apply(document, i18n("Clear Guidelines"));
+        }
+    });
+    clearGuides->setText(i18n("&Clear Guidelines"));
+    clearGuides->setIcon(QIcon::fromTheme(u"edit-clear"_s));
 }
 
 bool MainWindow::openFile(const QString &name)

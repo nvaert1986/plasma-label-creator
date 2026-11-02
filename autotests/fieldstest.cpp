@@ -277,6 +277,28 @@ private Q_SLOTS:
         buffer.open(QIODevice::ReadOnly);
         QCOMPARE(reader.read(&buffer)->dataSource, document.dataSource);
     }
+
+    void conditionsLeaveObjectsOut()
+    {
+        LabelDocument document = labelWith(u"Lot: {Lot}"_s);
+        objectBase(document.objects[0]).condition = {PrintCondition::Test::IsNotEmpty, u"Lot"_s, QString()};
+        QVERIFY(objectBase(Fields::fill(document, {{u"Lot"_s, u"L1"_s}}).objects.at(0)).printed);
+        QVERIFY(!objectBase(Fields::fill(document, {{u"Lot"_s, QString()}}).objects.at(0)).printed);
+        // A field without a value is empty.
+        QVERIFY(!objectBase(Fields::fill(document, {}).objects.at(0)).printed);
+
+        using Test = PrintCondition::Test;
+        const QHash<QString, QString> values = {{u"Weight"_s, u"12.5"_s}, {u"Site"_s, u"Utrecht"_s}, {u"Limit"_s, u"10"_s}};
+        QVERIFY(Fields::holds({Test::Always, QString(), QString()}, {}));
+        QVERIFY(Fields::holds({Test::GreaterThan, u"Weight"_s, u"9"_s}, values)); // as numbers: 12.5 > 9
+        QVERIFY(!Fields::holds({Test::LessThan, u"Weight"_s, u"9"_s}, values));
+        QVERIFY(Fields::holds({Test::GreaterThan, u"Weight"_s, u"{Limit}"_s}, values)); // the value may be a field
+        QVERIFY(Fields::holds({Test::Equals, u"{site}"_s, u"utrecht"_s}, values)); // braces and case do not matter
+        QVERIFY(Fields::holds({Test::NotEquals, u"Site"_s, u"Delft"_s}, values));
+        QVERIFY(Fields::holds({Test::Contains, u"Site"_s, u"TREC"_s}, values));
+        QVERIFY(Fields::holds({Test::IsEmpty, u"Nothing"_s, QString()}, values));
+        QVERIFY(Fields::holds({Test::Equals, u"Weight"_s, u"12.50"_s}, values)); // equal as numbers
+    }
 };
 
 QTEST_GUILESS_MAIN(FieldsTest)

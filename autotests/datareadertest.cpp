@@ -8,6 +8,8 @@
 #include <KLocalizedString>
 #include <KZip>
 
+#include <QBuffer>
+#include <QImage>
 #include <QLocale>
 #include <QSqlDatabase>
 #include <QSqlQuery>
@@ -223,6 +225,56 @@ private Q_SLOTS:
         QVERIFY(!DataReader::isReadOnlyQuery(u"EXEC dbo.Cleanup"_s));
         QVERIFY(!DataReader::isReadOnlyQuery(u"WITH x AS (SELECT 1) DELETE FROM t"_s));
         QVERIFY(!DataReader::isReadOnlyQuery(QString()));
+    }
+
+    void queryFieldsAreParameters()
+    {
+        QStringList names;
+        QCOMPARE(DataReader::boundQuery(u"SELECT * FROM t WHERE a = {Serial} AND b = '{Lot}' AND c = \"{Serial}\""_s, &names),
+                 u"SELECT * FROM t WHERE a = ? AND b = ? AND c = ?"_s);
+        QCOMPARE(names, (QStringList{u"Serial"_s, u"Lot"_s, u"Serial"_s}));
+        QCOMPARE(DataReader::queryParameters(u"SELECT 1 WHERE {A} = {B} OR {A} = 1"_s), (QStringList{u"A"_s, u"B"_s}));
+        if (!QSqlDatabase::isDriverAvailable(u"QSQLITE"_s)) {
+            QSKIP("Qt's SQLite driver is not installed (dev-qt/qtbase[sqlite], libqt6sql6-sqlite)");
+        }
+        QTemporaryDir dir;
+        const QString file = dir.filePath(u"assets.sqlite"_s);
+        QByteArray png;
+        {
+            QBuffer buffer(&png);
+            buffer.open(QIODevice::WriteOnly);
+            QImage(4, 4, QImage::Format_RGB32).save(&buffer, "PNG");
+        }
+        {
+            QSqlDatabase database = QSqlDatabase::addDatabase(u"QSQLITE"_s, u"setup"_s);
+            database.setDatabaseName(file);
+            QVERIFY(database.open());
+            QSqlQuery query(database);
+            QVERIFY(query.exec(u"CREATE TABLE assets (name TEXT, photo BLOB)"_s));
+            QVERIFY(query.prepare(u"INSERT INTO assets VALUES (?, ?)"_s));
+            query.addBindValue(u"SRV-HV01"_s);
+            query.addBindValue(png);
+            QVERIFY(query.exec());
+            QVERIFY(query.exec(u"INSERT INTO assets VALUES ('x'' OR ''1''=''1', NULL)"_s));
+            database.close();
+        }
+        QSqlDatabase::removeDatabase(u"setup"_s);
+        DataSource source;
+        source.kind = DataSource::Kind::Database;
+        source.driver = u"QSQLITE"_s;
+        source.database = file;
+        source.query = u"SELECT name AS Name, photo AS Photo FROM assets WHERE name = '{Name}'"_s;
+        QString error;
+        auto table = DataReader::read(source, {}, &error, {{u"Name"_s, u"SRV-HV01"_s}});
+        QVERIFY2(table, qPrintable(error));
+        QCOMPARE(table->rows.size(), 1);
+        // A stored picture comes as an image's data: address.
+        QVERIFY(table->rows.at(0).at(1).startsWith(u"data:image/png;base64,"_s));
+        // An answer is a value, never part of the query.
+        table = DataReader::read(source, {}, &error, {{u"Name"_s, u"x' OR '1'='1"_s}});
+        QVERIFY2(table, qPrintable(error));
+        QCOMPARE(table->rows.size(), 1);
+        QCOMPARE(table->rows.at(0).at(0), u"x' OR '1'='1"_s);
     }
 };
 

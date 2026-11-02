@@ -151,7 +151,8 @@ LabelObject create(Kind kind, const LabelDocument &document, const QByteArray &i
     case Kind::Image: {
         ImageObject image;
         image.name = uniqueName(document, u"GRAPHIC"_s);
-        image.imageData = imageData;
+        // An SVG drawing is kept as a drawing.
+        (imageData.left(1024).contains("<svg") ? image.svgData : image.imageData) = imageData;
         const QRectF area = usableArea(document);
         const qreal side = std::min(area.width(), area.height()) * 0.6;
         image.bounds = QRectF(QPointF(0, 0), QSizeF(side, side));
@@ -184,6 +185,9 @@ LabelObject create(Kind kind, const LabelDocument &document, const QByteArray &i
     case Kind::VerticalLine:
     case Kind::Rectangle:
     case Kind::Ellipse:
+    case Kind::Polygon:
+    case Kind::Star:
+    case Kind::Arrow:
         break;
     }
 
@@ -203,6 +207,21 @@ LabelObject create(Kind kind, const LabelDocument &document, const QByteArray &i
     case Kind::Ellipse:
         shape.shapeType = ShapeType::Ellipse;
         shape.bounds = centredBox(document, 0.6, 0.6);
+        break;
+    case Kind::Polygon:
+        shape.shapeType = ShapeType::Polygon;
+        shape.corners = 6;
+        shape.bounds = centredBox(document, 0.6, 0.6);
+        break;
+    case Kind::Star:
+        shape.shapeType = ShapeType::Star;
+        shape.corners = 5;
+        shape.bounds = centredBox(document, 0.6, 0.6);
+        break;
+    case Kind::Arrow:
+        shape.shapeType = ShapeType::Arrow;
+        shape.bounds = centredBox(document, 0.6, 0.3);
+        shape.fillColor = Qt::black;
         break;
     default:
         shape.shapeType = ShapeType::Rectangle;

@@ -6,6 +6,7 @@
 #include "labelformat.h"
 
 #include "dlslabelids.h"
+#include "labelrenderer.h"
 #include "tapelayout.h"
 #include "units.h"
 
@@ -242,6 +243,46 @@ QPainterPath parseDrawCommands(const QString &captured)
 // ignores: <!--plasma-label-creator {"questions": [...], "dataSource": {...}}-->
 constexpr QLatin1StringView ExtensionsTag = "plasma-label-creator"_L1;
 
+constexpr EnumName<PrintCondition::Test> conditionNames[] = {
+    {PrintCondition::Test::Always, "always"_L1},
+    {PrintCondition::Test::IsEmpty, "empty"_L1},
+    {PrintCondition::Test::IsNotEmpty, "notEmpty"_L1},
+    {PrintCondition::Test::Equals, "equals"_L1},
+    {PrintCondition::Test::NotEquals, "notEquals"_L1},
+    {PrintCondition::Test::Contains, "contains"_L1},
+    {PrintCondition::Test::GreaterThan, "greater"_L1},
+    {PrintCondition::Test::LessThan, "less"_L1},
+};
+
+// The shapes DLS has no ShapeType for: it gets a picture of them.
+constexpr EnumName<ShapeType> extraShapeNames[] = {
+    {ShapeType::Polygon, "polygon"_L1},
+    {ShapeType::Star, "star"_L1},
+    {ShapeType::Arrow, "arrow"_L1},
+    {ShapeType::DoubleArrow, "doubleArrow"_L1},
+};
+
+bool isExtraShape(ShapeType type)
+{
+    return std::any_of(std::begin(extraShapeNames), std::end(extraShapeNames), [type](const auto &entry) {
+        return entry.value == type;
+    });
+}
+
+// What DLS shows for an object it cannot draw itself: a picture of it, in
+// its box, at 300 dpi.
+QByteArray pictureOf(const LabelObject &object)
+{
+    LabelObject flat = object;
+    // DLS turns the picture itself by the quarter turn written with it.
+    objectBase(flat).rotation = Rotation::Rotation0;
+    objectBase(flat).angle = 0;
+    QBuffer buffer;
+    buffer.open(QIODevice::WriteOnly);
+    LabelRenderer(LabelRenderer::Mode::Print).objectPicture(flat, 300).save(&buffer, "PNG");
+    return buffer.data();
+}
+
 constexpr EnumName<PrintQuestion::Allowed> allowedNames[] = {
     {PrintQuestion::Allowed::Anything, "anything"_L1},
     {PrintQuestion::Allowed::Digits, "digits"_L1},
@@ -310,11 +351,51 @@ QJsonObject objectExtensions(const LabelObject &object)
     if (const auto *counter = std::get_if<CounterObject>(&object); counter && !counter->sharedFile.isEmpty()) {
         o[u"counterFile"_s] = counter->sharedFile;
     }
+    if (const TextObject *text = textOf(object); text && text->grow) {
+        o[u"grow"_s] = true;
+    }
+    if (base.condition.test != PrintCondition::Test::Always) {
+        o[u"if"_s] = QJsonObject{{u"test"_s, QString(enumName(conditionNames, base.condition.test))},
+                                 {u"field"_s, base.condition.field},
+                                 {u"value"_s, base.condition.value}};
+    }
+    if (!base.anchor.object.isEmpty()) {
+        o[u"anchor"_s] = QJsonObject{{u"object"_s, base.anchor.object}, {u"side"_s, base.anchor.side == Anchor::Side::Below ? u"below"_s : u"right"_s}};
+    }
+    // Written as a picture for DLS: the shape itself, to read back.
+    if (const auto *shape = std::get_if<ShapeObject>(&object); shape && isExtraShape(shape->shapeType)) {
+        o[u"shape"_s] = QJsonObject{{u"type"_s, QString(enumName(extraShapeNames, shape->shapeType))},
+                                    {u"corners"_s, shape->corners},
+                                    {u"lineWidth"_s, shape->lineWidth},
+                                    {u"line"_s, shape->foreColor.name(QColor::HexArgb)},
+                                    {u"fill"_s, shape->fillColor.name(QColor::HexArgb)}};
+    }
+    if (const auto *image = std::get_if<ImageObject>(&object); image && !image->svgData.isEmpty()) {
+        o[u"svg"_s] = QString::fromLatin1(image->svgData.toBase64());
+    }
     return o;
 }
 
 void applyObjectExtensions(LabelObject &object, const QJsonObject &o)
 {
+    // A shape DLS only has a picture of: the shape again.
+    if (const QJsonObject shape = o[u"shape"_s].toObject(); !shape.isEmpty() && std::holds_alternative<ImageObject>(object)) {
+        ShapeObject restored;
+        static_cast<ObjectBase &>(restored) = objectBase(object);
+        const QString type = shape[u"type"_s].toString();
+        for (const auto &entry : extraShapeNames) {
+            if (type == entry.name) {
+                restored.shapeType = entry.value;
+            }
+        }
+        if (isExtraShape(restored.shapeType)) {
+            restored.corners = std::clamp(shape[u"corners"_s].toInt(5), 3, 24);
+            restored.lineWidth = std::max(0.0, shape[u"lineWidth"_s].toDouble(15));
+            restored.foreColor = QColor(shape[u"line"_s].toString(u"#ff000000"_s));
+            restored.fillColor = QColor(shape[u"fill"_s].toString(u"#00ffffff"_s));
+            object = restored;
+        }
+    }
     ObjectBase &base = objectBase(object);
     base.locked = o[u"locked"_s].toBool();
     base.layer = o[u"layer"_s].toString();
@@ -325,6 +406,25 @@ void applyObjectExtensions(LabelObject &object, const QJsonObject &o)
     }
     if (auto *counter = std::get_if<CounterObject>(&object)) {
         counter->sharedFile = o[u"counterFile"_s].toString();
+    }
+    if (TextObject *text = textOf(object)) {
+        text->grow = o[u"grow"_s].toBool();
+    }
+    const QJsonObject condition = o[u"if"_s].toObject();
+    base.condition = PrintCondition();
+    const QString test = condition[u"test"_s].toString();
+    for (const auto &entry : conditionNames) {
+        if (test == entry.name) {
+            base.condition.test = entry.value;
+        }
+    }
+    base.condition.field = condition[u"field"_s].toString();
+    base.condition.value = condition[u"value"_s].toString();
+    const QJsonObject anchor = o[u"anchor"_s].toObject();
+    base.anchor.object = anchor[u"object"_s].toString();
+    base.anchor.side = anchor[u"side"_s].toString() == u"below"_s ? Anchor::Side::Below : Anchor::Side::Right;
+    if (auto *image = std::get_if<ImageObject>(&object)) {
+        image->svgData = QByteArray::fromBase64(o[u"svg"_s].toString().toLatin1());
     }
 }
 
@@ -338,7 +438,8 @@ bool hasObjectExtensions(const LabelDocument &document)
 bool hasExtensions(const LabelDocument &document)
 {
     return !document.questions.isEmpty() || document.dataSource.kind != DataSource::Kind::None || !document.layers.isEmpty()
-        || !document.calculated.isEmpty() || document.roll != RollLayout() || hasObjectExtensions(document);
+        || !document.calculated.isEmpty() || document.roll != RollLayout() || document.printing != PrintSettings() || !document.headerLabel.isEmpty()
+        || !document.trailerLabel.isEmpty() || !document.guidesX.isEmpty() || !document.guidesY.isEmpty() || hasObjectExtensions(document);
 }
 
 QString extensionsJson(const LabelDocument &document)
@@ -436,6 +537,36 @@ QString extensionsJson(const LabelDocument &document)
         }
         root[u"layers"_s] = layers;
     }
+    if (document.printing != PrintSettings()) {
+        QJsonObject printing;
+        if (!document.printing.density.isEmpty()) {
+            printing[u"density"_s] = document.printing.density;
+        }
+        if (document.printing.darkness > 0) {
+            printing[u"darkness"_s] = document.printing.darkness;
+        }
+        if (document.printing.speed > 0) {
+            printing[u"speed"_s] = document.printing.speed;
+        }
+        root[u"printing"_s] = printing;
+    }
+    if (!document.headerLabel.isEmpty()) {
+        root[u"header"_s] = document.headerLabel;
+    }
+    if (!document.trailerLabel.isEmpty()) {
+        root[u"trailer"_s] = document.trailerLabel;
+    }
+    if (!document.guidesX.isEmpty() || !document.guidesY.isEmpty()) {
+        QJsonArray x;
+        QJsonArray y;
+        for (const qreal value : document.guidesX) {
+            x.append(value);
+        }
+        for (const qreal value : document.guidesY) {
+            y.append(value);
+        }
+        root[u"guides"_s] = QJsonObject{{u"x"_s, x}, {u"y"_s, y}};
+    }
     const DataSource &source = document.dataSource;
     if (source.kind != DataSource::Kind::None) {
         QJsonObject s;
@@ -454,6 +585,12 @@ QString extensionsJson(const LabelDocument &document)
             s[u"port"_s] = source.port;
             s[u"user"_s] = source.user;
             s[u"query"_s] = source.query;
+        }
+        if (!source.copiesColumn.isEmpty()) {
+            s[u"copiesColumn"_s] = source.copiesColumn;
+        }
+        if (!source.labelColumn.isEmpty()) {
+            s[u"labelColumn"_s] = source.labelColumn;
         }
         root[u"dataSource"_s] = s;
     }
@@ -563,6 +700,23 @@ void readExtensions(const QByteArray &data, LabelDocument &document, QStringList
         source.port = s[u"port"_s].toInt();
         source.user = s[u"user"_s].toString();
         source.query = s[u"query"_s].toString();
+    }
+    if (source.kind != DataSource::Kind::None) {
+        source.copiesColumn = s[u"copiesColumn"_s].toString();
+        source.labelColumn = s[u"labelColumn"_s].toString();
+    }
+    const QJsonObject printing = root[u"printing"_s].toObject();
+    document.printing.density = printing[u"density"_s].toString();
+    document.printing.darkness = std::clamp(printing[u"darkness"_s].toInt(), 0, 30);
+    document.printing.speed = std::clamp(printing[u"speed"_s].toInt(), 0, 12);
+    document.headerLabel = root[u"header"_s].toString();
+    document.trailerLabel = root[u"trailer"_s].toString();
+    const QJsonObject guides = root[u"guides"_s].toObject();
+    for (const auto &value : guides[u"x"_s].toArray()) {
+        document.guidesX << value.toDouble();
+    }
+    for (const auto &value : guides[u"y"_s].toArray()) {
+        document.guidesY << value.toDouble();
     }
 }
 
@@ -1473,6 +1627,9 @@ void Serializer::writeObjectBody(const ImageObject &object)
     writeCommon(object);
     if (object.imageLocation) {
         m_xml.writeTextElement("ImageLocation"_L1, *object.imageLocation);
+    } else if (!object.svgData.isEmpty()) {
+        // DLS draws no SVG: a picture of it at its size now.
+        m_xml.writeTextElement("Image"_L1, QString::fromLatin1(pictureOf(object).toBase64()));
     } else {
         m_xml.writeTextElement("Image"_L1, QString::fromLatin1(object.imageData.toBase64()));
     }
@@ -1486,6 +1643,16 @@ void Serializer::writeObjectBody(const ImageObject &object)
 
 void Serializer::writeObjectBody(const ShapeObject &object)
 {
+    // A shape DLS does not know: a picture of it, the shape kept in the
+    // settings comment.
+    if (isExtraShape(object.shapeType)) {
+        ImageObject picture;
+        static_cast<ObjectBase &>(picture) = object;
+        picture.imageData = pictureOf(object);
+        picture.scaleMode = ImageScaleMode::Fill;
+        writeObjectBody(picture);
+        return;
+    }
     m_xml.writeStartElement("ShapeObject"_L1);
     writeCommon(object);
     writeEnum("ShapeType"_L1, shapeTypeNames, object.shapeType);

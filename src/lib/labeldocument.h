@@ -82,6 +82,12 @@ enum class ShapeType {
     VerticalLine,
     Rectangle,
     Ellipse,
+    // Not in DLS's format, which gets a picture of them: kept in the
+    // settings comment.
+    Polygon, // regular, with corners corners
+    Star, // with corners points
+    Arrow, // pointing right; turned with the object
+    DoubleArrow,
 };
 
 enum class DateFormat {
@@ -142,6 +148,42 @@ struct TextSpan {
     bool operator==(const TextSpan &) const = default;
 };
 
+/**
+ * When an object prints: always, or only when a field passes a test, such
+ * as a "Lot:" line only when {Lot} has a value. Not in DLS's format: kept
+ * in the settings comment.
+ */
+struct PrintCondition {
+    enum class Test {
+        Always,
+        IsEmpty,
+        IsNotEmpty,
+        Equals,
+        NotEquals,
+        Contains,
+        GreaterThan, // as numbers when both are, else as text
+        LessThan,
+    };
+    Test test = Test::Always;
+    QString field; // without braces
+    QString value; // may hold fields itself
+    bool operator==(const PrintCondition &) const = default;
+};
+
+/**
+ * An object that keeps its place beside or below another, which may grow
+ * with its text: it moves as far as that one grew. Not in DLS's format.
+ */
+struct Anchor {
+    enum class Side {
+        Right, // stays right of it: moves with its width
+        Below, // stays below it: moves with its height
+    };
+    QString object; // the other object's name; empty for none
+    Side side = Side::Right;
+    bool operator==(const Anchor &) const = default;
+};
+
 /** The properties every object shares, plus its position on the label. */
 struct ObjectBase {
     QString name;
@@ -169,6 +211,8 @@ struct ObjectBase {
      * format, which shows the object without it: kept in the settings comment.
      */
     qreal angle = 0;
+    PrintCondition condition;
+    Anchor anchor;
 
     bool operator==(const ObjectBase &) const = default;
 };
@@ -185,6 +229,12 @@ struct TextObject : ObjectBase {
      * format: kept in the settings comment.
      */
     bool wrap = false;
+    /**
+     * The box grows to fit the text instead of the text shrinking to the
+     * box: wider, or taller when it wraps. Objects anchored to it move along.
+     * Not in DLS's format.
+     */
+    bool grow = false;
 
     QString plainText() const;
 
@@ -223,6 +273,11 @@ struct BarcodeObject : ObjectBase {
 
 struct ImageObject : ObjectBase {
     QByteArray imageData; // the embedded file (PNG, GIF...), as stored
+    /**
+     * An SVG drawing, drawn sharp at any size. DLS gets a picture of it in
+     * imageData; the drawing is kept in the settings comment.
+     */
+    QByteArray svgData;
     std::optional<QString> imageLocation; // a linked file instead of embedded data
     ImageScaleMode scaleMode = ImageScaleMode::Uniform;
     qreal borderWidth = 0;
@@ -235,6 +290,7 @@ struct ImageObject : ObjectBase {
 
 struct ShapeObject : ObjectBase {
     ShapeType shapeType = ShapeType::HorizontalLine;
+    int corners = 5; // a polygon's corners, a star's points
     qreal lineWidth = 15;
     LineAlignment lineAlignment = LineAlignment::Center;
     QColor fillColor = QColor(255, 255, 255, 0);
@@ -440,7 +496,11 @@ struct DataSource {
     QString host;
     int port = 0; // 0 for the driver's default
     QString user;
+    /** May use {fields}: bound to the answers as parameters, never put in the text. */
     QString query;
+    // What a row prints, besides its values. Not in DLS's format.
+    QString copiesColumn; // how many of the row's label; empty: one
+    QString labelColumn; // another label file to print the row with; empty: this label
 
     bool operator==(const DataSource &) const = default;
 };
@@ -479,6 +539,17 @@ struct Layer {
     bool operator==(const Layer &) const = default;
 };
 
+/**
+ * How the printer prints the label, when not as it is set: DYMO's print
+ * density, a ZPL printer's darkness and speed. Not in DLS's format.
+ */
+struct PrintSettings {
+    QString density; // DYMO: Light, Medium, Normal or Dark; empty: the printer's
+    int darkness = 0; // ZPL: 1 to 30; 0: the printer's
+    int speed = 0; // ZPL: inches per second, 1 to 12; 0: the printer's
+    bool operator==(const PrintSettings &) const = default;
+};
+
 struct LabelDocument {
     PaperOrientation orientation = PaperOrientation::Landscape;
     QString id;
@@ -506,6 +577,13 @@ struct LabelDocument {
     QList<Layer> layers;
     QList<CalculatedField> calculated; // worked out in this order
     RollLayout roll;
+    PrintSettings printing;
+    /** Labels printed once before and after a run: files, next to this label or anywhere. */
+    QString headerLabel;
+    QString trailerLabel;
+    /** Guidelines to place objects by, in twips on the canvas: across, then down. */
+    QList<qreal> guidesX;
+    QList<qreal> guidesY;
 
     /**
      * Adds @p object and returns its index. On tape it gets a cell of its

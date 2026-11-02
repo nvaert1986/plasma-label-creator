@@ -360,8 +360,60 @@ LabelDocument fill(const LabelDocument &document, const QHash<QString, QString> 
         if (auto *address = std::get_if<AddressObject>(&object)) {
             address->fitLineFonts();
         }
+        // An object whose condition does not hold is left out of print;
+        // the screen shows it faded.
+        ObjectBase &base = objectBase(object);
+        if (!holds(base.condition, all, now)) {
+            base.printed = false;
+        }
     }
     return filled;
+}
+
+bool holds(const PrintCondition &condition, const QHash<QString, QString> &values, const QDateTime &now)
+{
+    if (condition.test == PrintCondition::Test::Always) {
+        return true;
+    }
+    QString name = condition.field.trimmed();
+    if (name.startsWith(u'{') && name.endsWith(u'}')) {
+        name = name.mid(1, name.size() - 2);
+    }
+    // As a field on the label would show it: exact name, else ignoring case.
+    const QString value = fill(u'{' + name + u'}', values, now);
+    const QString field = value == u'{' + name + u'}' ? QString() : value.trimmed();
+    const QString other = fill(condition.value, values, now).trimmed();
+    const auto number = [](const QString &text, bool *ok) {
+        double result = QLocale::c().toDouble(text, ok);
+        if (!*ok) {
+            result = QLocale().toDouble(text, ok);
+        }
+        return result;
+    };
+    bool fieldNumber = false;
+    bool otherNumber = false;
+    const double a = number(field, &fieldNumber);
+    const double b = number(other, &otherNumber);
+    const bool numbers = fieldNumber && otherNumber;
+    switch (condition.test) {
+    case PrintCondition::Test::Always:
+        return true;
+    case PrintCondition::Test::IsEmpty:
+        return field.isEmpty();
+    case PrintCondition::Test::IsNotEmpty:
+        return !field.isEmpty();
+    case PrintCondition::Test::Equals:
+        return numbers ? a == b : field.compare(other, Qt::CaseInsensitive) == 0;
+    case PrintCondition::Test::NotEquals:
+        return numbers ? a != b : field.compare(other, Qt::CaseInsensitive) != 0;
+    case PrintCondition::Test::Contains:
+        return field.contains(other, Qt::CaseInsensitive);
+    case PrintCondition::Test::GreaterThan:
+        return numbers ? a > b : QString::localeAwareCompare(field, other) > 0;
+    case PrintCondition::Test::LessThan:
+        return numbers ? a < b : QString::localeAwareCompare(field, other) < 0;
+    }
+    return true;
 }
 
 std::optional<QString> problem(const PrintQuestion &question, const QString &answer)

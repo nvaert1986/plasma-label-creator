@@ -18,6 +18,7 @@
 #include <QDialog>
 #include <QDialogButtonBox>
 #include <QDoubleSpinBox>
+#include <QFile>
 #include <QFileDialog>
 #include <QFontComboBox>
 #include <QFormLayout>
@@ -28,6 +29,7 @@
 #include <QPlainTextEdit>
 #include <QPushButton>
 #include <QSpinBox>
+#include <QSvgRenderer>
 #include <QVBoxLayout>
 
 #include <functional>
@@ -181,16 +183,32 @@ const QList<std::pair<QString, QString>> &barcodeTypes()
 
 } // namespace
 
+bool isSvg(const QByteArray &data)
+{
+    return data.left(1024).contains("<svg");
+}
+
 QByteArray chooseImage(QWidget *parent)
 {
-    QStringList patterns;
+    QStringList patterns{u"*.svg"_s};
     for (const QByteArray &format : QImageReader::supportedImageFormats()) {
         patterns << u"*."_s + QString::fromLatin1(format);
     }
+    patterns.removeDuplicates();
     const QString fileName =
         QFileDialog::getOpenFileName(parent, i18n("Choose Image"), QString(), i18n("Images (%1)", patterns.join(u' ')) + u";;"_s + i18n("All files (*)"));
     if (fileName.isEmpty()) {
         return {};
+    }
+    // An SVG drawing stays a drawing: sharp at any size.
+    if (fileName.endsWith(u".svg"_s, Qt::CaseInsensitive)) {
+        QFile file(fileName);
+        QByteArray svg = file.open(QIODevice::ReadOnly) ? file.readAll() : QByteArray();
+        if (!isSvg(svg) || !QSvgRenderer(svg).isValid()) {
+            KMessageBox::error(parent, i18n("Could not read the drawing %1.", fileName));
+            return {};
+        }
+        return svg;
     }
     const QImage image(fileName);
     if (image.isNull()) {
@@ -205,7 +223,7 @@ QByteArray chooseImage(QWidget *parent)
     return png;
 }
 
-bool editObjectProperties(QWidget *parent, LabelObject &object, TapeCell *cell)
+bool editObjectProperties(QWidget *parent, LabelObject &object, TapeCell *cell, const QStringList &objectNames, const QStringList &fields)
 {
     if (const auto *unknown = std::get_if<UnknownObject>(&object)) {
         KMessageBox::information(parent,
@@ -315,6 +333,9 @@ bool editObjectProperties(QWidget *parent, LabelObject &object, TapeCell *cell)
         fullHeight->setChecked(text->useFullFontHeight);
         auto *wrap = new QCheckBox(i18n("Wrap long lines to the box's width"));
         wrap->setChecked(text->wrap);
+        auto *grow = new QCheckBox(i18n("Grow the box to fit the text"));
+        grow->setToolTip(i18n("Wider for longer text, or taller when it wraps, instead of smaller text; objects anchored to it move along"));
+        grow->setChecked(text->grow);
         form->addRow(edit);
         form->addRow(i18n("Font:"), font);
         form->addRow(i18n("Horizontal alignment:"), horizontal);
@@ -322,6 +343,7 @@ bool editObjectProperties(QWidget *parent, LabelObject &object, TapeCell *cell)
         form->addRow(i18n("Text size:"), fit);
         form->addRow(QString(), fullHeight);
         form->addRow(QString(), wrap);
+        form->addRow(QString(), grow);
         if (text->spans.size() > 1) {
             form->addRow(new QLabel(i18n("This text uses several fonts. Changing the text or font gives all of it the font above.")));
         }
@@ -331,6 +353,7 @@ bool editObjectProperties(QWidget *parent, LabelObject &object, TapeCell *cell)
             text->fitMode = comboValue<TextFitMode>(fit);
             text->useFullFontHeight = fullHeight->isChecked();
             text->wrap = wrap->isChecked();
+            text->grow = grow->isChecked();
             const QString newText = edit->toPlainText();
             const LabelFont newFont = font->labelFont();
             if (newText != originalText || !(newFont == originalFont)) {
@@ -429,7 +452,9 @@ bool editObjectProperties(QWidget *parent, LabelObject &object, TapeCell *cell)
         form->addRow(i18n("Border:"), border);
         applySpecific = [=]() {
             if (!newData->isEmpty()) {
-                image->imageData = *newData;
+                // A drawing or a picture, whichever was chosen.
+                image->svgData = isSvg(*newData) ? *newData : QByteArray();
+                image->imageData = isSvg(*newData) ? QByteArray() : *newData;
                 image->imageLocation.reset();
             } else if (!location->text().trimmed().isEmpty()) {
                 image->imageLocation = location->text().trimmed();
@@ -446,8 +471,22 @@ bool editObjectProperties(QWidget *parent, LabelObject &object, TapeCell *cell)
         auto *type = enumCombo({{i18n("Horizontal line"), int(ShapeType::HorizontalLine)},
                                 {i18n("Vertical line"), int(ShapeType::VerticalLine)},
                                 {i18n("Rectangle"), int(ShapeType::Rectangle)},
-                                {i18n("Ellipse"), int(ShapeType::Ellipse)}},
+                                {i18n("Ellipse"), int(ShapeType::Ellipse)},
+                                {i18n("Polygon"), int(ShapeType::Polygon)},
+                                {i18n("Star"), int(ShapeType::Star)},
+                                {i18n("Arrow"), int(ShapeType::Arrow)},
+                                {i18n("Double arrow"), int(ShapeType::DoubleArrow)}},
                                int(shape->shapeType));
+        type->setToolTip(i18n("Other label software shows polygons, stars and arrows as a picture"));
+        auto *corners = new QSpinBox;
+        corners->setRange(3, 24);
+        corners->setValue(shape->corners);
+        const auto updateCorners = [type, corners]() {
+            const auto chosen = comboValue<ShapeType>(type);
+            corners->setEnabled(chosen == ShapeType::Polygon || chosen == ShapeType::Star);
+        };
+        updateCorners();
+        QObject::connect(type, &QComboBox::currentIndexChanged, corners, updateCorners);
         auto *lineWidth = new QDoubleSpinBox;
         lineWidth->setRange(0.25, 20);
         lineWidth->setDecimals(2);
@@ -457,10 +496,12 @@ bool editObjectProperties(QWidget *parent, LabelObject &object, TapeCell *cell)
         auto *filled = new QCheckBox(i18n("Fill"));
         filled->setChecked(shape->fillColor.alpha() > 0);
         form->addRow(i18n("Shape:"), type);
+        form->addRow(i18n("Corners or points:"), corners);
         form->addRow(i18n("Line width:"), lineWidth);
         form->addRow(QString(), filled);
         applySpecific = [=]() {
             shape->shapeType = comboValue<ShapeType>(type);
+            shape->corners = corners->value();
             shape->lineWidth = Units::pointsToTwips(lineWidth->value());
             shape->fillColor = filled->isChecked() ? QColor(Qt::black) : QColor(255, 255, 255, 0);
         };
@@ -608,11 +649,67 @@ bool editObjectProperties(QWidget *parent, LabelObject &object, TapeCell *cell)
         };
     }
 
+    // When it prints, and where it goes when another object grows.
+    auto *printing = new QGroupBox(i18n("When It Prints"));
+    auto *printingForm = new QFormLayout(printing);
+    auto *test = enumCombo({{i18n("Always"), int(PrintCondition::Test::Always)},
+                            {i18n("When a field is empty"), int(PrintCondition::Test::IsEmpty)},
+                            {i18n("When a field has a value"), int(PrintCondition::Test::IsNotEmpty)},
+                            {i18n("When a field is"), int(PrintCondition::Test::Equals)},
+                            {i18n("When a field is not"), int(PrintCondition::Test::NotEquals)},
+                            {i18n("When a field contains"), int(PrintCondition::Test::Contains)},
+                            {i18n("When a field is more than"), int(PrintCondition::Test::GreaterThan)},
+                            {i18n("When a field is less than"), int(PrintCondition::Test::LessThan)}},
+                           int(base.condition.test));
+    test->setToolTip(i18n("Left out of the print, and faded on the screen, when this does not hold for the label's data and answers"));
+    auto *field = new QComboBox;
+    field->setEditable(true);
+    field->addItems(fields);
+    field->setCurrentText(base.condition.field);
+    field->setToolTip(i18n("A field: a data column, a question, or a calculated field"));
+    auto *value = new QLineEdit(base.condition.value);
+    value->setPlaceholderText(i18n("Value, may use {fields}"));
+    auto *conditionRow = new QHBoxLayout;
+    conditionRow->addWidget(field, 1);
+    conditionRow->addWidget(value, 1);
+    const auto updateCondition = [test, field, value]() {
+        const auto chosen = comboValue<PrintCondition::Test>(test);
+        field->setEnabled(chosen != PrintCondition::Test::Always);
+        value->setEnabled(chosen != PrintCondition::Test::Always && chosen != PrintCondition::Test::IsEmpty && chosen != PrintCondition::Test::IsNotEmpty);
+    };
+    updateCondition();
+    QObject::connect(test, &QComboBox::currentIndexChanged, field, updateCondition);
+    printingForm->addRow(i18n("Prints:"), test);
+    printingForm->addRow(QString(), conditionRow);
+    auto *side = enumCombo({{i18n("Where it is"), -1}, {i18n("Right of"), int(Anchor::Side::Right)}, {i18n("Below"), int(Anchor::Side::Below)}},
+                           base.anchor.object.isEmpty() ? -1 : int(base.anchor.side));
+    side->setToolTip(i18n("Moves along when that object grows to fit its text"));
+    auto *anchor = new QComboBox;
+    for (const QString &other : objectNames) {
+        if (other != base.name) {
+            anchor->addItem(other);
+        }
+    }
+    if (!base.anchor.object.isEmpty() && anchor->findText(base.anchor.object) < 0) {
+        anchor->addItem(base.anchor.object);
+    }
+    anchor->setCurrentText(base.anchor.object);
+    const auto updateAnchor = [side, anchor]() {
+        anchor->setEnabled(side->currentData().toInt() >= 0 && anchor->count() > 0);
+    };
+    updateAnchor();
+    QObject::connect(side, &QComboBox::currentIndexChanged, anchor, updateAnchor);
+    auto *anchorRow = new QHBoxLayout;
+    anchorRow->addWidget(side);
+    anchorRow->addWidget(anchor, 1);
+    printingForm->addRow(i18n("Stays:"), anchorRow);
+
     layout->addWidget(general);
     if (tapeGroup) {
         layout->addWidget(tapeGroup);
     }
     layout->addWidget(specific, 1);
+    layout->addWidget(printing);
     auto *buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     QObject::connect(buttons, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
     QObject::connect(buttons, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
@@ -652,6 +749,15 @@ bool editObjectProperties(QWidget *parent, LabelObject &object, TapeCell *cell)
         base.angle = angle->value();
     }
     base.mirrored = mirrored->isChecked();
+    base.condition.test = comboValue<PrintCondition::Test>(test);
+    base.condition.field = base.condition.test == PrintCondition::Test::Always ? QString() : field->currentText().remove(u'{').remove(u'}').trimmed();
+    base.condition.value = value->isEnabled() ? value->text() : QString();
+    if (side->currentData().toInt() < 0 || anchor->currentText().isEmpty()) {
+        base.anchor = Anchor();
+    } else {
+        base.anchor.object = anchor->currentText();
+        base.anchor.side = Anchor::Side(side->currentData().toInt());
+    }
     if (applySpecific) {
         applySpecific();
     }
