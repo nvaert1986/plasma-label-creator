@@ -38,10 +38,13 @@ add_executable(plasma-label-creator
     mainwindow_format.cpp
     mainwindow_objects.cpp
     mainwindow_print.cpp
+    mainwindow_printonly.cpp
     mainwindow.h
     objectfactory.cpp
     objectfactory.h
     printbar.cpp
+    printonlypanel.cpp
+    printonlypanel.h
     printpreviewdialog.cpp
     printbar.h
     printersetup.cpp
@@ -83,4 +86,4 @@ target_link_libraries(plasma-label-creator
 target_compile_definitions(plasma-label-creator PRIVATE TRANSLATION_DOMAIN="plasma-label-creator")
 
 install(TARGETS plasma-label-creator ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})
-install(PROGRAMS plasma-label-creator.desktop DESTINATION ${KDE_INSTALL_APPDIR})
+install(PROGRAMS plasma-label-creator.desktop plasma-label-creator-print.desktop DESTINATION ${KDE_INSTALL_APPDIR})

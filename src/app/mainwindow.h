@@ -25,9 +25,11 @@ class KToggleAction;
 class LabelEditor;
 class LabelView;
 class PrintBar;
+class PrintOnlyPanel;
 class QDoubleSpinBox;
 class QLabel;
 class QSlider;
+class QSplitter;
 class Sidebar;
 namespace LabelCreator
 {
@@ -42,6 +44,14 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
 
     bool openFile(const QString &fileName);
+    /**
+     * Print-only mode: choose a label from a folder, fill in its form and
+     * print; the label cannot be edited. For people who only print.
+     */
+    void setPrintOnly(bool printOnly);
+    bool isPrintOnly() const;
+    /** The folder print-only mode lists labels from. */
+    void setPrintOnlyFolder(const QString &folder);
     /** Shows tab @p index of the side panel; for screenshots while developing. */
     void showScreenshotTab(int index);
     /** Selects object @p index; for screenshots while developing. */
@@ -165,6 +175,15 @@ private:
     void editDataSource();
     void editQuestions();
     void editCalculatedFields();
+    /** Ticks the data rows to print, without changing where they come from. */
+    void chooseRows();
+    void setupPrintOnlyActions();
+    /** In print-only mode, turns off every action that edits. */
+    void keepEditingOff();
+    /** The form in print-only mode follows the label shown. */
+    void updatePrintOnlyForm();
+    /** In print-only mode the label shows filled in with the form's answers. */
+    void updatePrintOnlyPreview();
     /** Puts {name} in the selected object, or a new text object with it. */
     void insertField(const QString &name);
     /** The fields the label can use: the data's columns, then the questions. */
@@ -218,6 +237,10 @@ private:
     KToggleAction *m_portrait = nullptr;
     KToggleAction *m_landscape = nullptr;
     KToggleAction *m_lock = nullptr;
+    KToggleAction *m_printOnlyAction = nullptr;
+    PrintOnlyPanel *m_printOnlyPanel = nullptr;
+    QSplitter *m_splitter = nullptr; // side panel or print-only panel, then the canvas
+    bool m_printOnly = false;
     KToggleAction *m_noPrint = nullptr;
     QDoubleSpinBox *m_angle = nullptr; // in the arrange toolbar
     QAction *m_paste = nullptr;

@@ -17,6 +17,7 @@
 #include <QIcon>
 #include <QTimer>
 #include <QMenuBar>
+#include <QFileInfo>
 #include <QMenu>
 #include <QUrl>
 
@@ -33,7 +34,7 @@ int main(int argc, char *argv[])
     KAboutData aboutData(u"plasma-label-creator"_s,
                          i18n("Plasma Label Creator"),
                          QStringLiteral(LABELCREATOR_VERSION_STRING),
-                         i18n("Label designer for DYMO LabelWriter printers"),
+                         i18n("Label designer for DYMO LabelWriter and LabelManager printers and ZPL label printers"),
                          KAboutLicense::GPL_V2,
                          i18n("© 2026 nvaert1986"));
     aboutData.addAuthor(u"nvaert1986"_s, i18n("Developer"), u"25772781+nvaert1986@users.noreply.github.com"_s);
@@ -46,14 +47,26 @@ int main(int argc, char *argv[])
     QCommandLineParser parser;
     aboutData.setupCommandLine(&parser);
     parser.addPositionalArgument(u"files"_s, i18n("Label files to open."), u"[files...]"_s);
+    const QCommandLineOption printOnly(u"print-only"_s, i18n("Start in print-only mode: choose a label from a folder and print it, without editing."));
+    parser.addOption(printOnly);
     parser.process(app);
     aboutData.processCommandLine(&parser);
 
     auto *window = new MainWindow;
     window->show();
+    // A folder lists its labels in print-only mode; a file opens.
     const QStringList files = parser.positionalArguments();
-    if (!files.isEmpty()) {
+    QString folder;
+    if (!files.isEmpty() && QFileInfo(files.constFirst()).isDir()) {
+        folder = QFileInfo(files.constFirst()).absoluteFilePath();
+    } else if (!files.isEmpty()) {
         window->openFile(files.constFirst());
+    }
+    if (parser.isSet(printOnly)) {
+        if (!folder.isEmpty()) {
+            window->setPrintOnlyFolder(folder);
+        }
+        window->setPrintOnly(true);
     }
 
     // For development: LABELCREATOR_SCREENSHOT=file.png saves a picture of the

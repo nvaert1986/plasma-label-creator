@@ -40,6 +40,8 @@ public:
     std::optional<DataTable> table() const;
     /** The ticked rows, by index into table(). */
     QList<int> selectedRows() const;
+    /** Only the rows to tick: where they come from stays as it is. */
+    void setRowsOnly(bool rowsOnly);
 
 private:
     void chooseFile();
@@ -65,6 +67,7 @@ private:
     QTableWidget *m_rows;
     std::optional<DataTable> m_table;
     QList<int> m_initialSelection;
+    QWidget *m_sourceSettings = nullptr; // where the rows come from
     bool m_tickAll = false; // after a new load, every row is ticked
 };
 

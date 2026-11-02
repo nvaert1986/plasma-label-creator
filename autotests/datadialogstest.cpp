@@ -6,10 +6,15 @@
 #include "answersform.h"
 #include "datadialogs.h"
 #include "gs1dialog.h"
+#include "labelformat.h"
 #include "layersdialog.h"
+#include "printonlypanel.h"
 #include "rolllayoutdialog.h"
 
 #include <QDialogButtonBox>
+#include <QGroupBox>
+#include <QSignalSpy>
+#include <QListWidget>
 #include <QStackedWidget>
 #include <QPlainTextEdit>
 #include <QDateEdit>
@@ -290,6 +295,77 @@ private Q_SLOTS:
         spins.at(1)->setValue(75);
         QCOMPARE(dialog.roll(), (RollLayout{2, 3, true}));
         QCOMPARE(dialog.lengthMm(), 75.0);
+    }
+
+    void printOnlyListsLabelsAndAsks()
+    {
+        QTemporaryDir dir;
+        LabelDocument label;
+        label.paperOutline.addRect(QRectF(0, 0, 1581, 5040));
+        TextObject text;
+        text.name = u"TEXT"_s;
+        text.spans = {{u"Batch {Batch}"_s, LabelFont(), Qt::black}};
+        text.bounds = QRectF(100, 100, 3000, 600);
+        label.objects << text;
+        PrintQuestion batch;
+        batch.name = u"Batch"_s;
+        batch.minimumLength = 4;
+        label.questions = {batch};
+        QVERIFY(LabelWriter::writeFile(label, dir.filePath(u"batch.label"_s)));
+        label.questions.clear();
+        QVERIFY(LabelWriter::writeFile(label, dir.filePath(u"plain.label"_s)));
+        QFile other(dir.filePath(u"notes.txt"_s));
+        QVERIFY(other.open(QIODevice::WriteOnly));
+        other.close();
+
+        PrintOnlyPanel panel;
+        panel.resize(340, 500);
+        panel.show();
+        QVERIFY(QTest::qWaitForWindowExposed(&panel));
+        panel.setFolder(dir.path());
+        auto *labels = panel.findChild<QListWidget *>();
+        QCOMPARE(labels->count(), 2); // the labels, not the notes
+        QCOMPARE(labels->item(0)->text(), u"batch"_s);
+        QSignalSpy chosen(&panel, &PrintOnlyPanel::labelChosen);
+        Q_EMIT labels->itemClicked(labels->item(1));
+        QCOMPARE(chosen.constFirst().constFirst().toString(), dir.filePath(u"plain.label"_s));
+
+        // A label without questions has no form; one with them has.
+        panel.setQuestions({}, {}, std::nullopt);
+        QVERIFY(!panel.findChild<QGroupBox *>()->isVisible());
+        panel.setQuestions({batch}, {{u"Batch"_s, u"12"_s}}, std::nullopt);
+        QVERIFY(panel.findChild<QGroupBox *>()->isVisible());
+        QVERIFY(panel.problem()); // too short
+        QSignalSpy changed(&panel, &PrintOnlyPanel::answersChanged);
+        panel.findChild<AnswersForm *>()->setAnswer(u"Batch"_s, u"1234"_s);
+        QVERIFY(!changed.isEmpty());
+        QVERIFY(!panel.problem());
+        QCOMPARE(panel.answers().value(u"Batch"_s), u"1234"_s);
+        grab(&panel, u"printonly-panel"_s);
+
+        // Labels added to the folder show up.
+        QVERIFY(LabelWriter::writeFile(label, dir.filePath(u"new.label"_s)));
+        QTRY_COMPARE(labels->count(), 3);
+    }
+
+    void rowsOnlyLeavesTheSourceAlone()
+    {
+        QTemporaryDir dir;
+        const QString file = dir.filePath(u"assets.csv"_s);
+        QFile csv(file);
+        QVERIFY(csv.open(QIODevice::WriteOnly));
+        csv.write("Name\nA\nB\n");
+        csv.close();
+        DataSource source;
+        source.kind = DataSource::Kind::File;
+        source.fileName = file;
+        DataSourceDialog dialog(source, DataReader::read(source), {1}, nullptr);
+        dialog.setRowsOnly(true);
+        dialog.show();
+        QVERIFY(QTest::qWaitForWindowExposed(&dialog));
+        QVERIFY(!dialog.findChild<QLineEdit *>()->isVisible()); // the file name
+        QCOMPARE(dialog.selectedRows(), QList<int>{1});
+        QCOMPARE(dialog.source(), source);
     }
 
     void questionsAreEdited()

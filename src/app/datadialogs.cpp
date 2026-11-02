@@ -83,9 +83,14 @@ DataSourceDialog::DataSourceDialog(const DataSource &source, const std::optional
     m_kind = new QComboBox(this);
     m_kind->addItem(i18n("A file: CSV, Excel or OpenDocument"), int(DataSource::Kind::File));
     m_kind->addItem(i18n("A database query"), int(DataSource::Kind::Database));
+    // Where the rows come from: the kind of source and its settings.
+    m_sourceSettings = new QWidget(this);
+    auto *sourceLayout = new QVBoxLayout(m_sourceSettings);
+    sourceLayout->setContentsMargins(0, 0, 0, 0);
     auto *kindForm = new QFormLayout;
     kindForm->addRow(i18n("Rows from:"), m_kind);
-    layout->addLayout(kindForm);
+    sourceLayout->addLayout(kindForm);
+    layout->addWidget(m_sourceSettings);
 
     // A file.
     auto *filePage = new QWidget(this);
@@ -153,7 +158,7 @@ DataSourceDialog::DataSourceDialog(const DataSource &source, const std::optional
     m_pages = new QStackedWidget(this);
     m_pages->addWidget(filePage);
     m_pages->addWidget(databasePage);
-    layout->addWidget(m_pages);
+    sourceLayout->addWidget(m_pages);
     connect(m_kind, &QComboBox::currentIndexChanged, m_pages, &QStackedWidget::setCurrentIndex);
     m_kind->setCurrentIndex(source.kind == DataSource::Kind::Database ? 1 : 0);
     m_pages->setCurrentIndex(m_kind->currentIndex());
@@ -292,6 +297,12 @@ void DataSourceDialog::setAllChecked(bool checked)
     for (int row = 0; row < m_rows->rowCount(); ++row) {
         m_rows->item(row, 0)->setCheckState(checked ? Qt::Checked : Qt::Unchecked);
     }
+}
+
+void DataSourceDialog::setRowsOnly(bool rowsOnly)
+{
+    m_sourceSettings->setVisible(!rowsOnly);
+    setWindowTitle(rowsOnly ? i18n("Rows to Print") : i18n("Data Source"));
 }
 
 std::optional<DataTable> DataSourceDialog::table() const

@@ -82,7 +82,15 @@ std::optional<QList<LabelDocument>> MainWindow::labelsToPrint()
 
     // The questions first: their answers go on every label of the run.
     QHash<QString, QString> answers;
-    if (!document.questions.isEmpty()) {
+    if (m_printOnly) {
+        // Print-only mode has the form at hand: its answers, once they do.
+        if (const auto problem = m_printOnlyPanel->problem()) {
+            KMessageBox::error(this, *problem);
+            return std::nullopt;
+        }
+        answers = m_printOnlyPanel->answers();
+        m_answers = answers;
+    } else if (!document.questions.isEmpty()) {
         // Drop-downs and lookups may come from the data source.
         ensureDataLoaded(true);
         AnswersDialog dialog(document.questions, m_answers, m_dataTable, this);
@@ -225,6 +233,14 @@ void MainWindow::printLabels(const QList<LabelDocument> &prepared)
         qWarning("Could not keep the label in the recently used layouts: %s", qPrintable(recentError));
     }
     advanceCounters(printer.printedLabels(), sharedNext);
+    // In print-only mode the label keeps its counters itself: nobody will
+    // save it by hand.
+    if (m_printOnly && m_editor->isModified() && !m_editor->fileName().isEmpty()) {
+        QString saveError;
+        if (!m_editor->save(m_editor->fileName(), &saveError)) {
+            KMessageBox::error(this, i18n("The counters could not be saved in the label:\n%1", saveError));
+        }
+    }
     // What was printed is the best guess of the labels in the printer.
     settings().writeEntry("Paper", m_editor->document().paperName);
     QString message = i18np("Sent one label to %2 as job %3.", "Sent %1 labels to %2 as job %3.", printer.printedLabels(), printerName, job);

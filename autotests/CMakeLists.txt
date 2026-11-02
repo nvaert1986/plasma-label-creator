@@ -71,6 +71,7 @@ if(BUILD_APP)
         ${CMAKE_SOURCE_DIR}/src/app/datadialogs.cpp
         ${CMAKE_SOURCE_DIR}/src/app/datareader.cpp
         ${CMAKE_SOURCE_DIR}/src/app/layersdialog.cpp
+        ${CMAKE_SOURCE_DIR}/src/app/printonlypanel.cpp
         ${CMAKE_SOURCE_DIR}/src/app/gs1dialog.cpp
         ${CMAKE_SOURCE_DIR}/src/app/rolllayoutdialog.cpp
         LINK_LIBRARIES labelcreatorcore Qt6::Test Qt6::Widgets Qt6::Sql KF6::Archive KF6::I18n

@@ -1,0 +1,11 @@
+# SPDX-FileCopyrightText: 2026 nvaert1986 <25772781+nvaert1986@users.noreply.github.com>
+# SPDX-License-Identifier: CC0-1.0
+[Desktop Entry]
+Type=Application
+Name=Label Printing
+GenericName=Label Printing
+Comment=Choose a label, fill in its form and print it, without editing
+Exec=plasma-label-creator --print-only %F
+Icon=document-print-direct
+Terminal=false
+Categories=Qt;KDE;Office;

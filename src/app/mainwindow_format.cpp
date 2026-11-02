@@ -282,84 +282,85 @@ void MainWindow::updateFormatActions()
     std::optional<VerticalAlignment> vertical;
     if (index >= 0) {
         std::visit(
-                [&](const auto &o) {
-                    using T = std::decay_t<decltype(o)>;
-                    if constexpr (std::is_same_v<T, TextObject> || std::is_same_v<T, AddressObject> || std::is_same_v<T, ImageObject>) {
-                        horizontal = o.horizontalAlignment;
-                        vertical = o.verticalAlignment;
-                    } else if constexpr (std::is_same_v<T, CounterObject> || std::is_same_v<T, DateTimeObject>) {
-                        horizontal = o.layout.horizontalAlignment;
-                        vertical = o.layout.verticalAlignment;
-                    } else if constexpr (std::is_same_v<T, BarcodeObject>) {
-                        horizontal = o.horizontalAlignment;
-                    } else if constexpr (std::is_same_v<T, CircularTextObject>) {
-                        horizontal = o.textAlignment;
-                    }
-                },
-                m_editor->document().objects.at(index));
-        }
-
-        const std::optional<LabelFont> font = selectedFont();
-        for (QAction *action : std::initializer_list<QAction *>{m_fontFamily, m_fontSize, m_bold, m_italic, m_underline, m_strikeout}) {
-            action->setEnabled(font.has_value());
-        }
-        actionCollection()->action(u"format_font_grow"_s)->setEnabled(font.has_value());
-        actionCollection()->action(u"format_font_shrink"_s)->setEnabled(font.has_value());
-        if (font) {
-            // Showing the font must not change it.
-            const QSignalBlocker familyBlocker(m_fontFamily);
-            const QSignalBlocker sizeBlocker(m_fontSize);
-            m_fontFamily->setFont(font->family);
-            m_fontSize->setFontSize(qRound(font->size));
-            m_bold->setChecked(font->bold);
-            m_italic->setChecked(font->italic);
-            m_underline->setChecked(font->underline);
-            m_strikeout->setChecked(font->strikeout);
-        }
-
-        const bool invertible = index >= 0 && ObjectFactory::canInvert(m_editor->document().objects.at(index));
-        m_inverted->setEnabled(invertible);
-        m_inverted->setChecked(invertible && ObjectFactory::isInverted(m_editor->document().objects.at(index)));
-
-        std::optional<TextFitMode> fitMode;
-        bool wraps = false;
-        if (index >= 0) {
-            const LabelObject &object = m_editor->document().objects.at(index);
-            if (const auto *text = std::get_if<TextObject>(&object)) {
-                fitMode = text->fitMode;
-                wraps = text->wrap;
-            } else if (const auto *address = std::get_if<AddressObject>(&object)) {
-                fitMode = address->fitMode;
-                wraps = address->wrap;
-            }
-        }
-        m_wrap->setEnabled(fitMode.has_value());
-        m_wrap->setChecked(wraps);
-        const QList<TextFitMode> fitModes = {TextFitMode::None, TextFitMode::ShrinkToFit, TextFitMode::AlwaysFit};
-        for (int i = 0; i < m_fitModes.size(); ++i) {
-            m_fitModes.at(i)->setEnabled(fitMode.has_value());
-            m_fitModes.at(i)->setChecked(fitMode == fitModes.at(i));
-        }
-
-        const QList<HorizontalAlignment> horizontals = {HorizontalAlignment::Left, HorizontalAlignment::Center, HorizontalAlignment::Right};
-        for (int i = 0; i < m_horizontalAlignment.size(); ++i) {
-            m_horizontalAlignment.at(i)->setEnabled(horizontal.has_value());
-            m_horizontalAlignment.at(i)->setChecked(horizontal == horizontals.at(i));
-        }
-        const QList<VerticalAlignment> verticals = {VerticalAlignment::Top, VerticalAlignment::Middle, VerticalAlignment::Bottom};
-        for (int i = 0; i < m_verticalAlignment.size(); ++i) {
-            m_verticalAlignment.at(i)->setEnabled(vertical.has_value());
-            m_verticalAlignment.at(i)->setChecked(vertical == verticals.at(i));
-        }
-        // The drop-downs show the alignment chosen.
-        const auto showChosen = [](KActionMenu *menu, const QList<KToggleAction *> &choices, bool enabled) {
-            menu->setEnabled(enabled);
-            for (KToggleAction *choice : choices) {
-                if (choice->isChecked()) {
-                    menu->setIcon(choice->icon());
+            [&](const auto &o) {
+                using T = std::decay_t<decltype(o)>;
+                if constexpr (std::is_same_v<T, TextObject> || std::is_same_v<T, AddressObject> || std::is_same_v<T, ImageObject>) {
+                    horizontal = o.horizontalAlignment;
+                    vertical = o.verticalAlignment;
+                } else if constexpr (std::is_same_v<T, CounterObject> || std::is_same_v<T, DateTimeObject>) {
+                    horizontal = o.layout.horizontalAlignment;
+                    vertical = o.layout.verticalAlignment;
+                } else if constexpr (std::is_same_v<T, BarcodeObject>) {
+                    horizontal = o.horizontalAlignment;
+                } else if constexpr (std::is_same_v<T, CircularTextObject>) {
+                    horizontal = o.textAlignment;
                 }
-            }
-        };
-        showChosen(m_horizontalMenu, m_horizontalAlignment, horizontal.has_value());
-        showChosen(m_verticalMenu, m_verticalAlignment, vertical.has_value());
+            },
+            m_editor->document().objects.at(index));
     }
+
+    const std::optional<LabelFont> font = selectedFont();
+    for (QAction *action : std::initializer_list<QAction *>{m_fontFamily, m_fontSize, m_bold, m_italic, m_underline, m_strikeout}) {
+        action->setEnabled(font.has_value());
+    }
+    actionCollection()->action(u"format_font_grow"_s)->setEnabled(font.has_value());
+    actionCollection()->action(u"format_font_shrink"_s)->setEnabled(font.has_value());
+    if (font) {
+        // Showing the font must not change it.
+        const QSignalBlocker familyBlocker(m_fontFamily);
+        const QSignalBlocker sizeBlocker(m_fontSize);
+        m_fontFamily->setFont(font->family);
+        m_fontSize->setFontSize(qRound(font->size));
+        m_bold->setChecked(font->bold);
+        m_italic->setChecked(font->italic);
+        m_underline->setChecked(font->underline);
+        m_strikeout->setChecked(font->strikeout);
+    }
+
+    const bool invertible = index >= 0 && ObjectFactory::canInvert(m_editor->document().objects.at(index));
+    m_inverted->setEnabled(invertible);
+    m_inverted->setChecked(invertible && ObjectFactory::isInverted(m_editor->document().objects.at(index)));
+
+    std::optional<TextFitMode> fitMode;
+    bool wraps = false;
+    if (index >= 0) {
+        const LabelObject &object = m_editor->document().objects.at(index);
+        if (const auto *text = std::get_if<TextObject>(&object)) {
+            fitMode = text->fitMode;
+            wraps = text->wrap;
+        } else if (const auto *address = std::get_if<AddressObject>(&object)) {
+            fitMode = address->fitMode;
+            wraps = address->wrap;
+        }
+    }
+    m_wrap->setEnabled(fitMode.has_value());
+    m_wrap->setChecked(wraps);
+    const QList<TextFitMode> fitModes = {TextFitMode::None, TextFitMode::ShrinkToFit, TextFitMode::AlwaysFit};
+    for (int i = 0; i < m_fitModes.size(); ++i) {
+        m_fitModes.at(i)->setEnabled(fitMode.has_value());
+        m_fitModes.at(i)->setChecked(fitMode == fitModes.at(i));
+    }
+
+    const QList<HorizontalAlignment> horizontals = {HorizontalAlignment::Left, HorizontalAlignment::Center, HorizontalAlignment::Right};
+    for (int i = 0; i < m_horizontalAlignment.size(); ++i) {
+        m_horizontalAlignment.at(i)->setEnabled(horizontal.has_value());
+        m_horizontalAlignment.at(i)->setChecked(horizontal == horizontals.at(i));
+    }
+    const QList<VerticalAlignment> verticals = {VerticalAlignment::Top, VerticalAlignment::Middle, VerticalAlignment::Bottom};
+    for (int i = 0; i < m_verticalAlignment.size(); ++i) {
+        m_verticalAlignment.at(i)->setEnabled(vertical.has_value());
+        m_verticalAlignment.at(i)->setChecked(vertical == verticals.at(i));
+    }
+    // The drop-downs show the alignment chosen.
+    const auto showChosen = [](KActionMenu *menu, const QList<KToggleAction *> &choices, bool enabled) {
+        menu->setEnabled(enabled);
+        for (KToggleAction *choice : choices) {
+            if (choice->isChecked()) {
+                menu->setIcon(choice->icon());
+            }
+        }
+    };
+    showChosen(m_horizontalMenu, m_horizontalAlignment, horizontal.has_value());
+    showChosen(m_verticalMenu, m_verticalAlignment, vertical.has_value());
+    keepEditingOff();
+}

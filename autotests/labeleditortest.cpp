@@ -552,6 +552,41 @@ private Q_SLOTS:
         grab(&view, u"turned"_s);
     }
 
+    void readOnlyShowsAndTakesNoEditing()
+    {
+        LabelEditor editor;
+        editor.reset(addressLabel());
+        LabelView view(&editor);
+        view.resize(800, 400);
+        view.show();
+        QVERIFY(QTest::qWaitForWindowExposed(&view));
+        view.setZoom(1.0);
+        editor.setSelection(0);
+        view.setReadOnly(true);
+        QCOMPARE(editor.selection(), -1);
+        const QRectF bounds = objectBase(editor.document().objects.at(0)).bounds;
+        const QPoint centre = (view.labelOrigin() + bounds.center() * view.scale()).toPoint();
+        QTest::mousePress(&view, Qt::LeftButton, {}, centre);
+        QTest::mouseMove(&view, centre + QPoint(40, 0));
+        QTest::mouseRelease(&view, Qt::LeftButton, {}, centre + QPoint(40, 0));
+        QTest::keyClick(&view, Qt::Key_Delete);
+        QCOMPARE(editor.selection(), -1);
+        QCOMPARE(editor.undoStack()->count(), 0);
+        QVERIFY(!view.acceptDrops());
+
+        // It can show another document, the label filled in; editing it
+        // again shows the editor's.
+        LabelDocument filled = editor.document();
+        std::get<TextObject>(filled.objects[0]).spans.first().text = u"Filled"_s;
+        view.setShownDocument(filled);
+        QImage shown(view.size(), QImage::Format_ARGB32);
+        view.render(&shown);
+        view.setReadOnly(false);
+        QImage editing(view.size(), QImage::Format_ARGB32);
+        view.render(&editing);
+        QVERIFY(shown != editing);
+    }
+
     void severalObjectsCopyWithTheirGroup()
     {
         LabelDocument document = addressLabel();

@@ -65,6 +65,18 @@ public:
     void setPrintArea(const QRectF &area);
     QRectF printArea() const;
 
+    /**
+     * Shows the label as it prints, without frames, and takes no editing:
+     * no selecting, moving, typing or dropping. For print-only mode.
+     */
+    void setReadOnly(bool readOnly);
+    bool isReadOnly() const;
+    /**
+     * While read-only, shows @p document instead of the editor's: the label
+     * with its fields filled in, say. nullopt shows the editor's again.
+     */
+    void setShownDocument(const std::optional<LabelCreator::LabelDocument> &document);
+
     /** Dots over the label at every grid point. */
     void setGridVisible(bool visible);
     bool isGridVisible() const;
@@ -159,6 +171,8 @@ private:
     QPointF m_rubberStart;
     QList<int> m_rubberBase;
 
+    bool m_readOnly = false;
+    std::optional<LabelCreator::LabelDocument> m_shownDocument; // while read-only
     QRectF m_printArea;
     bool m_gridVisible = false;
     bool m_snapToGrid = false;

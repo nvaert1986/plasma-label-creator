@@ -138,6 +138,29 @@ void LabelView::setGridSpacing(qreal twips)
     update();
 }
 
+void LabelView::setReadOnly(bool readOnly)
+{
+    if (m_readOnly == readOnly) {
+        return;
+    }
+    m_readOnly = readOnly;
+    m_shownDocument.reset();
+    if (readOnly) {
+        finishTextEdit(true);
+        m_dragDocument.reset();
+        m_rubberBand.reset();
+        m_editor->setSelection(-1);
+        unsetCursor();
+    }
+    setAcceptDrops(!readOnly);
+    update();
+}
+
+bool LabelView::isReadOnly() const
+{
+    return m_readOnly;
+}
+
 qreal LabelView::gridSpacing() const
 {
     return m_gridSpacing;
@@ -286,7 +309,16 @@ void LabelView::updateFitZoom()
 
 const LabelDocument &LabelView::shownDocument() const
 {
+    if (m_readOnly && m_shownDocument) {
+        return *m_shownDocument;
+    }
     return m_dragDocument ? *m_dragDocument : m_editor->document();
+}
+
+void LabelView::setShownDocument(const std::optional<LabelDocument> &document)
+{
+    m_shownDocument = document;
+    update();
 }
 
 qreal LabelView::scale() const
@@ -442,6 +474,11 @@ void LabelView::paintEvent(QPaintEvent *)
         painter.drawRect(toWidget(m_printArea));
     }
 
+    // Read-only: the label as it prints, nothing more.
+    if (m_readOnly) {
+        return;
+    }
+
     // Faint frames show where every object is, including empty ones.
     painter.setRenderHint(QPainter::Antialiasing, false);
     painter.setBrush(Qt::NoBrush);
@@ -543,7 +580,7 @@ void LabelView::resizeEvent(QResizeEvent *event)
 
 void LabelView::mousePressEvent(QMouseEvent *event)
 {
-    if (event->button() != Qt::LeftButton) {
+    if (event->button() != Qt::LeftButton || m_readOnly) {
         return;
     }
     setFocus();
@@ -612,6 +649,9 @@ void LabelView::mousePressEvent(QMouseEvent *event)
 
 void LabelView::mouseMoveEvent(QMouseEvent *event)
 {
+    if (m_readOnly) {
+        return;
+    }
     if (m_rubberBand) {
         m_rubberBand = QRectF(m_rubberStart, event->position()).normalized();
         const QRectF band(toTwips(m_rubberBand->topLeft()), toTwips(m_rubberBand->bottomRight()));
@@ -787,6 +827,9 @@ void LabelView::mouseReleaseEvent(QMouseEvent *event)
 
 void LabelView::mouseDoubleClickEvent(QMouseEvent *event)
 {
+    if (m_readOnly) {
+        return;
+    }
     const int index = objectAt(event->position());
     if (index >= 0) {
         m_editor->setSelectedObjects(Arrange::withGroups(m_editor->document(), {index}), index);
@@ -814,6 +857,10 @@ void LabelView::moveSelection(const QPointF &delta, const QString &description)
 
 void LabelView::keyPressEvent(QKeyEvent *event)
 {
+    if (m_readOnly) {
+        QWidget::keyPressEvent(event);
+        return;
+    }
     const qreal step = event->modifiers() & Qt::ShiftModifier ? LargeNudgeStep : NudgeStep;
     switch (event->key()) {
     case Qt::Key_Left:
@@ -864,6 +911,9 @@ void LabelView::wheelEvent(QWheelEvent *event)
 
 void LabelView::contextMenuEvent(QContextMenuEvent *event)
 {
+    if (m_readOnly) {
+        return;
+    }
     // On an object outside the selection, the menu is for that object (and its group).
     const int index = objectAt(event->pos());
     if (index >= 0 && !m_editor->isSelected(index)) {

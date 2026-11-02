@@ -24,6 +24,7 @@
 #include "layersdialog.h"
 #include "mainwindow.h"
 #include "printbar.h"
+#include "printonlypanel.h"
 #include "printpreviewdialog.h"
 #include "propertiesdialog.h"
 #include "recentlayoutsmenu.h"

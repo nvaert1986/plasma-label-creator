@@ -55,12 +55,17 @@ MainWindow::MainWindow(QWidget *parent)
     centreLayout->addWidget(line);
     centreLayout->addWidget(m_printBar);
 
-    auto *splitter = new QSplitter;
-    splitter->addWidget(m_sidebar);
-    splitter->addWidget(centre);
-    splitter->setStretchFactor(1, 1);
-    splitter->setSizes({300, 750});
-    setCentralWidget(splitter);
+    // Print-only mode swaps the side panel for a folder of labels and a form.
+    m_printOnlyPanel = new PrintOnlyPanel;
+    m_printOnlyPanel->hide();
+    m_splitter = new QSplitter;
+    m_splitter->addWidget(m_sidebar);
+    m_splitter->addWidget(m_printOnlyPanel);
+    m_splitter->addWidget(centre);
+    m_splitter->setStretchFactor(2, 1); // the canvas takes the room
+    m_splitter->setCollapsible(2, false);
+    m_splitter->setSizes({300, 0, 750});
+    setCentralWidget(m_splitter);
 
     setupActions();
     // First-run size; setupGUI() restores the user's own size after that.
@@ -121,7 +126,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_printBar, &PrintBar::printOffsetRequested, this, &MainWindow::editPrintOffset);
     // Custom sizes only for printers that print them (not a DYMO).
     const auto updateCustomSize = [this]() {
-        actionCollection()->action(u"label_custom_size"_s)->setEnabled(m_printBar->acceptsCustomSizes());
+        actionCollection()->action(u"label_custom_size"_s)->setEnabled(m_printBar->acceptsCustomSizes() && !m_printOnly);
     };
     connect(m_printBar, &PrintBar::paperSizesChanged, this, updateCustomSize);
     updateCustomSize();
@@ -156,6 +161,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     m_printBar->selectStartupPrinter(settings().readEntry("Printer", QString()));
     newLabel();
+    // Closed in print-only mode last time: the designer's toolbars come back.
+    if (settings().readEntry("PrintOnly", false)) {
+        setPrintOnly(false);
+    }
 }
 
 QWidget *MainWindow::createInfoBar()
@@ -229,8 +238,13 @@ void MainWindow::setupActions()
     QAction *redo = KStandardAction::redo(undoStack, &QUndoStack::redo, actions);
     undo->setEnabled(false);
     redo->setEnabled(false);
-    connect(undoStack, &QUndoStack::canUndoChanged, undo, &QAction::setEnabled);
-    connect(undoStack, &QUndoStack::canRedoChanged, redo, &QAction::setEnabled);
+    // Nothing to undo in print-only mode, where the label cannot be edited.
+    connect(undoStack, &QUndoStack::canUndoChanged, undo, [this, undo](bool can) {
+        undo->setEnabled(can && !m_printOnly);
+    });
+    connect(undoStack, &QUndoStack::canRedoChanged, redo, [this, redo](bool can) {
+        redo->setEnabled(can && !m_printOnly);
+    });
 
     QAction *remove = actions->addAction(u"edit_delete"_s, this, &MainWindow::deleteObject);
     remove->setText(i18n("Delete Object"));
@@ -251,7 +265,7 @@ void MainWindow::setupActions()
     m_paste->setShortcutContext(Qt::WidgetWithChildrenShortcut);
     m_view->addAction(m_paste);
     const auto updatePaste = [this]() {
-        m_paste->setEnabled(LabelClipboard::canPaste(QApplication::clipboard()->mimeData()));
+        m_paste->setEnabled(LabelClipboard::canPaste(QApplication::clipboard()->mimeData()) && !m_printOnly);
     };
     connect(QApplication::clipboard(), &QClipboard::dataChanged, this, updatePaste);
     updatePaste();
@@ -287,6 +301,7 @@ void MainWindow::setupActions()
     setupViewActions();
     setupDataActions();
     setupArrangeActions();
+    setupPrintOnlyActions();
 
     const auto addInsert = [&](const QString &name, const QString &text, const QString &icon, ObjectFactory::Kind kind) {
         QAction *action = actions->addAction(name, this, [this, kind]() {
@@ -620,7 +635,8 @@ void MainWindow::followPrinter()
 {
     const LabelDocument &document = m_editor->document();
     const bool untouched = document.objects.isEmpty() && !m_editor->isModified() && m_editor->fileName().isEmpty();
-    if (m_printBar->paperSizes().isEmpty() || (!untouched && !m_followPrinter)) {
+    // A label chosen to print stays the label it is.
+    if (m_printOnly || m_printBar->paperSizes().isEmpty() || (!untouched && !m_followPrinter)) {
         return;
     }
     if (!labelFitsPrinter()) {
@@ -796,6 +812,7 @@ void MainWindow::updateActions()
     const bool landscape = m_editor->document().orientation == PaperOrientation::Landscape;
     m_landscape->setChecked(landscape);
     m_portrait->setChecked(!landscape);
+    keepEditingOff();
 }
 
 void MainWindow::updateStatus()
