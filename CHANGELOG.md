@@ -107,6 +107,8 @@
   earlier versions, for the 57 label types that have one.
 - Reading CSV files moved into the core library, for the automation
   service; no change in use.
+- INSTALL.md lists the Qt SQL drivers for printing from databases on each
+  distribution; the database test skips itself without Qt's SQLite driver.
 
 ## 0.3.0 (2026-10-30)
 

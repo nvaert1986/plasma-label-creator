@@ -26,6 +26,7 @@ been tried; if one does not, please report it.
 | Qt 6: Widgets, PrintSupport, DBus, Sql (application) | 6.7 | 6.11 |
 | Qt 6: Test (only for the tests) | 6.7 | 6.11 |
 | Qt 6: HttpServer (optional: print requests over HTTP) | 6.8 | 6.11 |
+| Qt SQL drivers (optional, at run time: printing from databases; the SQLite driver also for the database test) | 6.7 | 6.11 (SQLite, ODBC) |
 | KDE Frameworks 6: Archive, ConfigWidgets, CoreAddons, Crash, I18n, IconThemes, WidgetsAddons, XmlGui | 6.0 | 6.29 |
 | zint, with its CMake package files | any 2.x that installs them | 2.16 |
 | CUPS library and headers | 2.x | 2.4 |
@@ -61,9 +62,14 @@ emerge --ask --noreplace dev-qt/qthttpserver
 ```
 
 `dev-qt/qtbase` needs the USE flags `gui`, `widgets`, `network`, `dbus` and
-`sql` (a KDE Plasma system has them), plus `sqlite` for SQLite databases and
-`odbc` for SQL Server, Access and other databases through ODBC. Printing from
-MySQL or PostgreSQL needs the `mysql` or `postgres` flag.
+`sql` (a KDE Plasma system has them).
+
+Printing from a database is optional and needs the Qt SQL driver for it,
+also flags of `dev-qt/qtbase`: `sqlite` for SQLite files, `odbc` for SQL
+Server, Access and other databases through ODBC, `mysql` for MySQL and
+MariaDB, `postgres` for PostgreSQL. The data source dialog only offers the
+drivers that are installed. The database test uses SQLite and skips itself
+without it.
 
 **Debian / Ubuntu** (with KDE Frameworks 6, e.g. Debian 13)
 
@@ -74,6 +80,8 @@ apt install build-essential cmake ninja-build extra-cmake-modules pkgconf \
     libkf6widgetsaddons-dev libkf6xmlgui-dev libzint-dev libcups2-dev \
     libudev-dev
 apt install qt6-httpserver-dev   # optional: print requests over HTTP
+# optional: printing from databases (SQLite, ODBC, MySQL, PostgreSQL)
+apt install libqt6sql6-sqlite libqt6sql6-odbc libqt6sql6-mysql libqt6sql6-psql
 ```
 
 **Fedora**
@@ -85,6 +93,8 @@ dnf install gcc-c++ cmake ninja-build extra-cmake-modules pkgconf \
     kf6-kwidgetsaddons-devel kf6-kxmlgui-devel zint-devel cups-devel \
     systemd-devel
 dnf install qt6-qthttpserver-devel   # optional: print requests over HTTP
+# optional: printing from databases; SQLite comes with qt6-qtbase
+dnf install qt6-qtbase-odbc qt6-qtbase-mysql qt6-qtbase-postgresql
 ```
 
 **Arch Linux**
@@ -95,6 +105,9 @@ pacman -S --needed base-devel cmake ninja extra-cmake-modules qt6-base \
     kxmlgui zint cups systemd-libs
 pacman -S --needed qt6-httpserver   # optional: print requests over HTTP
 ```
+
+qt6-base has the SQLite driver; for ODBC, MySQL and PostgreSQL databases
+also install `unixodbc`, `mariadb-libs` or `postgresql-libs`.
 
 Qt HTTP Server is found when the build is configured: install it before
 running CMake (or run CMake again after installing it). The summary at the
@@ -128,12 +141,14 @@ ctest --test-dir build --output-on-failure
 ```
 
 The programs are then in `build/bin/`: `plasma-label-creator` (the
-application) and `plasma-label-creator-render` (the command-line tool). You
-can run them from there without installing.
+application), `plasma-label-creator-render` (the command-line tool) and
+`plasma-label-creator-automation` (the automation service). You can run
+them from there without installing.
 
-The tests need no display and no printers. A few that compare against a
-real DYMO Label Software installation or real labels skip themselves when
-those are not there.
+The tests need no display and no printers. A few skip themselves when what
+they need is not there: real DYMO Label Software files or labels, DYMO's or
+CUPS's label drivers, Qt's SQLite driver (the database test) and Qt HTTP
+Server (requests over HTTP).
 
 ### For development
 

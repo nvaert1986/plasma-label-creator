@@ -175,6 +175,9 @@ private Q_SLOTS:
 
     void readsADatabase()
     {
+        if (!QSqlDatabase::isDriverAvailable(u"QSQLITE"_s)) {
+            QSKIP("Qt's SQLite driver is not installed (dev-qt/qtbase[sqlite], libqt6sql6-sqlite)");
+        }
         QTemporaryDir dir;
         const QString file = dir.filePath(u"assets.sqlite"_s);
         {

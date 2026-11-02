@@ -142,6 +142,8 @@ for those, make the label size with Layout > Custom Label Size….
 - To print: CUPS with DYMO's driver for DYMO printers, or CUPS's own Zebra
   ZPL driver for Altec and Zebra printers (also for labels across the roll
   and continuous rolls).
+- Optional: the Qt SQL driver of a database (SQLite, ODBC, MySQL,
+  PostgreSQL), to print from it; spreadsheets and CSV files need none.
 - Optional: Qt HTTP Server (6.8 or newer), for print requests over HTTP in
   the automation service. Without it the service watches folders only, and
   the settings show the HTTP part greyed out.
