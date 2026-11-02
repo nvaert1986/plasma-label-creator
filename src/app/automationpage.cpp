@@ -9,6 +9,7 @@
 #include "labelprinter.h"
 
 #include <KLocalizedString>
+#include <KColorScheme>
 #include <KMessageBox>
 
 #include <QApplication>
@@ -20,12 +21,14 @@
 #include <QDir>
 #include <QFileDialog>
 #include <QFileInfo>
+#include <QFileSystemWatcher>
 #include <QFormLayout>
 #include <QGroupBox>
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QLabel>
 #include <QLineEdit>
+#include <QLocale>
 #include <QProcess>
 #include <QPushButton>
 #include <QRadioButton>
@@ -168,8 +171,15 @@ AutomationPage::AutomationPage(const QString &settingsFile, QWidget *parent)
     connect(m_startStop, &QPushButton::clicked, this, [this]() {
         Automation::servicePid() > 0 ? stopService() : startService();
     });
+    auto *recent = new QPushButton(QIcon::fromTheme(u"view-history"_s), i18n("Recent Jobs…"));
+    recent->setToolTip(i18n("What the service printed lately, and why a job was not printed"));
+    connect(recent, &QPushButton::clicked, this, [this]() {
+        RecentJobsDialog dialog(Automation::jobLogFileName(), this);
+        dialog.exec();
+    });
     auto *statusRow = new QHBoxLayout;
     statusRow->addWidget(m_status, 1);
+    statusRow->addWidget(recent);
     statusRow->addWidget(m_startStop);
     serviceForm->addRow(i18n("Status:"), statusRow);
     m_atLogin = new QCheckBox(i18n("Start the service when I log in"));
@@ -459,4 +469,63 @@ void AutomationPage::updateExample()
     m_example->setText(i18n("For example:\ncurl -H \"Authorization: Bearer <token>\" -H \"Content-Type: application/json\" -d '{\"label\": \"Rack/patch panel\", "
                             "\"values\": {\"Port\": \"A12\"}}' http://localhost:%1/v1/print",
                             m_port->value()));
+}
+
+RecentJobsDialog::RecentJobsDialog(const QString &fileName, QWidget *parent)
+    : QDialog(parent)
+    , m_fileName(fileName)
+    , m_watcher(new QFileSystemWatcher(this))
+{
+    setWindowTitle(i18n("Recent Automation Jobs"));
+    auto *layout = new QVBoxLayout(this);
+    m_list = new QTreeWidget;
+    m_list->setHeaderLabels({i18n("When"), i18n("From"), i18n("Label"), i18n("Printer"), i18n("Labels"), i18n("Result")});
+    m_list->setRootIsDecorated(false);
+    m_list->setAlternatingRowColors(true);
+    m_list->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    m_list->header()->setStretchLastSection(true);
+    layout->addWidget(m_list, 1);
+    m_empty = new QLabel(i18n("The automation service has not taken any jobs yet."));
+    m_empty->setEnabled(false);
+    layout->addWidget(m_empty);
+    auto *buttons = new QDialogButtonBox(QDialogButtonBox::Close);
+    auto *refresh = buttons->addButton(i18n("Refresh"), QDialogButtonBox::ActionRole);
+    refresh->setIcon(QIcon::fromTheme(u"view-refresh"_s));
+    connect(refresh, &QPushButton::clicked, this, &RecentJobsDialog::reload);
+    connect(buttons, &QDialogButtonBox::rejected, this, &QDialog::reject);
+    layout->addWidget(buttons);
+    // The service adds to the file, or cuts it back by replacing it: the
+    // folder is watched as well.
+    m_watcher->addPath(QFileInfo(m_fileName).absolutePath());
+    connect(m_watcher, &QFileSystemWatcher::fileChanged, this, &RecentJobsDialog::reload);
+    connect(m_watcher, &QFileSystemWatcher::directoryChanged, this, &RecentJobsDialog::reload);
+    reload();
+    resize(900, 420);
+}
+
+void RecentJobsDialog::reload()
+{
+    if (QFileInfo::exists(m_fileName) && !m_watcher->files().contains(m_fileName)) {
+        m_watcher->addPath(m_fileName);
+    }
+    m_list->clear();
+    const QBrush failed = KColorScheme(QPalette::Active, KColorScheme::View).foreground(KColorScheme::NegativeText);
+    for (const AutomationJob &job : Automation::recentJobs(m_fileName)) {
+        const QString result = job.printed ? i18n("Printed, job %1", job.job) : job.message.section(u'\n', 0, 0);
+        auto *item = new QTreeWidgetItem(m_list,
+                                         {QLocale().toString(job.when, QLocale::ShortFormat),
+                                          job.source,
+                                          job.label,
+                                          job.printer,
+                                          job.printed ? QString::number(job.labels) : QString(),
+                                          result});
+        // The whole message, notes included.
+        for (int column = 0; column < m_list->columnCount(); ++column) {
+            item->setToolTip(column, job.message);
+        }
+        if (!job.printed) {
+            item->setForeground(5, failed);
+        }
+    }
+    m_empty->setVisible(m_list->topLevelItemCount() == 0);
 }

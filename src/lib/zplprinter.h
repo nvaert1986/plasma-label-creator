@@ -61,6 +61,12 @@ bool parseHostStatus(const QByteArray &answer, ZplPrinterInfo *info);
 /** The answer to ^HH: one setting per line, value first, name second. */
 QMap<QString, QString> parseConfiguration(const QByteArray &answer);
 
+/**
+ * Whether a label @p labelLengthMm long along the feed fits the length the
+ * printer measured, @p loadedLengthMm, which may include up to 3 mm of gap.
+ */
+bool fitsLoaded(qreal labelLengthMm, qreal loadedLengthMm);
+
 /** The host and port of a socket://host:port device address; nullopt for others. */
 std::optional<std::pair<QString, quint16>> networkAddress(const QString &deviceUri);
 

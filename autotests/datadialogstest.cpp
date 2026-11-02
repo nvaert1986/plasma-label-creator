@@ -25,6 +25,7 @@
 #include <QGroupBox>
 #include <QSignalSpy>
 #include <QListWidget>
+#include <QTreeWidget>
 #include <QStackedWidget>
 #include <QPlainTextEdit>
 #include <QDateEdit>
@@ -542,6 +543,27 @@ private Q_SLOTS:
         QCOMPARE(AutomationSettings::load(file), page.settings());
         // Not asked to start at log-in: no autostart entry.
         QVERIFY(!QFileInfo::exists(AutomationPage::autostartFile()));
+    }
+
+    void recentJobsAreListed()
+    {
+        QTemporaryDir dir;
+        const QString log = dir.filePath(u"jobs.jsonl"_s);
+        RecentJobsDialog dialog(log, nullptr);
+        dialog.show();
+        QVERIFY(QTest::qWaitForWindowExposed(&dialog));
+        auto *list = dialog.findChild<QTreeWidget *>();
+        QCOMPARE(list->topLevelItemCount(), 0);
+        AutomationJob printed{QDateTime::currentDateTime(), u"HTTP from 127.0.0.1"_s, u"box.label"_s, u"Zebra"_s, true, 3, 42, u"Sent 3 label(s)."_s};
+        AutomationJob failed{QDateTime::currentDateTime(), u"Folder: /srv/jobs/rows.csv"_s, u"box.label"_s, u"Zebra"_s, false, 0, 0, u"Zebra reports: paused.\nmore"_s};
+        QVERIFY(Automation::logJob(printed, log));
+        QVERIFY(Automation::logJob(failed, log));
+        // The service adds jobs while it is open: it follows.
+        QTRY_COMPARE(list->topLevelItemCount(), 2);
+        QCOMPARE(list->topLevelItem(0)->text(5), u"Zebra reports: paused."_s);
+        QCOMPARE(list->topLevelItem(0)->toolTip(5), u"Zebra reports: paused.\nmore"_s);
+        QVERIFY(list->topLevelItem(1)->text(5).contains(u"42"_s));
+        grab(&dialog, u"recent-jobs"_s);
     }
 
     void exportChoosesFormatAndOutline()

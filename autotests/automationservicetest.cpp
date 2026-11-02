@@ -88,6 +88,7 @@ private Q_SLOTS:
         QVERIFY(settings.save(settingsFile));
 
         AutomationService service(settingsFile);
+        service.setJobLog(dir.filePath(u"jobs.jsonl"_s));
         service.start();
         QVERIFY(write(jobs + u"/rows.csv"_s, "Serial;Site\nA1;Utrecht\nA2;Delft\n"));
         QVERIFY(write(jobs + u"/broken.json"_s, "{not json"));
@@ -106,6 +107,14 @@ private Q_SLOTS:
         QVERIFY(read(jobs + u"/failed/named.json.txt"_s).contains("no label ../elsewhere"));
         // Not a job.
         QVERIFY(QFileInfo::exists(jobs + u"/ignored.pdf"_s));
+        // Each in the list of recent jobs, with where it came from and why.
+        const QList<AutomationJob> recent = Automation::recentJobs(dir.filePath(u"jobs.jsonl"_s));
+        QCOMPARE(recent.size(), 3);
+        for (const AutomationJob &job : recent) {
+            QVERIFY(job.source.startsWith(u"Folder: "_s + jobs));
+            QVERIFY(!job.printed);
+            QVERIFY(!job.message.isEmpty());
+        }
 
         // The same name again: kept beside the first.
         QVERIFY(write(jobs + u"/rows.csv"_s, "Serial\nB1\n"));
@@ -132,6 +141,7 @@ private Q_SLOTS:
         const QString settingsFile = dir.filePath(u"automation.json"_s);
         QVERIFY(settings.save(settingsFile));
         AutomationService service(settingsFile);
+        service.setJobLog(dir.filePath(u"jobs.jsonl"_s));
         service.start();
         QVERIFY(service.httpPort() > 0);
 
@@ -181,6 +191,12 @@ private Q_SLOTS:
         const Reply noPrinter = send("POST", u"/v1/print"_s, token, R"({"label": "Rack/patch", "values": {"Port": "A12"}})");
         QCOMPARE(noPrinter.status, 404);
         QVERIFY(noPrinter.json.value("error"_L1).toString().contains(NoPrinter));
+        // Requests that got as far as printing are in the list, with the address.
+        const QList<AutomationJob> recent = Automation::recentJobs(dir.filePath(u"jobs.jsonl"_s));
+        QCOMPARE(recent.size(), 2); // the label not found, and the printer not found
+        QCOMPARE(recent.first().source, u"HTTP from 127.0.0.1"_s);
+        QCOMPARE(recent.first().label, u"patch.label"_s);
+        QCOMPARE(recent.first().printer, NoPrinter);
     }
 };
 

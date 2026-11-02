@@ -225,7 +225,7 @@ QHttpServerResponse HttpApi::print(const QHttpServerRequest &request)
     if (!job) {
         return error(QHttpServerResponse::StatusCode::BadRequest, problem);
     }
-    const PrintOutcome outcome = m_service->print(*job);
+    const PrintOutcome outcome = m_service->print(*job, u"HTTP from %1"_s.arg(request.remoteAddress().toString()));
     using Code = QHttpServerResponse::StatusCode;
     switch (outcome.status) {
     case PrintOutcome::Status::Printed:

@@ -37,8 +37,12 @@ public:
     /**
      * Prints @p request: its label named in the labels folder, else
      * @p defaultLabel; its printer, else @p defaultPrinter, else the default.
+     * Kept in the list of recent jobs as coming from @p source.
      */
-    LabelCreator::PrintOutcome print(const LabelCreator::PrintRequest &request, const QString &defaultLabel = {}, const QString &defaultPrinter = {});
+    LabelCreator::PrintOutcome
+    print(const LabelCreator::PrintRequest &request, const QString &source, const QString &defaultLabel = {}, const QString &defaultPrinter = {});
+    /** Where the list of recent jobs is kept (the app's data folder unless set). */
+    void setJobLog(const QString &fileName);
 
     /** Whether the service can take requests over HTTP (built with Qt HTTP Server). */
     static bool hasHttp();
@@ -47,6 +51,7 @@ public:
 
 private:
     void reload();
+    void logJob(const LabelCreator::AutomationJob &job);
     void processFile(const LabelCreator::AutomationSettings::Folder &folder, const QString &fileName);
     /** Moves a job done with into @p subfolder of its folder, with @p message beside it. */
     void putAway(const QString &fileName, const QString &subfolder, const QString &message);
@@ -65,4 +70,5 @@ private:
     // Jobs that could not be put away, as they were then.
     QHash<QString, QDateTime> m_stuck;
     HttpApi *m_http = nullptr;
+    QString m_jobLog;
 };

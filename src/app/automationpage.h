@@ -7,10 +7,12 @@
 
 #include "automation.h"
 
+#include <QDialog>
 #include <QWidget>
 
 class QCheckBox;
 class QComboBox;
+class QFileSystemWatcher;
 class QGroupBox;
 class QLabel;
 class QLineEdit;
@@ -19,6 +21,23 @@ class QRadioButton;
 class QSpinBox;
 class QTimer;
 class QTreeWidget;
+
+/** The automation service's recent jobs: when, from where, what, and how it went. */
+class RecentJobsDialog : public QDialog
+{
+    Q_OBJECT
+
+public:
+    explicit RecentJobsDialog(const QString &fileName = LabelCreator::Automation::jobLogFileName(), QWidget *parent = nullptr);
+    /** Reads the list again; done by itself when the service adds a job. */
+    void reload();
+
+private:
+    QString m_fileName;
+    QTreeWidget *m_list;
+    QLabel *m_empty;
+    QFileSystemWatcher *m_watcher;
+};
 
 /**
  * Settings > Automation: the automation service, its watched folders, the

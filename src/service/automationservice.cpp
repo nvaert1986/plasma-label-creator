@@ -43,6 +43,7 @@ AutomationService::AutomationService(const QString &settingsFile, QObject *paren
     , m_watcher(new QFileSystemWatcher(this))
     , m_reloadTimer(new QTimer(this))
     , m_scanTimer(new QTimer(this))
+    , m_jobLog(Automation::jobLogFileName())
 {
     // Editors and the app replace the file: its folder is watched too, and
     // a burst of changes is read once.
@@ -62,6 +63,11 @@ AutomationService::~AutomationService() = default;
 bool AutomationService::hasHttp()
 {
     return LABELCREATOR_HTTP_SERVER;
+}
+
+void AutomationService::setJobLog(const QString &fileName)
+{
+    m_jobLog = fileName;
 }
 
 quint16 AutomationService::httpPort() const
@@ -162,50 +168,80 @@ void AutomationService::scanFolders()
     }
 }
 
-PrintOutcome AutomationService::print(const PrintRequest &request, const QString &defaultLabel, const QString &defaultPrinter)
+PrintOutcome AutomationService::print(const PrintRequest &request, const QString &source, const QString &defaultLabel, const QString &defaultPrinter)
 {
     PrintOutcome outcome;
     QString labelFile = defaultLabel;
+    PrintRequest job = request;
+    if (job.printer.isEmpty()) {
+        job.printer = defaultPrinter.isEmpty() ? m_settings.printer : defaultPrinter;
+    }
     if (!request.label.isEmpty()) {
         const auto found = Automation::labelInFolder(m_settings.labelsFolder, request.label);
         if (!found) {
             outcome.status = PrintOutcome::Status::NotFound;
             outcome.message = m_settings.labelsFolder.isEmpty() ? u"No labels folder is set in the automation settings."_s
                                                                 : u"There is no label %1 in the labels folder."_s.arg(request.label);
-            return outcome;
         }
-        labelFile = *found;
-    }
-    if (labelFile.isEmpty()) {
+        labelFile = found.value_or(QString());
+    } else if (labelFile.isEmpty()) {
         outcome.status = PrintOutcome::Status::BadRequest;
         outcome.message = u"No label: name one."_s;
-        return outcome;
     }
-    PrintRequest job = request;
-    if (job.printer.isEmpty()) {
-        job.printer = defaultPrinter.isEmpty() ? m_settings.printer : defaultPrinter;
+    if (!labelFile.isEmpty()) {
+        // The app's printer settings as they are now: a print offset or a
+        // printer's model may have changed since the service started.
+        PrintEnvironment environment = PrintEnvironment::fromAppConfig();
+        environment.saveCounters = m_settings.saveCounters;
+        outcome = Automation::print(labelFile, job, environment);
     }
-    // The app's printer settings as they are now: a print offset or a
-    // printer's model may have changed since the service started.
-    PrintEnvironment environment = PrintEnvironment::fromAppConfig();
-    environment.saveCounters = m_settings.saveCounters;
-    outcome = Automation::print(labelFile, job, environment);
+
+    const QString name = labelFile.isEmpty() ? request.label : QFileInfo(labelFile).fileName();
     if (outcome.status == PrintOutcome::Status::Printed) {
-        qInfo("%s: %s", qPrintable(QFileInfo(labelFile).fileName()), qPrintable(outcome.message));
+        qInfo("%s: %s", qPrintable(name), qPrintable(outcome.message));
     } else {
-        qWarning("%s: %s", qPrintable(QFileInfo(labelFile).fileName()), qPrintable(outcome.message));
+        qWarning("%s: %s", qPrintable(name), qPrintable(outcome.message));
     }
     for (const QString &warning : std::as_const(outcome.warnings)) {
         qWarning("  %s", qPrintable(warning));
     }
+    AutomationJob logged;
+    logged.when = QDateTime::currentDateTime();
+    logged.source = source;
+    logged.label = name;
+    logged.printer = job.printer;
+    logged.printed = outcome.status == PrintOutcome::Status::Printed;
+    logged.labels = outcome.labels;
+    logged.job = outcome.job;
+    logged.message = (QStringList{outcome.message} + outcome.warnings).join(u'\n');
+    logJob(logged);
     return outcome;
+}
+
+void AutomationService::logJob(const AutomationJob &job)
+{
+    if (!Automation::logJob(job, m_jobLog)) {
+        qWarning("Could not write the list of recent jobs, %s.", qPrintable(m_jobLog));
+    }
 }
 
 void AutomationService::processFile(const AutomationSettings::Folder &folder, const QString &fileName)
 {
     QFile file(fileName);
+    const QString source = u"Folder: %1"_s.arg(fileName);
+    const auto refuse = [&](const QString &reason) {
+        AutomationJob logged;
+        logged.when = QDateTime::currentDateTime();
+        logged.source = source;
+        logged.label = QFileInfo(folder.label).fileName();
+        logged.printer = folder.printer.isEmpty() ? m_settings.printer : folder.printer;
+        logged.message = reason;
+        logJob(logged);
+        qWarning("%s: %s", qPrintable(fileName), qPrintable(reason));
+        putAway(fileName, u"failed"_s, reason);
+    };
     if (file.size() > MaxJobSize || !file.open(QIODevice::ReadOnly)) {
-        putAway(fileName, u"failed"_s, file.size() > MaxJobSize ? u"The file is too large for a print job."_s : file.errorString());
+        refuse(file.size() > MaxJobSize ? u"The file is too large for a print job."_s : file.errorString());
         return;
     }
     const QByteArray data = file.readAll();
@@ -234,10 +270,10 @@ void AutomationService::processFile(const AutomationSettings::Folder &folder, co
         }
     }
     if (!request) {
-        putAway(fileName, u"failed"_s, error);
+        refuse(error);
         return;
     }
-    const PrintOutcome outcome = print(*request, folder.label, folder.printer);
+    const PrintOutcome outcome = print(*request, source, folder.label, folder.printer);
     QString message = outcome.message;
     for (const QString &warning : outcome.warnings) {
         message += u'\n' + warning;

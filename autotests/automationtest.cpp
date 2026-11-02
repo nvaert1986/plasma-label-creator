@@ -6,6 +6,7 @@
 #include "automation.h"
 #include "dlslabelids.h"
 #include "labelformat.h"
+#include "zplprinter.h"
 
 #include <QDate>
 #include <QDir>
@@ -254,7 +255,7 @@ private Q_SLOTS:
         QVERIFY(write(user + u"/plasma-label-creatorrc"_s,
                       "[General]\nPaper=30252 Address\n\n[Print Offsets]\nZebra=1.5,-0.5\n"
                       "[Printer Drivers]\nOffice-LW=lw450t.ppd\n"
-                      "[Settings]\nHistoryKept=100\nCounterWaitSeconds=5\n"));
+                      "[Settings]\nHistoryKept=100\nCounterWaitSeconds=5\nAskPrinters=false\n"));
         qputenv("XDG_CONFIG_DIRS", system.path().toUtf8());
         const PrintEnvironment environment = PrintEnvironment::fromAppConfig();
         qunsetenv("XDG_CONFIG_DIRS");
@@ -265,6 +266,8 @@ private Q_SLOTS:
         QCOMPARE(environment.offsetsMm.value(u"Zebra"_s), QPointF(1.5, -0.5));
         QCOMPARE(environment.counterWaitSeconds, 5); // the user's
         QCOMPARE(environment.historyKept, 0); // fixed by the administrator
+        QVERIFY(!environment.askPrinters);
+        QVERIFY(PrintEnvironment().askPrinters); // by default, as the app
     }
 
     void printingNeedsAPrinterThatExists()
@@ -286,6 +289,60 @@ private Q_SLOTS:
         QCOMPARE(outcome.status, PrintOutcome::Status::NotFound);
         // Nothing printed, nothing in the history.
         QVERIFY(!QFileInfo::exists(environment.historyDirectory));
+    }
+
+    void asksZplPrintersAsTheAppDoes()
+    {
+        // A 30252 label is 89 mm long along the feed.
+        const LabelDocument document = labelWith(u"x"_s);
+        ZplPrinterInfo info;
+        info.dotsPerMm = 8;
+        info.labelLengthDots = 712; // 89 mm
+        QVERIFY(Automation::zplProblems(document, info, u"Altec"_s).isEmpty());
+        info.labelLengthDots = 712 + 16; // 2 mm of gap counted in: still fits
+        QVERIFY(Automation::zplProblems(document, info, u"Altec"_s).isEmpty());
+        info.labelLengthDots = 200; // 25 mm labels loaded
+        QVERIFY(Automation::zplProblems(document, info, u"Altec"_s).join(u' ').contains(u"25.0 mm"_s));
+        // Not measured, or a continuous roll: nothing to say about the length.
+        info.dotsPerMm = 0;
+        QVERIFY(Automation::zplProblems(document, info, u"Altec"_s).isEmpty());
+        info.dotsPerMm = 8;
+        info.configuration.insert(u"MEDIA TYPE"_s, u"CONTINUOUS"_s);
+        QVERIFY(Automation::zplProblems(document, info, u"Altec"_s).isEmpty());
+        // What the printer itself reports.
+        info.headOpen = true;
+        QCOMPARE(Automation::zplProblems(document, info, u"Altec"_s).size(), 1);
+    }
+
+    void keepsAListOfRecentJobs()
+    {
+        QTemporaryDir dir;
+        const QString log = dir.filePath(u"data/automation-jobs.jsonl"_s);
+        QVERIFY(Automation::recentJobs(log).isEmpty());
+        for (int i = 1; i <= 30; ++i) {
+            AutomationJob job;
+            job.when = QDateTime(QDate(2026, 11, 2), QTime(12, 0)).addSecs(i);
+            job.source = u"HTTP from 127.0.0.1"_s;
+            job.label = u"box.label"_s;
+            job.printer = u"Zebra"_s;
+            job.printed = i % 2 == 0;
+            job.labels = i;
+            job.job = 100 + i;
+            job.message = u"line one\nline two"_s;
+            QVERIFY(Automation::logJob(job, log, 10));
+        }
+        const QList<AutomationJob> jobs = Automation::recentJobs(log);
+        QVERIFY(jobs.size() >= 10 && jobs.size() <= 30);
+        // The newest first, as written.
+        QCOMPARE(jobs.first().job, 130);
+        QCOMPARE(jobs.first().message, u"line one\nline two"_s);
+        QVERIFY(jobs.first().printed);
+        QCOMPARE(jobs.first().when, QDateTime(QDate(2026, 11, 2), QTime(12, 0, 30)));
+        // Cut back once it grows: never more than a few hundred bytes a job.
+        for (int i = 0; i < 200; ++i) {
+            QVERIFY(Automation::logJob(jobs.first(), log, 10));
+        }
+        QVERIFY(Automation::recentJobs(log).size() <= 40);
     }
 
     void dymoLabelIds()

@@ -175,6 +175,11 @@ QMap<QString, QString> parseConfiguration(const QByteArray &answer)
     return settings;
 }
 
+bool fitsLoaded(qreal labelLengthMm, qreal loadedLengthMm)
+{
+    return labelLengthMm <= loadedLengthMm + 0.5 && labelLengthMm >= loadedLengthMm - 3.0;
+}
+
 std::optional<std::pair<QString, quint16>> networkAddress(const QString &deviceUri)
 {
     const QUrl url(deviceUri);

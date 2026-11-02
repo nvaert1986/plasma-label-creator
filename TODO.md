@@ -46,6 +46,7 @@ See `CHANGELOG.md` under "Unreleased" for the details.
 - [x] DYMO's own label ids in saved labels.
 - [x] Automation service: watched folders, and print requests over HTTP
   with Qt HTTP Server (optional, greyed out in the settings without it).
+- [x] Automation: network ZPL printers asked before printing; Recent Jobs.
 
 ## Next session
 
@@ -117,7 +118,8 @@ Still to do by hand, in the running app:
   row (counters count on in the label, the print shows in the history); a
   bad job lands in `failed/` with the reason; a request over HTTP with
   `curl` (and without the token: refused); a stopped queue is refused
-  unless `printAnyway`. Needs a real test print.
+  unless `printAnyway`; the Altec with its head open or other labels loaded
+  is refused; Recent Jobs lists it all. Needs a real test print.
 
 ## Designer
 
@@ -241,9 +243,6 @@ rather than build them twice.
 
 In the desktop app:
 
-- [ ] **Automation, more**: the network ZPL printer's loaded labels checked
-  before printing (the app asks the printer; the service only checks the
-  CUPS queue), and a page of recent jobs in the settings. (Easy-Medium)
 - [ ] **Open and save labels in the web version's library**, signed in with
   the same account. (Medium)
 

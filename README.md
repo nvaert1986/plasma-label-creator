@@ -190,8 +190,12 @@ plasma-label-creator-render --outline label.label proof.pdf
 
 `plasma-label-creator-automation` prints labels for other programs, in the
 background, with the same checks as the Print button: answers to the
-label's questions, shared counters, the printer's label types and state.
-Counters count on in the label, and every print goes in the print history.
+label's questions, shared counters, the printer's label types and state,
+and for a ZPL printer on the network, whether it is ready and the labels
+loaded are the label's length. Counters count on in the label, and every
+print goes in the print history. Recent Jobs... on the Automation page
+lists what it printed lately, where each job came from, and why a job was
+not printed.
 Set it up in Settings > Configure Plasma Label Creator > Automation: start
 it there or have it start when you log in. On a computer without a desktop
 session, run it as a systemd user service:

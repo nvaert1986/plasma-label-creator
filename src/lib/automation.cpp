@@ -12,6 +12,7 @@
 #include "sharedcounter.h"
 #include "tapelayout.h"
 #include "units.h"
+#include "zplprinter.h"
 
 #include <QDateTime>
 #include <QDir>
@@ -352,6 +353,7 @@ PrintEnvironment PrintEnvironment::fromAppConfig()
     if (const int kept = settings.value(u"HistoryKept"_s).toInt(&ok); ok) {
         environment.historyKept = std::max(0, kept);
     }
+    environment.askPrinters = settings.value(u"AskPrinters"_s, u"true"_s).trimmed().toLower() != u"false"_s;
     return environment;
 }
 
@@ -402,6 +404,94 @@ QStringList labelNames(const QString &labelsFolder)
     }
     names.sort(Qt::CaseInsensitive);
     return names;
+}
+
+QString jobLogFileName()
+{
+    return QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + u"/automation-jobs.jsonl"_s;
+}
+
+bool logJob(const AutomationJob &job, const QString &fileName, int kept)
+{
+    const QJsonObject line{
+        {"when"_L1, job.when.toString(Qt::ISODateWithMs)},
+        {"source"_L1, job.source},
+        {"label"_L1, job.label},
+        {"printer"_L1, job.printer},
+        {"printed"_L1, job.printed},
+        {"labels"_L1, job.labels},
+        {"job"_L1, job.job},
+        {"message"_L1, job.message},
+    };
+    QDir().mkpath(QFileInfo(fileName).absolutePath());
+    QFile file(fileName);
+    if (!file.open(QIODevice::Append)) {
+        return false;
+    }
+    file.write(QJsonDocument(line).toJson(QJsonDocument::Compact) + '\n');
+    file.close();
+    // Cut back to the last ones now and then, not on every job.
+    if (file.size() < 400 * qint64(kept)) {
+        return true;
+    }
+    if (!file.open(QIODevice::ReadOnly)) {
+        return false;
+    }
+    QList<QByteArray> lines = file.readAll().split('\n');
+    file.close();
+    lines.removeAll(QByteArray());
+    if (lines.size() <= kept) {
+        return true;
+    }
+    QSaveFile trimmed(fileName);
+    if (!trimmed.open(QIODevice::WriteOnly)) {
+        return false;
+    }
+    for (qsizetype i = lines.size() - kept; i < lines.size(); ++i) {
+        trimmed.write(lines.at(i) + '\n');
+    }
+    return trimmed.commit();
+}
+
+QList<AutomationJob> recentJobs(const QString &fileName)
+{
+    QList<AutomationJob> jobs;
+    QFile file(fileName);
+    if (!file.open(QIODevice::ReadOnly)) {
+        return jobs;
+    }
+    const QList<QByteArray> lines = file.readAll().split('\n');
+    for (auto it = lines.crbegin(); it != lines.crend(); ++it) {
+        const QJsonObject line = QJsonDocument::fromJson(*it).object();
+        if (line.isEmpty()) {
+            continue;
+        }
+        AutomationJob job;
+        job.when = QDateTime::fromString(line.value("when"_L1).toString(), Qt::ISODateWithMs);
+        job.source = line.value("source"_L1).toString();
+        job.label = line.value("label"_L1).toString();
+        job.printer = line.value("printer"_L1).toString();
+        job.printed = line.value("printed"_L1).toBool();
+        job.labels = line.value("labels"_L1).toInt();
+        job.job = line.value("job"_L1).toInt();
+        job.message = line.value("message"_L1).toString();
+        jobs << job;
+    }
+    return jobs;
+}
+
+QStringList zplProblems(const LabelDocument &document, const ZplPrinterInfo &info, const QString &printerName)
+{
+    QStringList problems = info.problems();
+    // The length it measured between gaps means nothing on a continuous roll.
+    if (!document.roll.continuous && !info.continuous() && info.labelLengthDots > 0 && info.dotsPerMm > 0) {
+        const qreal loaded = info.labelSizeMm().height();
+        const qreal length = Units::twipsToMm(document.paperSize().height());
+        if (!Zpl::fitsLoaded(length, loaded)) {
+            problems << u"this label is %1 mm long, but the labels in %2 are %3 mm long"_s.arg(QString::number(length, 'f', 1), printerName, QString::number(loaded, 'f', 1));
+        }
+    }
+    return problems;
 }
 
 std::optional<QString> labelInFolder(const QString &labelsFolder, const QString &name)
@@ -587,7 +677,18 @@ PrintOutcome print(const QString &labelFile, const PrintRequest &request, const 
         return refuse(PrintOutcome::Status::NotReady,
                       u"%1 cannot print this label: a %2 is not one of its label types."_s.arg(printerName, document.paperName));
     }
-    const QStringList problems = LabelPrinter::queueStatus(printerName).problems();
+    // What the queue says, and a ZPL printer on the network itself, as the
+    // print bar asks it: whether it is ready, and which labels are loaded.
+    QStringList problems = LabelPrinter::queueStatus(printerName).problems();
+    if (const auto address = environment.askPrinters && info->speaksZpl() ? Zpl::networkAddress(info->deviceUri) : std::nullopt) {
+        QString zplError;
+        if (const auto zpl = Zpl::query(address->first, address->second, 3000, &zplError)) {
+            problems += zplProblems(document, *zpl, printerName);
+        } else {
+            // Not answering says nothing about the labels: printed, as the app does.
+            outcome.warnings << u"%1 did not answer about its labels: %2"_s.arg(printerName, zplError);
+        }
+    }
     if (!problems.isEmpty() && !request.printAnyway) {
         return refuse(PrintOutcome::Status::NotReady,
                       u"%1 reports: %2. Ask with printAnyway to print anyway: the labels then wait in the queue."_s.arg(printerName, problems.join(u", "_s)));
@@ -639,7 +740,7 @@ PrintOutcome print(const QString &labelFile, const PrintRequest &request, const 
     outcome.status = PrintOutcome::Status::Printed;
     outcome.job = job;
     outcome.labels = printer.printedLabels();
-    outcome.warnings = printer.warnings();
+    outcome.warnings += printer.warnings();
     outcome.message = u"Sent %1 label(s) to %2 as job %3."_s.arg(outcome.labels).arg(printerName).arg(job);
 
     // Counters count on: shared ones in their files, the others in the label.

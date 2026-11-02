@@ -6,6 +6,7 @@
 #include "alteclabels.h"
 
 #include "units.h"
+#include "zplprinter.h"
 
 #include <KLocalizedString>
 
@@ -96,7 +97,7 @@ bool isAltec(const QString &text)
 
 bool fitsLoaded(qreal labelLengthMm, qreal loadedLengthMm)
 {
-    return labelLengthMm <= loadedLengthMm + 0.5 && labelLengthMm >= loadedLengthMm - 3.0;
+    return Zpl::fitsLoaded(labelLengthMm, loadedLengthMm);
 }
 
 QList<PaperSize> fitting(const QList<PaperSize> &labels, qreal loadedLengthMm)

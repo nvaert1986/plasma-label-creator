@@ -60,6 +60,13 @@
     default printer, and HTTP (port, token). Without Qt HTTP Server the
     HTTP part is greyed out and says the package is not installed.
   - A systemd user unit for computers without a desktop session.
+  - A ZPL printer on the network is asked before printing, as the print
+    bar does (unless asking printers is off in the settings): a head open,
+    no labels, paused, or labels of another length refuse the job unless
+    it says `printAnyway`.
+  - Recent Jobs... on the Automation page: the last 500 jobs, when, from
+    which folder or address, label, printer, and printed or why not;
+    it follows the service as it works.
 
 ### Settings
 

@@ -7,6 +7,7 @@
 
 #include "labeldocument.h"
 
+#include <QDateTime>
 #include <QHash>
 #include <QList>
 #include <QPointF>
@@ -99,6 +100,8 @@ struct PrintOutcome {
  * shared counter, and how many prints the history keeps.
  */
 struct PrintEnvironment {
+    /** Network ZPL printers are asked what is loaded and whether they are ready. */
+    bool askPrinters = true;
     QHash<QString, QString> drivers; // queue → LabelWriter driver, such as lw450t.ppd
     QHash<QString, QPointF> offsetsMm; // queue → across the head, along the feed
     int counterWaitSeconds = 10;
@@ -113,8 +116,38 @@ struct PrintEnvironment {
     static PrintEnvironment fromAppConfig();
 };
 
+struct ZplPrinterInfo;
+
+/** A job the service took, for the list of recent jobs. */
+struct AutomationJob {
+    QDateTime when;
+    QString source; // where it came from: a watched folder's file, or HTTP and the address
+    QString label;
+    QString printer;
+    bool printed = false;
+    int labels = 0;
+    int job = 0; // the CUPS job
+    QString message; // what was sent, or why not
+
+    bool operator==(const AutomationJob &) const = default;
+};
+
 namespace Automation
 {
+
+/** The list of recent jobs, in the app's data folder. */
+QString jobLogFileName();
+/** Adds @p job to the list in @p fileName, keeping the last @p kept. */
+bool logJob(const AutomationJob &job, const QString &fileName = jobLogFileName(), int kept = 500);
+/** The jobs in @p fileName, the newest first. */
+QList<AutomationJob> recentJobs(const QString &fileName = jobLogFileName());
+
+/**
+ * What @p info, a ZPL printer's own answer, says against printing
+ * @p document: a problem it reports (head open, out of labels, paused),
+ * or labels loaded of another length. Empty when it can print.
+ */
+QStringList zplProblems(const LabelDocument &document, const ZplPrinterInfo &info, const QString &printerName);
 
 /** The service's lock file: held while it runs, so it runs once per user. */
 QString lockFileName();
