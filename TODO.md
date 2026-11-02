@@ -168,18 +168,40 @@ Nothing open.
 
 ## Web version: the desktop app's features
 
-The web version has about what the first release had (designing, label
+The web version has most of what the first release had (designing, label
 types per printer, labels of a kind, `.label` and `.rhino` files, printing
 through the browser), plus sign-in, users, and printers, label sizes and
 labels kept per user. The aim is to bring it close to the desktop app, one
 phase at a time, each with its own tests. Not everything can follow: a
 browser cannot reach CUPS or talk to a printer directly.
 
+- [ ] **Phase 0, the rest of 0.1.0**, first:
+  - Rulers along the canvas.
+  - Editing text on the label itself (double-click), and a format toolbar:
+    font, size, larger and smaller, bold, italic, underline, strikeout.
+  - Cut, copy, paste and duplicate objects, also between labels.
+  - Bring to Front and Send to Back.
+  - Position Object: against an edge, centred, in the middle, moved by a
+    distance.
+  - Dragging objects in from the sidebar, and dropping pictures and label
+    files on the canvas.
+  - Address books: open and save `.ABX`, import addresses from CSV, check
+    addresses and print a label for each.
+  - Before printing, check that the label suits the printer's labels
+    ("Print Anyway").
+  - Recently used layouts, with thumbnails.
+  - Advance Counters.
+  - Clip art: DYMO's cannot be shipped; instead each user's own pictures
+    kept on the server to pick from.
+
+  (Medium; mostly Easy pieces. Not possible in a browser: noticing
+  printers plugged in over USB and setting them up, see phase 5. The
+  command-line tool stays with the desktop app.)
 - [ ] **Phase 1, the 0.2.0 features**: a label for each row of a CSV, text,
   Excel or ODS file; fields; pictures from data; print-time questions; grid
   and snapping; white on black; Rotate Label turning the objects; the
   barcodes added in 0.2.0; print preview; PDF and PNG export (with the
-  label's outline); the address book. (Medium; the barcodes are cheap, zint
+  label's outline). (Medium; the barcodes are cheap, zint
   already runs in the browser; Excel and ODS need a reader, PDF a library.)
 - [ ] **Phase 2, the 0.3.0 designer**: selecting several objects, align
   and distribute, group, lock, wrapped text, layers and Do Not Print, free
