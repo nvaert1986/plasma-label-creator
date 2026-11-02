@@ -138,6 +138,16 @@ int main(int argc, char *argv[])
     if (parser.isSet(listPrintersOption)) {
         for (const PrinterInfo &printer : LabelPrinter::printers()) {
             out << printer.name << (printer.isDefault ? " (default)" : "") << ": " << printer.makeAndModel << '\n';
+            // The queue's state, and what keeps it from printing.
+            const QueueStatus status = LabelPrinter::queueStatus(printer.name);
+            out << "  queue: " << status.stateText() << ", " << status.activeJobs << " active job(s)";
+            if (!status.message.isEmpty()) {
+                out << ", \"" << status.message << '"';
+            }
+            out << '\n';
+            for (const QString &problem : status.problems()) {
+                out << "  problem: " << problem << '\n';
+            }
             if (!printer.isLabelWriter()) {
                 continue;
             }

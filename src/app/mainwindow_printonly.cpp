@@ -33,6 +33,7 @@ bool allowedInPrintOnly(const QString &name)
                                         u"layout_recent"_s,
                                         u"data_choose_rows"_s,
                                         u"file_print_history"_s,
+                                        u"file_printer_status"_s,
                                         u"view_zoom_in"_s,
                                         u"view_zoom_out"_s,
                                         u"view_fit_to_page"_s,
@@ -58,6 +59,12 @@ void MainWindow::setupPrintOnlyActions()
     history->setText(i18n("Print &History…"));
     history->setIcon(QIcon::fromTheme(u"view-history"_s));
     history->setToolTip(i18n("What was printed, when and where; open a label as printed or print it again"));
+
+    QAction *status = actions->addAction(u"file_printer_status"_s, this, &MainWindow::showPrinterStatus);
+    status->setText(i18n("Printer &Status…"));
+    status->setIcon(QIcon::fromTheme(u"printer"_s));
+    status->setToolTip(i18n("How every label printer is: its queue, jobs waiting, and what network printers say"));
+    connect(m_printBar, &PrintBar::printerStatusRequested, this, &MainWindow::showPrinterStatus);
 
     QAction *rows = actions->addAction(u"data_choose_rows"_s, this, &MainWindow::chooseRows);
     rows->setText(i18n("Choose Rows…"));

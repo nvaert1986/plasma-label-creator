@@ -9,6 +9,7 @@
 #include "labelformat.h"
 #include "historydialogs.h"
 #include "layersdialog.h"
+#include "printerstatusdialog.h"
 #include "printonlypanel.h"
 #include "rolllayoutdialog.h"
 
@@ -418,6 +419,38 @@ private Q_SLOTS:
         }
         QCOMPARE(history.action(), PrintHistoryDialog::Action::PrintAgain);
         QCOMPARE(history.chosenRecord(), first);
+    }
+
+    void printerStatusShowsQueuesAndProblems()
+    {
+        PrinterInfo altec;
+        altec.name = u"AltecATP-600Pro"_s;
+        altec.makeAndModel = u"Zebra ZPL Label Printer"_s;
+        altec.deviceUri = u"socket://192.0.2.10:9100"_s;
+        PrinterInfo usb = altec;
+        usb.name = u"ATP-600_Pro-USB"_s;
+        usb.deviceUri = u"usb://Altec/ATP-600%20Pro"_s;
+        PrinterInfo office;
+        office.name = u"Office"_s;
+        office.makeAndModel = u"Brother MFC-L2700DW series"_s;
+        // Only label printers.
+        QCOMPARE(PrinterStatusDialog::labelPrinters({altec, office, usb}).size(), 2);
+
+        PrinterStatusDialog dialog(nullptr, false);
+        dialog.showPrinters({altec, usb},
+                            {QueueStatus::fromOptions({{u"printer-state"_s, u"3"_s}}, 0),
+                             QueueStatus::fromOptions({{u"printer-state"_s, u"5"_s}, {u"printer-state-reasons"_s, u"paused"_s}}, 2)});
+        dialog.show();
+        QVERIFY(QTest::qWaitForWindowExposed(&dialog));
+        auto *table = dialog.findChild<QTableWidget *>();
+        QCOMPARE(table->rowCount(), 2);
+        QCOMPARE(table->item(0, 1)->text(), u"Idle"_s);
+        QCOMPARE(table->item(0, 3)->text(), u"Asking…"_s); // on the network
+        QCOMPARE(table->item(1, 1)->text(), u"Stopped"_s);
+        QCOMPARE(table->item(1, 2)->text(), u"2"_s);
+        QVERIFY(table->item(1, 1)->toolTip().contains(u"paused"_s));
+        QVERIFY(table->item(1, 3)->text().startsWith(u"Cannot be asked"_s)); // on USB
+        grab(&dialog, u"printer-status"_s);
     }
 
     void questionsAreEdited()

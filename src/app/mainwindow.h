@@ -181,6 +181,9 @@ private:
     /** Earlier versions of the label: shown, and one restored if chosen. */
     void showVersions();
     void showPrintHistory();
+    void showPrinterStatus();
+    /** Warns when the printer or its queue reports a problem; false to stop. */
+    bool confirmPrinterReady();
     /** Prints @p record's labels again, with its answers and rows. */
     void printAgain(const LabelCreator::PrintRecord &record);
     void setupPrintOnlyActions();

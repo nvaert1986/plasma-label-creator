@@ -249,6 +249,109 @@ QList<PrinterInfo> LabelPrinter::printers()
     return printers;
 }
 
+QueueStatus QueueStatus::fromOptions(const QHash<QString, QString> &options, int activeJobs)
+{
+    QueueStatus status;
+    // IPP printer-state: 3 idle, 4 processing, 5 stopped.
+    switch (options.value(u"printer-state"_s).toInt()) {
+    case 3:
+        status.state = State::Idle;
+        break;
+    case 4:
+        status.state = State::Printing;
+        break;
+    case 5:
+        status.state = State::Stopped;
+        break;
+    default:
+        break;
+    }
+    status.acceptingJobs = options.value(u"printer-is-accepting-jobs"_s, u"true"_s) != u"false"_s;
+    status.message = options.value(u"printer-state-message"_s).trimmed();
+    for (const QString &reason : options.value(u"printer-state-reasons"_s).split(u',', Qt::SkipEmptyParts)) {
+        if (reason.trimmed() != u"none"_s) {
+            status.reasons << reason.trimmed();
+        }
+    }
+    status.activeJobs = activeJobs;
+    return status;
+}
+
+QStringList QueueStatus::problems() const
+{
+    QStringList problems;
+    if (state == State::Stopped) {
+        problems << u"The queue is paused"_s;
+    }
+    if (!acceptingJobs) {
+        problems << u"The queue does not take jobs"_s;
+    }
+    // The reasons that stop printing, in words; the rest (a -report, being
+    // busy connecting) are not problems.
+    static const QList<std::pair<QString, QString>> known = {{u"offline"_s, u"The printer is offline"_s},
+                                                            {u"media-empty"_s, u"Out of labels"_s},
+                                                            {u"media-needed"_s, u"Out of labels"_s},
+                                                            {u"media-jam"_s, u"Labels are jammed"_s},
+                                                            {u"cover-open"_s, u"The cover is open"_s},
+                                                            {u"door-open"_s, u"The cover is open"_s},
+                                                            {u"marker-supply-empty"_s, u"Out of ribbon"_s},
+                                                            {u"paused"_s, u"The printer is paused"_s}};
+    for (const QString &reason : reasons) {
+        QString base = reason;
+        bool reported = false;
+        for (const QString &suffix : {u"-error"_s, u"-warning"_s, u"-report"_s}) {
+            if (base.endsWith(suffix)) {
+                reported = suffix == u"-report"_s;
+                base.chop(suffix.size());
+            }
+        }
+        bool found = false;
+        for (const auto &[keyword, text] : known) {
+            // A stopped queue has "paused" too: said once is enough.
+            const bool said = keyword == u"paused"_s && state == State::Stopped;
+            if (base == keyword && (!reported || keyword == u"offline"_s) && !said && !problems.contains(text)) {
+                problems << text;
+            }
+            found = found || base == keyword;
+        }
+        if (!found && reason.endsWith(u"-error"_s)) {
+            problems << base;
+        }
+    }
+    return problems;
+}
+
+QString QueueStatus::stateText() const
+{
+    switch (state) {
+    case State::Idle:
+        return u"Idle"_s;
+    case State::Printing:
+        return u"Printing"_s;
+    case State::Stopped:
+        return u"Stopped"_s;
+    case State::Unknown:
+        break;
+    }
+    return u"Unknown"_s;
+}
+
+QueueStatus LabelPrinter::queueStatus(const QString &printerName)
+{
+    const QByteArray name = printerName.toUtf8();
+    QHash<QString, QString> options;
+    if (cups_dest_t *dest = cupsGetNamedDest(CUPS_HTTP_DEFAULT, name.constData(), nullptr)) {
+        for (int i = 0; i < dest->num_options; ++i) {
+            options.insert(QString::fromUtf8(dest->options[i].name), QString::fromUtf8(dest->options[i].value));
+        }
+        cupsFreeDests(1, dest);
+    }
+    cups_job_t *jobs = nullptr;
+    const int count = cupsGetJobs2(CUPS_HTTP_DEFAULT, &jobs, name.constData(), 0, CUPS_WHICHJOBS_ACTIVE);
+    cupsFreeJobs(std::max(0, count), jobs);
+    return QueueStatus::fromOptions(options, std::max(0, count));
+}
+
 QString LabelPrinter::printerName() const
 {
     return m_printerName;

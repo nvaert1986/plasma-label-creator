@@ -74,9 +74,10 @@ if(BUILD_APP)
         ${CMAKE_SOURCE_DIR}/src/app/layersdialog.cpp
         ${CMAKE_SOURCE_DIR}/src/app/printonlypanel.cpp
         ${CMAKE_SOURCE_DIR}/src/app/historydialogs.cpp
+        ${CMAKE_SOURCE_DIR}/src/app/printerstatusdialog.cpp
         ${CMAKE_SOURCE_DIR}/src/app/gs1dialog.cpp
         ${CMAKE_SOURCE_DIR}/src/app/rolllayoutdialog.cpp
-        LINK_LIBRARIES labelcreatorcore Qt6::Test Qt6::Widgets Qt6::Sql KF6::Archive KF6::I18n KF6::WidgetsAddons
+        LINK_LIBRARIES labelcreatorcore Qt6::Test Qt6::Widgets Qt6::Sql KF6::Archive KF6::I18n KF6::WidgetsAddons KF6::ConfigWidgets
         TEST_NAME datadialogstest)
     target_include_directories(datadialogstest PRIVATE ${CMAKE_SOURCE_DIR}/src/app)
     set_tests_properties(datadialogstest PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")

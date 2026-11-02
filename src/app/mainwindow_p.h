@@ -27,6 +27,7 @@
 #include "mainwindow.h"
 #include "printbar.h"
 #include "printonlypanel.h"
+#include "printerstatusdialog.h"
 #include "printpreviewdialog.h"
 #include "propertiesdialog.h"
 #include "recentlayoutsmenu.h"

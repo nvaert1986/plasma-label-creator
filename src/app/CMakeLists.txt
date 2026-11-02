@@ -47,6 +47,8 @@ add_executable(plasma-label-creator
     printbar.cpp
     printonlypanel.cpp
     printonlypanel.h
+    printerstatusdialog.cpp
+    printerstatusdialog.h
     printpreviewdialog.cpp
     printbar.h
     printersetup.cpp

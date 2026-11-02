@@ -77,13 +77,22 @@ PrintBar::PrintBar(QWidget *parent)
     m_detectAction->setToolTip(i18n("Ask the printer over the network which labels are loaded"));
     m_offsetAction = menu->addAction(QIcon::fromTheme(u"transform-move"_s), i18n("Print Offset…"));
     m_offsetAction->setToolTip(i18n("Move everything this printer prints a little, when labels come out shifted"));
+    menu->addSeparator();
+    m_statusAction = menu->addAction(QIcon::fromTheme(u"printer-symbolic"_s, QIcon::fromTheme(u"printer"_s)), i18n("Printer Status…"));
+    m_statusAction->setToolTip(i18n("How every label printer is: its queue, jobs waiting, and what network printers say"));
+    connect(m_statusAction, &QAction::triggered, this, &PrintBar::printerStatusRequested);
     m_printerMenu->setMenu(menu);
     m_graphics = new QCheckBox(i18n("Barcodes and graphics quality"));
     m_graphics->setToolTip(i18n("Prints slower but sharper, as DLS's \"Barcodes and graphics\" print quality."));
     auto *printerRow = new QHBoxLayout;
     printerRow->addWidget(m_printer, 1);
     printerRow->addWidget(m_printerMenu);
-    // What a network label printer says about itself and its labels.
+    // What the queue, and a network label printer, say about themselves:
+    // asked when the printer is chosen and every half minute after.
+    m_statusTimer = new QTimer(this);
+    m_statusTimer->setInterval(30 * 1000);
+    connect(m_statusTimer, &QTimer::timeout, this, &PrintBar::refreshStatus);
+    m_statusTimer->start();
     m_printerStatus = new QLabel;
     m_printerStatus->setWordWrap(true);
     m_printerStatus->hide();
@@ -146,7 +155,8 @@ PrintBar::PrintBar(QWidget *parent)
         reloadPaperSizes();
         m_printerMenu->setEnabled(!printerName().isEmpty());
         updatePrinterMenu();
-        detectLabels();
+        m_zplInfo.reset();
+        refreshStatus();
         Q_EMIT printerChanged(printerName());
     });
     // Choosing a queue without the DYMO driver asks which LabelWriter it is.
@@ -279,7 +289,7 @@ void PrintBar::selectStartupPrinter(const QString &lastUsed)
     m_previousPrinter = printerName();
     // Selecting the queue that was already current changed nothing, so
     // ask a network label printer about its labels here too.
-    detectLabels();
+    refreshStatus();
 }
 
 QString PrintBar::defaultPrinter() const
@@ -343,6 +353,20 @@ const PrinterInfo *PrintBar::currentPrinter() const
     return nullptr;
 }
 
+void PrintBar::refreshStatus()
+{
+    const QString name = printerName();
+    m_queueStatus = name.isEmpty() ? QueueStatus() : LabelPrinter::queueStatus(name);
+    const PrinterInfo *printer = currentPrinter();
+    if (printer && printer->speaksZpl() && Zpl::networkAddress(printer->deviceUri)) {
+        if (m_detecting.isEmpty()) {
+            detectLabels(); // shows the status when the printer answers
+        }
+        return;
+    }
+    updatePrinterStatus(QString());
+}
+
 void PrintBar::detectLabels()
 {
     const PrinterInfo *printer = currentPrinter();
@@ -351,14 +375,14 @@ void PrintBar::detectLabels()
         m_zplInfo.reset();
         m_zplPrinter.clear();
         m_detecting.clear();
-        m_printerStatus->hide();
+        updatePrinterStatus(QString());
         return;
     }
     const QString name = printer->name;
     m_detecting = name;
-    m_printerStatus->setText(i18n("Asking the printer which labels are loaded…"));
-    m_printerStatus->setForegroundRole(QPalette::PlaceholderText);
-    m_printerStatus->show();
+    if (!m_zplInfo) {
+        updatePrinterStatus(QString()); // "asking"
+    }
 
     // The query blocks for up to a few seconds; it runs in its own thread
     // and reports back here, if this queue is still the one selected.
@@ -374,32 +398,64 @@ void PrintBar::detectLabels()
         if (printerName() != name) {
             return;
         }
+        // The label types follow the labels loaded: only when those changed.
+        const QSizeF before = m_zplInfo && m_zplPrinter == name ? m_zplInfo->labelSizeMm() : QSizeF();
         m_detecting.clear();
         m_zplInfo = *result;
         m_zplPrinter = name;
-        updatePrinterStatus(*error);
-        reloadPaperSizes();
+        m_zplError = *error;
+        updatePrinterStatus(m_zplError);
+        if (!m_zplInfo || m_zplInfo->labelSizeMm() != before) {
+            reloadPaperSizes();
+        }
     });
     thread->start();
 }
 
+QStringList PrintBar::printerProblems() const
+{
+    QStringList problems = m_queueStatus.problems();
+    if (m_zplInfo && m_zplPrinter == printerName()) {
+        problems += m_zplInfo->problems();
+    }
+    return problems;
+}
+
 void PrintBar::updatePrinterStatus(const QString &error)
 {
-    if (!m_zplInfo) {
-        m_printerStatus->setText(i18n("The printer did not answer: %1", error));
-        m_printerStatus->setForegroundRole(QPalette::PlaceholderText);
-        return;
+    // Problems first, then what the printer says, then jobs waiting.
+    QStringList lines;
+    const QStringList problems = printerProblems();
+    if (!problems.isEmpty()) {
+        lines << problems.join(u", "_s);
     }
-    const ZplPrinterInfo &info = *m_zplInfo;
-    const QStringList problems = info.problems();
+    const PrinterInfo *printer = currentPrinter();
+    const bool network = printer && printer->speaksZpl() && Zpl::networkAddress(printer->deviceUri);
+    QString tooltip;
+    if (network && !m_zplInfo && !m_detecting.isEmpty()) {
+        lines << i18n("Asking the printer which labels are loaded…");
+    } else if (network && !m_zplInfo) {
+        lines << i18n("The printer did not answer: %1", error.isEmpty() ? m_zplError : error);
+    } else if (network && m_zplInfo->problems().isEmpty()) {
+        const ZplPrinterInfo &info = *m_zplInfo;
+        const QString labels = info.continuous() ? i18n("continuous labels")
+                                                 : i18nc("label length", "labels %1 mm long", QString::number(info.labelSizeMm().height(), 'f', 1));
+        lines << i18nc("model, dpi, labels", "%1, %2 dpi, %3, ready", info.model, qRound(info.dpi()), labels);
+    }
+    if (network && m_zplInfo) {
+        const ZplPrinterInfo &info = *m_zplInfo;
+        tooltip = i18n("Firmware %1, %2, %3", info.firmware, info.thermalTransfer ? i18n("thermal transfer") : i18n("direct thermal"), info.printMode().toLower());
+    }
+    if (m_queueStatus.activeJobs > 0) {
+        lines << i18np("1 job waiting in the queue", "%1 jobs waiting in the queue", m_queueStatus.activeJobs);
+    }
     QPalette palette = m_printerStatus->palette();
     KColorScheme::adjustForeground(palette, problems.isEmpty() ? KColorScheme::NormalText : KColorScheme::NegativeText, QPalette::WindowText);
     m_printerStatus->setPalette(palette);
-    m_printerStatus->setForegroundRole(QPalette::WindowText);
-    QString labels = info.continuous() ? i18n("continuous labels") : i18nc("label length", "labels %1 mm long", QString::number(info.labelSizeMm().height(), 'f', 1));
-    m_printerStatus->setText(problems.isEmpty() ? i18nc("model, dpi, labels", "%1, %2 dpi, %3, ready", info.model, qRound(info.dpi()), labels)
-                                                : i18nc("model, problems", "%1: %2", info.model, problems.join(u", "_s)));
-    m_printerStatus->setToolTip(i18n("Firmware %1, %2, %3", info.firmware, info.thermalTransfer ? i18n("thermal transfer") : i18n("direct thermal"), info.printMode().toLower()));
+    m_printerStatus->setForegroundRole(problems.isEmpty() && !m_zplInfo && network ? QPalette::PlaceholderText : QPalette::WindowText);
+    m_printerStatus->setText(lines.join(u'\n'));
+    m_printerStatus->setToolTip(tooltip);
+    m_printerStatus->setVisible(!lines.isEmpty());
 }
 
 bool PrintBar::choosePrinterModel()

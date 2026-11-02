@@ -7,6 +7,7 @@
 
 #include "labeldocument.h"
 
+#include <QHash>
 #include <QImage>
 #include <QList>
 #include <QRectF>
@@ -37,6 +38,28 @@ struct PrinterInfo {
     bool hasLabelDriver() const;
     /** Whether the queue's driver speaks ZPL, so the printer can be asked about its labels. */
     bool speaksZpl() const;
+};
+
+/** What CUPS says about a queue: its state, why, and the jobs waiting. */
+struct QueueStatus {
+    enum class State {
+        Unknown,
+        Idle,
+        Printing,
+        Stopped, // paused in CUPS: jobs wait until it is resumed
+    };
+    State state = State::Unknown;
+    bool acceptingJobs = true;
+    QString message; // the printer's own words, if any
+    QStringList reasons; // IPP printer-state-reasons, without "none"
+    int activeJobs = 0;
+
+    /** From a queue's CUPS options (printer-state, ...) and its active jobs. */
+    static QueueStatus fromOptions(const QHash<QString, QString> &options, int activeJobs);
+    /** What keeps the queue from printing, for showing; empty when it can print. */
+    QStringList problems() const;
+    /** The state in a word or two, for showing: "Idle", "Printing", "Stopped". */
+    QString stateText() const;
 };
 
 /** An installed DYMO LabelWriter driver (PPD). */
@@ -114,6 +137,8 @@ public:
     explicit LabelPrinter(const QString &printerName, const QString &driver = {});
 
     static QList<PrinterInfo> printers();
+    /** What CUPS says about queue @p printerName now. */
+    static QueueStatus queueStatus(const QString &printerName);
     /** The LabelWriter drivers CUPS knows, from the installed DYMO driver package. */
     static QList<LabelWriterDriver> installedDrivers();
     /**

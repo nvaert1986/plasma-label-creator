@@ -48,14 +48,39 @@ bool MainWindow::confirmLabelFitsPrinter()
     case LabelFit::Problem::None:
         break;
     }
-    if (reason.isEmpty()) {
-        return true;
-    }
-    return KMessageBox::warningContinueCancel(this,
+    if (!reason.isEmpty()
+        && KMessageBox::warningContinueCancel(this,
                                               reason + u"\n\n"_s + i18n("Choose the label type of the loaded labels in the Labels tab first, or print anyway."),
                                               i18n("Different Labels"),
                                               KGuiItem(i18n("Print Anyway"), u"document-print"_s))
+            != KMessageBox::Continue) {
+        return false;
+    }
+    return confirmPrinterReady();
+}
+
+bool MainWindow::confirmPrinterReady()
+{
+    // What the queue says now, and a network printer said last.
+    m_printBar->refreshStatus();
+    const QStringList problems = m_printBar->printerProblems();
+    if (problems.isEmpty()) {
+        return true;
+    }
+    return KMessageBox::warningContinueCancel(this,
+                                              i18n("%1 reports: %2.\n\nThe labels may wait in the queue until this is solved.",
+                                                   m_printBar->printerName(),
+                                                   problems.join(u", "_s)),
+                                              i18n("Printer Not Ready"),
+                                              KGuiItem(i18n("Print Anyway"), u"document-print"_s))
         == KMessageBox::Continue;
+}
+
+void MainWindow::showPrinterStatus()
+{
+    PrinterStatusDialog dialog(this);
+    dialog.exec();
+    m_printBar->refreshStatus();
 }
 
 LabelPrinter::Options MainWindow::printOptions() const

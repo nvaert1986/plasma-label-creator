@@ -20,6 +20,7 @@ class QPushButton;
 class QRadioButton;
 class QSpinBox;
 class QThread;
+class QTimer;
 class QToolButton;
 class UsbWatcher;
 struct UsbLabelWriter;
@@ -61,6 +62,14 @@ public:
      * millimetres, if it was asked (ZPL printers on the network).
      */
     std::optional<qreal> loadedLabelLengthMm() const;
+    /**
+     * What keeps the chosen printer from printing, as last heard: its CUPS
+     * queue, and for a network ZPL printer what it says itself. Empty when
+     * it can print.
+     */
+    QStringList printerProblems() const;
+    /** Asks the queue, and a network ZPL printer, how they are now. */
+    void refreshStatus();
     /** Whether the selected printer is still being asked which labels are loaded. */
     bool isDetecting() const;
     /** Whether the selected printer prints label sizes it does not list (not a DYMO). */
@@ -92,6 +101,8 @@ public:
 
 Q_SIGNALS:
     void printRequested();
+    /** The user wants to see how all label printers are. */
+    void printerStatusRequested();
     void printerChanged(const QString &name);
     /** The user chose another printer in the list (not a change at start-up or from a plug-in). */
     void printerChosen(const QString &name);
@@ -134,6 +145,10 @@ private:
     QLabel *m_printerStatus;
     QAction *m_detectAction;
     QAction *m_offsetAction;
+    QAction *m_statusAction;
+    QTimer *m_statusTimer;
+    LabelCreator::QueueStatus m_queueStatus;
+    QString m_zplError; // why the printer did not answer last time
     UsbWatcher *m_usbWatcher;
 
     QList<LabelCreator::PrinterInfo> m_printers;

@@ -385,6 +385,35 @@ private Q_SLOTS:
         QVERIFY(!zpl.contains("^MNY"));
     }
 
+    void queueStatusInWords()
+    {
+        QueueStatus idle = QueueStatus::fromOptions({{u"printer-state"_s, u"3"_s}, {u"printer-state-reasons"_s, u"none"_s}}, 0);
+        QCOMPARE(idle.state, QueueStatus::State::Idle);
+        QVERIFY(idle.problems().isEmpty());
+        QVERIFY(idle.reasons.isEmpty());
+
+        // Paused in CUPS, not taking jobs, the printer offline and out of
+        // labels, with two jobs waiting.
+        const QueueStatus stopped = QueueStatus::fromOptions({{u"printer-state"_s, u"5"_s},
+                                                              {u"printer-is-accepting-jobs"_s, u"false"_s},
+                                                              {u"printer-state-message"_s, u" Unable to connect "_s},
+                                                              {u"printer-state-reasons"_s, u"offline-report,media-empty-error,cups-waiting-for-job-completed"_s}},
+                                                             2);
+        QCOMPARE(stopped.state, QueueStatus::State::Stopped);
+        QCOMPARE(stopped.message, u"Unable to connect"_s);
+        QCOMPARE(stopped.activeJobs, 2);
+        QCOMPARE(stopped.problems(),
+                 (QStringList{u"The queue is paused"_s, u"The queue does not take jobs"_s, u"The printer is offline"_s, u"Out of labels"_s}));
+
+        // Reports and unknown warnings are no problem; unknown errors are.
+        const QueueStatus odd = QueueStatus::fromOptions({{u"printer-state"_s, u"4"_s}, {u"printer-state-reasons"_s, u"media-low-report,toner-low-warning,fuser-over-temp-error"_s}}, 1);
+        QCOMPARE(odd.state, QueueStatus::State::Printing);
+        QCOMPARE(odd.problems(), QStringList{u"fuser-over-temp"_s});
+        // CUPS adds "paused" to a stopped queue: said once.
+        const QueueStatus paused = QueueStatus::fromOptions({{u"printer-state"_s, u"5"_s}, {u"printer-state-reasons"_s, u"paused"_s}}, 0);
+        QCOMPARE(paused.problems(), QStringList{u"The queue is paused"_s});
+    }
+
     void dymoDriversPrintOnlyTheirOwnSizes()
     {
         if (LabelPrinter::driverFilter(u"lw450t.ppd"_s).isEmpty()) {
