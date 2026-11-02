@@ -1226,6 +1226,16 @@ private Q_SLOTS:
         QTest::mouseMove(&view, start + QPoint(qRound(towards), 0));
         QTest::mouseRelease(&view, Qt::LeftButton, {}, start + QPoint(qRound(towards), 0));
         QCOMPARE(objectBase(editor.document().objects.at(0)).bounds.left(), guide);
+        // Now on the guideline, the object is still what a press there takes.
+        const QRectF onIt = objectBase(editor.document().objects.at(0)).bounds;
+        // Just inside its left edge, away from the resize handles.
+        const QPoint edge = toWidget(QPointF(onIt.left(), onIt.top() + onIt.height() / 4)) + QPoint(2, 0);
+        QTest::mousePress(&view, Qt::LeftButton, {}, edge);
+        QTest::mouseMove(&view, edge + QPoint(0, 10));
+        QTest::mouseRelease(&view, Qt::LeftButton, {}, edge + QPoint(0, 10));
+        QCOMPARE(editor.document().guidesX, QList<qreal>{guide});
+        QVERIFY(objectBase(editor.document().objects.at(0)).bounds.top() > onIt.top());
+        editor.undoStack()->undo();
         // A picture of it, with the new shapes beside the text.
         LabelDocument shapes = editor.document();
         for (const auto &[type, x] : {std::pair{ShapeType::Star, 2600.0}, std::pair{ShapeType::Polygon, 3300.0}, std::pair{ShapeType::Arrow, 4000.0}}) {

@@ -45,6 +45,11 @@ std::optional<LabelDocument> otherLabel(const QString &name, const Request &requ
     if (const auto it = cache.constFind(file); it != cache.cend()) {
         return *it;
     }
+    // This label itself: as it is now, unsaved changes and all.
+    if (!request.labelFile.isEmpty() && QFileInfo(file) == QFileInfo(request.labelFile)) {
+        cache.insert(file, request.document);
+        return request.document;
+    }
     LabelReader reader;
     auto document = reader.readFile(file);
     if (!document) {

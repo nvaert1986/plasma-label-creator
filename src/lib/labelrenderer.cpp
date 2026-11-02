@@ -738,6 +738,10 @@ void LabelRenderer::paint(QPainter *painter, const LabelDocument &laidOut)
 
 LabelDocument LabelRenderer::grown(const LabelDocument &original) const
 {
+    // On tape the cells place and size the objects.
+    if (original.tape) {
+        return original;
+    }
     LabelDocument document = original;
     const qsizetype count = document.objects.size();
     // How far each object's right and bottom edges moved by growing.

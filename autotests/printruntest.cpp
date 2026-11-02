@@ -95,6 +95,15 @@ private Q_SLOTS:
         QCOMPARE(textOf(run->labels.at(0)), u"cable 1 red"_s); // its own question's default
         QCOMPARE(textOf(run->labels.at(1)), u"main 2"_s);
 
+        // This label named again: as it is on screen, not as last saved.
+        request.document = labelWith(u"changed {Serial}"_s);
+        request.document.dataSource = document.dataSource;
+        request.rows = {{{u"Serial"_s, u"3"_s}, {u"Label"_s, u"main.label"_s}}};
+        run = PrintRun::make(request, &error);
+        QVERIFY2(run, qPrintable(error));
+        QCOMPARE(textOf(run->labels.at(0)), u"changed 3"_s);
+        request.document = document;
+
         // Another label type, or no such label: refused, with the row.
         request.rows = {{{u"Serial"_s, u"1"_s}, {u"Label"_s, u"small.label"_s}}};
         QVERIFY(!PrintRun::make(request, &error));

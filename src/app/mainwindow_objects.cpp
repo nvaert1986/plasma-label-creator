@@ -106,7 +106,17 @@ void MainWindow::editObject(int index)
     for (const LabelObject &other : std::as_const(document.objects)) {
         names << objectBase(other).name;
     }
+    const QString oldName = objectBase(document.objects.at(index)).name;
     if (editObjectProperties(this, document.objects[index], document.cellOf(index), names, availableFields())) {
+        // Renamed: what is anchored to it keeps to it.
+        const QString newName = objectBase(document.objects.at(index)).name;
+        if (newName != oldName) {
+            for (LabelObject &other : document.objects) {
+                if (objectBase(other).anchor.object == oldName) {
+                    objectBase(other).anchor.object = newName;
+                }
+            }
+        }
         m_editor->apply(document, i18n("Change Object Properties"));
     }
 }

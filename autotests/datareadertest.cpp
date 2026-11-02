@@ -234,6 +234,11 @@ private Q_SLOTS:
                  u"SELECT * FROM t WHERE a = ? AND b = ? AND c = ?"_s);
         QCOMPARE(names, (QStringList{u"Serial"_s, u"Lot"_s, u"Serial"_s}));
         QCOMPARE(DataReader::queryParameters(u"SELECT 1 WHERE {A} = {B} OR {A} = 1"_s), (QStringList{u"A"_s, u"B"_s}));
+        // ODBC's own escapes stay as they are.
+        names.clear();
+        QCOMPARE(DataReader::boundQuery(u"SELECT {fn UCASE(name)} FROM t WHERE d > {d '2026-01-01'} AND s = {Serial}"_s, &names),
+                 u"SELECT {fn UCASE(name)} FROM t WHERE d > {d '2026-01-01'} AND s = ?"_s);
+        QCOMPARE(names, QStringList{u"Serial"_s});
         if (!QSqlDatabase::isDriverAvailable(u"QSQLITE"_s)) {
             QSKIP("Qt's SQLite driver is not installed (dev-qt/qtbase[sqlite], libqt6sql6-sqlite)");
         }

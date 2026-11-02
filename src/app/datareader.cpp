@@ -518,8 +518,13 @@ QString boundQuery(const QString &query, QStringList *names)
     static const QRegularExpression field(uR"((['"]?)\{([^{}|:]+)\}\1)"_s);
     QString result;
     qsizetype last = 0;
+    // ODBC's own escapes, {fn UCASE(x)} or {d '2026-11-02'}, are not fields.
+    static const QRegularExpression escape(u"^\\s*(fn|d|t|ts|oj|call|escape|\\?\\s*=\\s*call)\\s"_s, QRegularExpression::CaseInsensitiveOption);
     for (auto it = field.globalMatch(query); it.hasNext();) {
         const QRegularExpressionMatch match = it.next();
+        if (escape.match(match.captured(2)).hasMatch()) {
+            continue;
+        }
         result += QStringView(query).mid(last, match.capturedStart() - last);
         result += u'?';
         names->append(match.captured(2).trimmed());

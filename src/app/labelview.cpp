@@ -478,7 +478,8 @@ void LabelView::paintEvent(QPaintEvent *)
     }
 
     // Guidelines across the whole canvas; the one being dragged stronger.
-    if (m_guidesVisible) {
+    // Not for people who only print: guidelines are for designing.
+    if (m_guidesVisible && !m_readOnly) {
         const auto drawGuide = [&](Qt::Orientation orientation, qreal twips, bool dragged) {
             QPen pen(dragged ? QColor(0, 120, 215) : QColor(0, 160, 220, 170), 1, dragged ? Qt::SolidLine : Qt::DashLine);
             pen.setCosmetic(true);
@@ -632,8 +633,9 @@ void LabelView::mousePressEvent(QMouseEvent *event)
     const LabelDocument &document = m_editor->document();
     const bool adding = event->modifiers() & (Qt::ControlModifier | Qt::ShiftModifier);
     m_dragHandle = adding ? NoHandle : handleAt(event->position());
-    // A guideline under the mouse, away from the selection's handles: moved.
-    if (m_dragHandle == NoHandle && !adding) {
+    // A guideline under the mouse, away from the selection's handles and
+    // from objects (which often sit on one, snapped to it): moved.
+    if (m_dragHandle == NoHandle && !adding && objectAt(event->position()) < 0) {
         if (const auto guide = guideAt(event->position())) {
             m_guideDrag = guide;
             m_guideDrag->inside = true;
@@ -734,7 +736,7 @@ void LabelView::mouseMoveEvent(QMouseEvent *event)
             const qreal direction = std::fmod(angleOf(handleRects(base).at(handle).center() - toWidget(base.bounds).center()) + 360.0, 180.0);
             static const Qt::CursorShape shapes[] = {Qt::SizeHorCursor, Qt::SizeBDiagCursor, Qt::SizeVerCursor, Qt::SizeFDiagCursor};
             setCursor(shapes[int(std::round(direction / 45)) % 4]);
-        } else if (const auto guide = guideAt(event->position())) {
+        } else if (const auto guide = objectAt(event->position()) < 0 ? guideAt(event->position()) : std::nullopt) {
             setCursor(guide->orientation == Qt::Horizontal ? Qt::SplitVCursor : Qt::SplitHCursor);
         } else {
             const int index = objectAt(event->position());
