@@ -8,14 +8,16 @@
 #include <QDialog>
 #include <QImage>
 
+class QCheckBox;
 class QLabel;
 class QPushButton;
 class QScrollArea;
 class QSlider;
 
 /**
- * Shows the pages a print sends, dot for dot: what the printer gets, turned
- * the way the label feeds and in black and white. Steps through the labels of
+ * Shows the pages a print sends, dot for dot: what the printer gets, in
+ * black and white; a landscape label turned back to look as on the canvas,
+ * or as it feeds. Steps through the labels of
  * a print run, where counters and addresses differ.
  */
 class PrintPreviewDialog : public QDialog
@@ -24,10 +26,21 @@ class PrintPreviewDialog : public QDialog
 
 public:
     /** @p pages at @p dpi, for @p printerName; @p notes are the renderer's warnings. */
-    PrintPreviewDialog(const QList<QImage> &pages, qreal dpi, const QString &printerName, const QStringList &notes, QWidget *parent = nullptr);
+    /**
+     * @p turned: the label lies across the feed on the canvas (a landscape
+     * label), so the pages are shown turned back to look as there, unless
+     * asked to show them as they feed.
+     */
+    PrintPreviewDialog(const QList<QImage> &pages,
+                       qreal dpi,
+                       const QString &printerName,
+                       const QStringList &notes,
+                       QWidget *parent = nullptr,
+                       bool turned = false);
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
+    void showEvent(QShowEvent *event) override;
 
 private:
     void showPage(int index);
@@ -43,4 +56,5 @@ private:
     QPushButton *m_next = nullptr;
     QSlider *m_zoom = nullptr;
     QLabel *m_zoomText = nullptr;
+    QCheckBox *m_asFed = nullptr; // nullptr when the label is not turned
 };

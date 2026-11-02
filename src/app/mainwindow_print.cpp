@@ -363,7 +363,9 @@ void MainWindow::printPreview()
         KMessageBox::error(this, printer.errorString());
         return;
     }
-    PrintPreviewDialog dialog(pages, printer.resolution(), m_printBar->printerName(), printer.warnings(), this);
+    // A landscape label is turned on the paper; shown as on the canvas.
+    const bool turned = m_editor->document().orientation == PaperOrientation::Landscape && !m_editor->document().tape;
+    PrintPreviewDialog dialog(pages, printer.resolution(), m_printBar->printerName(), printer.warnings(), this, turned);
     // What was previewed, without asking the questions again.
     if (dialog.exec() == QDialog::Accepted) {
         printLabels(*labels);

@@ -18,6 +18,7 @@
 
 #include <KLocalizedString>
 
+#include <QCheckBox>
 #include <QDropEvent>
 #include <QLabel>
 #include <QLineEdit>
@@ -296,6 +297,17 @@ private Q_SLOTS:
         PrintPreviewDialog dialog(pages, 300, u"DYMO LabelWriter 450"_s, {});
         dialog.show();
         QVERIFY(QTest::qWaitForWindowExposed(&dialog));
+        // Fitted to the window as soon as it opens, not left at its first, tiny size.
+        QLabel *shown = nullptr;
+        for (QLabel *label : dialog.findChildren<QLabel *>()) {
+            if (!label->pixmap().isNull()) {
+                shown = label;
+            }
+        }
+        QVERIFY(shown);
+        QVERIFY2(shown->height() > 300, qPrintable(QString::number(shown->height())));
+        QCOMPARE(shown->size(), shown->pixmap().size() + QSize(2, 2)); // and its frame
+        QVERIFY(QTest::qWaitForWindowExposed(&dialog));
         const auto positionShows = [&dialog](const QString &text) {
             const auto labels = dialog.findChildren<QLabel *>();
             return std::any_of(labels.cbegin(), labels.cend(), [&text](const QLabel *label) {
@@ -318,6 +330,48 @@ private Q_SLOTS:
         if (qEnvironmentVariableIsSet("LABELCREATOR_TEST_GRAB")) {
             dialog.grab().save(qEnvironmentVariable("LABELCREATOR_TEST_GRAB"));
         }
+    }
+
+    void printPreviewShowsLandscapeLabelsAsOnTheCanvas()
+    {
+        // A box in the canvas's top-left corner of a landscape label.
+        LabelDocument label = addressLabel();
+        label.objects.clear();
+        ShapeObject box;
+        box.shapeType = ShapeType::Rectangle;
+        box.fillColor = Qt::black;
+        box.bounds = QRectF(200, 200, 600, 300);
+        label.objects << box;
+        QCOMPARE(label.orientation, PaperOrientation::Landscape);
+        PaperSize paper;
+        paper.size = label.paperSize() / Units::TwipsPerPoint;
+        const QImage page = LabelPrinter::paperImage(label, paper, 300);
+        QVERIFY(page.height() > page.width()); // fed short side first
+
+        PrintPreviewDialog dialog({page}, 300, u"DYMO LabelWriter 450"_s, {}, nullptr, true);
+        dialog.show();
+        QVERIFY(QTest::qWaitForWindowExposed(&dialog));
+        QLabel *shown = nullptr;
+        for (QLabel *candidate : dialog.findChildren<QLabel *>()) {
+            if (!candidate->pixmap().isNull()) {
+                shown = candidate;
+            }
+        }
+        QVERIFY(shown);
+        // As on the canvas: wide, and the box top-left.
+        QImage picture = shown->pixmap().toImage();
+        QVERIFY(picture.width() > picture.height());
+        const auto dark = [](const QImage &image, qreal x, qreal y) {
+            return image.pixelColor(int(x * image.width()), int(y * image.height())).lightness() < 128;
+        };
+        QVERIFY(dark(picture, 0.1, 0.25));
+        QVERIFY(!dark(picture, 0.9, 0.75));
+        grab(&dialog, u"preview-landscape"_s);
+
+        // As it feeds: tall again.
+        dialog.findChild<QCheckBox *>()->setChecked(true);
+        picture = shown->pixmap().toImage();
+        QVERIFY(picture.height() > picture.width());
     }
 
     void clickOnEmptySpaceDeselects()

@@ -9,6 +9,7 @@
 
 #include <KLocalizedString>
 
+#include <QCheckBox>
 #include <QDialogButtonBox>
 #include <QHBoxLayout>
 #include <QLabel>
@@ -16,12 +17,13 @@
 #include <QPushButton>
 #include <QScrollArea>
 #include <QSlider>
+#include <QTransform>
 #include <QVBoxLayout>
 
 using namespace LabelCreator;
 using namespace Qt::Literals::StringLiterals;
 
-PrintPreviewDialog::PrintPreviewDialog(const QList<QImage> &pages, qreal dpi, const QString &printerName, const QStringList &notes, QWidget *parent)
+PrintPreviewDialog::PrintPreviewDialog(const QList<QImage> &pages, qreal dpi, const QString &printerName, const QStringList &notes, QWidget *parent, bool turned)
     : QDialog(parent)
     , m_pages(pages)
     , m_dpi(dpi)
@@ -30,7 +32,8 @@ PrintPreviewDialog::PrintPreviewDialog(const QList<QImage> &pages, qreal dpi, co
     auto *layout = new QVBoxLayout(this);
 
     const QSize dots = pages.isEmpty() ? QSize() : pages.constFirst().size();
-    auto *info = new QLabel(i18n("What %1 receives: %2 × %3 dots at %4 dpi (%5 × %6 mm), as the label feeds through the printer, in black and white.",
+    // The size as the printer gets it, whichever way it is shown.
+    auto *info = new QLabel(i18n("What %1 receives: %2 × %3 dots at %4 dpi (%5 × %6 mm, across the print head and along the feed), in black and white.",
                                  printerName,
                                  dots.width(),
                                  dots.height(),
@@ -70,6 +73,14 @@ PrintPreviewDialog::PrintPreviewDialog(const QList<QImage> &pages, qreal dpi, co
     controls->addWidget(m_position);
     controls->addWidget(m_next);
     controls->addStretch();
+    // A landscape label feeds short side first: shown as on the canvas
+    // unless asked for the printer's view.
+    if (turned) {
+        m_asFed = new QCheckBox(i18n("As it feeds through the printer"), this);
+        m_asFed->setToolTip(i18n("Shown turned, as the printer receives it, leading edge at the top"));
+        connect(m_asFed, &QCheckBox::toggled, this, &PrintPreviewDialog::updateZoom);
+        controls->addWidget(m_asFed);
+    }
     m_zoomText = new QLabel(this);
     controls->addWidget(m_zoomText);
     // 0 fits the window; 1 shows every printer dot as one screen pixel, up
@@ -102,6 +113,13 @@ void PrintPreviewDialog::resizeEvent(QResizeEvent *event)
     }
 }
 
+void PrintPreviewDialog::showEvent(QShowEvent *event)
+{
+    QDialog::showEvent(event);
+    // Fitted to the room the window really has, now that it is laid out.
+    updateZoom();
+}
+
 void PrintPreviewDialog::showPage(int index)
 {
     if (m_pages.isEmpty()) {
@@ -122,7 +140,10 @@ void PrintPreviewDialog::updateZoom()
     if (m_pages.isEmpty()) {
         return;
     }
-    const QImage &page = m_pages.at(m_index);
+    // Turned back by a quarter, a landscape label looks as on the canvas
+    // (canvas x is paper y, canvas y the paper's width less x). Turning by
+    // a quarter keeps every dot as it is.
+    const QImage page = m_asFed && !m_asFed->isChecked() ? m_pages.at(m_index).transformed(QTransform().rotate(-90)) : m_pages.at(m_index);
     const int zoom = m_zoom->value();
     if (zoom == 0) {
         // The whole label in the window, smoothed: an overview.
