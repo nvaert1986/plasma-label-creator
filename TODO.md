@@ -48,7 +48,7 @@ See `CHANGELOG.md` under "Unreleased" for the details.
   with Qt HTTP Server (optional, greyed out in the settings without it).
 - [x] Automation: network ZPL printers asked before printing; Recent Jobs.
 
-## Done since 0.4.0 (not released yet)
+## Done in 0.5.0
 
 Features found in other label software, the Easy to Medium ones:
 
@@ -66,11 +66,13 @@ Features found in other label software, the Easy to Medium ones:
 
 ## Next session
 
-Version 0.4.0: print-only mode, forms, versions, print history, printer
-status, settings, export with the label's outline, DYMO's label ids and
-the automation service. Since then the features under "Done since 0.4.0",
-not released yet. Next: try those (checks under "Bug review"), then the
-printer tests below.
+Version 0.5.0: print conditions, growing text and anchoring, guidelines,
+polygons, stars, arrows and SVG, copies and a label per row, header and
+trailer labels, density, darkness and speed per label, query parameters
+and pictures from a database (tested). Version 0.4.0 before it: print-only
+mode, forms, versions, print history, printer status, settings, export
+with the label's outline, DYMO's label ids and the automation service.
+Next: the checks under "Bug review", then the printer tests below.
 After that, bringing the web version up to date (see "Web version").
 
 ## Third bug review (2026-10-30, 0.3.0)
@@ -136,7 +138,7 @@ Still to do by hand, in the running app:
   `curl` (and without the token: refused); a stopped queue is refused
   unless `printAnyway`; the Altec with its head open or other labels loaded
   is refused; Recent Jobs lists it all. Needs a real test print.
-- [x] The features since 0.4.0 (tested): a condition on an object (preview and
+- [x] The features of 0.5.0 (tested): a condition on an object (preview and
   print), text that grows with an object anchored to it, guidelines from
   both rulers, a star and an arrow in DYMO's software (a picture), an SVG
   logo printed sharp, copies and a label per row from a CSV, header and
