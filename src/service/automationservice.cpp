@@ -136,11 +136,13 @@ void AutomationService::reload()
 void AutomationService::scanFolders()
 {
     QSet<QString> present;
+    QSet<QString> looked; // a folder set up twice is looked in once
     for (const AutomationSettings::Folder &folder : std::as_const(m_settings.folders)) {
         const QDir dir(folder.folder);
-        if (!dir.exists()) {
+        if (!dir.exists() || looked.contains(dir.canonicalPath())) {
             continue;
         }
+        looked.insert(dir.canonicalPath());
         const QFileInfoList files = dir.entryInfoList(jobPatterns, QDir::Files | QDir::Readable, QDir::Time | QDir::Reversed);
         for (const QFileInfo &file : files) {
             const QString path = file.absoluteFilePath();

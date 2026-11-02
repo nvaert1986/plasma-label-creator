@@ -34,6 +34,8 @@ class DataSourceDialog : public QDialog
 
 public:
     DataSourceDialog(const LabelCreator::DataSource &source, const std::optional<DataTable> &table, const QList<int> &selectedRows, QWidget *parent = nullptr);
+    /** Lets go of the file field: losing focus while destroyed must not read the sheets. */
+    ~DataSourceDialog() override;
 
     LabelCreator::DataSource source() const;
     /** The rows as last loaded; nullopt if nothing loaded. */

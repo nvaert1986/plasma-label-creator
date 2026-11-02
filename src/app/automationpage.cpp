@@ -495,7 +495,8 @@ RecentJobsDialog::RecentJobsDialog(const QString &fileName, QWidget *parent)
     connect(buttons, &QDialogButtonBox::rejected, this, &QDialog::reject);
     layout->addWidget(buttons);
     // The service adds to the file, or cuts it back by replacing it: the
-    // folder is watched as well.
+    // folder is watched as well, made now if the service has not yet.
+    QDir().mkpath(QFileInfo(m_fileName).absolutePath());
     m_watcher->addPath(QFileInfo(m_fileName).absolutePath());
     connect(m_watcher, &QFileSystemWatcher::fileChanged, this, &RecentJobsDialog::reload);
     connect(m_watcher, &QFileSystemWatcher::directoryChanged, this, &RecentJobsDialog::reload);

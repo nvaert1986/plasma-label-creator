@@ -95,6 +95,13 @@ LabelView::LabelView(LabelEditor *editor, QWidget *parent)
     });
 }
 
+LabelView::~LabelView()
+{
+    if (m_textEditor) {
+        m_textEditor->disconnect(this);
+    }
+}
+
 void LabelView::setPrintArea(const QRectF &area)
 {
     if (m_printArea != area) {

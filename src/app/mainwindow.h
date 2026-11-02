@@ -105,6 +105,12 @@ private:
     bool saveAs();
     /** Asks to save unsaved changes; false if the user cancelled. */
     bool maybeSave();
+    /**
+     * Ends editing text on the label, keeping what was typed, before the
+     * label is saved, printed or exported: a shortcut leaves the focus in
+     * the editor, so it did not end by itself.
+     */
+    void finishEditing();
 
     /** Inserts a new object, centred on @p at (twips) if given, else on the label. */
     void insertObject(ObjectFactory::Kind kind, std::optional<QPointF> at = std::nullopt);

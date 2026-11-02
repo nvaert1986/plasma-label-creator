@@ -675,6 +675,7 @@ void MainWindow::open()
 
 bool MainWindow::save()
 {
+    finishEditing();
     if (m_editor->fileName().isEmpty()) {
         return saveAs();
     }
@@ -688,6 +689,7 @@ bool MainWindow::save()
 
 bool MainWindow::saveAs()
 {
+    finishEditing();
     // The dialog adds .label itself, so it also asks before overwriting that file.
     QFileDialog dialog(this, i18n("Save Label"), m_editor->fileName(), labelFileFilter());
     dialog.setAcceptMode(QFileDialog::AcceptSave);
@@ -709,8 +711,16 @@ bool MainWindow::saveAs()
     return true;
 }
 
+void MainWindow::finishEditing()
+{
+    if (m_view->isEditingText()) {
+        m_view->finishTextEdit(true);
+    }
+}
+
 bool MainWindow::maybeSave()
 {
+    finishEditing();
     // Print-only mode edits nothing: counters that moved on are saved after
     // printing, or meant to be forgotten when the settings say so.
     if (m_printOnly) {

@@ -894,6 +894,30 @@ private Q_SLOTS:
         QCOMPARE(std::get<TextObject>(editor.document().objects.at(0)).plainText(), u"Text"_s);
     }
 
+    void closingWhileEditingIsSafe()
+    {
+        // The view goes while text is being edited on it, still on screen:
+        // the editor losing its focus must not end the edit on a view half
+        // destroyed (the sanitizers build catches it).
+        LabelEditor editor;
+        editor.reset(addressLabel());
+        auto *window = new QWidget;
+        auto *view = new LabelView(&editor, window);
+        window->resize(800, 400);
+        view->resize(800, 400);
+        window->show();
+        QVERIFY(QTest::qWaitForWindowExposed(window));
+        const QRectF bounds = objectBase(editor.document().objects.at(0)).bounds;
+        QTest::mouseDClick(view, Qt::LeftButton, {}, (view->labelOrigin() + bounds.center() * view->scale()).toPoint());
+        auto *inline_ = view->findChild<InlineTextEditor *>();
+        QVERIFY(inline_);
+        inline_->setFocus();
+        QTest::keyClicks(inline_, u" typed"_s);
+        delete window;
+        // Not applied: the label is as it was.
+        QCOMPARE(std::get<TextObject>(editor.document().objects.at(0)).plainText(), u"Text"_s);
+    }
+
     void escapeCancelsEditing()
     {
         LabelEditor editor;

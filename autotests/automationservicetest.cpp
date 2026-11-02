@@ -83,6 +83,8 @@ private Q_SLOTS:
         QVERIFY(LabelWriter::writeFile(labelWith(u"{Serial}"_s), label));
         AutomationSettings settings;
         settings.folders << AutomationSettings::Folder{jobs, label, NoPrinter, 1};
+        // The same folder twice: still looked in once, and waited for.
+        settings.folders << AutomationSettings::Folder{jobs + u"/"_s, label, NoPrinter, 1};
         settings.labelsFolder = dir.filePath(u"labels"_s);
         const QString settingsFile = dir.filePath(u"automation.json"_s);
         QVERIFY(settings.save(settingsFile));

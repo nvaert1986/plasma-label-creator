@@ -141,6 +141,7 @@ LabelPrinter::Options MainWindow::printOptions() const
 
 std::optional<QList<LabelDocument>> MainWindow::labelsToPrint()
 {
+    finishEditing();
     if (m_printBar->printerName().isEmpty()) {
         KMessageBox::error(this, i18n("No printer was found. Connect a label printer or add one in the system's printer settings first."));
         return std::nullopt;
@@ -374,6 +375,7 @@ void MainWindow::printPreview()
 
 void MainWindow::exportLabel()
 {
+    finishEditing();
     // Named after the label, in the folder and format used last.
     const QString base = m_editor->fileName().isEmpty() ? i18n("Label") : QFileInfo(m_editor->fileName()).completeBaseName();
     const QString labelFolder = m_editor->fileName().isEmpty() ? QDir::homePath() : QFileInfo(m_editor->fileName()).absolutePath();

@@ -30,6 +30,8 @@ class LabelView : public QWidget
 
 public:
     explicit LabelView(LabelEditor *editor, QWidget *parent = nullptr);
+    /** Lets go of a text editor still open: it must not end its edit on a view half gone. */
+    ~LabelView() override;
 
     /** Zoom factor: 1 shows the label at its real size. */
     qreal zoom() const;

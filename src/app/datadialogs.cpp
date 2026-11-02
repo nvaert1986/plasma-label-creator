@@ -212,6 +212,11 @@ void DataSourceDialog::chooseFile()
     }
 }
 
+DataSourceDialog::~DataSourceDialog()
+{
+    m_file->disconnect(this);
+}
+
 void DataSourceDialog::updateSheets()
 {
     const QString current = m_sheet->currentText();

@@ -89,6 +89,13 @@
 
 ### Fixed
 
+- Saving, printing, print preview, export and closing with text still
+  being typed on the label (Ctrl+S, Ctrl+P) now keep what was typed; it
+  was left out, and closing did not ask about it.
+- A print-time form or the data source dialog closing while a field still
+  had the focus could act on itself half closed (found with the address
+  and undefined-behaviour sanitizers); the label view is guarded the same
+  way.
 - Print Again checks that the label suits the printer and the printer is
   ready, as any print, and keeps the label's name in the history.
 - A network printer that keeps not answering no longer reloads the label

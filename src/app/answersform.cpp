@@ -128,6 +128,13 @@ AnswersForm::AnswersForm(const QList<PrintQuestion> &questions, const QHash<QStr
     }
 }
 
+AnswersForm::~AnswersForm()
+{
+    for (QWidget *field : std::as_const(m_fields)) {
+        field->disconnect(this);
+    }
+}
+
 QString AnswersForm::answer(int index) const
 {
     const PrintQuestion &question = m_questions.at(index);

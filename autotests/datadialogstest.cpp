@@ -545,6 +545,37 @@ private Q_SLOTS:
         QVERIFY(!QFileInfo::exists(AutomationPage::autostartFile()));
     }
 
+    void closingFormsWhileTypingIsSafe()
+    {
+        // A form or dialog going while a field still has the focus: the
+        // field's "editing finished" must not reach it half destroyed.
+        PrintQuestion lookup;
+        lookup.name = u"Serial"_s;
+        lookup.lookupColumn = u"Serial"_s;
+        DataTable data;
+        data.columns = {u"Serial"_s};
+        data.rows = {{u"S1"_s}};
+        auto *form = new AnswersForm({lookup}, {}, data);
+        form->show();
+        QVERIFY(QTest::qWaitForWindowExposed(form));
+        auto *field = form->findChild<QLineEdit *>();
+        field->setFocus();
+        QTest::keyClicks(field, u"S1"_s);
+        delete form;
+
+        auto *dialog = new DataSourceDialog(DataSource(), std::nullopt, {}, nullptr);
+        dialog->show();
+        QVERIFY(QTest::qWaitForWindowExposed(dialog));
+        for (QLineEdit *edit : dialog->findChildren<QLineEdit *>()) {
+            if (edit->isVisible()) {
+                edit->setFocus();
+                QTest::keyClicks(edit, u"rows.csv"_s);
+                break;
+            }
+        }
+        delete dialog;
+    }
+
     void recentJobsAreListed()
     {
         QTemporaryDir dir;

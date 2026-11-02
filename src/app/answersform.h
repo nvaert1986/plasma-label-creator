@@ -32,6 +32,11 @@ public:
                 const QHash<QString, QString> &previous,
                 const std::optional<DataTable> &data,
                 QWidget *parent = nullptr);
+    /**
+     * Lets go of its fields first: a field losing focus while it is
+     * destroyed must not look up or report a change on a form half gone.
+     */
+    ~AnswersForm() override;
 
     /** The answers, by question name, written as each question says. */
     QHash<QString, QString> answers() const;
