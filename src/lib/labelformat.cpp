@@ -356,6 +356,43 @@ QString extensionsJson(const LabelDocument &document)
             q[u"maximumLength"_s] = question.maximumLength;
             q[u"allowed"_s] = QString(enumName(allowedNames, question.allowed));
             q[u"pattern"_s] = question.pattern;
+            // Form fields; only what differs from a plain text question.
+            switch (question.kind) {
+            case PrintQuestion::Kind::Text:
+                break;
+            case PrintQuestion::Kind::Choice:
+                q[u"kind"_s] = u"choice"_s;
+                break;
+            case PrintQuestion::Kind::Number:
+                q[u"kind"_s] = u"number"_s;
+                break;
+            case PrintQuestion::Kind::Date:
+                q[u"kind"_s] = u"date"_s;
+                break;
+            case PrintQuestion::Kind::Check:
+                q[u"kind"_s] = u"check"_s;
+                break;
+            }
+            if (!question.choices.isEmpty()) {
+                q[u"choices"_s] = QJsonArray::fromStringList(question.choices);
+            }
+            const auto text = [&q](const QString &key, const QString &value) {
+                if (!value.isEmpty()) {
+                    q[key] = value;
+                }
+            };
+            text(u"choicesColumn"_s, question.choicesColumn);
+            text(u"dateFormat"_s, question.dateFormat);
+            text(u"checked"_s, question.checkedText);
+            text(u"unchecked"_s, question.uncheckedText);
+            text(u"lookup"_s, question.lookupColumn);
+            if (question.minimum != 0 || question.maximum != 0) {
+                q[u"minimum"_s] = question.minimum;
+                q[u"maximum"_s] = question.maximum;
+            }
+            if (question.decimals > 0) {
+                q[u"decimals"_s] = question.decimals;
+            }
             questions.append(q);
         }
         root[u"questions"_s] = questions;
@@ -453,6 +490,23 @@ void readExtensions(const QByteArray &data, LabelDocument &document, QStringList
             }
         }
         question.pattern = q[u"pattern"_s].toString();
+        const QString kind = q[u"kind"_s].toString();
+        question.kind = kind == u"choice"_s ? PrintQuestion::Kind::Choice
+            : kind == u"number"_s           ? PrintQuestion::Kind::Number
+            : kind == u"date"_s             ? PrintQuestion::Kind::Date
+            : kind == u"check"_s            ? PrintQuestion::Kind::Check
+                                            : PrintQuestion::Kind::Text;
+        for (const auto &choice : q[u"choices"_s].toArray()) {
+            question.choices << choice.toString();
+        }
+        question.choicesColumn = q[u"choicesColumn"_s].toString();
+        question.dateFormat = q[u"dateFormat"_s].toString();
+        question.checkedText = q[u"checked"_s].toString();
+        question.uncheckedText = q[u"unchecked"_s].toString();
+        question.lookupColumn = q[u"lookup"_s].toString();
+        question.minimum = q[u"minimum"_s].toDouble();
+        question.maximum = q[u"maximum"_s].toDouble();
+        question.decimals = std::clamp(q[u"decimals"_s].toInt(), 0, 6);
         if (!question.name.isEmpty()) {
             document.questions << question;
         }

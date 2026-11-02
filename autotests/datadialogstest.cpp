@@ -3,17 +3,23 @@
     SPDX-License-Identifier: GPL-2.0-or-later
 */
 
+#include "answersform.h"
 #include "datadialogs.h"
 #include "gs1dialog.h"
 #include "layersdialog.h"
 #include "rolllayoutdialog.h"
 
 #include <QDialogButtonBox>
+#include <QStackedWidget>
+#include <QPlainTextEdit>
+#include <QDateEdit>
+#include <QComboBox>
 #include <QCheckBox>
 #include <QSpinBox>
 #include <QDoubleSpinBox>
 #include <QFile>
 #include <QLabel>
+#include <QLocale>
 #include <QLineEdit>
 #include <QPushButton>
 #include <QTableWidget>
@@ -53,7 +59,7 @@ private Q_SLOTS:
         note.required = false;
         note.defaultValue = u"Fragile"_s;
 
-        AnswersDialog dialog({batch, note}, {}, nullptr);
+        AnswersDialog dialog({batch, note}, {}, std::nullopt, nullptr);
         dialog.show();
         QVERIFY(QTest::qWaitForWindowExposed(&dialog));
         const QList<QLineEdit *> fields = dialog.findChildren<QLineEdit *>();
@@ -70,8 +76,88 @@ private Q_SLOTS:
         QCOMPARE(dialog.answers(), (QHash<QString, QString>{{u"Batch"_s, u"1234"_s}, {u"Note"_s, u"Fragile"_s}}));
 
         // Answers given before are offered again.
-        AnswersDialog again({batch, note}, {{u"Batch"_s, u"5678"_s}}, nullptr);
+        AnswersDialog again({batch, note}, {{u"Batch"_s, u"5678"_s}}, std::nullopt, nullptr);
         QCOMPARE(again.answers().value(u"Batch"_s), u"5678"_s);
+    }
+
+    void formsHaveFieldsOfEveryKind()
+    {
+        const QLocale before;
+        QLocale::setDefault(QLocale(u"nl_NL"_s));
+        PrintQuestion serial;
+        serial.name = u"Serial"_s;
+        serial.lookupColumn = u"Serial"_s;
+        PrintQuestion rack;
+        rack.name = u"Rack"_s;
+        rack.kind = PrintQuestion::Kind::Choice;
+        rack.choicesColumn = u"Rack"_s;
+        PrintQuestion size;
+        size.name = u"Size"_s;
+        size.kind = PrintQuestion::Kind::Choice;
+        size.choices = {u"S"_s, u"M"_s, u"L"_s};
+        size.defaultValue = u"M"_s;
+        PrintQuestion weight;
+        weight.name = u"Weight"_s;
+        weight.kind = PrintQuestion::Kind::Number;
+        weight.minimum = 0.5;
+        weight.maximum = 20;
+        weight.decimals = 1;
+        weight.defaultValue = u"2,5"_s;
+        PrintQuestion packed;
+        packed.name = u"Packed"_s;
+        packed.kind = PrintQuestion::Kind::Date;
+        packed.dateFormat = u"yyyy-MM-dd"_s;
+        PrintQuestion fragile;
+        fragile.name = u"Fragile"_s;
+        fragile.kind = PrintQuestion::Kind::Check;
+        fragile.checkedText = u"FRAGILE"_s;
+        fragile.uncheckedText = QString();
+        fragile.required = false;
+
+        DataTable data;
+        data.columns = {u"Serial"_s, u"Rack"_s, u"Size"_s};
+        data.rows = {{u"1001"_s, u"A"_s, u"L"_s}, {u"1002"_s, u"B"_s, u"S"_s}};
+        AnswersForm form({serial, rack, size, weight, packed, fragile}, {}, data, nullptr);
+        form.show();
+        QVERIFY(QTest::qWaitForWindowExposed(&form));
+        QCOMPARE(form.findChildren<QComboBox *>().at(0)->count(), 2); // racks from the data
+        QHash<QString, QString> answers = form.answers();
+        QCOMPARE(answers.value(u"Size"_s), u"M"_s);
+        QCOMPARE(answers.value(u"Weight"_s), u"2,5"_s);
+        QCOMPARE(answers.value(u"Packed"_s), QDate::currentDate().toString(u"yyyy-MM-dd"_s));
+        QCOMPARE(answers.value(u"Fragile"_s), u"No"_s); // the default text when none is given
+        QVERIFY(form.problem()); // no serial yet
+
+        // A serial looked up fills the rack and size from its row.
+        auto *serialField = form.findChildren<QLineEdit *>().constFirst();
+        serialField->setText(u"1002"_s);
+        Q_EMIT serialField->editingFinished();
+        form.findChild<QCheckBox *>()->setChecked(true);
+        grab(&form, u"form"_s);
+        answers = form.answers();
+        QCOMPARE(answers.value(u"Rack"_s), u"B"_s);
+        QCOMPARE(answers.value(u"Size"_s), u"S"_s);
+        QCOMPARE(answers.value(u"Fragile"_s), u"FRAGILE"_s);
+        QVERIFY(!form.problem());
+        QLocale::setDefault(before);
+    }
+
+    void questionKindsAreEdited()
+    {
+        PrintQuestion question;
+        question.name = u"Size"_s;
+        QuestionsDialog dialog({question}, nullptr);
+        dialog.show();
+        QVERIFY(QTest::qWaitForWindowExposed(&dialog));
+        auto *kind = dialog.findChildren<QComboBox *>().at(0);
+        QCOMPARE(kind->itemText(1), u"Drop-down list"_s);
+        kind->setCurrentIndex(1);
+        QCOMPARE(dialog.findChild<QStackedWidget *>()->currentIndex(), 1);
+        dialog.findChild<QPlainTextEdit *>()->setPlainText(u"S\nM\n\nL"_s);
+        grab(&dialog, u"question-kinds"_s);
+        dialog.findChild<QDialogButtonBox *>()->button(QDialogButtonBox::Ok)->click();
+        QCOMPARE(dialog.questions().constFirst().kind, PrintQuestion::Kind::Choice);
+        QCOMPARE(dialog.questions().constFirst().choices, (QStringList{u"S"_s, u"M"_s, u"L"_s}));
     }
 
     void dataSourceLoadsAndTicksRows()

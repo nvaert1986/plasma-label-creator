@@ -11,8 +11,10 @@
 #include <QDialog>
 #include <QHash>
 
+class AnswersForm;
 class QCheckBox;
 class QComboBox;
+class QDoubleSpinBox;
 class QLabel;
 class QLineEdit;
 class QListWidget;
@@ -94,6 +96,18 @@ private:
     QSpinBox *m_maximum;
     QComboBox *m_allowed;
     QLineEdit *m_pattern;
+    QLineEdit *m_lookup;
+    // The kind of field, with what each kind needs.
+    QComboBox *m_kind;
+    QStackedWidget *m_kindPages;
+    QPlainTextEdit *m_choices;
+    QLineEdit *m_choicesColumn;
+    QDoubleSpinBox *m_numberMinimum;
+    QDoubleSpinBox *m_numberMaximum;
+    QSpinBox *m_decimals;
+    QLineEdit *m_dateFormat;
+    QLineEdit *m_checked;
+    QLineEdit *m_unchecked;
 };
 
 /**
@@ -123,17 +137,23 @@ class AnswersDialog : public QDialog
     Q_OBJECT
 
 public:
-    /** @p previous: answers given before, offered again in place of the defaults. */
-    AnswersDialog(const QList<LabelCreator::PrintQuestion> &questions, const QHash<QString, QString> &previous, QWidget *parent = nullptr);
+    /**
+     * @p previous: answers given before, offered again in place of the
+     * defaults; @p data: the label's data source, for drop-downs and lookups.
+     */
+    AnswersDialog(const QList<LabelCreator::PrintQuestion> &questions,
+                  const QHash<QString, QString> &previous,
+                  const std::optional<DataTable> &data = std::nullopt,
+                  QWidget *parent = nullptr);
 
     /** The answers, by question name. */
     QHash<QString, QString> answers() const;
+    AnswersForm *form() const;
 
 private:
     void check();
 
-    QList<LabelCreator::PrintQuestion> m_questions;
-    QList<QLineEdit *> m_fields;
+    AnswersForm *m_form;
     QLabel *m_problem;
     QPushButton *m_ok;
 };

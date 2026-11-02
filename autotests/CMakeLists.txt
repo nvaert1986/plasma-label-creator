@@ -67,6 +67,7 @@ if(BUILD_APP)
 
     # The data source, questions and answers dialogs.
     ecm_add_test(datadialogstest.cpp
+        ${CMAKE_SOURCE_DIR}/src/app/answersform.cpp
         ${CMAKE_SOURCE_DIR}/src/app/datadialogs.cpp
         ${CMAKE_SOURCE_DIR}/src/app/datareader.cpp
         ${CMAKE_SOURCE_DIR}/src/app/layersdialog.cpp

@@ -372,6 +372,14 @@ struct TapeLabel {
  * {name} wherever it appears on the label.
  */
 struct PrintQuestion {
+    /** How it is asked; the answer is always text, filling {name}. */
+    enum class Kind {
+        Text,
+        Choice, // a drop-down list
+        Number,
+        Date,
+        Check, // a check box: one text when ticked, another when not
+    };
     enum class Allowed {
         Anything,
         Digits,
@@ -389,6 +397,24 @@ struct PrintQuestion {
     int maximumLength = 0; // 0 for no limit
     Allowed allowed = Allowed::Anything;
     QString pattern; // for Allowed::Pattern
+
+    Kind kind = Kind::Text;
+    // Choice: these, or the values in a column of the data source.
+    QStringList choices;
+    QString choicesColumn;
+    // Number: the range (both 0 for none) and decimals.
+    double minimum = 0;
+    double maximum = 0;
+    int decimals = 0;
+    // Date: how the answer is written (dd-MM-yyyy); empty for the short date
+    // format. Today unless the default says otherwise.
+    QString dateFormat;
+    // Check: the answer when ticked and when not.
+    QString checkedText;
+    QString uncheckedText;
+    // Text: the answer is looked up in this column of the data source; the
+    // row found fills the other questions named after its columns.
+    QString lookupColumn;
 
     bool operator==(const PrintQuestion &) const = default;
 };

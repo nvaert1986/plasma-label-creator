@@ -225,6 +225,44 @@ private Q_SLOTS:
         QCOMPARE(read->questions, document.questions);
         QCOMPARE(read->dataSource, document.dataSource);
 
+        // Form fields keep their kind and settings.
+        document.questions.clear();
+        PrintQuestion size;
+        size.name = u"Size"_s;
+        size.kind = PrintQuestion::Kind::Choice;
+        size.choices = {u"S"_s, u"M"_s};
+        size.choicesColumn = u"Size"_s;
+        PrintQuestion weight;
+        weight.name = u"Weight"_s;
+        weight.kind = PrintQuestion::Kind::Number;
+        weight.minimum = 1;
+        weight.maximum = 9;
+        weight.decimals = 2;
+        PrintQuestion packed;
+        packed.name = u"Packed"_s;
+        packed.kind = PrintQuestion::Kind::Date;
+        packed.dateFormat = u"yyMMdd"_s;
+        PrintQuestion fragile;
+        fragile.name = u"Fragile"_s;
+        fragile.kind = PrintQuestion::Kind::Check;
+        fragile.checkedText = u"FRAGILE"_s;
+        fragile.uncheckedText = u"-"_s;
+        PrintQuestion serial;
+        serial.name = u"Serial"_s;
+        serial.lookupColumn = u"Serial"_s;
+        document.questions = {size, weight, packed, fragile, serial};
+        QBuffer forms;
+        forms.setData(LabelWriter::toByteArray(document));
+        forms.open(QIODevice::ReadOnly);
+        QCOMPARE(reader.read(&forms)->questions, document.questions);
+        // A number out of its range, a choice not offered.
+        QVERIFY(Fields::problem(weight, u"12"_s));
+        QVERIFY(!Fields::problem(weight, QLocale().toString(3.5)));
+        PrintQuestion fixed = size;
+        fixed.choicesColumn.clear();
+        QVERIFY(Fields::problem(fixed, u"XL"_s));
+        QVERIFY(!Fields::problem(fixed, u"M"_s));
+
         // A label without them has no comment.
         QVERIFY(!LabelWriter::toByteArray(labelWith(u"x"_s)).contains("<!--"));
 

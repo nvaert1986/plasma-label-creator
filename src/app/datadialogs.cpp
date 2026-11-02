@@ -5,6 +5,8 @@
 
 #include "datadialogs.h"
 
+#include "answersform.h"
+
 #include "fields.h"
 
 #include <KLocalizedString>
@@ -13,6 +15,7 @@
 #include <QCheckBox>
 #include <QComboBox>
 #include <QDialogButtonBox>
+#include <QDoubleSpinBox>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QFormLayout>
@@ -446,6 +449,24 @@ QuestionsDialog::QuestionsDialog(const QList<PrintQuestion> &questions, QWidget 
     form->addRow(i18n("Default answer:"), m_default);
     m_required = new QCheckBox(i18n("An answer is needed"), m_editor);
     form->addRow(QString(), m_required);
+    m_kind = new QComboBox(m_editor);
+    m_kind->addItem(i18n("Text"), int(PrintQuestion::Kind::Text));
+    m_kind->addItem(i18n("Drop-down list"), int(PrintQuestion::Kind::Choice));
+    m_kind->addItem(i18n("Number"), int(PrintQuestion::Kind::Number));
+    m_kind->addItem(i18n("Date"), int(PrintQuestion::Kind::Date));
+    m_kind->addItem(i18n("Check box"), int(PrintQuestion::Kind::Check));
+    form->addRow(i18n("Field:"), m_kind);
+
+    // What each kind of field needs, one page each, in the order above.
+    m_kindPages = new QStackedWidget(m_editor);
+    const auto page = [this]() {
+        auto *widget = new QWidget(m_kindPages);
+        auto *layout = new QFormLayout(widget);
+        layout->setContentsMargins(0, 0, 0, 0);
+        m_kindPages->addWidget(widget);
+        return layout;
+    };
+    QFormLayout *text = page();
     m_minimum = new QSpinBox(m_editor);
     m_minimum->setRange(0, 1000);
     m_minimum->setSpecialValueText(i18n("Any"));
@@ -457,20 +478,67 @@ QuestionsDialog::QuestionsDialog(const QList<PrintQuestion> &questions, QWidget 
     lengths->addWidget(m_minimum);
     lengths->addWidget(new QLabel(i18n("at most"), m_editor));
     lengths->addWidget(m_maximum);
-    form->addRow(i18n("Length:"), lengths);
+    text->addRow(i18n("Length:"), lengths);
     m_allowed = new QComboBox(m_editor);
     m_allowed->addItem(i18n("Anything"), int(PrintQuestion::Allowed::Anything));
     m_allowed->addItem(i18n("Digits only"), int(PrintQuestion::Allowed::Digits));
     m_allowed->addItem(i18n("Letters only"), int(PrintQuestion::Allowed::Letters));
     m_allowed->addItem(i18n("Letters and digits"), int(PrintQuestion::Allowed::LettersAndDigits));
     m_allowed->addItem(i18n("A pattern (regular expression)"), int(PrintQuestion::Allowed::Pattern));
-    form->addRow(i18n("Allowed:"), m_allowed);
+    text->addRow(i18n("Allowed:"), m_allowed);
     m_pattern = new QLineEdit(m_editor);
     m_pattern->setPlaceholderText(u"[A-Z]{2}-\\d{4}"_s);
-    form->addRow(i18n("Pattern:"), m_pattern);
+    text->addRow(i18n("Pattern:"), m_pattern);
     connect(m_allowed, &QComboBox::currentIndexChanged, this, [this]() {
         m_pattern->setEnabled(PrintQuestion::Allowed(m_allowed->currentData().toInt()) == PrintQuestion::Allowed::Pattern);
     });
+    m_lookup = new QLineEdit(m_editor);
+    m_lookup->setPlaceholderText(i18n("A column of the data source, such as Serial"));
+    m_lookup->setToolTip(i18n("The answer is looked up in this column; the row found fills the other questions named after its columns."));
+    text->addRow(i18n("Look up in column:"), m_lookup);
+
+    QFormLayout *choice = page();
+    m_choices = new QPlainTextEdit(m_editor);
+    m_choices->setPlaceholderText(i18n("One choice per line"));
+    m_choices->setMaximumHeight(90);
+    choice->addRow(i18n("Choices:"), m_choices);
+    m_choicesColumn = new QLineEdit(m_editor);
+    m_choicesColumn->setPlaceholderText(i18n("Or a column of the data source"));
+    choice->addRow(i18n("From column:"), m_choicesColumn);
+
+    QFormLayout *number = page();
+    m_numberMinimum = new QDoubleSpinBox(m_editor);
+    m_numberMaximum = new QDoubleSpinBox(m_editor);
+    for (QDoubleSpinBox *box : {m_numberMinimum, m_numberMaximum}) {
+        box->setRange(-1e9, 1e9);
+        box->setDecimals(3);
+    }
+    auto *range = new QHBoxLayout;
+    range->addWidget(m_numberMinimum);
+    range->addWidget(new QLabel(i18nc("number range: from x to y", "to"), m_editor));
+    range->addWidget(m_numberMaximum);
+    number->addRow(i18n("From:"), range);
+    number->addRow(new QLabel(i18n("Both 0 for any number."), m_editor));
+    m_decimals = new QSpinBox(m_editor);
+    m_decimals->setRange(0, 6);
+    number->addRow(i18n("Decimals:"), m_decimals);
+
+    QFormLayout *date = page();
+    m_dateFormat = new QLineEdit(m_editor);
+    m_dateFormat->setPlaceholderText(i18n("The short date format, or e.g. dd-MM-yyyy"));
+    date->addRow(i18n("Written as:"), m_dateFormat);
+    date->addRow(new QLabel(i18n("Today, unless the default answer is a date."), m_editor));
+
+    QFormLayout *check = page();
+    m_checked = new QLineEdit(m_editor);
+    m_checked->setPlaceholderText(i18nc("answer of a ticked check box", "Yes"));
+    check->addRow(i18n("Answer when ticked:"), m_checked);
+    m_unchecked = new QLineEdit(m_editor);
+    m_unchecked->setPlaceholderText(i18nc("answer of a check box not ticked", "No"));
+    check->addRow(i18n("Answer when not:"), m_unchecked);
+
+    form->addRow(m_kindPages);
+    connect(m_kind, &QComboBox::currentIndexChanged, m_kindPages, &QStackedWidget::setCurrentIndex);
     row->addWidget(m_editor, 2);
     layout->addLayout(row, 1);
 
@@ -508,6 +576,17 @@ void QuestionsDialog::showQuestion(int row)
     m_allowed->setCurrentIndex(std::max(0, m_allowed->findData(int(question.allowed))));
     m_pattern->setText(question.pattern);
     m_pattern->setEnabled(question.allowed == PrintQuestion::Allowed::Pattern);
+    m_lookup->setText(question.lookupColumn);
+    m_kind->setCurrentIndex(std::max(0, m_kind->findData(int(question.kind))));
+    m_kindPages->setCurrentIndex(m_kind->currentIndex());
+    m_choices->setPlainText(question.choices.join(u'\n'));
+    m_choicesColumn->setText(question.choicesColumn);
+    m_numberMinimum->setValue(question.minimum);
+    m_numberMaximum->setValue(question.maximum);
+    m_decimals->setValue(question.decimals);
+    m_dateFormat->setText(question.dateFormat);
+    m_checked->setText(question.checkedText);
+    m_unchecked->setText(question.uncheckedText);
 }
 
 void QuestionsDialog::storeQuestion()
@@ -525,6 +604,21 @@ void QuestionsDialog::storeQuestion()
     question.maximumLength = m_maximum->value();
     question.allowed = PrintQuestion::Allowed(m_allowed->currentData().toInt());
     question.pattern = m_pattern->text();
+    question.lookupColumn = m_lookup->text().trimmed();
+    question.kind = PrintQuestion::Kind(m_kind->currentData().toInt());
+    question.choices.clear();
+    for (const QString &line : m_choices->toPlainText().split(u'\n')) {
+        if (!line.trimmed().isEmpty()) {
+            question.choices << line.trimmed();
+        }
+    }
+    question.choicesColumn = m_choicesColumn->text().trimmed();
+    question.minimum = m_numberMinimum->value();
+    question.maximum = m_numberMaximum->value();
+    question.decimals = m_decimals->value();
+    question.dateFormat = m_dateFormat->text().trimmed();
+    question.checkedText = m_checked->text();
+    question.uncheckedText = m_unchecked->text();
     if (QListWidgetItem *item = m_list->item(m_current)) {
         item->setText(question.name);
     }
@@ -565,23 +659,14 @@ QList<PrintQuestion> QuestionsDialog::questions() const
     return questions;
 }
 
-AnswersDialog::AnswersDialog(const QList<PrintQuestion> &questions, const QHash<QString, QString> &previous, QWidget *parent)
+AnswersDialog::AnswersDialog(const QList<PrintQuestion> &questions, const QHash<QString, QString> &previous, const std::optional<DataTable> &data, QWidget *parent)
     : QDialog(parent)
-    , m_questions(questions)
 {
     setWindowTitle(i18n("Print"));
     auto *layout = new QVBoxLayout(this);
-    auto *form = new QFormLayout;
-    for (const PrintQuestion &question : questions) {
-        auto *field = new QLineEdit(previous.value(question.name, question.defaultValue), this);
-        if (question.maximumLength > 0) {
-            field->setMaxLength(question.maximumLength);
-        }
-        connect(field, &QLineEdit::textChanged, this, &AnswersDialog::check);
-        form->addRow((question.prompt.isEmpty() ? question.name : question.prompt) + (question.required ? u" *"_s : QString()) + u':', field);
-        m_fields << field;
-    }
-    layout->addLayout(form);
+    m_form = new AnswersForm(questions, previous, data, this);
+    connect(m_form, &AnswersForm::changed, this, &AnswersDialog::check);
+    layout->addWidget(m_form);
     m_problem = new QLabel(this);
     m_problem->setWordWrap(true);
     layout->addWidget(m_problem);
@@ -596,24 +681,19 @@ AnswersDialog::AnswersDialog(const QList<PrintQuestion> &questions, const QHash<
 
 void AnswersDialog::check()
 {
-    for (qsizetype i = 0; i < m_questions.size(); ++i) {
-        if (const auto problem = Fields::problem(m_questions.at(i), m_fields.at(i)->text())) {
-            m_problem->setText(*problem);
-            m_ok->setEnabled(false);
-            return;
-        }
-    }
-    m_problem->clear();
-    m_ok->setEnabled(true);
+    const auto problem = m_form->problem();
+    m_problem->setText(problem.value_or(QString()));
+    m_ok->setEnabled(!problem);
 }
 
 QHash<QString, QString> AnswersDialog::answers() const
 {
-    QHash<QString, QString> answers;
-    for (qsizetype i = 0; i < m_questions.size(); ++i) {
-        answers.insert(m_questions.at(i).name, m_fields.at(i)->text());
-    }
-    return answers;
+    return m_form->answers();
+}
+
+AnswersForm *AnswersDialog::form() const
+{
+    return m_form;
 }
 
 QString askDatabasePassword(const DataSource &source, QWidget *parent, bool *ok)

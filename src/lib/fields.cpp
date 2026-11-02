@@ -370,6 +370,31 @@ std::optional<QString> problem(const PrintQuestion &question, const QString &ans
     if (answer.isEmpty()) {
         return question.required ? std::optional(u"%1: an answer is needed."_s.arg(label)) : std::nullopt;
     }
+    // The form's own fields keep their answers in shape; what is left to
+    // check is a fixed choice and a number's range.
+    switch (question.kind) {
+    case PrintQuestion::Kind::Text:
+        break;
+    case PrintQuestion::Kind::Choice:
+        if (!question.choices.isEmpty() && question.choicesColumn.isEmpty() && !question.choices.contains(answer)) {
+            return u"%1: not one of the choices."_s.arg(label);
+        }
+        return std::nullopt;
+    case PrintQuestion::Kind::Number: {
+        bool ok = false;
+        const double value = QLocale().toDouble(answer, &ok);
+        if (!ok) {
+            return u"%1: not a number."_s.arg(label);
+        }
+        if ((question.minimum != 0 || question.maximum != 0) && (value < question.minimum || value > question.maximum)) {
+            return u"%1: from %2 to %3."_s.arg(label, QLocale().toString(question.minimum), QLocale().toString(question.maximum));
+        }
+        return std::nullopt;
+    }
+    case PrintQuestion::Kind::Date:
+    case PrintQuestion::Kind::Check:
+        return std::nullopt;
+    }
     if (question.minimumLength > 0 && answer.size() < question.minimumLength) {
         return u"%1: at least %2 characters."_s.arg(label).arg(question.minimumLength);
     }

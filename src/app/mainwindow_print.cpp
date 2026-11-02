@@ -83,7 +83,9 @@ std::optional<QList<LabelDocument>> MainWindow::labelsToPrint()
     // The questions first: their answers go on every label of the run.
     QHash<QString, QString> answers;
     if (!document.questions.isEmpty()) {
-        AnswersDialog dialog(document.questions, m_answers, this);
+        // Drop-downs and lookups may come from the data source.
+        ensureDataLoaded(true);
+        AnswersDialog dialog(document.questions, m_answers, m_dataTable, this);
         if (dialog.exec() != QDialog::Accepted) {
             return std::nullopt;
         }

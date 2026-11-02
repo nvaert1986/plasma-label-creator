@@ -7,6 +7,8 @@ add_executable(plasma-label-creator
     addressbookpanel.h
     alteclabels.cpp
     alteclabels.h
+    answersform.cpp
+    answersform.h
     clipartpanel.cpp
     clipartpanel.h
     customlabels.cpp
