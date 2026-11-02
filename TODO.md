@@ -72,8 +72,11 @@ trailer labels, density, darkness and speed per label, query parameters
 and pictures from a database (tested). Version 0.4.0 before it: print-only
 mode, forms, versions, print history, printer status, settings, export
 with the label's outline, DYMO's label ids and the automation service.
-Next: the checks under "Bug review", then the printer tests below.
-After that, bringing the web version up to date (see "Web version").
+Next: the checks under "Bug review" (with a first real test print through
+the automation service), then the printer tests below. Without a printer:
+sheets of labels for office printers and the automation extras under
+"Later". After that, bringing the web version up to date (see "Web
+version"). Still to decide: whether RFID encoding stays on the list.
 
 ## Third bug review (2026-10-30, 0.3.0)
 
@@ -153,6 +156,11 @@ Hard:
 
 - [ ] **RFID encoding**: write RFID tags in RFID labels on printers that
   have an encoder. (Hard; the LabelWriter 550's RFID label check stays out.)
+  Needs an RFID printer, matching labels and a UHF reader to test: the
+  encoding (EPC, SGTIN-96) and the printer's answers can be tested without
+  one, a tag really written only with one. Printing would go to the
+  printer as raw ZPL (the label as a picture plus ^RS/^RF), since CUPS's
+  Zebra driver cannot add RFID commands.
 - [ ] **Scripting** in labels: fields calculated by a small script. (Hard)
 - [ ] **Read NiceLabel `.nlbl` files**: see Files below. (Hard)
 
