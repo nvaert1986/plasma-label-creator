@@ -4,6 +4,7 @@
 set(tests
     addressbooktest
     arrangetest
+    automationtest
     barcodetest
     clipartlibrarytest
     fieldstest
@@ -28,6 +29,9 @@ endforeach()
 target_link_libraries(barcodetest zint::zint)
 # Plays a ZPL printer on a local TCP port.
 target_link_libraries(zplprintertest Qt6::Network)
+
+# The automation service: watched folders, and requests over HTTP.
+ecm_add_test(automationservicetest.cpp LINK_LIBRARIES automationservice Qt6::Network Qt6::Test TEST_NAME automationservicetest)
 # Reads the printed raster back.
 target_link_libraries(labelprintertest Cups::Cups)
 
@@ -77,12 +81,13 @@ if(BUILD_APP)
         ${CMAKE_SOURCE_DIR}/src/app/printerstatusdialog.cpp
         ${CMAKE_SOURCE_DIR}/src/app/appsettings.cpp
         ${CMAKE_SOURCE_DIR}/src/app/settingsdialog.cpp
+        ${CMAKE_SOURCE_DIR}/src/app/automationpage.cpp
         ${CMAKE_SOURCE_DIR}/src/app/exportdialog.cpp
         ${CMAKE_SOURCE_DIR}/src/app/gs1dialog.cpp
         ${CMAKE_SOURCE_DIR}/src/app/rolllayoutdialog.cpp
         LINK_LIBRARIES labelcreatorcore Qt6::Test Qt6::Widgets Qt6::Sql KF6::Archive KF6::I18n KF6::WidgetsAddons KF6::ConfigWidgets
         TEST_NAME datadialogstest)
-    target_include_directories(datadialogstest PRIVATE ${CMAKE_SOURCE_DIR}/src/app)
+    target_include_directories(datadialogstest PRIVATE ${CMAKE_SOURCE_DIR}/src/app ${CMAKE_BINARY_DIR})
     set_tests_properties(datadialogstest PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
 
     # The address book tab: check marks, searching, sorting.

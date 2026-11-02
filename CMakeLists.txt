@@ -21,7 +21,7 @@ include(ECMSetupVersion)
 include(ECMAddTests)
 include(FeatureSummary)
 
-# The core library only needs QtCore, QtGui and zint, so a future headless
+# The core library only needs QtCore, QtGui and zint, so the automation
 # service can link it without pulling in widgets or KDE Frameworks.
 option(BUILD_APP "Build the Plasma Label Creator desktop application (needs KDE Frameworks)" ON)
 
@@ -36,6 +36,24 @@ set_package_properties(Cups PROPERTIES
     DESCRIPTION "Printing to DYMO LabelWriter queues"
     URL "https://openprinting.github.io/cups/"
     TYPE REQUIRED)
+
+# The automation service takes print requests over HTTP when Qt HTTP
+# Server is installed; without it, it watches folders only.
+option(WITH_HTTP_SERVER "Print requests over HTTP in the automation service (needs Qt HTTP Server)" ON)
+set(LABELCREATOR_HTTP_SERVER OFF)
+if(WITH_HTTP_SERVER)
+    find_package(Qt6HttpServer 6.8 QUIET CONFIG)
+    set_package_properties(Qt6HttpServer PROPERTIES
+        DESCRIPTION "Qt HTTP Server"
+        URL "https://doc.qt.io/qt-6/qthttpserver-index.html"
+        TYPE OPTIONAL
+        PURPOSE "Print requests over HTTP in the automation service")
+    if(Qt6HttpServer_FOUND)
+        set(LABELCREATOR_HTTP_SERVER ON)
+    endif()
+endif()
+add_feature_info("Print requests over HTTP" LABELCREATOR_HTTP_SERVER "the automation service takes print requests over HTTP (Qt HTTP Server)")
+configure_file(src/labelcreator_config.h.in ${CMAKE_CURRENT_BINARY_DIR}/labelcreator_config.h)
 
 if(BUILD_APP)
     find_package(Qt6 ${QT_MIN_VERSION} REQUIRED COMPONENTS Widgets PrintSupport DBus Sql)
@@ -65,6 +83,7 @@ ecm_setup_version(${PROJECT_VERSION}
 
 add_subdirectory(src/lib)
 add_subdirectory(src/cli)
+add_subdirectory(src/service)
 
 if(BUILD_APP)
     add_subdirectory(src/app)

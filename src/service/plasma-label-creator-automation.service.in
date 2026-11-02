@@ -1,0 +1,15 @@
+# SPDX-FileCopyrightText: 2026 nvaert1986 <25772781+nvaert1986@users.noreply.github.com>
+# SPDX-License-Identifier: CC0-1.0
+
+[Unit]
+Description=Plasma Label Creator automation service
+Documentation=https://github.com/nvaert1986/plasma-label-creator
+After=cups.service
+
+[Service]
+ExecStart=@KDE_INSTALL_FULL_BINDIR@/plasma-label-creator-automation
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=default.target

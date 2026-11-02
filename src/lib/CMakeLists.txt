@@ -8,10 +8,16 @@ add_library(labelcreatorcore STATIC
     addressbook.h
     arrange.cpp
     arrange.h
+    automation.cpp
+    automation.h
     barcode.cpp
     barcode.h
     clipartlibrary.cpp
     clipartlibrary.h
+    datatable.cpp
+    datatable.h
+    dlslabelids.cpp
+    dlslabelids.h
     fields.cpp
     gs1.cpp
     gs1.h

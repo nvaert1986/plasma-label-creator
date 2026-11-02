@@ -5,6 +5,7 @@
 
 #include "labelformat.h"
 
+#include "dlslabelids.h"
 #include "tapelayout.h"
 #include "units.h"
 
@@ -1327,7 +1328,8 @@ void Serializer::writeDocument(const LabelDocument &document)
     writeExtensions(document);
 
     writeEnum("PaperOrientation"_L1, paperOrientationNames, document.orientation);
-    m_xml.writeTextElement("Id"_L1, document.id);
+    // DYMO's own id where the label has one, not the driver's page keyword.
+    m_xml.writeTextElement("Id"_L1, DlsLabelIds::preferred(document.id, document.paperName));
     if (document.outlined) {
         m_xml.writeTextElement("IsOutlined"_L1, formatBool(*document.outlined));
     }

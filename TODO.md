@@ -43,12 +43,16 @@ See `CHANGELOG.md` under "Unreleased" for the details.
 - [x] Print preview fitted on opening, landscape labels as on the canvas.
 - [x] Export with the label's outline (rounded corners) as a proof.
 - [x] `printbar.cpp` split by topic (bar, printers, status).
+- [x] DYMO's own label ids in saved labels.
+- [x] Automation service: watched folders, and print requests over HTTP
+  with Qt HTTP Server (optional, greyed out in the settings without it).
 
 ## Next session
 
 Version 0.3.0 is released and tested. Since then: print-only mode, forms,
-versions, print history, printer status, settings and export with the
-label's outline, not released yet. Next: try
+versions, print history, printer status, settings, export with the
+label's outline, DYMO's label ids and the automation service, not released
+yet. Next: try
 those (checks under "Bug review"), then the printer tests below.
 After that, bringing the web version up to date (see "Web version").
 
@@ -157,10 +161,6 @@ Hard:
 
 - [ ] **Read NiceLabel `.nlbl` files**, for interoperability: open the
   label (size, objects, text, barcodes) and convert it to a `.label`.
-- [ ] **DLS label ids.** Labels made with File → New get the driver's page
-  keyword (e.g. `w79h252`) as `<Id>` where DLS writes its own (`Address`,
-  `Small30334`). DLS 8 opens them fine so far; if that changes, use DLS's
-  own ids.
 
 ## Code
 
@@ -231,10 +231,9 @@ rather than build them twice.
 
 In the desktop app:
 
-- [ ] **Automation service**: a background service that prints when a CSV
-  or JSON file lands in a folder, or on an HTTP request, through CUPS.
-  (Medium; HTTP would need Qt HTTP Server. Better in the web version's
-  server, which has logins and runs in a container.)
+- [ ] **Automation, more**: the network ZPL printer's loaded labels checked
+  before printing (the app asks the printer; the service only checks the
+  CUPS queue), and a page of recent jobs in the settings. (Easy-Medium)
 - [ ] **Open and save labels in the web version's library**, signed in with
   the same account. (Medium)
 

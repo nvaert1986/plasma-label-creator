@@ -41,6 +41,26 @@
   folder, format and choice are remembered. `plasma-label-creator-render
   --outline` does the same for PDF and `--print` PNG.
 
+### Automation
+
+- **Automation service** (`plasma-label-creator-automation`): prints in the
+  background, also when the app is closed, with the same checks as the
+  Print button (answers, shared counters, the printer's label types, a
+  stopped queue), counters saved in the label and every print in the print
+  history.
+  - Watched folders: a CSV file dropped in one prints a label per row with
+    the folder's label, printer and copies; a JSON file is a print job.
+    Printed files move to `printed/`, others to `failed/` with the reason.
+  - Print requests over HTTP, when built with Qt HTTP Server (optional):
+    `POST /v1/print`, `GET /v1/labels`, `/v1/printers` and `/v1/status`,
+    with a token on every request, from this computer only or from the
+    network. Only labels in the labels folder set for it can be named.
+  - Settings > Configure Plasma Label Creator > Automation: start and stop
+    it, start it at log-in, the watched folders, the labels folder, the
+    default printer, and HTTP (port, token). Without Qt HTTP Server the
+    HTTP part is greyed out and says the package is not installed.
+  - A systemd user unit for computers without a desktop session.
+
 ### Settings
 
 - **Settings > Configure Plasma Label Creator…**:
@@ -82,6 +102,11 @@
 - The about text names all supported printers.
 - The print bar's code is split into files by topic (the bar, printers,
   printer status); no change in use.
+- Labels are saved with DYMO's own label ids (`Address`, `Small30334`)
+  instead of the driver's page keyword (`w79h252`), also labels made with
+  earlier versions, for the 57 label types that have one.
+- Reading CSV files moved into the core library, for the automation
+  service; no change in use.
 
 ## 0.3.0 (2026-10-30)
 

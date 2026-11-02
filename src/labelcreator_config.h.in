@@ -1,0 +1,10 @@
+/*
+    SPDX-FileCopyrightText: 2026 nvaert1986 <25772781+nvaert1986@users.noreply.github.com>
+    SPDX-License-Identifier: GPL-2.0-or-later
+*/
+
+#pragma once
+
+// Whether Qt HTTP Server was found: the automation service then takes print
+// requests over HTTP, and the app offers them in its settings.
+#cmakedefine01 LABELCREATOR_HTTP_SERVER

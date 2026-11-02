@@ -5,6 +5,7 @@
 
 #include "objectfactory.h"
 
+#include "dlslabelids.h"
 #include "tapelayout.h"
 
 #include "units.h"
@@ -225,7 +226,8 @@ LabelDocument newLabel(const QString &paperName, const QString &id, const QSizeF
 {
     LabelDocument document;
     document.paperName = paperName;
-    document.id = id;
+    // DYMO's own id where the label has one, else the driver's page keyword.
+    document.id = DlsLabelIds::preferred(id, paperName);
     const QSizeF twips = paperSize * Units::TwipsPerPoint;
     document.paperOutline.addRoundedRect(QRectF(QPointF(0, 0), twips), 180, 180);
     // DLS lays labels out with their long side horizontal.

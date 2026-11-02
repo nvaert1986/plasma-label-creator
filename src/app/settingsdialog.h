@@ -6,9 +6,11 @@
 #pragma once
 
 #include "appsettings.h"
+#include "automation.h"
 
 #include <KPageDialog>
 
+class AutomationPage;
 class QCheckBox;
 class QComboBox;
 class QDoubleSpinBox;
@@ -16,13 +18,20 @@ class QFontComboBox;
 class QLineEdit;
 class QSpinBox;
 
-/** Settings > Configure Plasma Label Creator: designing, printing, print-only mode, history. */
+/**
+ * Settings > Configure Plasma Label Creator: designing, printing, print-only
+ * mode, history, and the automation service (kept in a file of its own,
+ * which the service reads).
+ */
 class SettingsDialog : public KPageDialog
 {
     Q_OBJECT
 
 public:
-    explicit SettingsDialog(const AppSettings &settings, QWidget *parent = nullptr);
+    /** @p automationFile: the automation service's settings. */
+    explicit SettingsDialog(const AppSettings &settings,
+                            QWidget *parent = nullptr,
+                            const QString &automationFile = LabelCreator::AutomationSettings::defaultFileName());
 
     AppSettings settings() const;
     void showSettings(const AppSettings &settings);
@@ -60,4 +69,6 @@ private:
     QCheckBox *m_versionsNextToLabel;
     QSpinBox *m_historyKept;
     QSpinBox *m_recentKept;
+    // Automation
+    AutomationPage *m_automation;
 };

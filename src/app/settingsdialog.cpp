@@ -5,7 +5,10 @@
 
 #include "settingsdialog.h"
 
+#include "automationpage.h"
+
 #include <KLocalizedString>
+#include <KMessageBox>
 
 #include <QCheckBox>
 #include <QComboBox>
@@ -18,6 +21,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
+#include <QScrollArea>
 #include <QSpinBox>
 
 using namespace Qt::Literals::StringLiterals;
@@ -72,7 +76,7 @@ void lockIfFixed(QWidget *widget, const char *key)
 
 } // namespace
 
-SettingsDialog::SettingsDialog(const AppSettings &settings, QWidget *parent)
+SettingsDialog::SettingsDialog(const AppSettings &settings, QWidget *parent, const QString &automationFile)
     : KPageDialog(parent)
 {
     setWindowTitle(i18n("Configure Plasma Label Creator"));
@@ -159,6 +163,15 @@ SettingsDialog::SettingsDialog(const AppSettings &settings, QWidget *parent)
     m_recentKept = countBox(1, 100);
     history->addRow(i18n("Recently used layouts kept:"), m_recentKept);
 
+    m_automation = new AutomationPage(automationFile);
+    auto *scroll = new QScrollArea;
+    scroll->setWidget(m_automation);
+    scroll->setWidgetResizable(true);
+    scroll->setFrameShape(QFrame::NoFrame);
+    KPageWidgetItem *automation = addPage(scroll, i18n("Automation"));
+    automation->setHeader(i18n("Printing for other programs, without anyone at the screen"));
+    automation->setIcon(QIcon::fromTheme(u"system-run"_s));
+
     const std::pair<QWidget *, const char *> keys[] = {{m_fontFamily, "TextFontFamily"},
                                                       {m_fontSize, "TextFontSize"},
                                                       {m_nudge, "NudgeMm"},
@@ -188,13 +201,23 @@ SettingsDialog::SettingsDialog(const AppSettings &settings, QWidget *parent)
     connect(button(QDialogButtonBox::RestoreDefaults), &QPushButton::clicked, this, [this]() {
         showSettings(AppSettings());
     });
-    connect(button(QDialogButtonBox::Apply), &QPushButton::clicked, this, [this]() {
+    // The automation settings are the service's: Restore Defaults leaves its
+    // folders alone.
+    const auto saveAutomation = [this]() {
+        QString error;
+        if (!m_automation->save(&error)) {
+            KMessageBox::error(this, i18n("The automation settings could not be saved:\n%1", error));
+        }
+    };
+    connect(button(QDialogButtonBox::Apply), &QPushButton::clicked, this, [this, saveAutomation]() {
+        saveAutomation();
         Q_EMIT applied(this->settings());
     });
-    connect(this, &QDialog::accepted, this, [this]() {
+    connect(this, &QDialog::accepted, this, [this, saveAutomation]() {
+        saveAutomation();
         Q_EMIT applied(this->settings());
     });
-    resize(640, 420);
+    resize(720, 560);
 }
 
 void SettingsDialog::showSettings(const AppSettings &settings)

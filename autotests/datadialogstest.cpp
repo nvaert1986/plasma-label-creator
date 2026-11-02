@@ -4,6 +4,7 @@
 */
 
 #include "answersform.h"
+#include "automationpage.h"
 #include "datadialogs.h"
 #include "gs1dialog.h"
 #include "labelformat.h"
@@ -503,6 +504,44 @@ private Q_SLOTS:
         dialog.button(QDialogButtonBox::Apply)->click();
         QCOMPARE(applied.size(), 1);
         KSharedConfig::openConfig()->deleteGroup(u"Settings"_s);
+    }
+
+    void automationPageKeepsItsSettings()
+    {
+        QStandardPaths::setTestModeEnabled(true);
+        QTemporaryDir dir;
+        const QString file = dir.filePath(u"automation.json"_s);
+        AutomationSettings settings;
+        settings.folders << AutomationSettings::Folder{dir.path(), dir.filePath(u"box.label"_s), QString(), 2};
+        settings.labelsFolder = dir.path();
+        settings.httpPort = 9100;
+        QVERIFY(settings.save(file));
+
+        AutomationPage page(file);
+        page.resize(680, 640);
+        page.show();
+        QVERIFY(QTest::qWaitForWindowExposed(&page));
+        QCOMPARE(page.settings(), settings);
+        auto *http = page.findChild<QGroupBox *>();
+        for (QGroupBox *box : page.findChildren<QGroupBox *>()) {
+            if (box->isCheckable()) {
+                http = box;
+            }
+        }
+        // Requests over HTTP: offered when built with Qt HTTP Server, and
+        // never without a token.
+        QCOMPARE(http->isEnabled(), AutomationPage::hasHttp());
+        if (AutomationPage::hasHttp()) {
+            http->setChecked(true);
+            QVERIFY(page.settings().http);
+            QVERIFY(page.settings().httpToken.size() >= 40);
+        }
+        grab(&page, u"automation"_s);
+        QString error;
+        QVERIFY2(page.save(&error), qPrintable(error));
+        QCOMPARE(AutomationSettings::load(file), page.settings());
+        // Not asked to start at log-in: no autostart entry.
+        QVERIFY(!QFileInfo::exists(AutomationPage::autostartFile()));
     }
 
     void exportChoosesFormatAndOutline()

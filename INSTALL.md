@@ -25,6 +25,7 @@ been tried; if one does not, please report it.
 | Qt 6: Core, Gui, Network | 6.7 | 6.11 |
 | Qt 6: Widgets, PrintSupport, DBus, Sql (application) | 6.7 | 6.11 |
 | Qt 6: Test (only for the tests) | 6.7 | 6.11 |
+| Qt 6: HttpServer (optional: print requests over HTTP) | 6.8 | 6.11 |
 | KDE Frameworks 6: Archive, ConfigWidgets, CoreAddons, Crash, I18n, IconThemes, WidgetsAddons, XmlGui | 6.0 | 6.29 |
 | zint, with its CMake package files | any 2.x that installs them | 2.16 |
 | CUPS library and headers | 2.x | 2.4 |
@@ -53,6 +54,12 @@ emerge --ask --noreplace dev-build/cmake dev-build/ninja \
     kde-frameworks/kxmlgui
 ```
 
+Optional, for print requests over HTTP in the automation service:
+
+```sh
+emerge --ask --noreplace dev-qt/qthttpserver
+```
+
 `dev-qt/qtbase` needs the USE flags `gui`, `widgets`, `network`, `dbus` and
 `sql` (a KDE Plasma system has them), plus `sqlite` for SQLite databases and
 `odbc` for SQL Server, Access and other databases through ODBC. Printing from
@@ -66,6 +73,7 @@ apt install build-essential cmake ninja-build extra-cmake-modules pkgconf \
     libkf6crash-dev libkf6i18n-dev libkf6iconthemes-dev \
     libkf6widgetsaddons-dev libkf6xmlgui-dev libzint-dev libcups2-dev \
     libudev-dev
+apt install qt6-httpserver-dev   # optional: print requests over HTTP
 ```
 
 **Fedora**
@@ -76,6 +84,7 @@ dnf install gcc-c++ cmake ninja-build extra-cmake-modules pkgconf \
     kf6-kcrash-devel kf6-ki18n-devel kf6-kiconthemes-devel \
     kf6-kwidgetsaddons-devel kf6-kxmlgui-devel zint-devel cups-devel \
     systemd-devel
+dnf install qt6-qthttpserver-devel   # optional: print requests over HTTP
 ```
 
 **Arch Linux**
@@ -84,7 +93,12 @@ dnf install gcc-c++ cmake ninja-build extra-cmake-modules pkgconf \
 pacman -S --needed base-devel cmake ninja extra-cmake-modules qt6-base \
     karchive kconfigwidgets kcoreaddons kcrash ki18n kiconthemes kwidgetsaddons \
     kxmlgui zint cups systemd-libs
+pacman -S --needed qt6-httpserver   # optional: print requests over HTTP
 ```
+
+Qt HTTP Server is found when the build is configured: install it before
+running CMake (or run CMake again after installing it). The summary at the
+end of the configure step says whether "Print requests over HTTP" is on.
 
 ### For printing
 
@@ -149,6 +163,7 @@ ctest --test-dir build -j "$(nproc)" --output-on-failure
 | `-DCMAKE_BUILD_TYPE=` | none | `RelWithDebInfo` or `Release` for normal use, `Debug` for development |
 | `-DBUILD_APP=OFF` | `ON` | Build only the core library and the command-line tool: no KDE Frameworks, Qt Widgets or libudev needed |
 | `-DBUILD_TESTING=OFF` | `ON` | Skip the tests: Qt Test is not needed |
+| `-DWITH_HTTP_SERVER=OFF` | `ON` | Leave print requests over HTTP out of the automation service even when Qt HTTP Server is installed |
 | `-DCMAKE_INSTALL_PREFIX=` | `/usr/local` | Where `cmake --install` puts the files, e.g. `~/.local` |
 
 Without Ninja, leave out `-G Ninja` and CMake uses make.
@@ -169,10 +184,29 @@ cmake --build build
 cmake --install build
 ```
 
-This installs both programs and two desktop entries: Plasma Label Creator,
-and Label Printing, which starts it in print-only mode
-(`plasma-label-creator --print-only [folder]`) for people who only print.
-For a `~/.local` install, make sure `~/.local/bin` is in your `PATH`.
+This installs the three programs (`plasma-label-creator`,
+`plasma-label-creator-render` and the automation service,
+`plasma-label-creator-automation`), a systemd user unit for the service,
+and two desktop entries: Plasma Label Creator, and Label Printing, which
+starts it in print-only mode (`plasma-label-creator --print-only [folder]`)
+for people who only print. For a `~/.local` install, make sure
+`~/.local/bin` is in your `PATH`.
+
+The automation service is set up in Settings > Configure Plasma Label
+Creator > Automation, which can start it and have it start when you log
+in. It runs as the user, with that user's printers and print history. On
+a computer without a desktop session, run it as a systemd user service,
+and let it run without anyone logged in:
+
+```sh
+systemctl --user enable --now plasma-label-creator-automation
+loginctl enable-linger $USER   # as root: keep it running after logging out
+```
+
+Its settings are in `~/.config/plasma-label-creator/automation.json`
+(readable by the user only: it holds the HTTP token); it follows changes to
+that file. It writes what it prints, and why a job failed, to the journal:
+`journalctl --user -t plasma-label-creator-automation`.
 
 Print-only mode, versions, the print history, printer status and the
 settings need nothing beyond the requirements above.

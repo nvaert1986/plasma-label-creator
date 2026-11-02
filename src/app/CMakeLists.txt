@@ -11,6 +11,8 @@ add_executable(plasma-label-creator
     answersform.h
     appsettings.cpp
     appsettings.h
+    automationpage.cpp
+    automationpage.h
     clipartpanel.cpp
     clipartpanel.h
     customlabels.cpp

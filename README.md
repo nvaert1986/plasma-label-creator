@@ -47,9 +47,11 @@ Altec, Zebra Technologies or KDE e.V. See [Trademarks](#trademarks).
   software that opens the file may not show the types in the second group.
 - **`.label` files**: open and save them, die-cut labels as well as
   LabelManager tape labels. Objects it does not know are kept and written
-  back unchanged. Address books (`.ABX`) are supported too. A label's data
-  source and print-time questions are kept in the file as a comment, which
-  other label software ignores, so the file stays compatible.
+  back unchanged. Labels are saved with DYMO's own label ids (such as
+  `Address` for a 30252 or 99010 label). Address books (`.ABX`) are
+  supported too. A label's data source and print-time questions are kept in
+  the file as a comment, which other label software ignores, so the file
+  stays compatible.
 - **Print from data**: a label for each row of a CSV file, an Excel or
   LibreOffice spreadsheet, or a database query (SQLite, ODBC for SQL Server
   and others, MySQL, PostgreSQL). Put fields on the label as `{Column}`, in
@@ -94,6 +96,11 @@ Altec, Zebra Technologies or KDE e.V. See [Trademarks](#trademarks).
 - **Recently used layouts**: every printed label, with a thumbnail.
 - **`plasma-label-creator-render`**: a command-line tool that renders a
   label to PNG or PDF, prints it, or shows what a printer would receive.
+- **Automation service** (`plasma-label-creator-automation`): prints
+  without anyone at the screen, also when the app is closed. CSV and JSON
+  files dropped in watched folders print a label per row; other programs
+  send print requests over HTTP (with Qt HTTP Server). Set up in Settings >
+  Configure Plasma Label Creator > Automation.
 
 ## Printers
 
@@ -135,6 +142,9 @@ for those, make the label size with Layout > Custom Label Size….
 - To print: CUPS with DYMO's driver for DYMO printers, or CUPS's own Zebra
   ZPL driver for Altec and Zebra printers (also for labels across the roll
   and continuous rolls).
+- Optional: Qt HTTP Server (6.8 or newer), for print requests over HTTP in
+  the automation service. Without it the service watches folders only, and
+  the settings show the HTTP part greyed out.
 - Optional: DYMO's clip art is not included. If you own DYMO Label
   Software, the Clip Art panel can import it from your own copy of
   `DYMO.DLS.dll`; it stays on your computer.
@@ -174,12 +184,52 @@ plasma-label-creator-render --outline label.label proof.pdf
 
 `plasma-label-creator-render --help` lists every option.
 
+## Automation service
+
+`plasma-label-creator-automation` prints labels for other programs, in the
+background, with the same checks as the Print button: answers to the
+label's questions, shared counters, the printer's label types and state.
+Counters count on in the label, and every print goes in the print history.
+Set it up in Settings > Configure Plasma Label Creator > Automation: start
+it there or have it start when you log in. On a computer without a desktop
+session, run it as a systemd user service:
+`systemctl --user enable --now plasma-label-creator-automation`.
+
+**Watched folders.** Each folder has a label, a printer and a number of
+copies. A CSV file dropped in it prints a label for each row, its first
+line naming the fields; a JSON file is a print job as below. Printed files
+move to `printed/`, others to `failed/` with the reason in a `.txt` file.
+
+**Over HTTP** (with Qt HTTP Server). From this computer only, or from the
+network; every request carries the token shown in the settings. Labels are
+named relative to the labels folder set there, and only labels in it print.
+
+```sh
+curl -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+     -d '{"label": "Rack/patch panel", "printer": "Zebra-ZT230", "copies": 1,
+          "values": {"Port": "A12"},
+          "rows": [{"Serial": "S1"}, {"Serial": "S2"}]}' \
+     http://localhost:8631/v1/print
+```
+
+| Request | Answer |
+|---|---|
+| `POST /v1/print` | `{"job": 42, "labels": 2, "warnings": []}`, or `{"error": "..."}` with 400 (the job does not do), 404 (no such label or printer), 409 (the printer cannot take the label or reports a problem: send `"printAnyway": true` to print anyway) or 500 |
+| `GET /v1/labels` | The labels in the labels folder, with their fields and questions |
+| `GET /v1/printers` | The printers, their state and problems |
+| `GET /v1/status` | The service's version and settings |
+
+`values` fill `{fields}` and answer the label's questions on every label;
+each of `rows` gives one label. Check boxes take `true` or `false`, dates
+`yyyy-MM-dd` or the question's own format.
+
 ## Source layout
 
 | Path | Contents |
 |---|---|
 | `src/lib` | `labelcreatorcore`: file formats, layout, rendering, printing. Qt Core, Gui and Network, zint and CUPS only; no widgets or KDE Frameworks |
 | `src/cli` | `plasma-label-creator-render` |
+| `src/service` | `plasma-label-creator-automation`, the automation service (Qt only, Qt HTTP Server optional) |
 | `src/app` | The desktop application (Qt Widgets and KDE Frameworks 6) |
 | `autotests` | Qt Test suites and their test data |
 
