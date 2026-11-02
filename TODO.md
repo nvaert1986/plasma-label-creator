@@ -136,7 +136,7 @@ Still to do by hand, in the running app:
   `curl` (and without the token: refused); a stopped queue is refused
   unless `printAnyway`; the Altec with its head open or other labels loaded
   is refused; Recent Jobs lists it all. Needs a real test print.
-- [ ] The features since 0.4.0: a condition on an object (preview and
+- [x] The features since 0.4.0 (tested): a condition on an object (preview and
   print), text that grows with an object anchored to it, guidelines from
   both rulers, a star and an arrow in DYMO's software (a picture), an SVG
   logo printed sharp, copies and a label per row from a CSV, header and
