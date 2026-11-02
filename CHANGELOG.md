@@ -5,6 +5,41 @@
 
 # Changelog
 
+## Unreleased
+
+### Printing
+
+- **Print-only mode** (File > Print-Only Mode, `plasma-label-creator
+  --print-only [folder]`, and a "Label Printing" launcher entry): the labels
+  in a folder with pictures to choose from, the label shown read-only and
+  filled in with the form's answers, the form beside it, Choose Rows for
+  data (without changing where it comes from), and the print bar. Nothing
+  can be edited. Counters that moved on are saved in the label after
+  printing. The designer's toolbars come back as they were.
+- **Data-entry forms**: print-time questions can be text (with rules, and
+  a lookup in a data column that fills the other fields from the row
+  found), a drop-down list (fixed choices or a column of the data), a
+  number (range, decimals), a date (format, today by default) or a check
+  box (an answer for ticked and for not). Data > Print-Time Questions...
+  chooses the kind.
+- **Versions** (File > Versions...): before a label is saved over, the
+  file as it was is kept, 20 per label, in the app's data folder; restore
+  one onto the canvas (undoable).
+- **Print history** (File > Print History...): every print, with when,
+  which label, printer, how many, job, answers and data rows, and the
+  label as printed; search it (data values too), open a label as printed,
+  or print the same labels again.
+- **Printer status**: the print bar shows a stopped or paused queue, jobs
+  waiting, and what a network ZPL printer reports (out of labels, head
+  open, paused, out of ribbon), asked again every 30 seconds; before
+  printing it asks "Print Anyway?" when something is wrong. Printer
+  Status... shows every label printer's queue and state, refreshed every
+  ten seconds. `plasma-label-creator-render --list-printers` shows them too.
+
+### Other
+
+- The about text names all supported printers.
+
 ## 0.3.0 (2026-10-30)
 
 ### Designing

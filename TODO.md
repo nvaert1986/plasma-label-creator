@@ -32,10 +32,18 @@ See `CHANGELOG.md` under "Unreleased" for the details.
   resize handles on turned objects), Turn Left/Right 15°, an angle box.
 - [x] Toolbars rearranged into two rows with new Insert and Arrange bars.
 
+## Done since 0.3.0 (not released yet)
+
+- [x] Print-only mode, with a "Label Printing" launcher entry.
+- [x] Data-entry forms: drop-downs, numbers, dates, check boxes, lookups.
+- [x] Versions of saved labels, and the print history.
+- [x] Printer warnings in the print bar and a Printer Status window.
+
 ## Next session
 
-Version 0.3.0 is released and tested. Next: the hands-on checks under
-"Bug review" and the printer tests below.
+Version 0.3.0 is released and tested. Since then: print-only mode, forms,
+versions, print history and printer status, not released yet. Next: try
+those (checks under "Bug review"), then the printer tests below.
 
 ## Third bug review (2026-10-30, 0.3.0)
 
@@ -77,6 +85,13 @@ Still to do by hand, in the running app:
   and a non-printing one.
 - [ ] The new toolbars on the real desktop (Breeze, your font size): both
   rows fit at 1280 px offscreen; at 1000 px Fit to Page runs over.
+- [ ] Print-only mode on real labels: a folder of labels, forms with each
+  kind of field, a lookup from data, Choose Rows, counters saved; the
+  Label Printing launcher entry after `cmake --install`.
+- [ ] Versions: save a label a few times and restore one. Print history:
+  Print Again with data rows.
+- [ ] Printer warnings: a paused CUPS queue, an Altec with the head open or
+  out of labels; the Printer Status window.
 - [ ] Shared counter: two computers printing the same label with one
   counter file on a share count on without repeats.
 
@@ -151,19 +166,10 @@ rather than build them twice.
 
 In the desktop app:
 
-- [ ] **Print-only mode**: pick a label from a folder, answer its questions,
-  choose rows, print; no editing. (Easy)
-- [ ] **Versions and print history, for one user**: earlier versions kept
-  next to a label to restore; a log of what was printed, when, where, how
-  many and with which answers. (Easy)
 - [ ] **Automation service**: a background service that prints when a CSV
   or JSON file lands in a folder, or on an HTTP request, through CUPS.
-  (Medium)
-- [ ] **Simple forms**: a data-entry screen per label with fields,
-  drop-downs, defaults, lookups and a Print button, built on the
-  print-time questions. (Medium)
-- [ ] **Printer status** for this computer's printers on one screen, from
-  CUPS and the ZPL network queries. (Medium)
+  (Medium; HTTP would need Qt HTTP Server. Better in the web version's
+  server, which has logins and runs in a container.)
 - [ ] **Open and save labels in the web version's library**, signed in with
   the same account. (Medium)
 

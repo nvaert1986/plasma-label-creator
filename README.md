@@ -55,9 +55,18 @@ Altec, Zebra Technologies or KDE e.V. See [Trademarks](#trademarks).
   and others, MySQL, PostgreSQL). Put fields on the label as `{Column}`, in
   texts, addresses, barcodes, or an image's file path for a picture per row.
   Only queries that read are run, and database passwords are never saved.
-- **Questions at print time**, such as a batch number, with rules for the
-  answer: required, length, digits or letters only, or a pattern. The answer
-  fills `{Name}` on every label of the print run.
+- **Forms at print time**: questions such as a batch number, as text with
+  rules (required, length, digits or letters only, a pattern), drop-down
+  lists (fixed, or a column of the data), numbers, dates and check boxes.
+  A text can be looked up in the data, filling the other fields from the
+  row found. The answers fill `{Name}` on every label of the print run.
+- **Print-only mode** for people who only print (File > Print-Only Mode, or
+  the "Label Printing" launcher): choose a label from a folder, fill in
+  its form, tick data rows and print, without editing the label. Counters
+  are kept in the label.
+- **Versions and print history**: each label saved over keeps its earlier
+  versions to restore; every print is logged with its answers and data
+  rows, searchable, to open as printed or print again.
 - **Print** through CUPS, with the right driver per printer: DYMO's own
   drivers for LabelWriters and LabelManagers, CUPS's Zebra ZPL driver for
   ZPL printers. Before printing it checks that the label fits what the
@@ -65,6 +74,9 @@ Altec, Zebra Technologies or KDE e.V. See [Trademarks](#trademarks).
 - **Find printers**: DYMO printers plugged in over USB are noticed, and one
   without a CUPS queue gets a "Set Up Printer" button. ZPL printers on the
   network are asked what they are and which labels are loaded.
+- **Printer status**: the print bar shows a stopped queue, jobs waiting, and
+  what a network ZPL printer reports (out of labels, head open, paused),
+  and warns before printing; Printer Status... shows every label printer.
 - **Labels of a kind** (Insert > Label of a Kind...): cable wraps, cable
   flags, patch panels, terminal blocks, breaker panels and rack markers,
   from a few values. DYMO Rhino templates (`.rhino`) open as tape labels.

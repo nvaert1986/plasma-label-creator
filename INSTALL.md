@@ -169,9 +169,15 @@ cmake --build build
 cmake --install build
 ```
 
-This installs both programs and a desktop entry, so Plasma Label Creator
-appears in the application launcher. For a `~/.local` install, make sure
-`~/.local/bin` is in your `PATH`.
+This installs both programs and two desktop entries: Plasma Label Creator,
+and Label Printing, which starts it in print-only mode
+(`plasma-label-creator --print-only [folder]`) for people who only print.
+For a `~/.local` install, make sure `~/.local/bin` is in your `PATH`.
+
+Print-only mode, versions, the print history and printer status need
+nothing beyond the requirements above. Versions and the print history are
+kept per user in `~/.local/share/plasma-label-creator/` (`versions/`,
+`print-history/`).
 
 To uninstall, remove the files listed in `build/install_manifest.txt`.
 
