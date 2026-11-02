@@ -711,6 +711,11 @@ bool MainWindow::saveAs()
 
 bool MainWindow::maybeSave()
 {
+    // Print-only mode edits nothing: counters that moved on are saved after
+    // printing, or meant to be forgotten when the settings say so.
+    if (m_printOnly) {
+        return true;
+    }
     if (!m_editor->isModified()) {
         return true;
     }

@@ -34,6 +34,9 @@ Q_SIGNALS:
 private:
     // Designing
     QFontComboBox *m_fontFamily;
+    // The family as set: kept when the list shows another for it (not installed).
+    QString m_fontFamilySet;
+    QString m_fontFamilyShown;
     QDoubleSpinBox *m_fontSize;
     QDoubleSpinBox *m_nudge;
     QDoubleSpinBox *m_largeNudge;

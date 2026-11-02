@@ -113,6 +113,13 @@ void MainWindow::setPrintOnly(bool printOnly)
         m_printOnlyAction->setChecked(true);
         return;
     }
+    // Unsaved changes are saved or dropped first: print-only mode does not
+    // ask about them.
+    if (printOnly && !m_printOnly && !maybeSave()) {
+        const QSignalBlocker blocker(m_printOnlyAction);
+        m_printOnlyAction->setChecked(false);
+        return;
+    }
     if (printOnly && !m_printOnly) {
         // Which designer toolbars were showing, to show them again after,
         // also when the app is closed in print-only mode.
@@ -240,7 +247,9 @@ void MainWindow::showVersions()
         KMessageBox::information(this, i18n("Versions are kept each time a label is saved over. This label has not been saved yet."));
         return;
     }
-    VersionsDialog dialog(fileName, LabelVersions().versions(fileName), this);
+    // Where the settings keep them.
+    const LabelVersions versions = m_settings.versionsNextToLabel ? LabelVersions::nextToLabels() : LabelVersions();
+    VersionsDialog dialog(fileName, versions.versions(fileName), this);
     if (dialog.exec() != QDialog::Accepted || dialog.chosenVersion().isEmpty()) {
         return;
     }

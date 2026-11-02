@@ -489,6 +489,11 @@ private Q_SLOTS:
         QCOMPARE(dialog.settings().tapeMm, 19);
         QVERIFY(dialog.settings().lockPrintOnly);
         grab(&dialog, u"settings"_s);
+        // A font not installed here keeps its name, unless another is picked.
+        AppSettings missing;
+        missing.textFont.family = u"No Such Font Family"_s;
+        SettingsDialog substitute(missing, nullptr);
+        QCOMPARE(substitute.settings().textFont.family, u"No Such Font Family"_s);
         QSignalSpy applied(&dialog, &SettingsDialog::applied);
         dialog.button(QDialogButtonBox::RestoreDefaults)->click();
         QCOMPARE(dialog.settings().turnStep, AppSettings().turnStep);

@@ -63,6 +63,10 @@
   types every 30 seconds.
 - Print-only mode no longer offers printing the hidden address book's
   checked addresses, and redraws a label's picture only when it changed.
+- File > Versions... looks where the settings keep versions (also next to
+  the label); a font for new text that is not installed keeps its name
+  when the settings are saved; print-only mode never asks about saving,
+  and switching to it asks about unsaved changes first.
 
 ### Other
 

@@ -200,6 +200,8 @@ SettingsDialog::SettingsDialog(const AppSettings &settings, QWidget *parent)
 void SettingsDialog::showSettings(const AppSettings &settings)
 {
     m_fontFamily->setCurrentFont(QFont(settings.textFont.family));
+    m_fontFamilySet = settings.textFont.family;
+    m_fontFamilyShown = m_fontFamily->currentFont().family();
     m_fontSize->setValue(settings.textFont.size);
     m_nudge->setValue(settings.nudgeMm);
     m_largeNudge->setValue(settings.largeNudgeMm);
@@ -226,7 +228,10 @@ void SettingsDialog::showSettings(const AppSettings &settings)
 AppSettings SettingsDialog::settings() const
 {
     AppSettings s;
-    s.textFont.family = m_fontFamily->currentFont().family();
+    // A font not installed here shows as another in the list: unless a
+    // family was picked, the one set stays.
+    const QString shown = m_fontFamily->currentFont().family();
+    s.textFont.family = shown == m_fontFamilyShown ? m_fontFamilySet : shown;
     s.textFont.size = m_fontSize->value();
     s.nudgeMm = m_nudge->value();
     s.largeNudgeMm = m_largeNudge->value();
