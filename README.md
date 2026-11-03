@@ -253,10 +253,12 @@ the app starts again.
 
 Add-ons build against one header, `PlasmaLabelCreator/plasmalabelcreatorplugin.h`,
 installed with the app (and in `src/plugin`). An add-on can put actions in
-the File menu and open labels it keeps in a folder of its own: the app opens,
+the File menu and a status indicator in the status bar (whether it is
+signed in, say), and open labels it keeps in a folder of its own: the app opens,
 prints and saves them as any label file, finds their pictures, data files and
 other labels next to them, and tells the add-on when such a label is saved or
-printed. Shared counters of its labels can count on with the add-on instead
+printed, also when it is opened again from the recent files or in
+print-only mode. Shared counters of its labels can count on with the add-on instead
 of in a counter file. That is enough for, say, a team's labels kept on a
 server.
 

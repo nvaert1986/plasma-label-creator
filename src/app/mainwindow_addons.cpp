@@ -40,6 +40,9 @@ void MainWindow::loadAddons()
         addon->initialise(this);
         m_addons << addon;
         fileActions << addon->fileActions();
+        if (QWidget *status = addon->createStatusWidget(statusBar())) {
+            statusBar()->addPermanentWidget(status);
+        }
     }
     if (!fileActions.isEmpty()) {
         auto *separator = new QAction(this);
@@ -96,6 +99,22 @@ bool MainWindow::openLabel(const QString &fileName, const QString &origin)
     m_originFile = m_editor->fileName();
     updateCaption();
     return true;
+}
+
+void MainWindow::claimByAddon()
+{
+    // A label file one of the add-ons keeps, opened as a file: still the add-on's.
+    m_origin.clear();
+    m_originFile.clear();
+    for (Plugin *addon : std::as_const(m_addons)) {
+        const QString origin = addon->originOf(m_editor->fileName());
+        if (!origin.isEmpty()) {
+            m_origin = origin;
+            m_originFile = m_editor->fileName();
+            break;
+        }
+    }
+    updateCaption();
 }
 
 QString MainWindow::currentFileName() const

@@ -94,8 +94,20 @@ public:
     /** Actions for the File menu, such as opening and saving labels elsewhere. */
     virtual QList<QAction *> fileActions() = 0;
 
+    /**
+     * A widget for the status bar showing how the add-on is (signed in, say),
+     * owned by @p parent; nullptr for none.
+     */
+    virtual QWidget *createStatusWidget(QWidget *parent) = 0;
+
     /** Whether @p origin is one of this add-on's labels. */
     virtual bool owns(const QString &origin) const = 0;
+
+    /**
+     * The origin of the label file @p fileName when it is one of the
+     * add-on's (opened again from the recent files, say); empty otherwise.
+     */
+    virtual QString originOf(const QString &fileName) = 0;
 
     /** The current label's name in the window's title, such as "Name tag (Warehouse)". */
     virtual QString title(const QString &origin) const = 0;
@@ -123,5 +135,5 @@ public:
 
 } // namespace LabelCreator
 
-#define LabelCreatorPlugin_iid "org.kde.plasma-label-creator.Plugin/1"
+#define LabelCreatorPlugin_iid "org.kde.plasma-label-creator.Plugin/2"
 Q_DECLARE_INTERFACE(LabelCreator::Plugin, LabelCreatorPlugin_iid)

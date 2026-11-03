@@ -31,9 +31,17 @@ public:
     {
         return {m_open};
     }
+    QWidget *createStatusWidget(QWidget *) override
+    {
+        return nullptr;
+    }
     bool owns(const QString &origin) const override
     {
         return origin.startsWith(u"fake:"_s);
+    }
+    QString originOf(const QString &fileName) override
+    {
+        return fileName.startsWith(u"/fake/"_s) ? u"fake:1"_s : QString();
     }
     QString title(const QString &origin) const override
     {

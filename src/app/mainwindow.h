@@ -245,6 +245,8 @@ private:
     void openRecentLayout(const LabelCreator::RecentLayout &layout);
     /** Loads the add-ons that are installed and switched on, and puts their actions in the menus. */
     void loadAddons();
+    /** Makes the label just opened an add-on's when one keeps its file. */
+    void claimByAddon();
     /** The add-on the current label belongs to; nullptr for none. */
     LabelCreator::Plugin *currentAddon() const;
     /**

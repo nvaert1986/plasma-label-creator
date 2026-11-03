@@ -83,6 +83,9 @@ private Q_SLOTS:
         QVERIFY(addon->owns(u"fake:1"_s));
         QVERIFY(!addon->owns(u"other:1"_s));
         QCOMPARE(addon->title(u"fake:7"_s), u"Fake label 7"_s);
+        // Its own files, opened as files, are still its labels.
+        QCOMPARE(addon->originOf(u"/fake/label.label"_s), u"fake:1"_s);
+        QVERIFY(addon->originOf(u"/home/someone/label.label"_s).isEmpty());
 
         // Counters: taken for printing, peeked at for a preview, or left to the app.
         QString error;

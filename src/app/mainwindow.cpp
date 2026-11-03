@@ -531,6 +531,7 @@ bool MainWindow::openFile(const QString &name)
     }
     m_recentFiles->addUrl(QUrl::fromLocalFile(fileName));
     m_recentFiles->saveEntries(KSharedConfig::openConfig()->group(u"Recent Files"_s));
+    claimByAddon();
     // A LabelWriter cannot tell which labels are loaded; like DLS, new labels
     // start with the type used last.
     settings().writeEntry("Paper", m_editor->document().paperName);
@@ -710,8 +711,10 @@ bool MainWindow::save()
         KMessageBox::error(this, i18n("Could not save %1:\n%2", m_editor->fileName(), error));
         return false;
     }
-    // An add-on's label goes back where it came from, too.
-    return addonSaved(true);
+    // An add-on's label goes back where it came from, too; when that fails
+    // it is saved all the same (here), so closing is not held up.
+    addonSaved(true);
+    return true;
 }
 
 bool MainWindow::saveAs()
