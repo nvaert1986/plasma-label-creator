@@ -64,9 +64,15 @@ Features found in other label software, the Easy to Medium ones:
 - [x] A different label per row, named in a data column.
 - [x] Print density, darkness and speed per label.
 
+## Done in 0.6.0
+
+- [x] Add-ons: optional Qt plugins (header-only interface in `src/plugin`),
+  with File menu actions, a status bar indicator, their own label folders,
+  and hooks for saving, printing and shared counters. Settings > Add-ons.
+
 ## Next session
 
-Version 0.5.0: print conditions, growing text and anchoring, guidelines,
+Version 0.6.0: add-ons. Version 0.5.0: print conditions, growing text and anchoring, guidelines,
 polygons, stars, arrows and SVG, copies and a label per row, header and
 trailer labels, density, darkness and speed per label, query parameters
 and pictures from a database (tested). Version 0.4.0 before it: print-only

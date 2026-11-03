@@ -5,7 +5,7 @@
 
 # Changelog
 
-## Unreleased
+## 0.6.0 (2026-11-03)
 
 - **Add-ons**: Qt plugins that add to the app, such as keeping a team's
   labels on a server: actions in the File menu, a status indicator in the
