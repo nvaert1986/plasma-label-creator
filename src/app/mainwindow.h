@@ -12,6 +12,7 @@
 #include "objectfactory.h"
 #include "printhistory.h"
 #include "recentlayouts.h"
+#include "../plugin/plasmalabelcreatorplugin.h"
 
 #include <KXmlGuiWindow>
 
@@ -39,12 +40,20 @@ namespace LabelCreator
 class SharedCounter;
 }
 
-class MainWindow : public KXmlGuiWindow
+class MainWindow : public KXmlGuiWindow, public LabelCreator::PluginHost
 {
     Q_OBJECT
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);
+
+    // What add-ons may do (see plasmalabelcreatorplugin.h).
+    QWidget *dialogParent() override;
+    bool openLabel(const QString &fileName, const QString &origin) override;
+    QString currentFileName() const override;
+    QString currentOrigin() const override;
+    bool saveLabelAs(const QString &fileName, const QString &origin, QString *errorString) override;
+    void showMessage(const QString &text) override;
 
     bool openFile(const QString &fileName);
     /**
@@ -128,10 +137,15 @@ private:
      * Sets the shared counters in @p labels to the values in their files;
      * with @p locks, locks the files first and keeps them locked there.
      * False, with the reason shown, when a file cannot be locked or read.
+     * The counters of an add-on's label that the add-on keeps come from it
+     * instead: @p count values taken for printing (0 for a preview), their
+     * names in @p byAddon.
      */
     bool useSharedCounters(QList<LabelCreator::LabelDocument> &labels,
                            std::vector<std::unique_ptr<LabelCreator::SharedCounter>> *locks,
-                           QHash<QString, int> *values);
+                           QHash<QString, int> *values,
+                           int count = 0,
+                           QSet<QString> *byAddon = nullptr);
     void editObject(int index);
     void deleteObject();
     void duplicateObject();
@@ -229,8 +243,22 @@ private:
     /** Asks for the selected printer's print offset, in on-screen terms for the current label. */
     void editPrintOffset();
     void openRecentLayout(const LabelCreator::RecentLayout &layout);
+    /** Loads the add-ons that are installed and switched on, and puts their actions in the menus. */
+    void loadAddons();
+    /** The add-on the current label belongs to; nullptr for none. */
+    LabelCreator::Plugin *currentAddon() const;
+    /**
+     * Tells the current label's add-on it was saved; false, with the
+     * reason shown unless @p quiet, when that failed.
+     */
+    bool addonSaved(bool keepVersion, bool quiet = false);
 
     LabelCreator::RecentLayouts m_recentLayouts;
+    // The add-ons loaded, and the add-on label open: its origin, as long as
+    // the editor has its file.
+    QList<LabelCreator::Plugin *> m_addons;
+    QString m_origin;
+    QString m_originFile;
     AppSettings m_settings;
     LabelEditor *m_editor;
     LabelView *m_view;

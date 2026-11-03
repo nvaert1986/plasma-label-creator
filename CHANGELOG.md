@@ -5,6 +5,13 @@
 
 # Changelog
 
+## Unreleased
+
+- **Add-ons**: Qt plugins that add to the app, such as keeping a team's
+  labels on a server: actions in the File menu, labels they open saved and
+  printed as any other (the add-on told), and shared counters that count
+  on with the add-on. None are needed; Settings > Add-ons switches them off.
+
 ## 0.5.0 (2026-11-02)
 
 ### Designing

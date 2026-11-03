@@ -78,6 +78,7 @@ MainWindow::MainWindow(QWidget *parent)
         settings().writeEntry("ToolBarLayout", ToolBarLayout);
     }
     setupGUI(Default, QStringLiteral("plasma-label-creatorui.rc"));
+    loadAddons();
     // The font list is as wide as its longest name: narrower leaves room on
     // the format toolbar.
     if (QWidget *list = toolBar(u"formatToolBar"_s)->widgetForAction(m_fontFamily)) {
@@ -709,7 +710,8 @@ bool MainWindow::save()
         KMessageBox::error(this, i18n("Could not save %1:\n%2", m_editor->fileName(), error));
         return false;
     }
-    return true;
+    // An add-on's label goes back where it came from, too.
+    return addonSaved(true);
 }
 
 bool MainWindow::saveAs()
@@ -776,7 +778,10 @@ bool MainWindow::queryClose()
 
 void MainWindow::updateCaption()
 {
-    const QString name = m_editor->fileName().isEmpty() ? i18n("Untitled") : QFileInfo(m_editor->fileName()).fileName();
+    const Plugin *addon = currentAddon();
+    const QString name = addon                         ? addon->title(currentOrigin())
+        : m_editor->fileName().isEmpty() ? i18n("Untitled")
+                                         : QFileInfo(m_editor->fileName()).fileName();
     setCaption(name, m_editor->isModified());
 }
 

@@ -5,6 +5,7 @@
 
 #include "settingsdialog.h"
 
+#include "addons.h"
 #include "automationpage.h"
 
 #include <KLocalizedString>
@@ -20,6 +21,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
+#include <QListWidget>
 #include <QPushButton>
 #include <QScrollArea>
 #include <QSpinBox>
@@ -172,6 +174,20 @@ SettingsDialog::SettingsDialog(const AppSettings &settings, QWidget *parent, con
     automation->setHeader(i18n("Printing for other programs, without anyone at the screen"));
     automation->setIcon(QIcon::fromTheme(u"system-run"_s));
 
+    // Add-ons: each installed one, on unless switched off here.
+    QFormLayout *addons = newPage(this, i18n("Add-ons"), i18n("Extra features from add-ons installed on this computer"), u"preferences-plugin"_s);
+    m_addons = new QListWidget;
+    const QStringList off = Addons::switchedOff();
+    for (const KPluginMetaData &metaData : Addons::installed()) {
+        auto *item = new QListWidgetItem(metaData.description().isEmpty() ? metaData.name() : u"%1: %2"_s.arg(metaData.name(), metaData.description()), m_addons);
+        item->setData(Qt::UserRole, metaData.pluginId());
+        item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
+        item->setCheckState(off.contains(metaData.pluginId()) ? Qt::Unchecked : Qt::Checked);
+    }
+    addons->addRow(m_addons);
+    addons->addRow(note(m_addons->count() == 0 ? i18n("No add-ons are installed. Plasma Label Creator needs none.")
+                                               : i18n("Switching an add-on on or off takes effect when Plasma Label Creator starts again.")));
+
     const std::pair<QWidget *, const char *> keys[] = {{m_fontFamily, "TextFontFamily"},
                                                       {m_fontSize, "TextFontSize"},
                                                       {m_nudge, "NudgeMm"},
@@ -208,6 +224,22 @@ SettingsDialog::SettingsDialog(const AppSettings &settings, QWidget *parent, con
         if (!m_automation->save(&error)) {
             KMessageBox::error(this, i18n("The automation settings could not be saved:\n%1", error));
         }
+        // The add-ons switched off; ones not installed now stay as they were.
+        QStringList listed;
+        QStringList off;
+        for (int i = 0; i < m_addons->count(); ++i) {
+            const QString id = m_addons->item(i)->data(Qt::UserRole).toString();
+            listed << id;
+            if (m_addons->item(i)->checkState() == Qt::Unchecked) {
+                off << id;
+            }
+        }
+        for (const QString &id : Addons::switchedOff()) {
+            if (!listed.contains(id)) {
+                off << id;
+            }
+        }
+        Addons::setSwitchedOff(off);
     };
     connect(button(QDialogButtonBox::Apply), &QPushButton::clicked, this, [this, saveAutomation]() {
         saveAutomation();

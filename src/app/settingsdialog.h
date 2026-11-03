@@ -11,6 +11,7 @@
 #include <KPageDialog>
 
 class AutomationPage;
+class QListWidget;
 class QCheckBox;
 class QComboBox;
 class QDoubleSpinBox;
@@ -71,4 +72,6 @@ private:
     QSpinBox *m_recentKept;
     // Automation
     AutomationPage *m_automation;
+    // Add-ons
+    QListWidget *m_addons;
 };

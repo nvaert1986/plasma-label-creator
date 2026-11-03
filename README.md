@@ -243,6 +243,23 @@ curl -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
 each of `rows` gives one label. Check boxes take `true` or `false`, dates
 `yyyy-MM-dd` or the question's own format.
 
+## Add-ons
+
+Plasma Label Creator needs no add-ons. An add-on is a Qt plugin installed
+in the `plasma-label-creator` folder under Qt's plugin folders (for
+instance `/usr/lib64/qt6/plugins/plasma-label-creator/`); each one found is
+on until it is switched off under Settings > Add-ons, and takes effect when
+the app starts again.
+
+Add-ons build against one header, `PlasmaLabelCreator/plasmalabelcreatorplugin.h`,
+installed with the app (and in `src/plugin`). An add-on can put actions in
+the File menu and open labels it keeps in a folder of its own: the app opens,
+prints and saves them as any label file, finds their pictures, data files and
+other labels next to them, and tells the add-on when such a label is saved or
+printed. Shared counters of its labels can count on with the add-on instead
+of in a counter file. That is enough for, say, a team's labels kept on a
+server.
+
 ## Source layout
 
 | Path | Contents |
@@ -251,6 +268,7 @@ each of `rows` gives one label. Check boxes take `true` or `false`, dates
 | `src/cli` | `plasma-label-creator-render` |
 | `src/service` | `plasma-label-creator-automation`, the automation service (Qt only, Qt HTTP Server optional) |
 | `src/app` | The desktop application (Qt Widgets and KDE Frameworks 6) |
+| `src/plugin` | The add-on interface, a header only |
 | `autotests` | Qt Test suites and their test data |
 
 ## Contributing

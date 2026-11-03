@@ -82,12 +82,13 @@ if(BUILD_APP)
         ${CMAKE_SOURCE_DIR}/src/app/printerstatusdialog.cpp
         ${CMAKE_SOURCE_DIR}/src/app/appsettings.cpp
         ${CMAKE_SOURCE_DIR}/src/app/settingsdialog.cpp
+        ${CMAKE_SOURCE_DIR}/src/app/addons.cpp
         ${CMAKE_SOURCE_DIR}/src/app/automationpage.cpp
         ${CMAKE_SOURCE_DIR}/src/app/exportdialog.cpp
         ${CMAKE_SOURCE_DIR}/src/app/printsettingsdialog.cpp
         ${CMAKE_SOURCE_DIR}/src/app/gs1dialog.cpp
         ${CMAKE_SOURCE_DIR}/src/app/rolllayoutdialog.cpp
-        LINK_LIBRARIES labelcreatorcore Qt6::Test Qt6::Widgets Qt6::Sql KF6::Archive KF6::I18n KF6::WidgetsAddons KF6::ConfigWidgets
+        LINK_LIBRARIES labelcreatorcore Qt6::Test Qt6::Widgets Qt6::Sql KF6::Archive KF6::CoreAddons KF6::I18n KF6::WidgetsAddons KF6::ConfigWidgets
         TEST_NAME datadialogstest)
     target_include_directories(datadialogstest PRIVATE ${CMAKE_SOURCE_DIR}/src/app ${CMAKE_BINARY_DIR})
     set_tests_properties(datadialogstest PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
@@ -115,6 +116,20 @@ if(BUILD_APP)
         ${CMAKE_SOURCE_DIR}/src/app/plasma-label-creator.qrc # the Altec catalogue
         LINK_LIBRARIES labelcreatorcore Qt6::Test Qt6::Widgets KF6::ConfigCore KF6::I18n
         TEST_NAME labeltypestest)
+
+    # Add-ons: one built on its own, against the header only, found and loaded.
+    add_library(fakeaddon MODULE addon/fakeaddon.cpp)
+    target_include_directories(fakeaddon PRIVATE ${CMAKE_SOURCE_DIR}/src/plugin)
+    target_link_libraries(fakeaddon Qt6::Core Qt6::Gui)
+    set_target_properties(fakeaddon PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/plugins/plasma-label-creator)
+    ecm_add_test(addontest.cpp
+        ${CMAKE_SOURCE_DIR}/src/app/addons.cpp
+        LINK_LIBRARIES Qt6::Test Qt6::Gui KF6::ConfigCore KF6::CoreAddons
+        TEST_NAME addontest)
+    target_include_directories(addontest PRIVATE ${CMAKE_SOURCE_DIR}/src/app ${CMAKE_SOURCE_DIR}/src/plugin)
+    target_compile_definitions(addontest PRIVATE ADDON_DIR="${CMAKE_CURRENT_BINARY_DIR}/plugins")
+    add_dependencies(addontest fakeaddon)
+    set_tests_properties(addontest PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
 
     foreach(test addressbookpaneltest propertiesdialogtest labeltypestest)
         target_include_directories(${test} PRIVATE ${CMAKE_SOURCE_DIR}/src/app)

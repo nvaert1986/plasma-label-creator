@@ -236,15 +236,39 @@ void MainWindow::print()
     }
 }
 
-bool MainWindow::useSharedCounters(QList<LabelDocument> &labels, std::vector<std::unique_ptr<SharedCounter>> *locks, QHash<QString, int> *values)
+bool MainWindow::useSharedCounters(QList<LabelDocument> &labels,
+                                   std::vector<std::unique_ptr<SharedCounter>> *locks,
+                                   QHash<QString, int> *values,
+                                   int count,
+                                   QSet<QString> *byAddon)
 {
     // The label's shared counters, read from their files (locked first when
     // printing); every label of the run that shares one gets its value.
     QHash<QString, int> read;
+    Plugin *addon = currentAddon();
     for (const LabelObject &object : m_editor->document().objects) {
         const auto *counter = std::get_if<CounterObject>(&object);
         if (!counter || counter->sharedFile.isEmpty() || read.contains(counter->sharedFile)) {
             continue;
+        }
+        // An add-on's label may count on with its add-on (a team's counter
+        // on a server, say): values are taken there, never twice.
+        if (addon) {
+            QString error;
+            QApplication::setOverrideCursor(Qt::WaitCursor);
+            const auto value = addon->takeCounter(currentOrigin(), counter->sharedFile, counter->current, locks ? count : 0, counter->increment, &error);
+            QApplication::restoreOverrideCursor();
+            if (value) {
+                read.insert(counter->sharedFile, *value);
+                if (byAddon) {
+                    byAddon->insert(counter->sharedFile);
+                }
+                continue;
+            }
+            if (!error.isEmpty()) {
+                KMessageBox::error(this, i18n("The shared counter %1 could not be reached:\n%2", counter->sharedFile, error));
+                return false;
+            }
         }
         auto shared = std::make_unique<SharedCounter>(counter->sharedFile);
         // Another computer may be printing: it is waited for a while.
@@ -285,7 +309,10 @@ void MainWindow::printLabels(const PrintRun::Run &prepared)
     PrintRun::Run run = prepared;
     std::vector<std::unique_ptr<SharedCounter>> locks;
     QHash<QString, int> sharedValues;
-    if (!useSharedCounters(run.labels, &locks, &sharedValues)) {
+    QSet<QString> byAddon;
+    // As LabelPrinter counts them: every copy, without header and trailer labels.
+    const int counted = int(std::max<qsizetype>(0, run.labels.size() - run.headerLabels - run.trailerLabels)) * std::max(1, run.copies);
+    if (!useSharedCounters(run.labels, &locks, &sharedValues, counted, &byAddon)) {
         return;
     }
     const QString printerName = m_printBar->printerName();
@@ -309,7 +336,8 @@ void MainWindow::printLabels(const PrintRun::Run &prepared)
         }
         const int next = sharedValues.value(counter->sharedFile, counter->current) + printer.printedLabels() * counter->increment;
         sharedNext.insert(i, next);
-        if (written.contains(counter->sharedFile)) {
+        // The add-on moved its counters on when they were taken.
+        if (written.contains(counter->sharedFile) || byAddon.contains(counter->sharedFile)) {
             continue;
         }
         written << counter->sharedFile;
@@ -344,6 +372,18 @@ void MainWindow::printLabels(const PrintRun::Run &prepared)
             qWarning("Could not write the print history: %s", qPrintable(historyError));
         }
     }
+    // An add-on's label is kept in its history too (a team's, say).
+    if (Plugin *addon = currentAddon()) {
+        PluginPrint print;
+        print.origin = currentOrigin();
+        print.content = LabelWriter::toByteArray(m_editor->document());
+        print.title = record.title;
+        print.printer = record.printer;
+        print.labels = record.labels;
+        print.answers = record.answers;
+        print.rows = record.rows;
+        addon->printed(print);
+    }
     advanceCounters(printer.printedLabels(), sharedNext);
     // In print-only mode the label keeps its counters itself: nobody will
     // save it by hand.
@@ -351,6 +391,9 @@ void MainWindow::printLabels(const PrintRun::Run &prepared)
         QString saveError;
         if (!m_editor->save(m_editor->fileName(), &saveError, false)) {
             KMessageBox::error(this, i18n("The counters could not be saved in the label:\n%1", saveError));
+        } else {
+            // Who only prints may not change the add-on's label: that is no reason to stop.
+            addonSaved(false, true);
         }
     }
     // What was printed is the best guess of the labels in the printer.

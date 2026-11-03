@@ -1,0 +1,6 @@
+{
+    "KPlugin": {
+        "Name": "Fake add-on",
+        "Description": "For the tests"
+    }
+}

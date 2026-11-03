@@ -4,13 +4,14 @@
     SPDX-License-Identifier: CC0-1.0
 -->
 <!DOCTYPE gui>
-<gui name="plasma-label-creator" version="21"
+<gui name="plasma-label-creator" version="22"
      xmlns="http://www.kde.org/standards/kxmlgui/1.0"
      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
      xsi:schemaLocation="http://www.kde.org/standards/kxmlgui/1.0 http://www.kde.org/standards/kxmlgui/1.0/kxmlgui.xsd">
     <MenuBar>
         <Menu name="file">
             <Action name="layout_recent" append="open_merge"/>
+            <ActionList name="addon_file_actions" append="save_merge"/>
             <Action name="file_export" append="save_merge"/>
             <Action name="file_print_history" append="print_merge"/>
             <Action name="file_printer_status" append="print_merge"/>

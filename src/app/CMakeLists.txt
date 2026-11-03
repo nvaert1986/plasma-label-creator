@@ -3,6 +3,8 @@
 
 add_executable(plasma-label-creator
     main.cpp
+    addons.cpp
+    addons.h
     addressbookpanel.cpp
     addressbookpanel.h
     alteclabels.cpp
@@ -42,6 +44,7 @@ add_executable(plasma-label-creator
     layersdialog.cpp
     layersdialog.h
     mainwindow.cpp
+    mainwindow_addons.cpp
     mainwindow_data.cpp
     mainwindow_format.cpp
     mainwindow_objects.cpp
@@ -77,6 +80,7 @@ add_executable(plasma-label-creator
     sidebar.h
     usbwatcher.cpp
     usbwatcher.h
+    ../plugin/plasmalabelcreatorplugin.h
     plasma-label-creator.qrc
 )
 
@@ -102,4 +106,6 @@ target_link_libraries(plasma-label-creator
 target_compile_definitions(plasma-label-creator PRIVATE TRANSLATION_DOMAIN="plasma-label-creator")
 
 install(TARGETS plasma-label-creator ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})
+# For add-ons, which need only this header.
+install(FILES ../plugin/plasmalabelcreatorplugin.h DESTINATION ${KDE_INSTALL_INCLUDEDIR}/PlasmaLabelCreator)
 install(PROGRAMS plasma-label-creator.desktop plasma-label-creator-print.desktop DESTINATION ${KDE_INSTALL_APPDIR})

@@ -6,6 +6,7 @@ version = 1
 
 [[annotations]]
 path = [
+    "autotests/addon/fakeaddon.json",
     "autotests/data/addresses.ABX",
     "autotests/data/assets.ods",
     "autotests/data/assets.xlsx",
