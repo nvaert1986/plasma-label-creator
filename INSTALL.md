@@ -145,6 +145,10 @@ application), `plasma-label-creator-render` (the command-line tool) and
 `plasma-label-creator-automation` (the automation service). You can run
 them from there without installing.
 
+To install afterwards, configure with the install location as well
+(`-DCMAKE_INSTALL_PREFIX=/usr` or `-DCMAKE_INSTALL_PREFIX=$HOME/.local`, see
+[Installing](#installing)).
+
 The tests need no display and no printers. A few skip themselves when what
 they need is not there: real DYMO Label Software files or labels, DYMO's or
 CUPS's label drivers, Qt's SQLite driver (the database test) and Qt HTTP
@@ -185,52 +189,82 @@ ctest --test-dir build -j "$(nproc)" --output-on-failure
 | `-DWITH_APPSTREAM=OFF` | `ON` | Leave out the AppStream metadata for software centres |
 | `-DWITH_DOLPHIN_MENU=OFF` | `ON` | Leave "Print Label" out of Dolphin's right-click menu |
 | `-DWITH_THUMBNAILS=OFF` | `ON` | Leave out the thumbnailer, which is built only when KIO (KF6KIO) is found |
-| `-DCMAKE_INSTALL_PREFIX=` | `/usr/local` | Where `cmake --install` puts the files, e.g. `~/.local` |
+| `-DCMAKE_INSTALL_PREFIX=` | `/usr/local` | Where `cmake --install` puts the files: `/usr` for every user, `~/.local` for you only; see [Installing](#installing). Set it when configuring, not only when installing: the launchers and the service's unit name the programs by their full path |
 
 Without Ninja, leave out `-G Ninja` and CMake uses make.
 
 ## Installing
 
-System-wide (as root):
+Plasma Label Creator installs either for every user on the computer
+(system-wide, as root) or for you alone (in your home folder, without
+root). Choose when configuring, with `CMAKE_INSTALL_PREFIX`: the launchers,
+Dolphin's menu and the automation service's unit name the programs by their
+full path. A package from your distribution, where there is one, takes care
+of all of this instead.
+
+### System-wide, for every user
 
 ```sh
-cmake --install build
+cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=/usr
+cmake --build build
+cmake --install build          # as root
 ```
 
-Or for your user only, without root:
+With `/usr` everything works for everyone straight away: the thumbnailer
+and add-ons go to Qt's own plugin folder (such as `/usr/lib64/qt6/plugins`).
+
+CMake's default, `/usr/local`, keeps the files apart from your
+distribution's. The app, its file types, icons, launchers and Dolphin's menu
+work the same, but Qt does not look for plugins in `/usr/local/lib64/plugins`:
+for thumbnails and add-ons, set `QT_PLUGIN_PATH` for every user at login, in
+`/etc/xdg/plasma-workspace/env/plasma-label-creator.sh`:
 
 ```sh
-cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=~/.local
+export QT_PLUGIN_PATH="/usr/local/lib64/plugins${QT_PLUGIN_PATH:+:$QT_PLUGIN_PATH}"
+```
+
+### For your user only, without root
+
+```sh
+cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=$HOME/.local
 cmake --build build
 cmake --install build
+kbuildsycoca6
 ```
 
-This installs the three programs (`plasma-label-creator`,
-`plasma-label-creator-render` and the automation service,
-`plasma-label-creator-automation`), a systemd user unit for the service,
-and two desktop entries: Plasma Label Creator, and Label Printing, which
-starts it in print-only mode (`plasma-label-creator --print-only [folder]`)
-for people who only print. For a `~/.local` install, make sure
-`~/.local/bin` is in your `PATH`.
-
-The automation service is set up in Settings > Configure Plasma Label
-Creator > Automation, which can start it and have it start when you log
-in. It runs as the user, with that user's printers and print history. On
-a computer without a desktop session, run it as a systemd user service,
-and let it run without anyone logged in:
+Everything goes into `~/.local` (`bin`, `share`, `lib64/plugins`). The
+launchers and Dolphin's menu start the app by its full path, so
+`~/.local/bin` need not be in your `PATH` (add it to run the programs from a
+terminal by name). For thumbnails and add-ons, Qt has to look in
+`~/.local/lib64/plugins` too: create
+`~/.config/plasma-workspace/env/plasma-label-creator.sh` with
 
 ```sh
-systemctl --user enable --now plasma-label-creator-automation
-loginctl enable-linger $USER   # as root: keep it running after logging out
+export QT_PLUGIN_PATH="$HOME/.local/lib64/plugins${QT_PLUGIN_PATH:+:$QT_PLUGIN_PATH}"
 ```
 
-Its settings are in `~/.config/plasma-label-creator/automation.json`
-(readable by the user only: it holds the HTTP token); it follows changes to
-that file. It writes what it prints, and why a job failed, to the journal:
-`journalctl --user -t plasma-label-creator-automation`.
+and log out and in again. The automation service's unit goes to
+`~/.local/lib/systemd/user`, where `systemctl --user` finds it.
 
-It also fits the app into the desktop; each part can be left out with its
-build option above, and the app works the same without any of them:
+| | `/usr` | `/usr/local` | `~/.local` |
+|---|---|---|---|
+| Who can use it | every user | every user | you |
+| Needs root | yes | yes | no |
+| Programs | `/usr/bin` | `/usr/local/bin` | `~/.local/bin` |
+| Thumbnails and add-ons | work as installed | need `QT_PLUGIN_PATH` (system-wide) | need `QT_PLUGIN_PATH` (yours) |
+
+### What is installed
+
+The three programs (`plasma-label-creator`, `plasma-label-creator-render`
+and the automation service, `plasma-label-creator-automation`), a systemd
+user unit for the service, the add-on header
+(`PlasmaLabelCreator/plasmalabelcreatorplugin.h`), and two launchers: Plasma
+Label Creator, and Label Printing, which starts it in print-only mode
+(`plasma-label-creator --print-only [folder]`) for people who only print.
+
+It also fits the app into the desktop. Each part can be left out with its
+build option (see [Build options](#build-options)), and the app works the
+same without any of them:
 
 - **File types** for `.label`, `.ABX` and `.rhino` files. A `.label` file is
   known by its content (`DieCutLabel` or `ContinuousLabel`), so other
@@ -249,23 +283,42 @@ build option above, and the app works the same without any of them:
   app's renderer (with KIO). Switch them off in Dolphin under Configure
   Dolphin > Interface > Previews.
 
-A system-wide install updates the file types database itself when
-`update-mime-database` is installed; Dolphin needs to be restarted to see
-the new types. The launchers and Dolphin's menu start the app by its full
-path, so a `~/.local` install works without `~/.local/bin` in `PATH`.
+Installing updates the file types database of its location itself when
+`update-mime-database` is installed. Run `kbuildsycoca6` (as the user) so
+the menus and Dolphin see the new launchers and types straight away, and
+restart Dolphin.
 
-In a `~/.local` install the thumbnailer (and any add-on installed there)
-goes to `~/.local/lib64/plugins`, which Qt searches only when it is in
-`QT_PLUGIN_PATH`. Plasma sets that at login from a script in
-`~/.config/plasma-workspace/env/`, such as `plasma-label-creator.sh`:
+### Uninstalling
+
+Remove the files listed in `build/install_manifest.txt` (as root for a
+system-wide install), then the `plasma-label-creator.sh` script for
+`QT_PLUGIN_PATH` if you made one, and refresh the desktop's caches:
 
 ```sh
-export QT_PLUGIN_PATH="$HOME/.local/lib64/plugins${QT_PLUGIN_PATH:+:$QT_PLUGIN_PATH}"
+xargs rm -f < build/install_manifest.txt
+update-mime-database <prefix>/share/mime     # /usr/share/mime, ~/.local/share/mime, ...
+kbuildsycoca6
 ```
 
-Log out and in again for it to take effect. After installing, run
-`kbuildsycoca6` so the menus and Dolphin see the new launchers and types
-straight away.
+### The automation service
+
+The automation service is set up in Settings > Configure Plasma Label
+Creator > Automation, which can start it and have it start when you log
+in. It runs as the user, with that user's printers and print history. On
+a computer without a desktop session, run it as a systemd user service,
+and let it run without anyone logged in:
+
+```sh
+systemctl --user enable --now plasma-label-creator-automation
+loginctl enable-linger $USER   # as root: keep it running after logging out
+```
+
+Its settings are in `~/.config/plasma-label-creator/automation.json`
+(readable by the user only: it holds the HTTP token); it follows changes to
+that file. It writes what it prints, and why a job failed, to the journal:
+`journalctl --user -t plasma-label-creator-automation`.
+
+### Print-only computers
 
 Print-only mode, versions, the print history, printer status and the
 settings need nothing beyond the requirements above.
@@ -278,11 +331,10 @@ system-wide `/etc/xdg/plasma-label-creatorrc`:
 ```ini
 [Settings]
 LockPrintOnly[$i]=true
-``` Versions and the print history are
-kept per user in `~/.local/share/plasma-label-creator/` (`versions/`,
-`print-history/`).
+```
 
-To uninstall, remove the files listed in `build/install_manifest.txt`.
+Versions and the print history are kept per user in
+`~/.local/share/plasma-label-creator/` (`versions/`, `print-history/`).
 
 ## Setting up a printer
 

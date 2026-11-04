@@ -163,17 +163,25 @@ for those, make the label size with Layout > Custom Label Size….
 
 ## Building and installing
 
+For every user (system-wide, as root):
+
 ```sh
-cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo
+cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=/usr
 cmake --build build
 ctest --test-dir build --output-on-failure
 cmake --install build          # as root
 ```
 
+Or for you alone, in your home folder without root: configure with
+`-DCMAKE_INSTALL_PREFIX=$HOME/.local` instead, install without root and run
+`kbuildsycoca6`; thumbnails and add-ons then need `QT_PLUGIN_PATH` set at
+login (see INSTALL.md).
+
 **[INSTALL.md](INSTALL.md)** has the full list of requirements with minimum
 and tested versions, the packages to install on Gentoo, Debian/Ubuntu,
-Fedora and Arch, the build options, installing for one user without root,
-and how to set up each kind of printer.
+Fedora and Arch, the build options, both ways of installing with what each
+means for the desktop integration, uninstalling, and how to set up each
+kind of printer.
 
 ## Using the command-line tool
 
@@ -255,7 +263,8 @@ can be left out when building (see [INSTALL.md](INSTALL.md)).
 
 Plasma Label Creator needs no add-ons. An add-on is a Qt plugin installed
 in the `plasma-label-creator` folder under Qt's plugin folders (for
-instance `/usr/lib64/qt6/plugins/plasma-label-creator/`); each one found is
+instance `/usr/lib64/qt6/plugins/plasma-label-creator/`, or under
+`~/.local/lib64/plugins` with `QT_PLUGIN_PATH` set, see INSTALL.md); each one found is
 on until it is switched off under Settings > Add-ons, and takes effect when
 the app starts again.
 
