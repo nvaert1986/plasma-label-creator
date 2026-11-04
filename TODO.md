@@ -72,7 +72,7 @@ Features found in other label software, the Easy to Medium ones:
 
 ## Next session
 
-Version 0.6.0: add-ons. Version 0.5.0: print conditions, growing text and anchoring, guidelines,
+Version 0.6.1: desktop integration (file types, icons, Dolphin thumbnails and menu, launcher extras, AppStream), each optional. Version 0.6.0: add-ons. Version 0.5.0: print conditions, growing text and anchoring, guidelines,
 polygons, stars, arrows and SVG, copies and a label per row, header and
 trailer labels, density, darkness and speed per label, query parameters
 and pictures from a database (tested). Version 0.4.0 before it: print-only
@@ -114,10 +114,10 @@ reopening, copy and paste, also on tape labels with reordered cells.
 
 Still to do by hand, in the running app:
 
-- [ ] Try multi-select, align, distribute, group, lock and wrapping text
-  on real labels, with undo and redo in between.
-- [ ] Print a label with wrapped text and grouped objects, and compare it
-  with the screen and the print preview.
+- [x] Try multi-select, align, distribute, group, lock and wrapping text
+  on real labels, with undo and redo in between. (Tested 2026-11-04.)
+- [x] Print a label with wrapped text and grouped objects, and compare it
+  with the screen and the print preview. (Tested 2026-11-04.)
 - [ ] Print from a database with a password (SQL Server over ODBC, say):
   the password is asked once per database and again after a wrong one.
 - [ ] Try layers, Do Not Print, turning with the mouse and the angle box,
@@ -125,9 +125,9 @@ Still to do by hand, in the running app:
   and a non-printing one.
 - [ ] The new toolbars on the real desktop (Breeze, your font size): both
   rows fit at 1280 px offscreen; at 1000 px Fit to Page runs over.
-- [ ] Print-only mode on real labels: a folder of labels, forms with each
+- [x] Print-only mode on real labels: a folder of labels, forms with each
   kind of field, a lookup from data, Choose Rows, counters saved; the
-  Label Printing launcher entry after `cmake --install`.
+  Label Printing launcher entry after `cmake --install`. (Tested 2026-11-04.)
 - [ ] Versions: save a label a few times and restore one. Print history:
   Print Again with data rows.
 - [ ] Printer warnings: a paused CUPS queue, an Altec with the head open or
@@ -245,58 +245,27 @@ the AppStream id points at them with `<launchable>`, so pinned launchers stay.
 
 ## Web version: the desktop app's features
 
-The web version has most of what the first release had (designing, label
-types per printer, labels of a kind, `.label` and `.rhino` files, printing
-through the browser), plus sign-in, users, and printers, label sizes and
-labels kept per user. The aim is to bring it close to the desktop app, one
-phase at a time, each with its own tests. Not everything can follow: a
-browser cannot reach CUPS or talk to a printer directly.
+Done: the web version (a separate project) has caught up with the desktop
+app through 0.5.0, and its server does what a browser cannot.
 
-- [ ] **Phase 0, the rest of 0.1.0**, first:
-  - Rulers along the canvas.
-  - Editing text on the label itself (double-click), and a format toolbar:
-    font, size, larger and smaller, bold, italic, underline, strikeout.
-  - Cut, copy, paste and duplicate objects, also between labels.
-  - Bring to Front and Send to Back.
-  - Position Object: against an edge, centred, in the middle, moved by a
-    distance.
-  - Dragging objects in from the sidebar, and dropping pictures and label
-    files on the canvas.
-  - Address books: open and save `.ABX`, import addresses from CSV, check
-    addresses and print a label for each.
-  - Before printing, check that the label suits the printer's labels
-    ("Print Anyway").
-  - Recently used layouts, with thumbnails.
-  - Advance Counters.
-  - Clip art: DYMO's cannot be shipped; instead each user's own pictures
-    kept on the server to pick from.
-
-  (Medium; mostly Easy pieces. Not possible in a browser: noticing
-  printers plugged in over USB and setting them up, see phase 5. The
-  command-line tool stays with the desktop app.)
-- [ ] **Phase 1, the 0.2.0 features**: a label for each row of a CSV, text,
-  Excel or ODS file; fields; pictures from data; print-time questions; grid
-  and snapping; white on black; Rotate Label turning the objects; the
-  barcodes added in 0.2.0; print preview; PDF and PNG export (with the
-  label's outline). (Medium; the barcodes are cheap, zint
-  already runs in the browser; Excel and ODS need a reader, PDF a library.)
-- [ ] **Phase 2, the 0.3.0 designer**: selecting several objects, align
-  and distribute, group, lock, wrapped text, layers and Do Not Print, free
-  angles and turning with the mouse, calculated fields, the GS1 builder,
-  labels across and continuous rolls. (Medium-Hard; working with several
-  objects at once on the canvas is most of it.)
-- [ ] **Phase 3, for operators**: print-only page, data-entry forms,
-  versions of labels, print history, shared counters, settings. (Medium;
-  simpler than on the desktop, as the server already knows the users: the
-  versions and history can be per user and shared, see "Later".)
-- [ ] **Phase 4, databases** as a data source (SQL Server and others),
-  queried by the server: read-only, with care for who may use which
-  database and where its password is kept. (Medium)
-- [ ] **Phase 5, printers**, only where it can be done: the server asking a
-  ZPL printer on the network about its labels and status, if it can reach
-  it. A CUPS queue's state, LabelWriters plugged in over USB and printing
-  without the browser's print dialog would need a small helper program on
-  each computer. (Hard; left out unless needed.)
+- [x] **Phase 0**: rulers, text edited on the label with a format bar, cut,
+  copy, paste, duplicate, order, Position Object, drag and drop, address
+  books, the fit check before printing, recent layouts, counters, the
+  user's own pictures.
+- [x] **Phase 1**: a label per row of CSV, text, Excel and ODS files, fields,
+  questions, grid and snapping, white on black, Rotate Label, the 0.2.0
+  barcodes, print preview, PDF and PNG export.
+- [x] **Phase 2**: several objects at once, align, distribute, group, lock,
+  wrapped text, layers, Do Not Print, free angles, calculated fields, the
+  GS1 builder, labels across and continuous rolls.
+- [x] **Phase 3**: print-only page, forms, versions, print history, shared
+  counters, settings.
+- [x] **Phase 4**: databases queried by the server, read-only, limited to
+  the servers the administrator allows; passwords never kept.
+- [x] **Phase 5**: the server prints itself, without a helper program on
+  each computer: ZPL printers on the network (with their status and the
+  labels loaded), DYMOs through a CUPS queue, and LabelWriters and
+  LabelManagers on a printer share in their own language.
 
 ## Later (low priority)
 
@@ -308,15 +277,16 @@ rather than build them twice.
 
 In the desktop app:
 
-- [ ] **Open and save labels in the web version's library**, signed in with
-  the same account. (Medium)
+- [x] **Open and save labels in the web version's library**, signed in with
+  the same account: done as an optional add-on (0.6.0's add-on interface)
+  with a team's labels, pictures, data files, counters and history.
 - [ ] **Sheets of labels on office printers**: A4 and Letter sheets (Avery,
   Herma and the like) with a catalogue of sheet layouts, printing the
   labels of a run in rows and columns, starting at any label of a sheet
   that was used before. (Medium-Hard)
 - [ ] **Automation: a raw TCP port**, so other systems print to the
   service as if to a printer on port 9100, with the data as CSV or JSON.
-  (Medium)
+  (Medium) The web version's server already takes jobs this way.
 - [ ] **Automation: XML and fixed-width text jobs**, and a data filter
   that maps their fields to the label's. (Medium to Hard)
 - [ ] **Automation: a database trigger** (print when rows appear) and
@@ -324,15 +294,14 @@ In the desktop app:
 
 In the web version's server, used by both apps:
 
-- [ ] **Versions** of saved labels, shared by everyone using them, to compare
-  and restore (the desktop app keeps them per computer). (Easy-Medium)
-- [ ] **Print history** for everyone (the desktop app keeps one per
-  computer): who printed which label, version and how many.
-  (Easy-Medium)
-- [ ] **Roles and permissions**: designers, approvers, operators; labels per
-  group. (Medium)
-- [ ] **Approval**: labels are drafts until released; operators print only
-  released versions. (Medium)
+- [x] **Versions** of saved labels, shared by everyone using them, to compare
+  and restore (the desktop app keeps them per computer).
+- [x] **Print history** for everyone (the desktop app keeps one per
+  computer): who printed which label and how many.
+- [x] **Roles and permissions**: teams with members, and roles (designers,
+  approvers, operators, or the organisation's own) made of permissions.
+- [x] **Approval**: labels are drafts until released; operators print only
+  released versions (per team, optional).
 
 Big projects, only when someone needs them:
 
