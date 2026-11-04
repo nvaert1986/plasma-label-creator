@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!-- SPDX-FileCopyrightText: 2026 nvaert1986 <25772781+nvaert1986@users.noreply.github.com> -->
+  <!-- SPDX-License-Identifier: CC0-1.0 -->
+  <!-- Plasma Label Creator: a die-cut label with a barcode, on its backing. -->
+  <rect x="4" y="10" width="56" height="44" rx="5" fill="#2980b9"/>
+  <rect x="4" y="10" width="56" height="22" rx="5" fill="#3daee9"/>
+  <rect x="10" y="16" width="44" height="32" rx="4" fill="#fcfcfc"/>
+  <rect x="10" y="44" width="44" height="4" rx="2" fill="#000" opacity="0.08"/>
+  <g fill="#232629">
+    <rect x="15" y="21" width="2" height="14"/>
+    <rect x="18.5" y="21" width="1" height="14"/>
+    <rect x="21" y="21" width="3" height="14"/>
+    <rect x="25.5" y="21" width="1" height="14"/>
+    <rect x="28" y="21" width="2" height="14"/>
+    <rect x="31.5" y="21" width="1" height="14"/>
+    <rect x="34" y="21" width="1" height="14"/>
+    <rect x="36.5" y="21" width="3" height="14"/>
+    <rect x="41" y="21" width="1" height="14"/>
+    <rect x="43.5" y="21" width="2" height="14"/>
+    <rect x="47" y="21" width="2" height="14"/>
+  </g>
+  <rect x="15" y="39" width="22" height="3" rx="1.5" fill="#7f8c8d"/>
+  <rect x="39" y="39" width="10" height="3" rx="1.5" fill="#bdc3c7"/>
+</svg>

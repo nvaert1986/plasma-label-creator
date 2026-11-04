@@ -6,6 +6,7 @@ Name=Plasma Label Creator
 GenericName=Label Designer
 Comment=Design and print labels on DYMO LabelWriter and LabelManager printers and ZPL label printers
 Exec=plasma-label-creator %F
-Icon=document-print
+Icon=@APP_ICON@
 Terminal=false
 Categories=Qt;KDE;Office;
+@MIME_TYPES@@LAUNCHER_EXTRAS@

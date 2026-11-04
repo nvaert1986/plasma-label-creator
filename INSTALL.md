@@ -179,6 +179,12 @@ ctest --test-dir build -j "$(nproc)" --output-on-failure
 | `-DBUILD_APP=OFF` | `ON` | Build only the core library and the command-line tool: no KDE Frameworks, Qt Widgets or libudev needed |
 | `-DBUILD_TESTING=OFF` | `ON` | Skip the tests: Qt Test is not needed |
 | `-DWITH_HTTP_SERVER=OFF` | `ON` | Leave print requests over HTTP out of the automation service even when Qt HTTP Server is installed |
+| `-DWITH_FILE_TYPES=OFF` | `ON` | Leave out the file types: `.label`, `.ABX` and `.rhino` files stay plain XML to the desktop and do not open with the app (also leaves out the Dolphin menu and thumbnails) |
+| `-DWITH_ICONS=OFF` | `ON` | Leave out the app's own icons: the launchers use the theme's printer icons |
+| `-DWITH_LAUNCHER_EXTRAS=OFF` | `ON` | Leave out the launchers' search keywords and right-click actions |
+| `-DWITH_APPSTREAM=OFF` | `ON` | Leave out the AppStream metadata for software centres |
+| `-DWITH_DOLPHIN_MENU=OFF` | `ON` | Leave "Print Label" out of Dolphin's right-click menu |
+| `-DWITH_THUMBNAILS=OFF` | `ON` | Leave out the thumbnailer, which is built only when KIO (KF6KIO) is found |
 | `-DCMAKE_INSTALL_PREFIX=` | `/usr/local` | Where `cmake --install` puts the files, e.g. `~/.local` |
 
 Without Ninja, leave out `-G Ninja` and CMake uses make.
@@ -222,6 +228,32 @@ Its settings are in `~/.config/plasma-label-creator/automation.json`
 (readable by the user only: it holds the HTTP token); it follows changes to
 that file. It writes what it prints, and why a job failed, to the journal:
 `journalctl --user -t plasma-label-creator-automation`.
+
+It also fits the app into the desktop; each part can be left out with its
+build option above, and the app works the same without any of them:
+
+- **File types** for `.label`, `.ABX` and `.rhino` files. A `.label` file is
+  known by its content (`DieCutLabel` or `ContinuousLabel`), so other
+  programs' `.label` files are not claimed. Dolphin then names them, shows
+  them with the app's icon and opens them with it; an address book opens in
+  the Address Book tab.
+- **Icons** for the app, Label Printing and label files.
+- **Launcher extras**: "Print-Only Mode" and "Design Labels" when you
+  right-click the launchers, and search keywords (label, DYMO, Zebra,
+  barcode, …) for KRunner and the launcher.
+- **AppStream metadata** for Discover and other software centres.
+- **"Print Label"** in Dolphin's right-click menu for label files: the label
+  opens in print-only mode, with its form. Switch it off in Dolphin under
+  Configure Dolphin > Context Menu.
+- **Thumbnails** of label files in Dolphin and the file dialogs, drawn by the
+  app's renderer (with KIO). Switch them off in Dolphin under Configure
+  Dolphin > Interface > Previews.
+
+A system-wide install updates the file types database itself when
+`update-mime-database` is installed; Dolphin needs to be restarted to see
+the new types. In a `~/.local` install the thumbnailer goes to
+`~/.local/lib64/qt6/plugins`, which Qt only searches when it is in
+`QT_PLUGIN_PATH`.
 
 Print-only mode, versions, the print history, printer status and the
 settings need nothing beyond the requirements above.

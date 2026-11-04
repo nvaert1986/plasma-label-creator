@@ -6,6 +6,7 @@ Name=Label Printing
 GenericName=Label Printing
 Comment=Choose a label, fill in its form and print it, without editing
 Exec=plasma-label-creator --print-only %F
-Icon=document-print-direct
+Icon=@PRINT_ICON@
 Terminal=false
 Categories=Qt;KDE;Office;
+@PRINT_LAUNCHER_EXTRAS@

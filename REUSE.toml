@@ -15,6 +15,7 @@ path = [
     "doc/screenshot.png",
     "src/app/data/altec-labels.json",
     "src/app/plasma-label-creator.qrc",
+    "src/integration/thumbnailer/labelthumbnail.json",
 ]
 SPDX-FileCopyrightText = "2026 nvaert1986 <25772781+nvaert1986@users.noreply.github.com>"
 SPDX-License-Identifier = "CC0-1.0"

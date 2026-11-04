@@ -504,6 +504,12 @@ bool MainWindow::openFile(const QString &name)
     // Relative paths from the command line would end up in the recent files
     // as broken entries.
     const QString fileName = QFileInfo(name).absoluteFilePath();
+    // An address book (opened from the file manager, say) goes to its tab;
+    // the label stays as it is.
+    if (fileName.endsWith(u".abx"_s, Qt::CaseInsensitive)) {
+        m_sidebar->showAddressBook();
+        return m_sidebar->addressBook()->openFile(fileName);
+    }
     if (!maybeSave()) {
         return false;
     }

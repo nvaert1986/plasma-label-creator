@@ -1,0 +1,15 @@
+# SPDX-FileCopyrightText: 2026 nvaert1986 <25772781+nvaert1986@users.noreply.github.com>
+# SPDX-License-Identifier: CC0-1.0
+#
+# Dolphin's right-click menu for label files (switched off in Dolphin's
+# Settings > Context Menu like any other).
+[Desktop Entry]
+Type=Service
+MimeType=application/x-dymo-label;
+Actions=printLabel;
+X-KDE-Priority=TopLevel
+
+[Desktop Action printLabel]
+Name=Print Label…
+Icon=@PRINT_ICON@
+Exec=plasma-label-creator --print-only %f

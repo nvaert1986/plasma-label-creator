@@ -1,0 +1,7 @@
+{
+    "CacheThumbnail": true,
+    "KPlugin": {
+        "MimeTypes": ["application/x-dymo-label"],
+        "Name": "Labels"
+    }
+}

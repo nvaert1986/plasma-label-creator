@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!-- SPDX-FileCopyrightText: 2026 nvaert1986 <25772781+nvaert1986@users.noreply.github.com> -->
+  <!-- SPDX-License-Identifier: CC0-1.0 -->
+  <!-- Label Printing: a label coming out of a label printer. -->
+  <rect x="16" y="4" width="32" height="30" rx="3" fill="#fcfcfc" stroke="#bdc3c7" stroke-width="1"/>
+  <g fill="#232629">
+    <rect x="21" y="9" width="2" height="12"/>
+    <rect x="24.5" y="9" width="1" height="12"/>
+    <rect x="27" y="9" width="3" height="12"/>
+    <rect x="31.5" y="9" width="1" height="12"/>
+    <rect x="34" y="9" width="2" height="12"/>
+    <rect x="37.5" y="9" width="1" height="12"/>
+    <rect x="40" y="9" width="3" height="12"/>
+  </g>
+  <rect x="21" y="24" width="16" height="3" rx="1.5" fill="#7f8c8d"/>
+  <rect x="6" y="30" width="52" height="28" rx="6" fill="#31363b"/>
+  <rect x="6" y="30" width="52" height="10" rx="5" fill="#4d4d4d"/>
+  <rect x="12" y="34" width="40" height="3" rx="1.5" fill="#232629"/>
+  <circle cx="49" cy="49" r="3" fill="#27ae60"/>
+  <rect x="12" y="47" width="20" height="4" rx="2" fill="#3daee9"/>
+</svg>

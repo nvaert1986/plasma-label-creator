@@ -108,4 +108,3 @@ target_compile_definitions(plasma-label-creator PRIVATE TRANSLATION_DOMAIN="plas
 install(TARGETS plasma-label-creator ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})
 # For add-ons, which need only this header.
 install(FILES ../plugin/plasmalabelcreatorplugin.h DESTINATION ${KDE_INSTALL_INCLUDEDIR}/PlasmaLabelCreator)
-install(PROGRAMS plasma-label-creator.desktop plasma-label-creator-print.desktop DESTINATION ${KDE_INSTALL_APPDIR})

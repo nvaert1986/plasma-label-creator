@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    SPDX-FileCopyrightText: 2026 nvaert1986 <25772781+nvaert1986@users.noreply.github.com>
+    SPDX-License-Identifier: CC0-1.0
+
+    The file types Plasma Label Creator opens. Label files are known by their
+    XML root only, so other programs' .label files are not claimed: root-XML
+    for GLib, and magic for Qt (KIO, Dolphin), which has no root-XML. The
+    magic searches past the XML declaration and any comments.
+-->
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+    <mime-type type="application/x-dymo-label">
+        <comment>DYMO label</comment>
+        <sub-class-of type="application/xml"/>
+        <generic-icon name="application-x-dymo-label"/>
+        <root-XML namespaceURI="" localName="DieCutLabel"/>
+        <root-XML namespaceURI="" localName="ContinuousLabel"/>
+        <magic priority="80">
+            <match type="string" value="&lt;DieCutLabel" offset="0:4096"/>
+            <match type="string" value="&lt;ContinuousLabel" offset="0:4096"/>
+        </magic>
+    </mime-type>
+    <mime-type type="application/x-dymo-address-book">
+        <comment>DYMO address book</comment>
+        <sub-class-of type="application/xml"/>
+        <generic-icon name="x-office-address-book"/>
+        <glob pattern="*.abx"/>
+        <root-XML namespaceURI="" localName="AddressBook"/>
+        <magic priority="80">
+            <match type="string" value="&lt;AddressBook" offset="0:4096"/>
+        </magic>
+    </mime-type>
+    <mime-type type="application/x-dymo-rhino-template">
+        <comment>DYMO Rhino label template</comment>
+        <sub-class-of type="application/xml"/>
+        <generic-icon name="application-x-dymo-label"/>
+        <glob pattern="*.rhino"/>
+    </mime-type>
+</mime-info>

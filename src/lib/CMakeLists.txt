@@ -47,6 +47,8 @@ add_library(labelcreatorcore STATIC
     zplprinter.cpp
     zplprinter.h
 )
+# Linked into plugins too (the thumbnailer): position-independent code.
+set_target_properties(labelcreatorcore PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 target_include_directories(labelcreatorcore PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 

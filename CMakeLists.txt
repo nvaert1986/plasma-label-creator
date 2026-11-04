@@ -87,6 +87,7 @@ add_subdirectory(src/service)
 
 if(BUILD_APP)
     add_subdirectory(src/app)
+    add_subdirectory(src/integration)
 endif()
 
 if(BUILD_TESTING)

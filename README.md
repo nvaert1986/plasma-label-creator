@@ -243,6 +243,14 @@ curl -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
 each of `rows` gives one label. Check boxes take `true` or `false`, dates
 `yyyy-MM-dd` or the question's own format.
 
+## Desktop integration
+
+Label files open from Dolphin, show their own icon and a thumbnail of the
+label, Dolphin's right-click menu has "Print Label" (print-only mode), and
+the launchers have search keywords and right-click actions; AppStream
+metadata describes the app to software centres. Each part is optional and
+can be left out when building (see [INSTALL.md](INSTALL.md)).
+
 ## Add-ons
 
 Plasma Label Creator needs no add-ons. An add-on is a Qt plugin installed

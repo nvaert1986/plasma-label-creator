@@ -40,7 +40,8 @@ int main(int argc, char *argv[])
     aboutData.addAuthor(u"nvaert1986"_s, i18n("Developer"), u"25772781+nvaert1986@users.noreply.github.com"_s);
     aboutData.setDesktopFileName(u"plasma-label-creator"_s);
     KAboutData::setApplicationData(aboutData);
-    QApplication::setWindowIcon(QIcon::fromTheme(u"document-print"_s));
+    // Its own icon when installed (WITH_ICONS), else a generic one.
+    QApplication::setWindowIcon(QIcon::fromTheme(u"plasma-label-creator"_s, QIcon::fromTheme(u"document-print"_s)));
 
     KCrash::initialize();
 

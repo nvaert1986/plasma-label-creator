@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!-- SPDX-FileCopyrightText: 2026 nvaert1986 <25772781+nvaert1986@users.noreply.github.com> -->
+  <!-- SPDX-License-Identifier: CC0-1.0 -->
+  <!-- A label file: a page with a label on it. -->
+  <path d="M12 4h28l12 12v44H12z" fill="#fcfcfc" stroke="#bdc3c7" stroke-width="1"/>
+  <path d="M40 4v12h12z" fill="#dee0e2"/>
+  <rect x="17" y="24" width="30" height="22" rx="3" fill="#3daee9"/>
+  <rect x="20" y="27" width="24" height="16" rx="2" fill="#fcfcfc"/>
+  <g fill="#232629">
+    <rect x="23" y="30" width="1.5" height="7"/>
+    <rect x="26" y="30" width="1" height="7"/>
+    <rect x="28.5" y="30" width="2" height="7"/>
+    <rect x="32" y="30" width="1" height="7"/>
+    <rect x="34.5" y="30" width="1.5" height="7"/>
+    <rect x="37.5" y="30" width="1" height="7"/>
+    <rect x="40" y="30" width="1.5" height="7"/>
+  </g>
+  <rect x="23" y="39" width="12" height="2" rx="1" fill="#7f8c8d"/>
+</svg>

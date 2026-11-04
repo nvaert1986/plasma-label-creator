@@ -5,6 +5,15 @@
 
 # Changelog
 
+## Unreleased
+
+- **Desktop integration**, each part optional at build time: file types
+  for `.label` (known by content, so other `.label` files are not claimed),
+  `.ABX` and `.rhino` files; the app's own icons; label thumbnails in
+  Dolphin (with KIO); "Print Label" in Dolphin's right-click menu; launcher
+  keywords and right-click actions; AppStream metadata. Address books opened
+  from the file manager go to the Address Book tab.
+
 ## 0.6.0 (2026-11-03)
 
 - **Add-ons**: Qt plugins that add to the app, such as keeping a team's

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    SPDX-FileCopyrightText: 2026 nvaert1986 <25772781+nvaert1986@users.noreply.github.com>
+    SPDX-License-Identifier: CC0-1.0
+-->
+<component type="desktop-application">
+  <id>io.github.nvaert1986.PlasmaLabelCreator</id>
+  <launchable type="desktop-id">plasma-label-creator.desktop</launchable>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-2.0-or-later</project_license>
+  <name>Plasma Label Creator</name>
+  <summary>Design and print labels on DYMO and ZPL label printers</summary>
+  <developer id="io.github.nvaert1986">
+    <name>nvaert1986</name>
+  </developer>
+  <description>
+    <p>
+      Plasma Label Creator designs and prints labels on DYMO LabelWriter and
+      LabelManager printers and on ZPL label printers such as Zebra and Altec.
+      It opens and saves .label files and DYMO address books.
+    </p>
+    <ul>
+      <li>Text, addresses, barcodes and QR codes, pictures, shapes, counters and dates</li>
+      <li>Fields filled from questions asked when printing, or a label per row of a CSV, spreadsheet or database</li>
+      <li>Label types for every DYMO model, tape labels, and custom sizes for ZPL printers</li>
+      <li>A print-only mode with forms, for people who only print</li>
+      <li>Versions of labels, a print history and shared counters</li>
+      <li>An automation service that prints jobs from folders and over HTTP</li>
+    </ul>
+  </description>
+  <categories>
+    <category>Office</category>
+  </categories>
+  <keywords>
+    <keyword>label</keyword>
+    <keyword>DYMO</keyword>
+    <keyword>LabelWriter</keyword>
+    <keyword>Zebra</keyword>
+    <keyword>ZPL</keyword>
+    <keyword>barcode</keyword>
+  </keywords>
+  <url type="homepage">https://github.com/nvaert1986/plasma-label-creator</url>
+  <url type="bugtracker">https://github.com/nvaert1986/plasma-label-creator/issues</url>
+  <url type="vcs-browser">https://github.com/nvaert1986/plasma-label-creator</url>
+  <screenshots>
+    <screenshot type="default">
+      <caption>Designing a label</caption>
+      <image>https://raw.githubusercontent.com/nvaert1986/plasma-label-creator/main/doc/screenshot.png</image>
+    </screenshot>
+  </screenshots>
+  <provides>
+    <binary>plasma-label-creator</binary>
+    <binary>plasma-label-creator-render</binary>
+    <mediatype>application/x-dymo-label</mediatype>
+    <mediatype>application/x-dymo-address-book</mediatype>
+    <mediatype>application/x-dymo-rhino-template</mediatype>
+  </provides>
+  <content_rating type="oars-1.1"/>
+  <branding>
+    <color type="primary" scheme_preference="light">#3daee9</color>
+    <color type="primary" scheme_preference="dark">#2980b9</color>
+  </branding>
+  <releases>
+    <release version="0.6.0" date="2026-11-03">
+      <description>
+        <p>Add-ons: optional plugins that add to the app, such as working with a team's labels on a server.</p>
+      </description>
+    </release>
+    <release version="0.5.0" date="2026-11-02">
+      <description>
+        <p>Print conditions, text that grows to fit with anchored objects, guidelines, polygons, stars, arrows and SVG drawings, a label per row from data, header and trailer labels, print density, darkness and speed per label.</p>
+      </description>
+    </release>
+    <release version="0.4.0" date="2026-11-02">
+      <description>
+        <p>Print-only mode with forms, label versions, print history, printer status, settings, export with the label's outline and the automation service.</p>
+      </description>
+    </release>
+  </releases>
+</component>
