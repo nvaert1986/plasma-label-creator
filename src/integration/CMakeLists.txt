@@ -21,12 +21,15 @@ foreach(part WITH_DOLPHIN_MENU WITH_THUMBNAILS)
     endif()
 endforeach()
 
-# The launchers, as the options make them.
+# The launchers, as the options make them. They start the program by its
+# full path, so an install in ~/.local works without ~/.local/bin in PATH.
 set(APP_ICON "document-print")
 set(PRINT_ICON "document-print-direct")
 if(WITH_ICONS)
-    set(APP_ICON "plasma-label-creator")
-    set(PRINT_ICON "plasma-label-creator-print")
+    # Named by the app id: a name with dashes, such as plasma-label-creator,
+    # would find Breeze's "plasma" icon first when looked up.
+    set(APP_ICON "io.github.nvaert1986.PlasmaLabelCreator")
+    set(PRINT_ICON "io.github.nvaert1986.PlasmaLabelCreator-print")
 endif()
 set(MIME_TYPES "")
 if(WITH_FILE_TYPES)
@@ -35,8 +38,8 @@ endif()
 set(LAUNCHER_EXTRAS "")
 set(PRINT_LAUNCHER_EXTRAS "")
 if(WITH_LAUNCHER_EXTRAS)
-    set(LAUNCHER_EXTRAS "Keywords=label;labels;DYMO;LabelWriter;LabelManager;Zebra;Altec;ZPL;barcode;QR code;sticker;\nActions=printOnly;\n\n[Desktop Action printOnly]\nName=Print-Only Mode\nIcon=${PRINT_ICON}\nExec=plasma-label-creator --print-only\n")
-    set(PRINT_LAUNCHER_EXTRAS "Keywords=label;labels;print;DYMO;LabelWriter;Zebra;Altec;form;\nActions=design;\n\n[Desktop Action design]\nName=Design Labels\nIcon=${APP_ICON}\nExec=plasma-label-creator\n")
+    set(LAUNCHER_EXTRAS "Keywords=label;labels;DYMO;LabelWriter;LabelManager;Zebra;Altec;ZPL;barcode;QR code;sticker;\nActions=printOnly;\n\n[Desktop Action printOnly]\nName=Print-Only Mode\nIcon=${PRINT_ICON}\nExec=${KDE_INSTALL_FULL_BINDIR}/plasma-label-creator --print-only\n")
+    set(PRINT_LAUNCHER_EXTRAS "Keywords=label;labels;print;DYMO;LabelWriter;Zebra;Altec;form;\nActions=design;\n\n[Desktop Action design]\nName=Design Labels\nIcon=${APP_ICON}\nExec=${KDE_INSTALL_FULL_BINDIR}/plasma-label-creator\n")
 endif()
 configure_file(plasma-label-creator.desktop.in ${CMAKE_CURRENT_BINARY_DIR}/plasma-label-creator.desktop @ONLY)
 configure_file(plasma-label-creator-print.desktop.in ${CMAKE_CURRENT_BINARY_DIR}/plasma-label-creator-print.desktop @ONLY)
@@ -56,8 +59,8 @@ endif()
 
 if(WITH_ICONS)
     ecm_install_icons(ICONS
-        icons/sc-apps-plasma-label-creator.svg
-        icons/sc-apps-plasma-label-creator-print.svg
+        icons/sc-apps-io.github.nvaert1986.PlasmaLabelCreator.svg
+        icons/sc-apps-io.github.nvaert1986.PlasmaLabelCreator-print.svg
         icons/sc-mimetypes-application-x-dymo-label.svg
         DESTINATION ${KDE_INSTALL_ICONDIR}
         THEME hicolor)

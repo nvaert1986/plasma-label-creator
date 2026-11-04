@@ -251,9 +251,21 @@ build option above, and the app works the same without any of them:
 
 A system-wide install updates the file types database itself when
 `update-mime-database` is installed; Dolphin needs to be restarted to see
-the new types. In a `~/.local` install the thumbnailer goes to
-`~/.local/lib64/qt6/plugins`, which Qt only searches when it is in
-`QT_PLUGIN_PATH`.
+the new types. The launchers and Dolphin's menu start the app by its full
+path, so a `~/.local` install works without `~/.local/bin` in `PATH`.
+
+In a `~/.local` install the thumbnailer (and any add-on installed there)
+goes to `~/.local/lib64/plugins`, which Qt searches only when it is in
+`QT_PLUGIN_PATH`. Plasma sets that at login from a script in
+`~/.config/plasma-workspace/env/`, such as `plasma-label-creator.sh`:
+
+```sh
+export QT_PLUGIN_PATH="$HOME/.local/lib64/plugins${QT_PLUGIN_PATH:+:$QT_PLUGIN_PATH}"
+```
+
+Log out and in again for it to take effect. After installing, run
+`kbuildsycoca6` so the menus and Dolphin see the new launchers and types
+straight away.
 
 Print-only mode, versions, the print history, printer status and the
 settings need nothing beyond the requirements above.
