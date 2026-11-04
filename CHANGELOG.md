@@ -5,7 +5,7 @@
 
 # Changelog
 
-## Unreleased
+## 0.6.1 (2026-11-04)
 
 - **Desktop integration**, each part optional at build time: file types
   for `.label` (known by content, so other `.label` files are not claimed),
@@ -13,6 +13,10 @@
   Dolphin (with KIO); "Print Label" in Dolphin's right-click menu; launcher
   keywords and right-click actions; AppStream metadata. Address books opened
   from the file manager go to the Address Book tab.
+- **Installing** system-wide (`/usr`) or for one user (`~/.local`, without
+  root) is described in INSTALL.md, with what each means for thumbnails and
+  add-ons, and how to uninstall. The launchers start the app by its full
+  path, so a `~/.local` install works without `~/.local/bin` in `PATH`.
 
 ## 0.6.0 (2026-11-03)
 

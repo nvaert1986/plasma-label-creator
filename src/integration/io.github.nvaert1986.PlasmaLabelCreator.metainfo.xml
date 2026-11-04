@@ -61,6 +61,11 @@
     <color type="primary" scheme_preference="dark">#2980b9</color>
   </branding>
   <releases>
+    <release version="0.6.1" date="2026-11-04">
+      <description>
+        <p>Desktop integration, each part optional: file types for label files and address books, the app's own icons, label thumbnails in Dolphin, "Print Label" in Dolphin's right-click menu, launcher keywords and actions, and this metadata. Installing system-wide or for one user is documented.</p>
+      </description>
+    </release>
     <release version="0.6.0" date="2026-11-03">
       <description>
         <p>Add-ons: optional plugins that add to the app, such as working with a team's labels on a server.</p>

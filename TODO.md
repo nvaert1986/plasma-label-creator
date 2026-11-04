@@ -216,7 +216,7 @@ Nothing open.
 
 ## Plasma integration
 
-Done after 0.6.0 in `src/integration`, each part a build option (see
+Done in 0.6.1 in `src/integration`, each part a build option (see
 INSTALL.md). One change from the plan: the desktop files keep their names;
 the AppStream id points at them with `<launchable>`, so pinned launchers stay.
 
