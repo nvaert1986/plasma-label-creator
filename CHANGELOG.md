@@ -15,6 +15,13 @@
   file types, Dolphin's "Print Label", the AppStream metadata, and the
   sample text of new address and curved text objects. Check boxes answered
   by the automation service print the same "Yes" and "No" as the app.
+- **Choosing a language** under Settings > Configure Language… now also
+  translates the KDE Frameworks' own menu items (Configure Toolbars…), and
+  works on a desktop whose locale is `C.UTF-8`, where gettext ignores the
+  chosen language: the app then uses another installed locale for its
+  messages only. Run from the build folder, the app and the Teams add-on
+  find their translations there, so the dialog offers them before
+  installing.
 - **Handbook**: Help > Plasma Label Creator Handbook (F1) opens a KDE-style
   handbook in KHelpCenter, in English and Dutch: getting started,
   designing, data and questions, printing, print-only mode, automation,
