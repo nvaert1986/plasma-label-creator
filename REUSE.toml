@@ -19,3 +19,14 @@ path = [
 ]
 SPDX-FileCopyrightText = "2026 nvaert1986 <25772781+nvaert1986@users.noreply.github.com>"
 SPDX-License-Identifier = "CC0-1.0"
+
+# Templates of the messages to translate, made by po/update.sh.
+[[annotations]]
+path = "po/plasma-label-creator.pot"
+SPDX-FileCopyrightText = "2026 nvaert1986 <25772781+nvaert1986@users.noreply.github.com>"
+SPDX-License-Identifier = "GPL-2.0-or-later"
+
+[[annotations]]
+path = "doc/po/handbook.pot"
+SPDX-FileCopyrightText = "2026 nvaert1986 <25772781+nvaert1986@users.noreply.github.com>"
+SPDX-License-Identifier = "CC0-1.0"

@@ -1,0 +1,5724 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the plasma-label-creator package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: plasma-label-creator 0.6.1\n"
+"Report-Msgid-Bugs-To: https://github.com/nvaert1986/plasma-label-creator/"
+"issues\n"
+"POT-Creation-Date: 2026-11-09 09:31+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+#. i18n: file: src/app/plasma-label-creatorui.rc
+#: rc.cpp:2
+#, kde-format
+msgid "F&ormat"
+msgstr ""
+
+#. i18n: file: src/app/plasma-label-creatorui.rc
+#: rc.cpp:4
+#, kde-format
+msgid "&Horizontal Alignment"
+msgstr ""
+
+#. i18n: file: src/app/plasma-label-creatorui.rc
+#: rc.cpp:6
+#, kde-format
+msgid "&Vertical Alignment"
+msgstr ""
+
+#. i18n: file: src/app/plasma-label-creatorui.rc
+#: rc.cpp:8
+#, kde-format
+msgid "&Text Fit"
+msgstr ""
+
+#. i18n: file: src/app/plasma-label-creatorui.rc
+#: rc.cpp:10
+#, kde-format
+msgid "&Insert"
+msgstr ""
+
+#. i18n: file: src/app/plasma-label-creatorui.rc
+#: rc.cpp:12
+#, kde-format
+msgid "&Layout"
+msgstr ""
+
+#. i18n: file: src/app/plasma-label-creatorui.rc
+#: rc.cpp:14
+#, kde-format
+msgid "Label &Orientation"
+msgstr ""
+
+#. i18n: file: src/app/plasma-label-creatorui.rc
+#: rc.cpp:16
+#, kde-format
+msgid "&Position Object on Label"
+msgstr ""
+
+#. i18n: file: src/app/plasma-label-creatorui.rc
+#: rc.cpp:18 rc.cpp:36
+#, kde-format
+msgid "&Align Objects"
+msgstr ""
+
+#. i18n: file: src/app/plasma-label-creatorui.rc
+#: rc.cpp:20
+#, kde-format
+msgid "&Data"
+msgstr ""
+
+#. i18n: file: src/app/plasma-label-creatorui.rc
+#: rc.cpp:22
+#, kde-format
+msgid "&Address Book"
+msgstr ""
+
+#. i18n: file: src/app/plasma-label-creatorui.rc
+#: rc.cpp:24
+#, kde-format
+msgid "Main Toolbar"
+msgstr ""
+
+#. i18n: file: src/app/plasma-label-creatorui.rc
+#: rc.cpp:26
+#, kde-format
+msgid "Insert Toolbar"
+msgstr ""
+
+#. i18n: file: src/app/plasma-label-creatorui.rc
+#: rc.cpp:28
+#, kde-format
+msgid "Format Toolbar"
+msgstr ""
+
+#. i18n: file: src/app/plasma-label-creatorui.rc
+#: rc.cpp:30
+#, kde-format
+msgid "Arrange Toolbar"
+msgstr ""
+
+#. i18n: file: src/app/plasma-label-creatorui.rc
+#: rc.cpp:32
+#, kde-format
+msgid "Print-Only Toolbar"
+msgstr ""
+
+#. i18n: file: src/app/plasma-label-creatorui.rc
+#: rc.cpp:34
+#, kde-format
+msgid "&Position on Label"
+msgstr ""
+
+#: src/app/addressbookpanel.cpp:39
+#, kde-format
+msgid "DYMO address books (*.ABX *.abx)"
+msgstr ""
+
+#: src/app/addressbookpanel.cpp:39 src/app/addressbookpanel.cpp:305
+#: src/app/datadialogs.cpp:232 src/app/mainwindow_p.h:96
+#: src/app/propertiesdialog.cpp:199
+#, kde-format
+msgid "All files (*)"
+msgstr ""
+
+#: src/app/addressbookpanel.cpp:56
+#, kde-format
+msgid "Search the address book"
+msgstr ""
+
+#: src/app/addressbookpanel.cpp:59
+#, kde-format
+msgid "Search"
+msgstr ""
+
+#: src/app/addressbookpanel.cpp:60
+#, kde-format
+msgid "Address book"
+msgstr ""
+
+#: src/app/addressbookpanel.cpp:65
+#, kde-format
+msgid "All"
+msgstr ""
+
+#: src/app/addressbookpanel.cpp:71
+#, kde-format
+msgid "Delete"
+msgstr ""
+
+#: src/app/addressbookpanel.cpp:72
+#, kde-format
+msgid "Delete the checked entries"
+msgstr ""
+
+#: src/app/addressbookpanel.cpp:84
+#, kde-format
+msgid "New"
+msgstr ""
+
+#: src/app/addressbookpanel.cpp:85
+#, kde-format
+msgid "Save"
+msgstr ""
+
+#: src/app/addressbookpanel.cpp:86
+#, kde-format
+msgid "Cancel"
+msgstr ""
+
+#: src/app/addressbookpanel.cpp:94
+#, kde-format
+msgid "Current address:"
+msgstr ""
+
+#: src/app/addressbookpanel.cpp:97
+#, kde-format
+msgid "File as:"
+msgstr ""
+
+#: src/app/addressbookpanel.cpp:193
+#, kde-format
+msgid "New address book"
+msgstr ""
+
+#: src/app/addressbookpanel.cpp:200
+#, kde-format
+msgid "Open…"
+msgstr ""
+
+#: src/app/addressbookpanel.cpp:212
+#, kde-format
+msgid ""
+"Could not open the address book %1:\n"
+"%2"
+msgstr ""
+
+#: src/app/addressbookpanel.cpp:241
+#, kde-format
+msgid "Open Address Book"
+msgstr ""
+
+#: src/app/addressbookpanel.cpp:256
+#, kde-format
+msgid ""
+"Could not save the address book %1:\n"
+"%2"
+msgstr ""
+
+#: src/app/addressbookpanel.cpp:266 src/app/mainwindow.cpp:356
+#, kde-format
+msgid "Save Address Book"
+msgstr ""
+
+#: src/app/addressbookpanel.cpp:290
+#, kde-format
+msgid "The address book has been changed. Do you want to save it?"
+msgstr ""
+
+#: src/app/addressbookpanel.cpp:291
+#, kde-format
+msgid "Unsaved Address Book"
+msgstr ""
+
+#: src/app/addressbookpanel.cpp:305
+#, kde-format
+msgid "Import Addresses"
+msgstr ""
+
+#: src/app/addressbookpanel.cpp:305
+#, kde-format
+msgid "CSV files (*.csv *.txt)"
+msgstr ""
+
+#: src/app/addressbookpanel.cpp:312
+#, kde-format
+msgid "No addresses were found in %1."
+msgstr ""
+
+#: src/app/addressbookpanel.cpp:319
+#, kde-format
+msgid "Imported one address."
+msgid_plural "Imported %1 addresses."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/app/addressbookpanel.cpp:391
+#, kde-format
+msgid "1 entry"
+msgid_plural "%1 entries"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/app/addressbookpanel.cpp:391
+#, kde-format
+msgid "1 selected"
+msgid_plural "%1 selected"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/app/addressbookpanel.cpp:468
+#, kde-format
+msgid "Delete the checked address?"
+msgid_plural "Delete the %1 checked addresses?"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/app/addressbookpanel.cpp:469
+#, kde-format
+msgid "Delete Addresses"
+msgstr ""
+
+#: src/app/alteclabels.cpp:65
+#, kde-format
+msgctxt "product, round label diameter"
+msgid "%1 Ø %2 mm"
+msgstr ""
+
+#: src/app/alteclabels.cpp:66
+#, kde-format
+msgctxt "product, roll width"
+msgid "%1 %2 mm, continuous"
+msgstr ""
+
+#: src/app/alteclabels.cpp:67
+#, kde-format
+msgctxt "product, label width x height"
+msgid "%1 %2 × %3 mm"
+msgstr ""
+
+#: src/app/alteclabels.cpp:69
+#, kde-format
+msgctxt "label name, labels across the roll"
+msgid "%1 (%2 across)"
+msgstr ""
+
+#: src/app/answersform.cpp:39 src/app/datadialogs.cpp:592
+#: src/lib/automation.cpp:178
+#, kde-format
+msgctxt "answer of a ticked check box"
+msgid "Yes"
+msgstr ""
+
+#: src/app/answersform.cpp:44 src/app/datadialogs.cpp:595
+#: src/lib/automation.cpp:183
+#, kde-format
+msgctxt "answer of a check box not ticked"
+msgid "No"
+msgstr ""
+
+#: src/app/answersform.cpp:69
+#, kde-format
+msgid ""
+"Looked up in the column %1 of the data; the row found fills the other fields."
+msgstr ""
+
+#: src/app/automationpage.cpp:59 src/app/exportdialog.cpp:32
+#: src/app/printsettingsdialog.cpp:89
+#, kde-format
+msgid "Browse…"
+msgstr ""
+
+#: src/app/automationpage.cpp:91
+#, kde-format
+msgctxt "printer that is not found"
+msgid "%1 (not found)"
+msgstr ""
+
+#: src/app/automationpage.cpp:100 src/app/automationpage.cpp:104
+#, kde-format
+msgid "Watched Folder"
+msgstr ""
+
+#: src/app/automationpage.cpp:103
+#, kde-format
+msgid "Folder:"
+msgstr ""
+
+#: src/app/automationpage.cpp:110
+#, kde-format
+msgid "Label:"
+msgstr ""
+
+#: src/app/automationpage.cpp:111
+#, kde-format
+msgid "Label to Print"
+msgstr ""
+
+#: src/app/automationpage.cpp:111 src/app/printsettingsdialog.cpp:92
+#, kde-format
+msgid "Label files (*.label)"
+msgstr ""
+
+#: src/app/automationpage.cpp:117 src/app/automationpage.cpp:455
+#, kde-format
+msgid "The default printer"
+msgstr ""
+
+#: src/app/automationpage.cpp:118
+#, kde-format
+msgid "Printer:"
+msgstr ""
+
+#: src/app/automationpage.cpp:122 src/app/printbar.cpp:103
+#, kde-format
+msgid "Copies:"
+msgstr ""
+
+#: src/app/automationpage.cpp:123
+#, kde-format
+msgid ""
+"A CSV file dropped in the folder prints a label for each row, with the "
+"columns named on its first line as fields. A JSON file is a print job as "
+"sent over HTTP. Printed jobs move to \"printed\", the others to \"failed\" "
+"with the reason."
+msgstr ""
+
+#: src/app/automationpage.cpp:130
+#, kde-format
+msgid "Choose a folder that exists."
+msgstr ""
+
+#: src/app/automationpage.cpp:134
+#, kde-format
+msgid "Choose the label to print."
+msgstr ""
+
+#: src/app/automationpage.cpp:160
+#, kde-format
+msgid ""
+"The automation service prints without anyone at the screen: jobs dropped in "
+"watched folders, and requests from other programs over HTTP. It runs in the "
+"background, also when Plasma Label Creator is closed."
+msgstr ""
+
+#: src/app/automationpage.cpp:166
+#, kde-format
+msgid "Service"
+msgstr ""
+
+#: src/app/automationpage.cpp:174
+#, kde-format
+msgid "Recent Jobs…"
+msgstr ""
+
+#: src/app/automationpage.cpp:175
+#, kde-format
+msgid "What the service printed lately, and why a job was not printed"
+msgstr ""
+
+#: src/app/automationpage.cpp:184
+#, kde-format
+msgid "Status:"
+msgstr ""
+
+#: src/app/automationpage.cpp:185
+#, kde-format
+msgid "Start the service when I log in"
+msgstr ""
+
+#: src/app/automationpage.cpp:188
+#, kde-format
+msgid "No labels may be named"
+msgstr ""
+
+#: src/app/automationpage.cpp:189
+#, kde-format
+msgid ""
+"Jobs and requests may name the labels in this folder and its subfolders, "
+"such as \"Rack/patch panel\"; no others."
+msgstr ""
+
+#: src/app/automationpage.cpp:190
+#, kde-format
+msgid "Labels folder:"
+msgstr ""
+
+#: src/app/automationpage.cpp:191
+#, kde-format
+msgid "Labels Folder"
+msgstr ""
+
+#: src/app/automationpage.cpp:197
+#, kde-format
+msgid "Default printer:"
+msgstr ""
+
+#: src/app/automationpage.cpp:198 src/app/settingsdialog.cpp:148
+#, kde-format
+msgid "Save counters in the label after printing"
+msgstr ""
+
+#: src/app/automationpage.cpp:199
+#, kde-format
+msgid "So the next job counts on from where this one stopped."
+msgstr ""
+
+#: src/app/automationpage.cpp:204
+#, kde-format
+msgid "Watched Folders"
+msgstr ""
+
+#: src/app/automationpage.cpp:207
+#, kde-format
+msgid "Folder"
+msgstr ""
+
+#: src/app/automationpage.cpp:207 src/app/automationpage.cpp:482
+#: src/app/historydialogs.cpp:141 src/app/mainwindow_print.cpp:144
+#: src/app/mainwindow_print.cpp:441
+#, kde-format
+msgid "Label"
+msgstr ""
+
+#: src/app/automationpage.cpp:207 src/app/automationpage.cpp:482
+#: src/app/historydialogs.cpp:141 src/app/printerstatusdialog.cpp:63
+#, kde-format
+msgid "Printer"
+msgstr ""
+
+#: src/app/automationpage.cpp:207
+#, kde-format
+msgid "Copies"
+msgstr ""
+
+#: src/app/automationpage.cpp:213
+#, kde-format
+msgid "Add…"
+msgstr ""
+
+#: src/app/automationpage.cpp:214
+#, kde-format
+msgid "Edit…"
+msgstr ""
+
+#: src/app/automationpage.cpp:215 src/app/datadialogs.cpp:408
+#: src/app/datadialogs.cpp:489 src/app/gs1dialog.cpp:78
+#, kde-format
+msgid "Remove"
+msgstr ""
+
+#: src/app/automationpage.cpp:238
+#, kde-format
+msgid "Take print requests over HTTP"
+msgstr ""
+
+#: src/app/automationpage.cpp:241
+#, kde-format
+msgid "From this computer only"
+msgstr ""
+
+#: src/app/automationpage.cpp:242
+#, kde-format
+msgid "From other computers on the network too"
+msgstr ""
+
+#: src/app/automationpage.cpp:243
+#, kde-format
+msgid ""
+"Anyone on the network who has the token can print. Keep the token secret."
+msgstr ""
+
+#: src/app/automationpage.cpp:245
+#, kde-format
+msgid "Listen:"
+msgstr ""
+
+#: src/app/automationpage.cpp:249 src/app/datadialogs.cpp:141
+#, kde-format
+msgid "Port:"
+msgstr ""
+
+#: src/app/automationpage.cpp:255
+#, kde-format
+msgid "Show the token"
+msgstr ""
+
+#: src/app/automationpage.cpp:260
+#, kde-format
+msgid "Copy the token"
+msgstr ""
+
+#: src/app/automationpage.cpp:264
+#, kde-format
+msgid "New Token"
+msgstr ""
+
+#: src/app/automationpage.cpp:265
+#, kde-format
+msgid "Programs using the old token can no longer print."
+msgstr ""
+
+#: src/app/automationpage.cpp:275
+#, kde-format
+msgid "Token:"
+msgstr ""
+
+#: src/app/automationpage.cpp:292
+#, kde-format
+msgid ""
+"Print requests over HTTP need Qt HTTP Server, which was not installed when "
+"Plasma Label Creator was built (dev-qt/qthttpserver on Gentoo, qt6-"
+"httpserver-dev on Debian and Ubuntu, qt6-qthttpserver-devel on Fedora, qt6-"
+"httpserver on Arch). Install it and build Plasma Label Creator again to use "
+"them; watched folders work without it."
+msgstr ""
+
+#: src/app/automationpage.cpp:348
+#, kde-format
+msgid "None: jobs name their printer"
+msgstr ""
+
+#: src/app/automationpage.cpp:400
+#, kde-format
+msgid "Running (process %1)."
+msgstr ""
+
+#: src/app/automationpage.cpp:402
+#, kde-format
+msgid "Not running."
+msgstr ""
+
+#: src/app/automationpage.cpp:404
+#, kde-format
+msgid "The service (%1) is not installed."
+msgstr ""
+
+#: src/app/automationpage.cpp:406
+#, kde-format
+msgid "Stop"
+msgstr ""
+
+#: src/app/automationpage.cpp:406
+#, kde-format
+msgid "Start"
+msgstr ""
+
+#: src/app/automationpage.cpp:409
+#, kde-format
+msgid "Starts it with the settings as last applied."
+msgstr ""
+
+#: src/app/automationpage.cpp:416
+#, kde-format
+msgid "The automation service could not be started."
+msgstr ""
+
+#: src/app/automationpage.cpp:469
+#, kde-format
+msgid ""
+"For example:\n"
+"curl -H \"Authorization: Bearer <token>\" -H \"Content-Type: application/"
+"json\" -d '{\"label\": \"Rack/patch panel\", \"values\": {\"Port\": "
+"\"A12\"}}' http://localhost:%1/v1/print"
+msgstr ""
+
+#: src/app/automationpage.cpp:479
+#, kde-format
+msgid "Recent Automation Jobs"
+msgstr ""
+
+#: src/app/automationpage.cpp:482
+#, kde-format
+msgid "When"
+msgstr ""
+
+#: src/app/automationpage.cpp:482
+#, kde-format
+msgid "From"
+msgstr ""
+
+#: src/app/automationpage.cpp:482 src/app/historydialogs.cpp:141
+#: src/app/sidebar.cpp:141
+#, kde-format
+msgid "Labels"
+msgstr ""
+
+#: src/app/automationpage.cpp:482
+#, kde-format
+msgid "Result"
+msgstr ""
+
+#: src/app/automationpage.cpp:488
+#, kde-format
+msgid "The automation service has not taken any jobs yet."
+msgstr ""
+
+#: src/app/automationpage.cpp:492 src/app/printerstatusdialog.cpp:71
+#, kde-format
+msgid "Refresh"
+msgstr ""
+
+#: src/app/automationpage.cpp:515
+#, kde-format
+msgid "Printed, job %1"
+msgstr ""
+
+#: src/app/clipartpanel.cpp:100
+#, kde-format
+msgid "<b>Clip Art</b>"
+msgstr ""
+
+#: src/app/clipartpanel.cpp:102
+#, kde-format
+msgid "Show All"
+msgstr ""
+
+#: src/app/clipartpanel.cpp:105
+#, kde-format
+msgid "Hide All"
+msgstr ""
+
+#: src/app/clipartpanel.cpp:112 src/app/sidebar.cpp:220
+#, kde-format
+msgid "Drag onto the label, or double-click"
+msgstr ""
+
+#: src/app/clipartpanel.cpp:127
+#, kde-format
+msgid "Add images to My Clip Art"
+msgstr ""
+
+#: src/app/clipartpanel.cpp:130
+#, kde-format
+msgid "Remove the selected clip art"
+msgstr ""
+
+#: src/app/clipartpanel.cpp:134
+#, kde-format
+msgid "Import / Export"
+msgstr ""
+
+#: src/app/clipartpanel.cpp:138
+#, kde-format
+msgid "Import DYMO Label Software's Clip Art…"
+msgstr ""
+
+#: src/app/clipartpanel.cpp:139
+#, kde-format
+msgid "Import a DYMO Clip Art List (Clipart.xml)…"
+msgstr ""
+
+#: src/app/clipartpanel.cpp:141
+#, kde-format
+msgid "Export Clip Art for DYMO Label Software…"
+msgstr ""
+
+#: src/app/clipartpanel.cpp:184
+#, kde-format
+msgid ""
+"No clip art yet. Add images with +, or import DYMO Label Software's clip art."
+msgstr ""
+
+#: src/app/clipartpanel.cpp:201
+#, kde-format
+msgid "Other"
+msgstr ""
+
+#: src/app/clipartpanel.cpp:226
+#, kde-format
+msgctxt "clip art category, number of images"
+msgid "%1 (%2)"
+msgstr ""
+
+#: src/app/clipartpanel.cpp:300
+#, kde-format
+msgid "Nothing was imported."
+msgstr ""
+
+#: src/app/clipartpanel.cpp:312
+#, kde-format
+msgid "Add Clip Art"
+msgstr ""
+
+#: src/app/clipartpanel.cpp:312 src/app/propertiesdialog.cpp:199
+#, kde-format
+msgid "Images (%1)"
+msgstr ""
+
+#: src/app/clipartpanel.cpp:324
+#, kde-format
+msgid "Remove this clip art?"
+msgid_plural "Remove these %1 clip art images?"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/app/clipartpanel.cpp:324
+#, kde-format
+msgid "Remove Clip Art"
+msgstr ""
+
+#: src/app/clipartpanel.cpp:339
+#, kde-format
+msgid ""
+"Choose <b>DYMO.DLS.dll</b> from the folder DYMO Label Software is installed "
+"in on Windows, usually C:\\Program Files (x86)\\DYMO\\DYMO Label Software. "
+"Plasma Label Creator copies the clip art from it into your library."
+msgstr ""
+
+#: src/app/clipartpanel.cpp:341
+#, kde-format
+msgid "Import DYMO Clip Art"
+msgstr ""
+
+#: src/app/clipartpanel.cpp:343
+#, kde-format
+msgid "DYMO Label Software Program File"
+msgstr ""
+
+#: src/app/clipartpanel.cpp:343
+#, kde-format
+msgid "DYMO.DLS.dll (*.dll)"
+msgstr ""
+
+#: src/app/clipartpanel.cpp:353
+#, kde-format
+msgid "DYMO Clip Art List"
+msgstr ""
+
+#: src/app/clipartpanel.cpp:353
+#, kde-format
+msgid "Clip art lists (Clipart.xml *.xml)"
+msgstr ""
+
+#: src/app/clipartpanel.cpp:363
+#, kde-format
+msgid "Export Clip Art to Folder"
+msgstr ""
+
+#: src/app/clipartpanel.cpp:373
+#, kde-format
+msgid ""
+"The clip art and a Clipart.xml listing it are in %1. In DYMO Label Software, "
+"add the images to My Clip Art."
+msgstr ""
+
+#: src/app/customlabels.cpp:58 src/app/customlabels.cpp:177
+#, kde-format
+msgid "My label sizes"
+msgstr ""
+
+#: src/app/customlabels.cpp:104
+#, kde-format
+msgid "Edit Label Size"
+msgstr ""
+
+#: src/app/customlabels.cpp:104
+#, kde-format
+msgid "Custom Label Size"
+msgstr ""
+
+#: src/app/customlabels.cpp:106
+#, kde-format
+msgid ""
+"For labels that are in no list. Measure one label without the gap to the "
+"next one."
+msgstr ""
+
+#: src/app/customlabels.cpp:110
+#, kde-format
+msgid "For example: Cable wrap label 41 × 41.5 mm"
+msgstr ""
+
+#: src/app/customlabels.cpp:116 src/app/labelkindsdialog.cpp:44
+#: src/app/mainwindow.cpp:625 src/app/mainwindow_print.cpp:505
+#: src/app/propertiesdialog.cpp:66 src/app/rolllayoutdialog.cpp:48
+#: src/app/rolllayoutdialog.cpp:56 src/app/settingsdialog.cpp:87
+#, kde-format
+msgctxt "millimetres"
+msgid " mm"
+msgstr ""
+
+#: src/app/customlabels.cpp:123 src/app/propertiesdialog.cpp:270
+#, kde-format
+msgid "Name:"
+msgstr ""
+
+#: src/app/customlabels.cpp:124
+#, kde-format
+msgid "Width, across the roll:"
+msgstr ""
+
+#: src/app/customlabels.cpp:125
+#, kde-format
+msgid "Length, along the roll:"
+msgstr ""
+
+#: src/app/customlabels.cpp:129
+#, kde-format
+msgid "Only part of the label takes print (a wrap label's strip, say)"
+msgstr ""
+
+#: src/app/customlabels.cpp:149
+#, kde-format
+msgid "As the label shows on screen: from its top-left corner."
+msgstr ""
+
+#: src/app/customlabels.cpp:152
+#, kde-format
+msgid "From the left:"
+msgstr ""
+
+#: src/app/customlabels.cpp:153
+#, kde-format
+msgid "From the top:"
+msgstr ""
+
+#: src/app/customlabels.cpp:154
+#, kde-format
+msgid "Width:"
+msgstr ""
+
+#: src/app/customlabels.cpp:155
+#, kde-format
+msgid "Height:"
+msgstr ""
+
+#: src/app/datadialogs.cpp:46
+#, kde-format
+msgid "SQLite file"
+msgstr ""
+
+#: src/app/datadialogs.cpp:47
+#, kde-format
+msgid "ODBC (SQL Server, Access, and others)"
+msgstr ""
+
+#: src/app/datadialogs.cpp:48
+#, kde-format
+msgid "PostgreSQL"
+msgstr ""
+
+#: src/app/datadialogs.cpp:49
+#, kde-format
+msgid "MySQL / MariaDB"
+msgstr ""
+
+#: src/app/datadialogs.cpp:50
+#, kde-format
+msgid "MariaDB"
+msgstr ""
+
+#: src/app/datadialogs.cpp:51
+#, kde-format
+msgid "Firebird / InterBase"
+msgstr ""
+
+#: src/app/datadialogs.cpp:52
+#, kde-format
+msgid "Oracle"
+msgstr ""
+
+#: src/app/datadialogs.cpp:74 src/app/datadialogs.cpp:352
+#, kde-format
+msgid "Data Source"
+msgstr ""
+
+#: src/app/datadialogs.cpp:77
+#, kde-format
+msgid ""
+"Print a label for each row. Put fields on the label as <b>{Column}</b>, in "
+"texts, addresses, barcodes or an image's file path; each label gets that "
+"row's values."
+msgstr ""
+
+#: src/app/datadialogs.cpp:84
+#, kde-format
+msgid "A file: CSV, Excel or OpenDocument"
+msgstr ""
+
+#: src/app/datadialogs.cpp:85
+#, kde-format
+msgid "A database query"
+msgstr ""
+
+#: src/app/datadialogs.cpp:91
+#, kde-format
+msgid "Rows from:"
+msgstr ""
+
+#: src/app/datadialogs.cpp:100
+#, kde-format
+msgid "Choose…"
+msgstr ""
+
+#: src/app/datadialogs.cpp:106 src/app/exportdialog.cpp:37
+#, kde-format
+msgid "File:"
+msgstr ""
+
+#: src/app/datadialogs.cpp:108
+#, kde-format
+msgid "Sheet:"
+msgstr ""
+
+#: src/app/datadialogs.cpp:110
+#, kde-format
+msgid "Detect"
+msgstr ""
+
+#: src/app/datadialogs.cpp:111
+#, kde-format
+msgid "Semicolon ( ; )"
+msgstr ""
+
+#: src/app/datadialogs.cpp:112
+#, kde-format
+msgid "Comma ( , )"
+msgstr ""
+
+#: src/app/datadialogs.cpp:113
+#, kde-format
+msgid "Tab"
+msgstr ""
+
+#: src/app/datadialogs.cpp:114
+#, kde-format
+msgid "Bar ( | )"
+msgstr ""
+
+#: src/app/datadialogs.cpp:116
+#, kde-format
+msgid "CSV separator:"
+msgstr ""
+
+#: src/app/datadialogs.cpp:117
+#, kde-format
+msgid "The first row names the columns"
+msgstr ""
+
+#: src/app/datadialogs.cpp:130
+#, kde-format
+msgid "Database type:"
+msgstr ""
+
+#: src/app/datadialogs.cpp:132
+#, kde-format
+msgid "Database name, SQLite file, or ODBC data source or connection string"
+msgstr ""
+
+#: src/app/datadialogs.cpp:133
+#, kde-format
+msgid "Database:"
+msgstr ""
+
+#: src/app/datadialogs.cpp:137
+#, kde-format
+msgid "Default"
+msgstr ""
+
+#: src/app/datadialogs.cpp:143
+#, kde-format
+msgid "Server:"
+msgstr ""
+
+#: src/app/datadialogs.cpp:145
+#, kde-format
+msgid "User:"
+msgstr ""
+
+#: src/app/datadialogs.cpp:148
+#, kde-format
+msgid "Not saved: asked again when printing"
+msgstr ""
+
+#: src/app/datadialogs.cpp:149
+#, kde-format
+msgid "Password:"
+msgstr ""
+
+#: src/app/datadialogs.cpp:153
+#, kde-format
+msgid "Query:"
+msgstr ""
+
+#: src/app/datadialogs.cpp:154
+#, kde-format
+msgid ""
+"Only a query that reads is run (SELECT or WITH ... SELECT), so printing a "
+"label never changes the database. Fields in it, such as WHERE Serial = "
+"{Serial}, take the answers to the print-time questions when printing; they "
+"are passed as values, so an answer can never change the query."
+msgstr ""
+
+#: src/app/datadialogs.cpp:171
+#, kde-format
+msgid "Load Rows"
+msgstr ""
+
+#: src/app/datadialogs.cpp:173
+#, kde-format
+msgid "Tick All"
+msgstr ""
+
+#: src/app/datadialogs.cpp:174
+#, kde-format
+msgid "Tick None"
+msgstr ""
+
+#: src/app/datadialogs.cpp:207
+#, kde-format
+msgid "One of each row"
+msgstr ""
+
+#: src/app/datadialogs.cpp:208
+#, kde-format
+msgid ""
+"A column that says how many labels each row prints; empty means one, 0 none"
+msgstr ""
+
+#: src/app/datadialogs.cpp:209
+#, kde-format
+msgid "This label for every row"
+msgstr ""
+
+#: src/app/datadialogs.cpp:210
+#, kde-format
+msgid ""
+"A column that names the label file to print the row with, such as "
+"cable.label next to this label; empty uses this label. All must be for the "
+"same label type."
+msgstr ""
+
+#: src/app/datadialogs.cpp:212
+#, kde-format
+msgid "Copies from column:"
+msgstr ""
+
+#: src/app/datadialogs.cpp:213
+#, kde-format
+msgid "Label from column:"
+msgstr ""
+
+#: src/app/datadialogs.cpp:230
+#, kde-format
+msgid "Choose Data File"
+msgstr ""
+
+#: src/app/datadialogs.cpp:232
+#, kde-format
+msgid "Data files (*.csv *.txt *.xlsx *.xlsm *.ods)"
+msgstr ""
+
+#: src/app/datadialogs.cpp:304
+#, kde-format
+msgid "Load the rows to see them and choose which to print."
+msgstr ""
+
+#: src/app/datadialogs.cpp:308 src/app/datadialogs.cpp:723
+#: src/app/datadialogs.cpp:733 src/app/layersdialog.cpp:55
+#: src/app/mainwindow_printonly.cpp:332 src/app/printbar.cpp:111
+#: src/app/printpreviewdialog.cpp:97
+#, kde-format
+msgid "Print"
+msgstr ""
+
+#: src/app/datadialogs.cpp:324
+#, kde-format
+msgid "1 row; columns: %2"
+msgid_plural "%1 rows; columns: %2"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/app/datadialogs.cpp:352
+#, kde-format
+msgid "Rows to Print"
+msgstr ""
+
+#: src/app/datadialogs.cpp:375
+#, kde-format
+msgid "Calculated Fields"
+msgstr ""
+
+#: src/app/datadialogs.cpp:377
+#, kde-format
+msgid ""
+"<p>A calculated field is worked out when printing, from other fields, and is "
+"used on the label as <b>{Name}</b>, like a column. Each can use the ones "
+"above it.</p><p><b>{Date}</b>, <b>{Time}</b> and <b>{Now}</b> are when "
+"printing. <b>{Date+30}</b> or <b>{Installed+1y}</b> moves a date by days, "
+"weeks (w), months (m), years (y) or hours (h); <b>{Serial+1}</b> adds to a "
+"number. After a <b>|</b>: upper, lower, trim, left:3, right:4, mid:2:3, "
+"pad:6, date:dd-MM-yyyy, replace:old:new, default:text. For example "
+"<b>{Date+30|date:dd-MM-yyyy}</b> or <b>{Prefix}-{Serial|pad:6}</b>.</p>"
+msgstr ""
+
+#: src/app/datadialogs.cpp:390
+#, kde-format
+msgid "Name"
+msgstr ""
+
+#: src/app/datadialogs.cpp:390
+#, kde-format
+msgid "Worked out from"
+msgstr ""
+
+#: src/app/datadialogs.cpp:390
+#, kde-format
+msgid "Example"
+msgstr ""
+
+#: src/app/datadialogs.cpp:407 src/app/datadialogs.cpp:488
+#: src/app/gs1dialog.cpp:77
+#, kde-format
+msgid "Add"
+msgstr ""
+
+#: src/app/datadialogs.cpp:410
+#, kde-format
+msgid "Field%1"
+msgstr ""
+
+#: src/app/datadialogs.cpp:478
+#, kde-format
+msgid "Print-Time Questions"
+msgstr ""
+
+#: src/app/datadialogs.cpp:480
+#, kde-format
+msgid ""
+"Questions asked each time the label is printed, such as a batch number. The "
+"answer fills <b>{Name}</b> on the label."
+msgstr ""
+
+#: src/app/datadialogs.cpp:501
+#, kde-format
+msgctxt "example field name"
+msgid "Batch"
+msgstr ""
+
+#: src/app/datadialogs.cpp:502
+#, kde-format
+msgid "Field name:"
+msgstr ""
+
+#: src/app/datadialogs.cpp:504
+#, kde-format
+msgid "Batch number"
+msgstr ""
+
+#: src/app/datadialogs.cpp:505
+#, kde-format
+msgid "Question:"
+msgstr ""
+
+#: src/app/datadialogs.cpp:507
+#, kde-format
+msgid "Default answer:"
+msgstr ""
+
+#: src/app/datadialogs.cpp:508
+#, kde-format
+msgid "An answer is needed"
+msgstr ""
+
+#: src/app/datadialogs.cpp:511 src/app/mainwindow.cpp:321
+#: src/app/propertiesdialog.cpp:320 src/app/sidebar.cpp:200
+#, kde-format
+msgid "Text"
+msgstr ""
+
+#: src/app/datadialogs.cpp:512
+#, kde-format
+msgid "Drop-down list"
+msgstr ""
+
+#: src/app/datadialogs.cpp:513
+#, kde-format
+msgid "Number"
+msgstr ""
+
+#: src/app/datadialogs.cpp:514
+#, kde-format
+msgid "Date"
+msgstr ""
+
+#: src/app/datadialogs.cpp:515
+#, kde-format
+msgid "Check box"
+msgstr ""
+
+#: src/app/datadialogs.cpp:516
+#, kde-format
+msgid "Field:"
+msgstr ""
+
+#: src/app/datadialogs.cpp:530 src/app/datadialogs.cpp:533
+#, kde-format
+msgid "Any"
+msgstr ""
+
+#: src/app/datadialogs.cpp:535
+#, kde-format
+msgid "at least"
+msgstr ""
+
+#: src/app/datadialogs.cpp:537
+#, kde-format
+msgid "at most"
+msgstr ""
+
+#: src/app/datadialogs.cpp:539 src/app/propertiesdialog.cpp:305
+#, kde-format
+msgid "Length:"
+msgstr ""
+
+#: src/app/datadialogs.cpp:541
+#, kde-format
+msgid "Anything"
+msgstr ""
+
+#: src/app/datadialogs.cpp:542
+#, kde-format
+msgid "Digits only"
+msgstr ""
+
+#: src/app/datadialogs.cpp:543
+#, kde-format
+msgid "Letters only"
+msgstr ""
+
+#: src/app/datadialogs.cpp:544
+#, kde-format
+msgid "Letters and digits"
+msgstr ""
+
+#: src/app/datadialogs.cpp:545
+#, kde-format
+msgid "A pattern (regular expression)"
+msgstr ""
+
+#: src/app/datadialogs.cpp:546
+#, kde-format
+msgid "Allowed:"
+msgstr ""
+
+#: src/app/datadialogs.cpp:549
+#, kde-format
+msgid "Pattern:"
+msgstr ""
+
+#: src/app/datadialogs.cpp:554
+#, kde-format
+msgid "A column of the data source, such as Serial"
+msgstr ""
+
+#: src/app/datadialogs.cpp:555
+#, kde-format
+msgid ""
+"The answer is looked up in this column; the row found fills the other "
+"questions named after its columns."
+msgstr ""
+
+#: src/app/datadialogs.cpp:556
+#, kde-format
+msgid "Look up in column:"
+msgstr ""
+
+#: src/app/datadialogs.cpp:560
+#, kde-format
+msgid "One choice per line"
+msgstr ""
+
+#: src/app/datadialogs.cpp:562
+#, kde-format
+msgid "Choices:"
+msgstr ""
+
+#: src/app/datadialogs.cpp:564
+#, kde-format
+msgid "Or a column of the data source"
+msgstr ""
+
+#: src/app/datadialogs.cpp:565
+#, kde-format
+msgid "From column:"
+msgstr ""
+
+#: src/app/datadialogs.cpp:576
+#, kde-format
+msgctxt "number range: from x to y"
+msgid "to"
+msgstr ""
+
+#: src/app/datadialogs.cpp:578
+#, kde-format
+msgid "From:"
+msgstr ""
+
+#: src/app/datadialogs.cpp:579
+#, kde-format
+msgid "Both 0 for any number."
+msgstr ""
+
+#: src/app/datadialogs.cpp:582
+#, kde-format
+msgid "Decimals:"
+msgstr ""
+
+#: src/app/datadialogs.cpp:586
+#, kde-format
+msgid "The short date format, or e.g. dd-MM-yyyy"
+msgstr ""
+
+#: src/app/datadialogs.cpp:587
+#, kde-format
+msgid "Written as:"
+msgstr ""
+
+#: src/app/datadialogs.cpp:588
+#, kde-format
+msgid "Today, unless the default answer is a date."
+msgstr ""
+
+#: src/app/datadialogs.cpp:593
+#, kde-format
+msgid "Answer when ticked:"
+msgstr ""
+
+#: src/app/datadialogs.cpp:596
+#, kde-format
+msgid "Answer when not:"
+msgstr ""
+
+#: src/app/datadialogs.cpp:689
+#, kde-format
+msgctxt "default name of a print-time question"
+msgid "Question%1"
+msgstr ""
+
+#: src/app/datadialogs.cpp:760
+#, kde-format
+msgid "Database Password"
+msgstr ""
+
+#: src/app/datadialogs.cpp:761
+#, kde-format
+msgid "the database"
+msgstr ""
+
+#: src/app/datadialogs.cpp:761
+#, kde-format
+msgid "Password for %1 on %2 (not saved):"
+msgstr ""
+
+#: src/app/datareader.cpp:147
+#, kde-format
+msgid "%1 is not an Excel workbook."
+msgstr ""
+
+#: src/app/datareader.cpp:155
+#, kde-format
+msgid "%1 has no sheets."
+msgstr ""
+
+#: src/app/datareader.cpp:155 src/app/datareader.cpp:343
+#, kde-format
+msgid "%1 has no sheet called %2."
+msgstr ""
+
+#: src/app/datareader.cpp:245 src/app/datareader.cpp:339
+#: src/lib/automation.cpp:642 src/lib/printrun.cpp:57
+#, kde-format
+msgid "%1 could not be read: %2"
+msgstr ""
+
+#: src/app/datareader.cpp:255
+#, kde-format
+msgid "%1 is not an OpenDocument spreadsheet."
+msgstr ""
+
+#: src/app/datareader.cpp:370
+#, kde-format
+msgid "The database driver %1 is not installed."
+msgstr ""
+
+#: src/app/datareader.cpp:379
+#, kde-format
+msgid ""
+"Only a query that reads is run: one SELECT (or WITH ... SELECT) statement."
+msgstr ""
+
+#: src/app/datareader.cpp:400
+#, kde-format
+msgid "Could not connect to the database: %1"
+msgstr ""
+
+#: src/app/datareader.cpp:423
+#, kde-format
+msgid "The query failed: %1"
+msgstr ""
+
+#: src/app/datareader.cpp:468
+#, kde-format
+msgid "%1 could not be opened."
+msgstr ""
+
+#: src/app/datareader.cpp:541
+#, kde-format
+msgid "No data source has been chosen."
+msgstr ""
+
+#: src/app/datareader.cpp:559
+#, kde-format
+msgid "Could not open %1: %2"
+msgstr ""
+
+#: src/app/exportdialog.cpp:29 src/app/exportdialog.cpp:96
+#: src/app/exportdialog.cpp:126 src/app/exportdialog.cpp:132
+#, kde-format
+msgid "Export Label"
+msgstr ""
+
+#: src/app/exportdialog.cpp:39
+#, kde-format
+msgid "PDF: vectors, the label's own size"
+msgstr ""
+
+#: src/app/exportdialog.cpp:40
+#, kde-format
+msgid "PNG: the printer's dots, at its resolution"
+msgstr ""
+
+#: src/app/exportdialog.cpp:43
+#, kde-format
+msgid "As:"
+msgstr ""
+
+#: src/app/exportdialog.cpp:46
+#, kde-format
+msgid "Show the label's outline"
+msgstr ""
+
+#: src/app/exportdialog.cpp:48
+#, kde-format
+msgid ""
+"Draws the label's shape, such as rounded corners, as a thin grey line, with "
+"nothing outside it: a proof of how the label will look. Leave it off for "
+"printing the file elsewhere."
+msgstr ""
+
+#: src/app/exportdialog.cpp:53
+#, kde-format
+msgid "Export"
+msgstr ""
+
+#: src/app/exportdialog.cpp:94
+#, kde-format
+msgid "PNG images (*.png)"
+msgstr ""
+
+#: src/app/exportdialog.cpp:94
+#, kde-format
+msgid "PDF documents (*.pdf)"
+msgstr ""
+
+#: src/app/exportdialog.cpp:126
+#, kde-format
+msgid "%1 is a folder. Type a name for the file."
+msgstr ""
+
+#: src/app/exportdialog.cpp:131
+#, kde-format
+msgid "%1 already exists. Replace it?"
+msgstr ""
+
+#: src/app/gs1dialog.cpp:57
+#, kde-format
+msgid "Build GS1 Data"
+msgstr ""
+
+#: src/app/gs1dialog.cpp:59
+#, kde-format
+msgid ""
+"Choose application identifiers and give their values. A check digit left out "
+"is added; a value may use fields, such as {Batch}, which are checked when "
+"printing."
+msgstr ""
+
+#: src/app/gs1dialog.cpp:66
+#, kde-format
+msgid "Application identifier"
+msgstr ""
+
+#: src/app/gs1dialog.cpp:66
+#, kde-format
+msgid "Value"
+msgstr ""
+
+#: src/app/gs1dialog.cpp:124
+#, kde-format
+msgid "The data was not written with [AI] brackets: %1"
+msgstr ""
+
+#: src/app/gs1dialog.cpp:201
+#, kde-format
+msgid "%1; check digit %2 added"
+msgstr ""
+
+#: src/app/gs1dialog.cpp:202
+#, kde-format
+msgid "Not listed: only its characters are checked"
+msgstr ""
+
+#: src/app/gs1dialog.cpp:209
+#, kde-format
+msgid "Data: %1"
+msgstr ""
+
+#: src/app/historydialogs.cpp:62
+#, kde-format
+msgid "1 data row"
+msgid_plural "%1 data rows"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/app/historydialogs.cpp:73
+#, kde-format
+msgid "Versions of %1"
+msgstr ""
+
+#: src/app/historydialogs.cpp:75
+#, kde-format
+msgid ""
+"Each time the label is saved, the version it replaces is kept here. "
+"Restoring one puts it on the canvas; save to keep it, or undo."
+msgstr ""
+
+#: src/app/historydialogs.cpp:87
+#, kde-format
+msgid "No earlier versions yet"
+msgstr ""
+
+#: src/app/historydialogs.cpp:97
+#, kde-format
+msgid "Restore"
+msgstr ""
+
+#: src/app/historydialogs.cpp:132
+#, kde-format
+msgid "Print History"
+msgstr ""
+
+#: src/app/historydialogs.cpp:135
+#, kde-format
+msgid "Search labels, printers, answers and data…"
+msgstr ""
+
+#: src/app/historydialogs.cpp:141
+#, kde-format
+msgid "Printed"
+msgstr ""
+
+#: src/app/historydialogs.cpp:141
+#, kde-format
+msgid "With"
+msgstr ""
+
+#: src/app/historydialogs.cpp:165 src/app/mainwindow.cpp:703
+#, kde-format
+msgid "Open Label"
+msgstr ""
+
+#: src/app/historydialogs.cpp:167
+#, kde-format
+msgid "The label as it was printed"
+msgstr ""
+
+#: src/app/historydialogs.cpp:168 src/app/mainwindow_printonly.cpp:331
+#, kde-format
+msgid "Print Again"
+msgstr ""
+
+#: src/app/historydialogs.cpp:170
+#, kde-format
+msgid ""
+"The same labels, with the same answers and data rows, on the printer chosen "
+"now"
+msgstr ""
+
+#: src/app/historydialogs.cpp:171
+#, kde-format
+msgid "Clear History…"
+msgstr ""
+
+#: src/app/historydialogs.cpp:181
+#, kde-format
+msgid "Forget everything printed so far?"
+msgstr ""
+
+#: src/app/historydialogs.cpp:181
+#, kde-format
+msgid "Clear History"
+msgstr ""
+
+#: src/app/labelkindsdialog.cpp:61 src/app/mainwindow_format.cpp:96
+#: src/app/propertiesdialog.cpp:100
+#, kde-format
+msgid "Bold"
+msgstr ""
+
+#: src/app/labelkindsdialog.cpp:68 src/app/propertiesdialog.cpp:98
+#: src/app/propertiesdialog.cpp:302 src/app/propertiesdialog.cpp:439
+#: src/app/propertiesdialog.cpp:494 src/app/settingsdialog.cpp:91
+#, kde-format
+msgctxt "points"
+msgid " pt"
+msgstr ""
+
+#: src/app/labelkindsdialog.cpp:78 src/app/propertiesdialog.cpp:340
+#: src/app/propertiesdialog.cpp:563 src/app/propertiesdialog.cpp:607
+#: src/app/propertiesdialog.cpp:641
+#, kde-format
+msgid "Font:"
+msgstr ""
+
+#: src/app/labelkindsdialog.cpp:97
+#, kde-format
+msgid "Label of a Kind"
+msgstr ""
+
+#: src/app/labelkindsdialog.cpp:137 src/app/labelkindsdialog.cpp:152
+#: src/app/propertiesdialog.cpp:409 src/app/propertiesdialog.cpp:636
+#, kde-format
+msgid "Text:"
+msgstr ""
+
+#: src/app/labelkindsdialog.cpp:138 src/app/labelkindsdialog.cpp:153
+#, kde-format
+msgid "Cable diameter:"
+msgstr ""
+
+#: src/app/labelkindsdialog.cpp:141
+#, kde-format
+msgid "Cable Wrap"
+msgstr ""
+
+#: src/app/labelkindsdialog.cpp:141
+#, kde-format
+msgid "Around a cable, readable from every side"
+msgstr ""
+
+#: src/app/labelkindsdialog.cpp:154
+#, kde-format
+msgid "Flag length:"
+msgstr ""
+
+#: src/app/labelkindsdialog.cpp:157
+#, kde-format
+msgid "Cable Flag"
+msgstr ""
+
+#: src/app/labelkindsdialog.cpp:157
+#, kde-format
+msgid "Folded around a cable, the text on both sides"
+msgstr ""
+
+#: src/app/labelkindsdialog.cpp:172
+#, kde-format
+msgid "No leading zeros"
+msgstr ""
+
+#: src/app/labelkindsdialog.cpp:173
+#, kde-format
+msgid "Number from the far end"
+msgstr ""
+
+#: src/app/labelkindsdialog.cpp:174
+#, kde-format
+msgid "Lines between the cells"
+msgstr ""
+
+#: src/app/labelkindsdialog.cpp:177 src/app/printsettingsdialog.cpp:87
+#: src/app/propertiesdialog.cpp:254 src/app/propertiesdialog.cpp:303
+#: src/app/propertiesdialog.cpp:402
+#, kde-format
+msgid "None"
+msgstr ""
+
+#: src/app/labelkindsdialog.cpp:178
+#, kde-format
+msgid "▲ Up, for a label under the ports"
+msgstr ""
+
+#: src/app/labelkindsdialog.cpp:179
+#, kde-format
+msgid "▼ Down, for a label above the ports"
+msgstr ""
+
+#: src/app/labelkindsdialog.cpp:183
+#, kde-format
+msgid "Number of cells:"
+msgstr ""
+
+#: src/app/labelkindsdialog.cpp:184
+#, kde-format
+msgid "Cell width (pitch):"
+msgstr ""
+
+#: src/app/labelkindsdialog.cpp:188
+#, kde-format
+msgid "step"
+msgstr ""
+
+#: src/app/labelkindsdialog.cpp:190
+#, kde-format
+msgid "Numbers (prefix, first):"
+msgstr ""
+
+#: src/app/labelkindsdialog.cpp:191
+#, kde-format
+msgid "Digits:"
+msgstr ""
+
+#: src/app/labelkindsdialog.cpp:194
+#, kde-format
+msgid "Arrows:"
+msgstr ""
+
+#: src/app/labelkindsdialog.cpp:195
+#, kde-format
+msgid "Before the first cell:"
+msgstr ""
+
+#: src/app/labelkindsdialog.cpp:196
+#, kde-format
+msgid "After the last cell:"
+msgstr ""
+
+#: src/app/labelkindsdialog.cpp:216
+#, kde-format
+msgid "Patch Panel"
+msgstr ""
+
+#: src/app/labelkindsdialog.cpp:216
+#, kde-format
+msgid "A row of numbered ports"
+msgstr ""
+
+#: src/app/labelkindsdialog.cpp:217
+#, kde-format
+msgid "Terminal Block"
+msgstr ""
+
+#: src/app/labelkindsdialog.cpp:217
+#, kde-format
+msgid "Terminals at their pitch on a DIN rail"
+msgstr ""
+
+#: src/app/labelkindsdialog.cpp:218
+#, kde-format
+msgid "Breaker Panel"
+msgstr ""
+
+#: src/app/labelkindsdialog.cpp:218
+#, kde-format
+msgid "Breakers of one module (18 mm) each"
+msgstr ""
+
+#: src/app/labelkindsdialog.cpp:228
+#, kde-format
+msgid "Highest unit first"
+msgstr ""
+
+#: src/app/labelkindsdialog.cpp:229
+#, kde-format
+msgid "A box around every unit"
+msgstr ""
+
+#: src/app/labelkindsdialog.cpp:234
+#, kde-format
+msgctxt "from unit ... to unit"
+msgid "to"
+msgstr ""
+
+#: src/app/labelkindsdialog.cpp:236
+#, kde-format
+msgid "Units:"
+msgstr ""
+
+#: src/app/labelkindsdialog.cpp:237
+#, kde-format
+msgid "Unit height:"
+msgstr ""
+
+#: src/app/labelkindsdialog.cpp:238
+#, kde-format
+msgid "Prefix:"
+msgstr ""
+
+#: src/app/labelkindsdialog.cpp:242
+#, kde-format
+msgid ""
+"A LabelManager prints up to about 1.4 m in one label: 31 units. Make longer "
+"racks in parts."
+msgstr ""
+
+#: src/app/labelkindsdialog.cpp:247
+#, kde-format
+msgid "Rack Markers"
+msgstr ""
+
+#: src/app/labelkindsdialog.cpp:247
+#, kde-format
+msgid "Height units along a rack's rail, boxed"
+msgstr ""
+
+#: src/app/labelkindsdialog.cpp:313
+#, kde-format
+msgid "On %1 tape, %2 mm long"
+msgstr ""
+
+#: src/app/labelkindsdialog.cpp:314
+#, kde-format
+msgid "On the label in use, %1 (%2 × %3 mm)"
+msgstr ""
+
+#: src/app/labelview.cpp:245
+#, kde-format
+msgid "Edit Text"
+msgstr ""
+
+#: src/app/labelview.cpp:593
+#, kde-format
+msgctxt "angle in degrees"
+msgid "%1°"
+msgstr ""
+
+#: src/app/labelview.cpp:918
+#, kde-format
+msgid "Turn Object"
+msgstr ""
+
+#: src/app/labelview.cpp:919
+#, kde-format
+msgid "Resize Object"
+msgstr ""
+
+#: src/app/labelview.cpp:920
+#, kde-format
+msgid "Move Objects"
+msgstr ""
+
+#: src/app/labelview.cpp:920 src/app/labelview.cpp:1076
+#: src/app/labelview.cpp:1079 src/app/labelview.cpp:1082
+#: src/app/labelview.cpp:1085
+#, kde-format
+msgid "Move Object"
+msgstr ""
+
+#: src/app/labelview.cpp:1021
+#, kde-format
+msgid "Add Guideline"
+msgstr ""
+
+#: src/app/labelview.cpp:1026
+#, kde-format
+msgid "Remove Guideline"
+msgstr ""
+
+#: src/app/labelview.cpp:1029
+#, kde-format
+msgid "Move Guideline"
+msgstr ""
+
+#: src/app/layersdialog.cpp:46
+#, kde-format
+msgid "Layers"
+msgstr ""
+
+#: src/app/layersdialog.cpp:48
+#, kde-format
+msgid ""
+"Objects on a layer show, print and can be edited as the layer says. Objects "
+"not on a layer are on the label itself, which always shows and prints. A "
+"layer that does not print suits a picture of the product to design on."
+msgstr ""
+
+#: src/app/layersdialog.cpp:55
+#, kde-format
+msgid "Layer"
+msgstr ""
+
+#: src/app/layersdialog.cpp:55
+#, kde-format
+msgid "Show"
+msgstr ""
+
+#: src/app/layersdialog.cpp:55
+#, kde-format
+msgid "Locked"
+msgstr ""
+
+#: src/app/layersdialog.cpp:67
+#, kde-format
+msgid "Add Layer"
+msgstr ""
+
+#: src/app/layersdialog.cpp:68
+#, kde-format
+msgid "Remove Layer"
+msgstr ""
+
+#: src/app/layersdialog.cpp:69
+#, kde-format
+msgid "Its objects move to the label itself"
+msgstr ""
+
+#: src/app/layersdialog.cpp:104 src/app/layersdialog.cpp:108
+#, kde-format
+msgid "Layer %1"
+msgstr ""
+
+#: src/app/main.cpp:35
+#, kde-format
+msgid "Plasma Label Creator"
+msgstr ""
+
+#: src/app/main.cpp:37
+#, kde-format
+msgid ""
+"Label designer for DYMO LabelWriter and LabelManager printers and ZPL label "
+"printers"
+msgstr ""
+
+#: src/app/main.cpp:39
+#, kde-format
+msgid "© 2026 nvaert1986"
+msgstr ""
+
+#: src/app/main.cpp:40
+#, kde-format
+msgid "Developer"
+msgstr ""
+
+#: src/app/main.cpp:50
+#, kde-format
+msgid "Label files to open."
+msgstr ""
+
+#: src/app/main.cpp:51
+#, kde-format
+msgid ""
+"Start in print-only mode: choose a label from a folder and print it, without "
+"editing."
+msgstr ""
+
+#: src/app/mainwindow_addons.cpp:83
+#, kde-format
+msgid ""
+"The label was saved on this computer, but not where it came from:\n"
+"%1"
+msgstr ""
+
+#: src/app/mainwindow.cpp:149
+#, kde-format
+msgid "Remove the label size \"%1\"? Labels made with it keep their size."
+msgstr ""
+
+#: src/app/mainwindow.cpp:149
+#, kde-format
+msgid "Remove Label Size"
+msgstr ""
+
+#: src/app/mainwindow.cpp:193
+#, kde-format
+msgid "Zoom"
+msgstr ""
+
+#: src/app/mainwindow.cpp:196
+#, kde-format
+msgid "Fit the label in the window"
+msgstr ""
+
+#: src/app/mainwindow.cpp:225
+#, kde-format
+msgid "Recently Used Layouts"
+msgstr ""
+
+#: src/app/mainwindow.cpp:227
+#, kde-format
+msgid "Open one of the labels printed last"
+msgstr ""
+
+#: src/app/mainwindow.cpp:238
+#, kde-format
+msgid "&Export as PDF or Image…"
+msgstr ""
+
+#: src/app/mainwindow.cpp:257 src/app/mainwindow.cpp:853
+#: src/app/mainwindow_objects.cpp:134
+#, kde-format
+msgid "Delete Object"
+msgstr ""
+
+#: src/app/mainwindow.cpp:281 src/app/mainwindow.cpp:854
+#: src/app/mainwindow_objects.cpp:155
+#, kde-format
+msgid "Duplicate Object"
+msgstr ""
+
+#: src/app/mainwindow.cpp:288
+#, kde-format
+msgid "Object Properties…"
+msgstr ""
+
+#: src/app/mainwindow.cpp:293 src/app/mainwindow_objects.cpp:376
+#, kde-format
+msgid "Bring to Front"
+msgstr ""
+
+#: src/app/mainwindow.cpp:296 src/app/mainwindow_objects.cpp:381
+#, kde-format
+msgid "Send to Back"
+msgstr ""
+
+#: src/app/mainwindow.cpp:320 src/app/propertiesdialog.cpp:320
+#: src/app/sidebar.cpp:199
+#, kde-format
+msgid "Address"
+msgstr ""
+
+#: src/app/mainwindow.cpp:322 src/app/propertiesdialog.cpp:368
+#: src/app/sidebar.cpp:203
+#, kde-format
+msgid "Barcode"
+msgstr ""
+
+#: src/app/mainwindow.cpp:323
+#, kde-format
+msgid "Image…"
+msgstr ""
+
+#: src/app/mainwindow.cpp:324 src/app/propertiesdialog.cpp:473
+#: src/app/sidebar.cpp:205
+#, kde-format
+msgid "Rectangle"
+msgstr ""
+
+#: src/app/mainwindow.cpp:325 src/app/propertiesdialog.cpp:474
+#: src/app/sidebar.cpp:206
+#, kde-format
+msgid "Ellipse"
+msgstr ""
+
+#: src/app/mainwindow.cpp:326 src/app/sidebar.cpp:207
+#, kde-format
+msgid "Horizontal Line"
+msgstr ""
+
+#: src/app/mainwindow.cpp:327 src/app/sidebar.cpp:208
+#, kde-format
+msgid "Vertical Line"
+msgstr ""
+
+#: src/app/mainwindow.cpp:328 src/app/propertiesdialog.cpp:475
+#: src/app/sidebar.cpp:209
+#, kde-format
+msgid "Polygon"
+msgstr ""
+
+#: src/app/mainwindow.cpp:329 src/app/propertiesdialog.cpp:476
+#: src/app/sidebar.cpp:210
+#, kde-format
+msgid "Star"
+msgstr ""
+
+#: src/app/mainwindow.cpp:330 src/app/propertiesdialog.cpp:477
+#: src/app/sidebar.cpp:211
+#, kde-format
+msgid "Arrow"
+msgstr ""
+
+#: src/app/mainwindow.cpp:331 src/app/propertiesdialog.cpp:511
+#: src/app/sidebar.cpp:201
+#, kde-format
+msgid "Counter"
+msgstr ""
+
+#: src/app/mainwindow.cpp:332 src/app/propertiesdialog.cpp:578
+#: src/app/sidebar.cpp:202
+#, kde-format
+msgid "Date and Time"
+msgstr ""
+
+#: src/app/mainwindow.cpp:333 src/app/propertiesdialog.cpp:620
+#: src/app/sidebar.cpp:212
+#, kde-format
+msgid "Curved Text"
+msgstr ""
+
+#: src/app/mainwindow.cpp:343
+#, kde-format
+msgid "Label of a Kind…"
+msgstr ""
+
+#: src/app/mainwindow.cpp:353
+#, kde-format
+msgid "New Address Book"
+msgstr ""
+
+#: src/app/mainwindow.cpp:354
+#, kde-format
+msgid "Open Address Book…"
+msgstr ""
+
+#: src/app/mainwindow.cpp:355
+#, kde-format
+msgid "Import Addresses from CSV…"
+msgstr ""
+
+#: src/app/mainwindow.cpp:357
+#, kde-format
+msgid "Save Address Book As…"
+msgstr ""
+
+#: src/app/mainwindow.cpp:374
+#, kde-format
+msgid "Label Type…"
+msgstr ""
+
+#: src/app/mainwindow.cpp:382
+#, kde-format
+msgid "Custom Label Size…"
+msgstr ""
+
+#: src/app/mainwindow.cpp:386
+#, kde-format
+msgid "Tape Length…"
+msgstr ""
+
+#: src/app/mainwindow.cpp:392
+#, kde-format
+msgid "Move on the Tape"
+msgstr ""
+
+#: src/app/mainwindow.cpp:398
+#, kde-format
+msgid "Move Earlier on the Tape"
+msgstr ""
+
+#: src/app/mainwindow.cpp:399
+#, kde-format
+msgid "Move Later on the Tape"
+msgstr ""
+
+#: src/app/mainwindow.cpp:401 src/app/mainwindow.cpp:937
+#, kde-format
+msgid "Rotate Label"
+msgstr ""
+
+#: src/app/mainwindow.cpp:406
+#, kde-format
+msgid "Portrait"
+msgstr ""
+
+#: src/app/mainwindow.cpp:407
+#, kde-format
+msgid "Landscape"
+msgstr ""
+
+#: src/app/mainwindow.cpp:428
+#, kde-format
+msgid "Against the Left Edge"
+msgstr ""
+
+#: src/app/mainwindow.cpp:429
+#, kde-format
+msgid "Centred Horizontally"
+msgstr ""
+
+#: src/app/mainwindow.cpp:430
+#, kde-format
+msgid "Against the Right Edge"
+msgstr ""
+
+#: src/app/mainwindow.cpp:431
+#, kde-format
+msgid "Against the Top Edge"
+msgstr ""
+
+#: src/app/mainwindow.cpp:432
+#, kde-format
+msgid "Centred Vertically"
+msgstr ""
+
+#: src/app/mainwindow.cpp:433
+#, kde-format
+msgid "Against the Bottom Edge"
+msgstr ""
+
+#: src/app/mainwindow.cpp:434
+#, kde-format
+msgid "In the Middle of the Label"
+msgstr ""
+
+#: src/app/mainwindow.cpp:442
+#, kde-format
+msgid "Show &Grid"
+msgstr ""
+
+#: src/app/mainwindow.cpp:452
+#, kde-format
+msgid "&Snap to Grid"
+msgstr ""
+
+#: src/app/mainwindow.cpp:453
+#, kde-format
+msgid "Moving and resizing put edges on the grid. Hold Alt to place freely."
+msgstr ""
+
+#: src/app/mainwindow.cpp:465
+#, kde-format
+msgid "Grid S&pacing"
+msgstr ""
+
+#: src/app/mainwindow.cpp:468
+#, kde-format
+msgctxt "grid spacing"
+msgid "%1 mm"
+msgstr ""
+
+#: src/app/mainwindow.cpp:480
+#, kde-format
+msgid "Show &Guidelines"
+msgstr ""
+
+#: src/app/mainwindow.cpp:482
+#, kde-format
+msgid ""
+"Drag a guideline out of a ruler; objects snap to it, Alt places freely. Drag "
+"it back to the ruler to remove it."
+msgstr ""
+
+#: src/app/mainwindow.cpp:495
+#, kde-format
+msgid "Clear Guidelines"
+msgstr ""
+
+#: src/app/mainwindow.cpp:498
+#, kde-format
+msgid "&Clear Guidelines"
+msgstr ""
+
+#: src/app/mainwindow.cpp:522 src/app/mainwindow.cpp:535
+#, kde-format
+msgid ""
+"Could not open %1:\n"
+"%2"
+msgstr ""
+
+#: src/app/mainwindow.cpp:528
+#, kde-format
+msgid "The template has %1 labels; this is the first."
+msgstr ""
+
+#: src/app/mainwindow.cpp:546
+#, kde-format
+msgid "Opened with one note: %2"
+msgid_plural "Opened with %1 notes, first: %2"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/app/mainwindow.cpp:617
+#, kde-format
+msgid "Tape Length"
+msgstr ""
+
+#: src/app/mainwindow.cpp:619
+#, kde-format
+msgid "As long as the content"
+msgstr ""
+
+#: src/app/mainwindow.cpp:620
+#, kde-format
+msgid "Fixed length:"
+msgstr ""
+
+#: src/app/mainwindow.cpp:646
+#, kde-format
+msgid "Change Tape Length"
+msgstr ""
+
+#: src/app/mainwindow.cpp:691
+#, kde-format
+msgid "The label type is now %1, to suit %2. Undo to go back."
+msgstr ""
+
+#: src/app/mainwindow.cpp:717 src/app/mainwindow.cpp:742
+#, kde-format
+msgid ""
+"Could not save %1:\n"
+"%2"
+msgstr ""
+
+#: src/app/mainwindow.cpp:730
+#, kde-format
+msgid "Save Label"
+msgstr ""
+
+#: src/app/mainwindow.cpp:768 src/app/mainwindow.cpp:792
+#, kde-format
+msgid "Untitled"
+msgstr ""
+
+#: src/app/mainwindow.cpp:770
+#, kde-format
+msgid "The label \"%1\" has been changed. Do you want to save it?"
+msgstr ""
+
+#: src/app/mainwindow.cpp:771
+#, kde-format
+msgid "Unsaved Changes"
+msgstr ""
+
+#: src/app/mainwindow.cpp:853 src/app/mainwindow_objects.cpp:134
+#, kde-format
+msgid "Delete Objects"
+msgstr ""
+
+#: src/app/mainwindow.cpp:854 src/app/mainwindow_objects.cpp:155
+#, kde-format
+msgid "Duplicate Objects"
+msgstr ""
+
+#: src/app/mainwindow.cpp:887
+#, kde-format
+msgctxt "label width x height"
+msgid "%1 mm × %2 mm"
+msgstr ""
+
+#: src/app/mainwindow.cpp:888
+#, kde-format
+msgctxt "zoom level"
+msgid "%1%"
+msgstr ""
+
+#: src/app/mainwindow.cpp:910 src/app/mainwindow.cpp:928
+#, kde-format
+msgid "Change Label Type"
+msgstr ""
+
+#: src/app/mainwindow.cpp:957
+#, kde-format
+msgid ""
+"Could not open the layout %1:\n"
+"%2"
+msgstr ""
+
+#: src/app/mainwindow.cpp:964
+#, kde-format
+msgid "Opened \"%1\" as it was printed. Save it to keep it as a file."
+msgstr ""
+
+#: src/app/mainwindow_data.cpp:19
+#, kde-format
+msgid "&Data Source…"
+msgstr ""
+
+#: src/app/mainwindow_data.cpp:22
+#, kde-format
+msgid "Print-Time &Questions…"
+msgstr ""
+
+#: src/app/mainwindow_data.cpp:25
+#, kde-format
+msgid "&Calculated Fields…"
+msgstr ""
+
+#: src/app/mainwindow_data.cpp:30
+#, kde-format
+msgid "Remove Data Source"
+msgstr ""
+
+#: src/app/mainwindow_data.cpp:32
+#, kde-format
+msgid "&Remove Data Source"
+msgstr ""
+
+#: src/app/mainwindow_data.cpp:36
+#, kde-format
+msgid "Insert &Field"
+msgstr ""
+
+#: src/app/mainwindow_data.cpp:49
+#, kde-format
+msgid "No fields yet: choose a data source or add a question"
+msgstr ""
+
+#: src/app/mainwindow_data.cpp:118
+#, kde-format
+msgid "Insert Field"
+msgstr ""
+
+#: src/app/mainwindow_data.cpp:169
+#, kde-format
+msgid ""
+"The data could not be read:\n"
+"%1"
+msgstr ""
+
+#: src/app/mainwindow_data.cpp:214
+#, kde-format
+msgid "Change Data Source"
+msgstr ""
+
+#: src/app/mainwindow_data.cpp:237
+#, kde-format
+msgid "Change Calculated Fields"
+msgstr ""
+
+#: src/app/mainwindow_data.cpp:248
+#, kde-format
+msgid "Change Print-Time Questions"
+msgstr ""
+
+#: src/app/mainwindow_format.cpp:41
+#, kde-format
+msgid "Font"
+msgstr ""
+
+#: src/app/mainwindow_format.cpp:49
+#, kde-format
+msgid "Font Size"
+msgstr ""
+
+#: src/app/mainwindow_format.cpp:75
+#, kde-format
+msgid "Larger Font"
+msgstr ""
+
+#: src/app/mainwindow_format.cpp:81
+#, kde-format
+msgid "Smaller Font"
+msgstr ""
+
+#: src/app/mainwindow_format.cpp:97 src/app/propertiesdialog.cpp:102
+#, kde-format
+msgid "Italic"
+msgstr ""
+
+#: src/app/mainwindow_format.cpp:98 src/app/propertiesdialog.cpp:104
+#, kde-format
+msgid "Underline"
+msgstr ""
+
+#: src/app/mainwindow_format.cpp:99
+#, kde-format
+msgid "Strikeout"
+msgstr ""
+
+#: src/app/mainwindow_format.cpp:102 src/app/mainwindow_format.cpp:184
+#, kde-format
+msgid "White on Black"
+msgstr ""
+
+#: src/app/mainwindow_format.cpp:115
+#, kde-format
+msgid "Align Left"
+msgstr ""
+
+#: src/app/mainwindow_format.cpp:118
+#, kde-format
+msgid "Align Centre"
+msgstr ""
+
+#: src/app/mainwindow_format.cpp:121
+#, kde-format
+msgid "Align Right"
+msgstr ""
+
+#: src/app/mainwindow_format.cpp:127
+#, kde-format
+msgid "Align Top"
+msgstr ""
+
+#: src/app/mainwindow_format.cpp:130
+#, kde-format
+msgid "Align Middle"
+msgstr ""
+
+#: src/app/mainwindow_format.cpp:133
+#, kde-format
+msgid "Align Bottom"
+msgstr ""
+
+#: src/app/mainwindow_format.cpp:149
+#, kde-format
+msgid "Horizontal Alignment"
+msgstr ""
+
+#: src/app/mainwindow_format.cpp:150
+#, kde-format
+msgid "Vertical Alignment"
+msgstr ""
+
+#: src/app/mainwindow_format.cpp:155
+#, kde-format
+msgid "Fixed Font Size"
+msgstr ""
+
+#: src/app/mainwindow_format.cpp:158
+#, kde-format
+msgid "Shrink to Fit"
+msgstr ""
+
+#: src/app/mainwindow_format.cpp:161
+#, kde-format
+msgid "Always Fit"
+msgstr ""
+
+#: src/app/mainwindow_format.cpp:167 src/app/mainwindow_format.cpp:199
+#, kde-format
+msgid "Wrap Text"
+msgstr ""
+
+#: src/app/mainwindow_format.cpp:168
+#, kde-format
+msgid "Break long lines at spaces to fit the box's width"
+msgstr ""
+
+#: src/app/mainwindow_format.cpp:184
+#, kde-format
+msgid "Black on White"
+msgstr ""
+
+#: src/app/mainwindow_format.cpp:199
+#, kde-format
+msgid "Do Not Wrap Text"
+msgstr ""
+
+#: src/app/mainwindow_format.cpp:214
+#, kde-format
+msgid "Change Text Fit"
+msgstr ""
+
+#: src/app/mainwindow_format.cpp:250
+#, kde-format
+msgid "Change Font"
+msgstr ""
+
+#: src/app/mainwindow_format.cpp:274
+#, kde-format
+msgid "Change Alignment"
+msgstr ""
+
+#: src/app/mainwindow_objects.cpp:48
+#, kde-format
+msgid "Could not read the clip art %1."
+msgstr ""
+
+#: src/app/mainwindow_objects.cpp:65
+#, kde-format
+msgid "Insert Object"
+msgstr ""
+
+#: src/app/mainwindow_objects.cpp:77
+#, kde-format
+msgid "Use Address"
+msgstr ""
+
+#: src/app/mainwindow_objects.cpp:81
+#, kde-format
+msgid "Add an address object to the label to put the address on it."
+msgstr ""
+
+#: src/app/mainwindow_objects.cpp:95
+#, kde-format
+msgid "Advance Counters"
+msgstr ""
+
+#: src/app/mainwindow_objects.cpp:120
+#, kde-format
+msgid "Change Object Properties"
+msgstr ""
+
+#: src/app/mainwindow_objects.cpp:182
+#, kde-format
+msgid "Cut Objects"
+msgstr ""
+
+#: src/app/mainwindow_objects.cpp:182
+#, kde-format
+msgid "Cut Object"
+msgstr ""
+
+#: src/app/mainwindow_objects.cpp:196
+#, kde-format
+msgid "Paste"
+msgstr ""
+
+#: src/app/mainwindow_objects.cpp:224
+#, kde-format
+msgid "Position Object"
+msgstr ""
+
+#: src/app/mainwindow_objects.cpp:231 src/app/mainwindow_objects.cpp:435
+#, kde-format
+msgid "Align Objects"
+msgstr ""
+
+#: src/app/mainwindow_objects.cpp:239
+#, kde-format
+msgid "Distribute Objects"
+msgstr ""
+
+#: src/app/mainwindow_objects.cpp:247
+#, kde-format
+msgid "Group Objects"
+msgstr ""
+
+#: src/app/mainwindow_objects.cpp:254
+#, kde-format
+msgid "Ungroup Objects"
+msgstr ""
+
+#: src/app/mainwindow_objects.cpp:261
+#, kde-format
+msgid "Lock Objects"
+msgstr ""
+
+#: src/app/mainwindow_objects.cpp:261
+#, kde-format
+msgid "Unlock Objects"
+msgstr ""
+
+#: src/app/mainwindow_objects.cpp:270
+#, kde-format
+msgid "Print Objects"
+msgstr ""
+
+#: src/app/mainwindow_objects.cpp:270
+#, kde-format
+msgid "Do Not Print Objects"
+msgstr ""
+
+#: src/app/mainwindow_objects.cpp:285
+#, kde-format
+msgid "Turn Left"
+msgstr ""
+
+#: src/app/mainwindow_objects.cpp:285
+#, kde-format
+msgid "Turn Right"
+msgstr ""
+
+#: src/app/mainwindow_objects.cpp:297
+#, kde-format
+msgid "Set Angle"
+msgstr ""
+
+#: src/app/mainwindow_objects.cpp:318
+#, kde-format
+msgid "Change Roll Layout"
+msgstr ""
+
+#: src/app/mainwindow_objects.cpp:333
+#, kde-format
+msgid "Change Print Settings"
+msgstr ""
+
+#: src/app/mainwindow_objects.cpp:346
+#, kde-format
+msgid "Change Layers"
+msgstr ""
+
+#: src/app/mainwindow_objects.cpp:355 src/app/mainwindow_objects.cpp:505
+#, kde-format
+msgid "Move to Layer"
+msgstr ""
+
+#: src/app/mainwindow_objects.cpp:416
+#, kde-format
+msgid "Left Edges"
+msgstr ""
+
+#: src/app/mainwindow_objects.cpp:417
+#, kde-format
+msgid "Centres Horizontally"
+msgstr ""
+
+#: src/app/mainwindow_objects.cpp:418
+#, kde-format
+msgid "Right Edges"
+msgstr ""
+
+#: src/app/mainwindow_objects.cpp:419
+#, kde-format
+msgid "Top Edges"
+msgstr ""
+
+#: src/app/mainwindow_objects.cpp:420
+#, kde-format
+msgid "Centres Vertically"
+msgstr ""
+
+#: src/app/mainwindow_objects.cpp:421
+#, kde-format
+msgid "Bottom Edges"
+msgstr ""
+
+#: src/app/mainwindow_objects.cpp:426
+#, kde-format
+msgid "Distribute Horizontally"
+msgstr ""
+
+#: src/app/mainwindow_objects.cpp:431
+#, kde-format
+msgid "Distribute Vertically"
+msgstr ""
+
+#: src/app/mainwindow_objects.cpp:456
+#, kde-format
+msgid "Group"
+msgstr ""
+
+#: src/app/mainwindow_objects.cpp:460
+#, kde-format
+msgid "Ungroup"
+msgstr ""
+
+#: src/app/mainwindow_objects.cpp:468
+#, kde-format
+msgid "Turn Left 15°"
+msgstr ""
+
+#: src/app/mainwindow_objects.cpp:474
+#, kde-format
+msgid "Turn Right 15°"
+msgstr ""
+
+#: src/app/mainwindow_objects.cpp:482 src/app/propertiesdialog.cpp:265
+#: src/app/settingsdialog.cpp:100
+#, kde-format
+msgctxt "degrees"
+msgid "°"
+msgstr ""
+
+#: src/app/mainwindow_objects.cpp:483
+#, kde-format
+msgid "Angle of the selected objects, counter-clockwise"
+msgstr ""
+
+#: src/app/mainwindow_objects.cpp:488
+#, kde-format
+msgid "Angle"
+msgstr ""
+
+#: src/app/mainwindow_objects.cpp:493
+#, kde-format
+msgid "&Roll Layout…"
+msgstr ""
+
+#: src/app/mainwindow_objects.cpp:495
+#, kde-format
+msgid "Labels across the roll, or a continuous roll"
+msgstr ""
+
+#: src/app/mainwindow_objects.cpp:497
+#, kde-format
+msgid "&Print Settings…"
+msgstr ""
+
+#: src/app/mainwindow_objects.cpp:499
+#, kde-format
+msgid ""
+"Darkness, speed and density for this label, and header and trailer labels"
+msgstr ""
+
+#: src/app/mainwindow_objects.cpp:503
+#, kde-format
+msgid "La&yers…"
+msgstr ""
+
+#: src/app/mainwindow_objects.cpp:521
+#, kde-format
+msgid "The Label Itself"
+msgstr ""
+
+#: src/app/mainwindow_objects.cpp:526
+#, kde-format
+msgid "Edit Layers…"
+msgstr ""
+
+#: src/app/mainwindow_objects.cpp:528
+#, kde-format
+msgid "Do Not Print"
+msgstr ""
+
+#: src/app/mainwindow_objects.cpp:529
+#, kde-format
+msgid "Shown faded while designing, left out when printing"
+msgstr ""
+
+#: src/app/mainwindow_objects.cpp:535
+#, kde-format
+msgid "Lock Position and Size"
+msgstr ""
+
+#: src/app/mainwindow_objects.cpp:536
+#, kde-format
+msgid "Locked objects cannot be moved or resized"
+msgstr ""
+
+#: src/app/mainwindow_p.h:96
+#, kde-format
+msgid "DYMO label files (*.label)"
+msgstr ""
+
+#: src/app/mainwindow_p.h:96
+#, kde-format
+msgid "DYMO Rhino templates (*.rhino)"
+msgstr ""
+
+#: src/app/mainwindow_print.cpp:31
+#, kde-format
+msgid ""
+"This label is a %1 (%2 × %3 mm), which is not one of the label types of %4."
+msgstr ""
+
+#: src/app/mainwindow_print.cpp:38
+#, kde-format
+msgid "This label is %1 mm long, but the labels in %2 are %3 mm long."
+msgstr ""
+
+#: src/app/mainwindow_print.cpp:44
+#, kde-format
+msgid ""
+"This label is laid out for several labels across or a continuous roll "
+"(Layout > Roll Layout), which %1 does not print: it takes one die-cut label "
+"at a time."
+msgstr ""
+
+#: src/app/mainwindow_print.cpp:53
+#, kde-format
+msgid ""
+"Choose the label type of the loaded labels in the Labels tab first, or print "
+"anyway."
+msgstr ""
+
+#: src/app/mainwindow_print.cpp:54
+#, kde-format
+msgid "Different Labels"
+msgstr ""
+
+#: src/app/mainwindow_print.cpp:55 src/app/mainwindow_print.cpp:78
+#, kde-format
+msgid "Print Anyway"
+msgstr ""
+
+#: src/app/mainwindow_print.cpp:74
+#, kde-format
+msgid ""
+"%1 reports: %2.\n"
+"\n"
+"The labels may wait in the queue until this is solved."
+msgstr ""
+
+#: src/app/mainwindow_print.cpp:77
+#, kde-format
+msgid "Printer Not Ready"
+msgstr ""
+
+#: src/app/mainwindow_print.cpp:101
+#, kde-format
+msgctxt "degrees"
+msgid "Turn Left %1°"
+msgstr ""
+
+#: src/app/mainwindow_print.cpp:102
+#, kde-format
+msgctxt "degrees"
+msgid "Turn Right %1°"
+msgstr ""
+
+#: src/app/mainwindow_print.cpp:152
+#, kde-format
+msgid ""
+"No printer was found. Connect a label printer or add one in the system's "
+"printer settings first."
+msgstr ""
+
+#: src/app/mainwindow_print.cpp:194
+#, kde-format
+msgid "No rows are ticked. Choose them under Data > Data Source."
+msgstr ""
+
+#: src/app/mainwindow_print.cpp:207
+#, kde-format
+msgid "To print the checked addresses, the label needs an address object."
+msgstr ""
+
+#: src/app/mainwindow_print.cpp:269
+#, kde-format
+msgid ""
+"The shared counter %1 could not be reached:\n"
+"%2"
+msgstr ""
+
+#: src/app/mainwindow_print.cpp:346
+#, kde-format
+msgid ""
+"The labels were printed, but the next counter value could not be saved:\n"
+"%1"
+msgstr ""
+
+#: src/app/mainwindow_print.cpp:393
+#, kde-format
+msgid ""
+"The counters could not be saved in the label:\n"
+"%1"
+msgstr ""
+
+#: src/app/mainwindow_print.cpp:401 src/lib/automation.cpp:744
+#, kde-format
+msgid "Sent one label to %2 as job %3."
+msgid_plural "Sent %1 labels to %2 as job %3."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/app/mainwindow_print.cpp:403 src/app/printpreviewdialog.cpp:47
+#, kde-format
+msgid "Note: %2"
+msgid_plural "%1 notes, first: %2"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/app/mainwindow_print.cpp:481
+#, kde-format
+msgid "Could not write %1."
+msgstr ""
+
+#: src/app/mainwindow_print.cpp:484
+#, kde-format
+msgid "Exported to %1."
+msgstr ""
+
+#: src/app/mainwindow_print.cpp:494
+#, kde-format
+msgid "Print Offset of %1"
+msgstr ""
+
+#: src/app/mainwindow_print.cpp:496
+#, kde-format
+msgid ""
+"Print a label and measure how far everything must move to land where it is "
+"on the screen. The offset is kept for this printer and applies to all labels."
+msgstr ""
+
+#: src/app/mainwindow_print.cpp:511
+#, kde-format
+msgid "Move right by:"
+msgstr ""
+
+#: src/app/mainwindow_print.cpp:512
+#, kde-format
+msgid "Move down by:"
+msgstr ""
+
+#: src/app/mainwindow_print.cpp:513
+#, kde-format
+msgid ""
+"Negative values move left and up. The label itself does not move, so what "
+"comes within this distance of its edges may be cut off."
+msgstr ""
+
+#: src/app/mainwindow_printonly.cpp:49 src/app/settingsdialog.cpp:133
+#, kde-format
+msgid "Print-Only Mode"
+msgstr ""
+
+#: src/app/mainwindow_printonly.cpp:50
+#, kde-format
+msgid ""
+"Choose a label from a folder, fill in its form and print, without editing it"
+msgstr ""
+
+#: src/app/mainwindow_printonly.cpp:55
+#, kde-format
+msgid "&Versions…"
+msgstr ""
+
+#: src/app/mainwindow_printonly.cpp:57
+#, kde-format
+msgid "Earlier versions of this label, kept each time it was saved over"
+msgstr ""
+
+#: src/app/mainwindow_printonly.cpp:59
+#, kde-format
+msgid "Print &History…"
+msgstr ""
+
+#: src/app/mainwindow_printonly.cpp:61
+#, kde-format
+msgid ""
+"What was printed, when and where; open a label as printed or print it again"
+msgstr ""
+
+#: src/app/mainwindow_printonly.cpp:64
+#, kde-format
+msgid "Printer &Status…"
+msgstr ""
+
+#: src/app/mainwindow_printonly.cpp:66 src/app/printbar.cpp:65
+#, kde-format
+msgid ""
+"How every label printer is: its queue, jobs waiting, and what network "
+"printers say"
+msgstr ""
+
+#: src/app/mainwindow_printonly.cpp:70
+#, kde-format
+msgid "Choose Rows…"
+msgstr ""
+
+#: src/app/mainwindow_printonly.cpp:72
+#, kde-format
+msgid "Tick the rows of the label's data to print"
+msgstr ""
+
+#: src/app/mainwindow_printonly.cpp:222
+#, kde-format
+msgid "This label prints without data: it has no data source."
+msgstr ""
+
+#: src/app/mainwindow_printonly.cpp:247
+#, kde-format
+msgid ""
+"Versions are kept each time a label is saved over. This label has not been "
+"saved yet."
+msgstr ""
+
+#: src/app/mainwindow_printonly.cpp:259
+#, kde-format
+msgid "The version could not be read: %1"
+msgstr ""
+
+#: src/app/mainwindow_printonly.cpp:263
+#, kde-format
+msgid "Restore Version"
+msgstr ""
+
+#: src/app/mainwindow_printonly.cpp:287 src/app/mainwindow_printonly.cpp:310
+#, kde-format
+msgid "The label as printed could not be read: %1"
+msgstr ""
+
+#: src/app/mainwindow_printonly.cpp:293
+#, kde-format
+msgid "The label %1 as printed on %2."
+msgstr ""
+
+#: src/app/mainwindow_printonly.cpp:330
+#, kde-format
+msgid "Print the label %2 again on %3?"
+msgid_plural "Print the %1 labels of %2 again on %3?"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/app/objectfactory.cpp:139
+#, kde-format
+msgctxt "sample address in a new address object"
+msgid ""
+"Name\n"
+"Street 1\n"
+"1234 AB City"
+msgstr ""
+
+#: src/app/objectfactory.cpp:181
+#, kde-format
+msgctxt "sample text of a new curved text object"
+msgid "Curved text"
+msgstr ""
+
+#: src/app/printbar.cpp:52
+#, kde-format
+msgid "Printer settings"
+msgstr ""
+
+#: src/app/printbar.cpp:55
+#, kde-format
+msgid "Use as Default Printer"
+msgstr ""
+
+#: src/app/printbar.cpp:57
+#, kde-format
+msgid ""
+"Always start with this printer, even when another LabelWriter is plugged in"
+msgstr ""
+
+#: src/app/printbar.cpp:58
+#, kde-format
+msgid "Which LabelWriter Is This…"
+msgstr ""
+
+#: src/app/printbar.cpp:59
+#, kde-format
+msgid "Detect the Loaded Labels Again"
+msgstr ""
+
+#: src/app/printbar.cpp:60
+#, kde-format
+msgid "Ask the printer over the network which labels are loaded"
+msgstr ""
+
+#: src/app/printbar.cpp:61
+#, kde-format
+msgid "Print Offset…"
+msgstr ""
+
+#: src/app/printbar.cpp:62
+#, kde-format
+msgid ""
+"Move everything this printer prints a little, when labels come out shifted"
+msgstr ""
+
+#: src/app/printbar.cpp:64
+#, kde-format
+msgid "Printer Status…"
+msgstr ""
+
+#: src/app/printbar.cpp:68
+#, kde-format
+msgid "Barcodes and graphics quality"
+msgstr ""
+
+#: src/app/printbar.cpp:69
+#, kde-format
+msgid ""
+"Prints slower but sharper, as DLS's \"Barcodes and graphics\" print quality."
+msgstr ""
+
+#: src/app/printbar.cpp:88
+#, kde-format
+msgid "Only the label on the canvas"
+msgstr ""
+
+#: src/app/printbar.cpp:90 src/app/printbar.cpp:272
+#, kde-format
+msgid "All checked addresses in the address book"
+msgstr ""
+
+#: src/app/printbar.cpp:92 src/app/printbar.cpp:252
+#, kde-format
+msgid "Each row of the data source"
+msgstr ""
+
+#: src/app/printbar.cpp:253
+#, kde-format
+msgid "The ticked row of the data source"
+msgid_plural "Each of the %1 ticked rows of the data source"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/app/printbar.cpp:271
+#, kde-format
+msgid "The checked address in the address book"
+msgid_plural "All %1 checked addresses in the address book"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/app/printbar.cpp:279
+#, kde-format
+msgid "1 label per row"
+msgid_plural "%1 labels per row"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/app/printbar.cpp:283
+#, kde-format
+msgid "1 label will be printed"
+msgid_plural "%1 labels will be printed"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/app/printbar_printers.cpp:71
+#, kde-format
+msgctxt "printer connection"
+msgid "USB"
+msgstr ""
+
+#: src/app/printbar_printers.cpp:74
+#, kde-format
+msgctxt "printer connection"
+msgid "Windows share"
+msgstr ""
+
+#: src/app/printbar_printers.cpp:77
+#, kde-format
+msgctxt "printer connection"
+msgid "network"
+msgstr ""
+
+#: src/app/printbar_printers.cpp:84
+#, kde-format
+msgctxt "printer, connection"
+msgid "%1 (%2)"
+msgstr ""
+
+#: src/app/printbar_printers.cpp:100
+#, kde-format
+msgctxt "printer name"
+msgid "%1 (not set up as a LabelWriter)"
+msgstr ""
+
+#: src/app/printbar_printers.cpp:100
+#, kde-format
+msgctxt "printer name, model"
+msgid "%1 (as %2)"
+msgstr ""
+
+#: src/app/printbar_printers.cpp:106
+#, kde-format
+msgid "No printers found"
+msgstr ""
+
+#: src/app/printbar_printers.cpp:207
+#, kde-format
+msgid "%1 uses the DYMO driver for a %2 already."
+msgstr ""
+
+#: src/app/printbar_printers.cpp:212
+#, kde-format
+msgid ""
+"No DYMO LabelWriter drivers are installed. Install the DYMO CUPS drivers "
+"first: net-print/dymo-cups-drivers for the LabelWriter 450 and older, net-"
+"print/dymo-lw5xx-cups-drivers for the 550 series."
+msgstr ""
+
+#: src/app/printbar_printers.cpp:232 src/app/printbar_printers.cpp:253
+#, kde-format
+msgid "LabelWriter Model"
+msgstr ""
+
+#: src/app/printbar_printers.cpp:233
+#, kde-format
+msgid ""
+"%1 does not use the DYMO driver. Which LabelWriter does it print to?\n"
+"Labels are then prepared with that model's driver on this computer and sent "
+"to the printer as they are."
+msgstr ""
+
+#: src/app/printbar_printers.cpp:248
+#, kde-format
+msgid ""
+"%1 cannot print through %2. Its DYMO driver reads the printer's status "
+"before every label, which only works when the printer is set up with that "
+"driver itself: connect it over USB or the network and add it as a printer "
+"with the \"%1\" driver."
+msgstr ""
+
+#: src/app/printbar_printers.cpp:273
+#, kde-format
+msgid "%1 is connected."
+msgstr ""
+
+#: src/app/printbar_printers.cpp:278
+#, kde-format
+msgid "Use It"
+msgstr ""
+
+#: src/app/printbar_printers.cpp:304
+#, kde-format
+msgid ""
+"%1 is connected, but no driver for it is installed. The LabelWriter 550 "
+"series needs DYMO's LW5xx driver (net-print/dymo-lw5xx-cups-drivers), the "
+"450 and older net-print/dymo-cups-drivers."
+msgstr ""
+
+#: src/app/printbar_printers.cpp:309
+#, kde-format
+msgid "%1 is connected, but not set up as a printer yet."
+msgstr ""
+
+#: src/app/printbar_printers.cpp:310
+#, kde-format
+msgid "Set Up Printer"
+msgstr ""
+
+#: src/app/printbar_printers.cpp:333
+#, kde-format
+msgid "Setting up %1…"
+msgstr ""
+
+#: src/app/printbar_printers.cpp:337
+#, kde-format
+msgid "%1 could not be set up: %2"
+msgstr ""
+
+#: src/app/printbar_printers.cpp:346
+#, kde-format
+msgid "%1 is set up as printer %2."
+msgstr ""
+
+#: src/app/printbar_printers.cpp:370
+#, kde-format
+msgid "Fit the loaded labels (%1 mm long)"
+msgstr ""
+
+#: src/app/printbar_status.cpp:112
+#, kde-format
+msgid "Asking the printer which labels are loaded…"
+msgstr ""
+
+#: src/app/printbar_status.cpp:114
+#, kde-format
+msgid "The printer did not answer: %1"
+msgstr ""
+
+#: src/app/printbar_status.cpp:117 src/app/printerstatusdialog.cpp:177
+#, kde-format
+msgid "continuous labels"
+msgstr ""
+
+#: src/app/printbar_status.cpp:118 src/app/printerstatusdialog.cpp:178
+#, kde-format
+msgctxt "label length"
+msgid "labels %1 mm long"
+msgstr ""
+
+#: src/app/printbar_status.cpp:119 src/app/printerstatusdialog.cpp:179
+#, kde-format
+msgctxt "model, dpi, labels"
+msgid "%1, %2 dpi, %3, ready"
+msgstr ""
+
+#: src/app/printbar_status.cpp:123
+#, kde-format
+msgid "thermal transfer"
+msgstr ""
+
+#: src/app/printbar_status.cpp:123
+#, kde-format
+msgid "direct thermal"
+msgstr ""
+
+#: src/app/printbar_status.cpp:123
+#, kde-format
+msgid "Firmware %1, %2, %3"
+msgstr ""
+
+#: src/app/printbar_status.cpp:126
+#, kde-format
+msgid "1 job waiting in the queue"
+msgid_plural "%1 jobs waiting in the queue"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/app/printersetup.cpp:40
+#, kde-format
+msgid ""
+"cups-pk-helper is not installed, so printers cannot be set up from here. Use "
+"the system's printer settings instead."
+msgstr ""
+
+#: src/app/printerstatusdialog.cpp:39
+#, kde-format
+msgctxt "printer queue state"
+msgid "Idle"
+msgstr ""
+
+#: src/app/printerstatusdialog.cpp:41
+#, kde-format
+msgctxt "printer queue state"
+msgid "Printing"
+msgstr ""
+
+#: src/app/printerstatusdialog.cpp:43
+#, kde-format
+msgctxt "printer queue state"
+msgid "Stopped"
+msgstr ""
+
+#: src/app/printerstatusdialog.cpp:47
+#, kde-format
+msgctxt "printer queue state"
+msgid "Unknown"
+msgstr ""
+
+#: src/app/printerstatusdialog.cpp:55
+#, kde-format
+msgid "Printer Status"
+msgstr ""
+
+#: src/app/printerstatusdialog.cpp:57
+#, kde-format
+msgid ""
+"The label printers on this computer: their queues, and what network label "
+"printers (Altec, Zebra) say about themselves. Printers on USB cannot be "
+"asked; the system's printer settings manage the queues."
+msgstr ""
+
+#: src/app/printerstatusdialog.cpp:63
+#, kde-format
+msgid "Queue"
+msgstr ""
+
+#: src/app/printerstatusdialog.cpp:63
+#, kde-format
+msgid "Jobs"
+msgstr ""
+
+#: src/app/printerstatusdialog.cpp:63
+#, kde-format
+msgid "The printer says"
+msgstr ""
+
+#: src/app/printerstatusdialog.cpp:168
+#, kde-format
+msgid "Cannot be asked (not a network ZPL printer)"
+msgstr ""
+
+#: src/app/printerstatusdialog.cpp:170
+#, kde-format
+msgid "Asking…"
+msgstr ""
+
+#: src/app/printerstatusdialog.cpp:172
+#, kde-format
+msgid "Did not answer"
+msgstr ""
+
+#: src/app/printerstatusdialog.cpp:173
+#, kde-format
+msgid "The printer did not answer"
+msgstr ""
+
+#: src/app/printerstatusdialog.cpp:180
+#, kde-format
+msgctxt "model, problems"
+msgid "%1: %2"
+msgstr ""
+
+#: src/app/printonlypanel.cpp:63
+#, kde-format
+msgid "Folder…"
+msgstr ""
+
+#: src/app/printonlypanel.cpp:64
+#, kde-format
+msgid "Choose the folder with the labels to print"
+msgstr ""
+
+#: src/app/printonlypanel.cpp:85
+#, kde-format
+msgid "Print With"
+msgstr ""
+
+#: src/app/printonlypanel.cpp:108
+#, kde-format
+msgid "No folder chosen"
+msgstr ""
+
+#: src/app/printonlypanel.cpp:118 src/app/settingsdialog.cpp:139
+#, kde-format
+msgid "Folder With Labels"
+msgstr ""
+
+#: src/app/printpreviewdialog.cpp:31
+#, kde-format
+msgid "Print Preview"
+msgstr ""
+
+#: src/app/printpreviewdialog.cpp:36
+#, kde-format
+msgid ""
+"What %1 receives: %2 × %3 dots at %4 dpi (%5 × %6 mm, across the print head "
+"and along the feed), in black and white."
+msgstr ""
+
+#: src/app/printpreviewdialog.cpp:63
+#, kde-format
+msgid "Previous"
+msgstr ""
+
+#: src/app/printpreviewdialog.cpp:64
+#, kde-format
+msgid "Next"
+msgstr ""
+
+#: src/app/printpreviewdialog.cpp:79
+#, kde-format
+msgid "As it feeds through the printer"
+msgstr ""
+
+#: src/app/printpreviewdialog.cpp:80
+#, kde-format
+msgid "Shown turned, as the printer receives it, leading edge at the top"
+msgstr ""
+
+#: src/app/printpreviewdialog.cpp:126 src/lib/labelprinter.cpp:600
+#: src/lib/labelprinter.cpp:697
+#, kde-format
+msgid "Nothing to print"
+msgstr ""
+
+#: src/app/printpreviewdialog.cpp:132
+#, kde-format
+msgid "Label %1 of %2"
+msgstr ""
+
+#: src/app/printpreviewdialog.cpp:150
+#, kde-format
+msgid "Zoom: fit"
+msgstr ""
+
+#: src/app/printpreviewdialog.cpp:155
+#, kde-format
+msgid "Zoom: %1 × dots"
+msgstr ""
+
+#: src/app/printsettingsdialog.cpp:31
+#, kde-format
+msgid "Print Settings"
+msgstr ""
+
+#: src/app/printsettingsdialog.cpp:35
+#, kde-format
+msgid "How the Printer Prints This Label"
+msgstr ""
+
+#: src/app/printsettingsdialog.cpp:38 src/app/printsettingsdialog.cpp:46
+#: src/app/printsettingsdialog.cpp:51
+#, kde-format
+msgid "The printer's setting"
+msgstr ""
+
+#: src/app/printsettingsdialog.cpp:39
+#, kde-format
+msgctxt "print density"
+msgid "Light"
+msgstr ""
+
+#: src/app/printsettingsdialog.cpp:40
+#, kde-format
+msgctxt "print density"
+msgid "Medium"
+msgstr ""
+
+#: src/app/printsettingsdialog.cpp:41
+#, kde-format
+msgctxt "print density"
+msgid "Normal"
+msgstr ""
+
+#: src/app/printsettingsdialog.cpp:42
+#, kde-format
+msgctxt "print density"
+msgid "Dark"
+msgstr ""
+
+#: src/app/printsettingsdialog.cpp:48
+#, kde-format
+msgid ""
+"1 is the lightest, 30 the darkest. Darker for thick barcodes and some "
+"ribbons, lighter when print bleeds."
+msgstr ""
+
+#: src/app/printsettingsdialog.cpp:52
+#, kde-format
+msgctxt "inches per second"
+msgid " in/s"
+msgstr ""
+
+#: src/app/printsettingsdialog.cpp:54
+#, kde-format
+msgid "Slower prints sharper, for small barcodes and text."
+msgstr ""
+
+#: src/app/printsettingsdialog.cpp:55
+#, kde-format
+msgid "DYMO print density:"
+msgstr ""
+
+#: src/app/printsettingsdialog.cpp:56
+#, kde-format
+msgid "Darkness (Altec, Zebra):"
+msgstr ""
+
+#: src/app/printsettingsdialog.cpp:57
+#, kde-format
+msgid "Speed (Altec, Zebra):"
+msgstr ""
+
+#: src/app/printsettingsdialog.cpp:61
+#, kde-format
+msgid "Around a Print Run"
+msgstr ""
+
+#: src/app/printsettingsdialog.cpp:65
+#, kde-format
+msgid "Header label:"
+msgstr ""
+
+#: src/app/printsettingsdialog.cpp:66
+#, kde-format
+msgid "Trailer label:"
+msgstr ""
+
+#: src/app/printsettingsdialog.cpp:67
+#, kde-format
+msgid ""
+"Printed once before or after the labels, filled with the answers and "
+"{Count}, the number of labels in between. They must be for the same label "
+"type. A label next to this one is named without its folder."
+msgstr ""
+
+#: src/app/printsettingsdialog.cpp:92
+#, kde-format
+msgid "Choose a Label"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:73
+#, kde-format
+msgid "Left"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:74
+#, kde-format
+msgid "Centre"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:75
+#, kde-format
+msgid "Right"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:81
+#, kde-format
+msgid "Top"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:81
+#, kde-format
+msgid "Middle"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:81
+#, kde-format
+msgid "Bottom"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:149
+#, kde-format
+msgctxt "@item barcode type"
+msgid "Code 39 w/Mod 43 Checksum"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:159
+#, kde-format
+msgctxt "@item barcode type"
+msgid "POSTNET (US)"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:160
+#, kde-format
+msgctxt "@item barcode type"
+msgid "PLANET (US)"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:161
+#, kde-format
+msgctxt "@item barcode type"
+msgid "Intelligent Mail (US)"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:170
+#, kde-format
+msgctxt "@item barcode type"
+msgid "GS1-128 ([AI] data)"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:171
+#, kde-format
+msgctxt "@item barcode type"
+msgid "GS1 Data Matrix ([AI] data)"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:173
+#, kde-format
+msgctxt "@item barcode type"
+msgid "GS1 DataBar Expanded ([AI] data)"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:199
+#, kde-format
+msgid "Choose Image"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:208
+#, kde-format
+msgid "Could not read the drawing %1."
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:215
+#, kde-format
+msgid "Could not read the image %1."
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:230
+#, kde-format
+msgid ""
+"Plasma Label Creator cannot edit \"%1\" objects yet. The object is kept as "
+"it is and saved unchanged."
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:235
+#, kde-format
+msgid "Properties of %1"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:240
+#, kde-format
+msgid "General"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:255
+#, kde-format
+msgid "90° counter-clockwise"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:256
+#, kde-format
+msgid "180°"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:257
+#, kde-format
+msgid "90° clockwise"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:266
+#, kde-format
+msgid ""
+"Turns the whole object about its centre, counter-clockwise; negative values "
+"turn it clockwise"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:268
+#, kde-format
+msgid "Mirror"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:271
+#, kde-format
+msgid "Position (x, y):"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:272
+#, kde-format
+msgid "Size (w, h):"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:273
+#, kde-format
+msgid "Rotation:"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:274
+#, kde-format
+msgid "Angle:"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:285
+#, kde-format
+msgid "On tape, the object's cell places it; set its length below."
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:287
+#, kde-format
+msgid "On the Tape"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:289
+#, kde-format
+msgid "As long as its content"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:290
+#, kde-format
+msgid "Fixed length"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:291
+#, kde-format
+msgid "A share of a fixed-length label"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:307 src/app/propertiesdialog.cpp:452
+#, kde-format
+msgid "Border:"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:328
+#, kde-format
+msgid "Shrink to fit"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:329
+#, kde-format
+msgid "Always fit"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:330
+#, kde-format
+msgid "Fixed size"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:332
+#, kde-format
+msgid "Use full font height"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:334
+#, kde-format
+msgid "Wrap long lines to the box's width"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:336
+#, kde-format
+msgid "Grow the box to fit the text"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:337
+#, kde-format
+msgid ""
+"Wider for longer text, or taller when it wraps, instead of smaller text; "
+"objects anchored to it move along"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:341 src/app/propertiesdialog.cpp:450
+#, kde-format
+msgid "Horizontal alignment:"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:342 src/app/propertiesdialog.cpp:451
+#, kde-format
+msgid "Vertical alignment:"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:343
+#, kde-format
+msgid "Text size:"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:348
+#, kde-format
+msgid ""
+"This text uses several fonts. Changing the text or font gives all of it the "
+"font above."
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:379
+#, kde-format
+msgid "Build…"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:380
+#, kde-format
+msgid "Build GS1 data from application identifiers, with each value checked"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:398
+#, kde-format
+msgid "Small"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:398
+#, kde-format
+msgid "Medium"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:398
+#, kde-format
+msgid "Large"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:400 src/app/propertiesdialog.cpp:684
+#, kde-format
+msgid "Below"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:401
+#, kde-format
+msgid "Above"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:406
+#, kde-format
+msgid "Type:"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:407
+#, kde-format
+msgid "Data:"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:408
+#, kde-format
+msgid "Size:"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:410
+#, kde-format
+msgid "Text font:"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:411 src/app/propertiesdialog.cpp:564
+#: src/app/propertiesdialog.cpp:608
+#, kde-format
+msgid "Alignment:"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:421 src/app/sidebar.cpp:204
+#, kde-format
+msgid "Image"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:423
+#, kde-format
+msgid "Change Image…"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:430
+#, kde-format
+msgid "Keep proportions"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:431
+#, kde-format
+msgid "Stretch to fill"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:432
+#, kde-format
+msgid "Actual size"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:444
+#, kde-format
+msgid "Embedded in the label"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:445
+#, kde-format
+msgid ""
+"A picture file to show instead of the embedded one. It may use fields, such "
+"as /photos/{Serial}.png, for a picture per data row; a relative path is "
+"looked up next to the data file."
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:448
+#, kde-format
+msgid "Picture file:"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:449
+#, kde-format
+msgid "Scaling:"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:470
+#, kde-format
+msgid "Shape"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:471
+#, kde-format
+msgid "Horizontal line"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:472
+#, kde-format
+msgid "Vertical line"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:478
+#, kde-format
+msgid "Double arrow"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:480
+#, kde-format
+msgid "Other label software shows polygons, stars and arrows as a picture"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:496
+#, kde-format
+msgid "Fill"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:498 src/app/propertiesdialog.cpp:637
+#, kde-format
+msgid "Shape:"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:499
+#, kde-format
+msgid "Corners or points:"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:500
+#, kde-format
+msgid "Line width:"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:525
+#, kde-format
+msgid "Leading zeros"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:527
+#, kde-format
+msgid "Restart at Start Value"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:535
+#, kde-format
+msgid "Only on this label"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:536
+#, kde-format
+msgid ""
+"A file, on a network share say, that keeps the next value for every computer "
+"printing this label. It is locked while printing, so no two computers print "
+"the same number."
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:539
+#, kde-format
+msgid "Choose the file"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:542
+#, kde-format
+msgid "Shared Counter File"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:544
+#, kde-format
+msgid "Counter files (*.counter);;All files (*)"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:554 src/app/propertiesdialog.cpp:605
+#, kde-format
+msgid "Text before:"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:555 src/app/propertiesdialog.cpp:606
+#, kde-format
+msgid "Text after:"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:556
+#, kde-format
+msgid "Start value:"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:557
+#, kde-format
+msgid "Next value:"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:559
+#, kde-format
+msgid "Increment:"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:560
+#, kde-format
+msgid "Minimum digits:"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:562
+#, kde-format
+msgid "Shared with other computers:"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:587
+#, kde-format
+msgid "No date"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:590
+#, kde-format
+msgid "Include the time"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:592
+#, kde-format
+msgid "24-hour clock"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:595
+#, kde-format
+msgid "System language"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:596
+#, kde-format
+msgid ""
+"A language code such as nl-NL or en-US; empty uses the system's language."
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:601
+#, kde-format
+msgid "Format:"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:604
+#, kde-format
+msgid "Language:"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:622
+#, kde-format
+msgid "Arc, text on top"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:623
+#, kde-format
+msgid "Arc, text along the bottom"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:624
+#, kde-format
+msgid "Full circle"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:626
+#, kde-format
+msgid "Centred at the top"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:627
+#, kde-format
+msgid "Centred at the bottom"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:628
+#, kde-format
+msgid "From the start angle"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:638
+#, kde-format
+msgid "Circle position:"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:639
+#, kde-format
+msgid "Start angle:"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:640
+#, kde-format
+msgid "Arc alignment:"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:653
+#, kde-format
+msgid "When It Prints"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:655
+#, kde-format
+msgid "Always"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:656
+#, kde-format
+msgid "When a field is empty"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:657
+#, kde-format
+msgid "When a field has a value"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:658
+#, kde-format
+msgid "When a field is"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:659
+#, kde-format
+msgid "When a field is not"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:660
+#, kde-format
+msgid "When a field contains"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:661
+#, kde-format
+msgid "When a field is more than"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:662
+#, kde-format
+msgid "When a field is less than"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:664
+#, kde-format
+msgid ""
+"Left out of the print, and faded on the screen, when this does not hold for "
+"the label's data and answers"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:669
+#, kde-format
+msgid "A field: a data column, a question, or a calculated field"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:671
+#, kde-format
+msgid "Value, may use {fields}"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:682
+#, kde-format
+msgid "Prints:"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:684
+#, kde-format
+msgid "Where it is"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:684
+#, kde-format
+msgid "Right of"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:686
+#, kde-format
+msgid "Moves along when that object grows to fit its text"
+msgstr ""
+
+#: src/app/propertiesdialog.cpp:705
+#, kde-format
+msgid "Stays:"
+msgstr ""
+
+#: src/app/recentlayoutsmenu.cpp:41
+#, kde-format
+msgid "Labels you print appear here"
+msgstr ""
+
+#: src/app/recentlayoutsmenu.cpp:60
+#, kde-format
+msgctxt "layout name, when it was printed"
+msgid ""
+"%1\n"
+"Printed %2"
+msgstr ""
+
+#: src/app/recentlayoutsmenu.cpp:74
+#, kde-format
+msgid "Clear List"
+msgstr ""
+
+#: src/app/rolllayoutdialog.cpp:24
+#, kde-format
+msgid "Roll Layout"
+msgstr ""
+
+#: src/app/rolllayoutdialog.cpp:26
+#, kde-format
+msgid ""
+"Rolls with several labels side by side print a row at a time, with the next "
+"labels (data rows, copies, counters going on) next to each other. A "
+"continuous roll has no gaps: each label takes the length set here."
+msgstr ""
+
+#: src/app/rolllayoutdialog.cpp:33
+#, kde-format
+msgid ""
+"The chosen printer prints one die-cut label at a time. Labels across and "
+"continuous rolls need a printer that takes any label size, such as an Altec "
+"ATP or a Zebra."
+msgstr ""
+
+#: src/app/rolllayoutdialog.cpp:50
+#, kde-format
+msgid ""
+"From the right edge of one label to the left edge of the next, on the roll"
+msgstr ""
+
+#: src/app/rolllayoutdialog.cpp:51
+#, kde-format
+msgid "Continuous roll, without gaps between labels"
+msgstr ""
+
+#: src/app/rolllayoutdialog.cpp:61
+#, kde-format
+msgid "Labels across:"
+msgstr ""
+
+#: src/app/rolllayoutdialog.cpp:62
+#, kde-format
+msgid "Gap between them:"
+msgstr ""
+
+#: src/app/rolllayoutdialog.cpp:64
+#, kde-format
+msgid "Label length:"
+msgstr ""
+
+#: src/app/rolllayoutdialog.cpp:84
+#, kde-format
+msgid "Printed %1 mm wide and %2 mm long per row."
+msgstr ""
+
+#: src/app/rulerwidget.cpp:48
+#, kde-format
+msgid ""
+"Drag onto the label for a guideline; drag a guideline back here to remove it"
+msgstr ""
+
+#: src/app/settingsdialog.cpp:75
+#, kde-format
+msgid "Set by your administrator"
+msgstr ""
+
+#: src/app/settingsdialog.cpp:84
+#, kde-format
+msgid "Configure Plasma Label Creator"
+msgstr ""
+
+#: src/app/settingsdialog.cpp:89
+#, kde-format
+msgid "Designing"
+msgstr ""
+
+#: src/app/settingsdialog.cpp:89
+#, kde-format
+msgid "New objects and moving them"
+msgstr ""
+
+#: src/app/settingsdialog.cpp:95
+#, kde-format
+msgid "Font for new text:"
+msgstr ""
+
+#: src/app/settingsdialog.cpp:97
+#, kde-format
+msgid "Arrow keys move by:"
+msgstr ""
+
+#: src/app/settingsdialog.cpp:99
+#, kde-format
+msgid "With Shift:"
+msgstr ""
+
+#: src/app/settingsdialog.cpp:101
+#, kde-format
+msgid "Turning with Shift held, and Turn Left / Turn Right"
+msgstr ""
+
+#: src/app/settingsdialog.cpp:102
+#, kde-format
+msgid "Turn in steps of:"
+msgstr ""
+
+#: src/app/settingsdialog.cpp:105
+#, kde-format
+msgctxt "tape width"
+msgid "%1 mm"
+msgstr ""
+
+#: src/app/settingsdialog.cpp:107
+#, kde-format
+msgid "Tape to start with:"
+msgstr ""
+
+#: src/app/settingsdialog.cpp:109
+#, kde-format
+msgid "Millimetres"
+msgstr ""
+
+#: src/app/settingsdialog.cpp:110
+#, kde-format
+msgid "Inches"
+msgstr ""
+
+#: src/app/settingsdialog.cpp:111
+#, kde-format
+msgid "Rulers in:"
+msgstr ""
+
+#: src/app/settingsdialog.cpp:113
+#, kde-format
+msgid "Printing"
+msgstr ""
+
+#: src/app/settingsdialog.cpp:113
+#, kde-format
+msgid "Printers, copies and rolls"
+msgstr ""
+
+#: src/app/settingsdialog.cpp:114
+#, kde-format
+msgid "Ask network label printers how they are"
+msgstr ""
+
+#: src/app/settingsdialog.cpp:115
+#, kde-format
+msgid ""
+"Altec and Zebra printers on the network: labels loaded, paper out, head "
+"open, paused"
+msgstr ""
+
+#: src/app/settingsdialog.cpp:117 src/app/settingsdialog.cpp:129
+#, kde-format
+msgctxt "seconds"
+msgid " s"
+msgstr ""
+
+#: src/app/settingsdialog.cpp:118
+#, kde-format
+msgid "Ask again every:"
+msgstr ""
+
+#: src/app/settingsdialog.cpp:120
+#, kde-format
+msgid "Warn before printing when the printer is not ready"
+msgstr ""
+
+#: src/app/settingsdialog.cpp:123
+#, kde-format
+msgid "Copies to start with:"
+msgstr ""
+
+#: src/app/settingsdialog.cpp:125
+#, kde-format
+msgid "Altec does not give it: measure a roll with labels across"
+msgstr ""
+
+#: src/app/settingsdialog.cpp:126
+#, kde-format
+msgid "Gap between Altec labels across:"
+msgstr ""
+
+#: src/app/settingsdialog.cpp:128
+#, kde-format
+msgid "Continuous rolls start at:"
+msgstr ""
+
+#: src/app/settingsdialog.cpp:130
+#, kde-format
+msgid ""
+"How long to wait while another computer prints with the same shared counter"
+msgstr ""
+
+#: src/app/settingsdialog.cpp:131
+#, kde-format
+msgid "Wait for a shared counter:"
+msgstr ""
+
+#: src/app/settingsdialog.cpp:133
+#, kde-format
+msgid "For people who only print"
+msgstr ""
+
+#: src/app/settingsdialog.cpp:135
+#, kde-format
+msgid "The folder used last"
+msgstr ""
+
+#: src/app/settingsdialog.cpp:137
+#, kde-format
+msgid "Choose the folder"
+msgstr ""
+
+#: src/app/settingsdialog.cpp:147
+#, kde-format
+msgid "Labels from:"
+msgstr ""
+
+#: src/app/settingsdialog.cpp:150
+#, kde-format
+msgid "Always start in print-only mode, with no way back to designing"
+msgstr ""
+
+#: src/app/settingsdialog.cpp:152
+#, kde-format
+msgid ""
+"To keep people from changing these settings too, an administrator can fix "
+"them with KDE's Kiosk (LockPrintOnly[$i]=true in the [Settings] group of "
+"plasma-label-creatorrc)."
+msgstr ""
+
+#: src/app/settingsdialog.cpp:155
+#, kde-format
+msgid "History"
+msgstr ""
+
+#: src/app/settingsdialog.cpp:155
+#, kde-format
+msgid "Versions, print history and recent layouts"
+msgstr ""
+
+#: src/app/settingsdialog.cpp:157
+#, kde-format
+msgctxt "no versions kept"
+msgid "None"
+msgstr ""
+
+#: src/app/settingsdialog.cpp:158
+#, kde-format
+msgid "Versions kept per label:"
+msgstr ""
+
+#: src/app/settingsdialog.cpp:159
+#, kde-format
+msgid "Next to the label, in a .versions folder"
+msgstr ""
+
+#: src/app/settingsdialog.cpp:160
+#, kde-format
+msgid ""
+"They then go along with the label, also on a network share, for everyone who "
+"opens it there"
+msgstr ""
+
+#: src/app/settingsdialog.cpp:163
+#, kde-format
+msgctxt "no print history"
+msgid "None"
+msgstr ""
+
+#: src/app/settingsdialog.cpp:164
+#, kde-format
+msgid "Prints kept in the history:"
+msgstr ""
+
+#: src/app/settingsdialog.cpp:166
+#, kde-format
+msgid "Recently used layouts kept:"
+msgstr ""
+
+#: src/app/settingsdialog.cpp:173
+#, kde-format
+msgid "Automation"
+msgstr ""
+
+#: src/app/settingsdialog.cpp:174
+#, kde-format
+msgid "Printing for other programs, without anyone at the screen"
+msgstr ""
+
+#: src/app/settingsdialog.cpp:178
+#, kde-format
+msgid "Add-ons"
+msgstr ""
+
+#: src/app/settingsdialog.cpp:178
+#, kde-format
+msgid "Extra features from add-ons installed on this computer"
+msgstr ""
+
+#: src/app/settingsdialog.cpp:188
+#, kde-format
+msgid "No add-ons are installed. Plasma Label Creator needs none."
+msgstr ""
+
+#: src/app/settingsdialog.cpp:189
+#, kde-format
+msgid ""
+"Switching an add-on on or off takes effect when Plasma Label Creator starts "
+"again."
+msgstr ""
+
+#: src/app/settingsdialog.cpp:225
+#, kde-format
+msgid ""
+"The automation settings could not be saved:\n"
+"%1"
+msgstr ""
+
+#: src/app/sidebar.cpp:115
+#, kde-format
+msgctxt "label name, width x height"
+msgid "%1 (%2 × %3 mm)"
+msgstr ""
+
+#: src/app/sidebar.cpp:133
+#, kde-format
+msgid "Search label types…"
+msgstr ""
+
+#: src/app/sidebar.cpp:168
+#, kde-format
+msgid "Edit This Label Size…"
+msgstr ""
+
+#: src/app/sidebar.cpp:171
+#, kde-format
+msgid "Remove This Label Size"
+msgstr ""
+
+#: src/app/sidebar.cpp:199
+#, kde-format
+msgid "Smart text box for addresses"
+msgstr ""
+
+#: src/app/sidebar.cpp:200
+#, kde-format
+msgid "Text box for static text"
+msgstr ""
+
+#: src/app/sidebar.cpp:201
+#, kde-format
+msgid "Automatic counter"
+msgstr ""
+
+#: src/app/sidebar.cpp:202
+#, kde-format
+msgid "Updates the date and time automatically"
+msgstr ""
+
+#: src/app/sidebar.cpp:203
+#, kde-format
+msgid "Range of barcode types"
+msgstr ""
+
+#: src/app/sidebar.cpp:204
+#, kde-format
+msgid "Picture from your files"
+msgstr ""
+
+#: src/app/sidebar.cpp:205
+#, kde-format
+msgid "Box with an outline and fill"
+msgstr ""
+
+#: src/app/sidebar.cpp:206
+#, kde-format
+msgid "Oval or circle"
+msgstr ""
+
+#: src/app/sidebar.cpp:207
+#, kde-format
+msgid "Line across the label"
+msgstr ""
+
+#: src/app/sidebar.cpp:208
+#, kde-format
+msgid "Line from top to bottom"
+msgstr ""
+
+#: src/app/sidebar.cpp:209
+#, kde-format
+msgid "Shape with equal sides"
+msgstr ""
+
+#: src/app/sidebar.cpp:210
+#, kde-format
+msgid "Star with any number of points"
+msgstr ""
+
+#: src/app/sidebar.cpp:211
+#, kde-format
+msgid "Arrow, turned with the object"
+msgstr ""
+
+#: src/app/sidebar.cpp:212
+#, kde-format
+msgid "Text along an arc or circle"
+msgstr ""
+
+#: src/app/sidebar.cpp:219
+#, kde-format
+msgid "<b>Label Objects</b>"
+msgstr ""
+
+#: src/app/sidebar.cpp:231
+#, kde-format
+msgid "Insert"
+msgstr ""
+
+#: src/app/sidebar.cpp:234
+#, kde-format
+msgid "Address Book"
+msgstr ""
+
+#: src/app/sidebar.cpp:312
+#, kde-format
+msgid "Select a label printer below to see its label types."
+msgstr ""
+
+#: src/cli/main.cpp:81
+#, kde-format
+msgid "Renders a DYMO Label Software .label file to an image."
+msgstr ""
+
+#: src/cli/main.cpp:84
+#, kde-format
+msgid "Resolution of the image (default 300, the LabelWriter head)."
+msgstr ""
+
+#: src/cli/main.cpp:85
+#, kde-format
+msgid "Render as for the printer: no antialiasing, no outline."
+msgstr ""
+
+#: src/cli/main.cpp:86
+#, kde-format
+msgid ""
+"With --print or a PDF: draw the label's outline, a proof of how it will look."
+msgstr ""
+
+#: src/cli/main.cpp:87
+#, kde-format
+msgid "List the paper and the objects."
+msgstr ""
+
+#: src/cli/main.cpp:88
+#, kde-format
+msgid "Write the label back out to <file>, to check round trips."
+msgstr ""
+
+#: src/cli/main.cpp:89
+#, kde-format
+msgid "List the CUPS queues and their DYMO paper sizes."
+msgstr ""
+
+#: src/cli/main.cpp:90
+#, kde-format
+msgid "Print the label on CUPS queue <printer>."
+msgstr ""
+
+#: src/cli/main.cpp:91
+#, kde-format
+msgid "Number of copies to print (default 1)."
+msgstr ""
+
+#: src/cli/main.cpp:92
+#, kde-format
+msgid "DYMO print quality: Text or Graphics."
+msgstr ""
+
+#: src/cli/main.cpp:93
+#, kde-format
+msgid "DYMO print density: Light, Medium, Normal or Dark."
+msgstr ""
+
+#: src/cli/main.cpp:94
+#, kde-format
+msgid "Extra print offset in mm, x,y (right and down positive)."
+msgstr ""
+
+#: src/cli/main.cpp:95
+#, kde-format
+msgid "Do not move the label up by the driver's top margin."
+msgstr ""
+
+#: src/cli/main.cpp:96
+#, kde-format
+msgid "Write the 1-bit image that would be printed to <file>."
+msgstr ""
+
+#: src/cli/main.cpp:97
+#, kde-format
+msgid "The CUPS queue whose driver --paper-image uses, without printing."
+msgstr ""
+
+#: src/cli/main.cpp:99
+#, kde-format
+msgid ""
+"Ask the ZPL label printer at <host[:port]> what it is and which labels are "
+"in it (prints nothing)."
+msgstr ""
+
+#: src/cli/main.cpp:116
+#, kde-format
+msgid "The .label file."
+msgstr ""
+
+#: src/cli/main.cpp:117
+#, kde-format
+msgid "The image to write, for example label.png, or label.pdf for a PDF."
+msgstr ""
+
+#: src/cli/main.cpp:178
+#, kde-format
+msgid "Invalid --dpi value"
+msgstr ""
+
+#: src/cli/main.cpp:198 src/cli/main.cpp:243 src/cli/main.cpp:264
+#: src/cli/main.cpp:284 src/cli/main.cpp:291
+#, kde-format
+msgid "warning: %1"
+msgstr ""
+
+#: src/cli/main.cpp:237 src/lib/labelprinter.cpp:687
+#, kde-format
+msgid "%1 has no paper size for \"%2\""
+msgstr ""
+
+#: src/cli/main.cpp:247 src/cli/main.cpp:294
+#, kde-format
+msgid "%1: could not write the image"
+msgstr ""
+
+#: src/cli/main.cpp:270
+#, kde-format
+msgid "Sent to %1 as job %2"
+msgstr ""
+
+#: src/cli/main.cpp:280
+#, kde-format
+msgid "%1: could not write the PDF"
+msgstr ""
+
+#: src/lib/addressbook.cpp:175
+#, kde-format
+msgid "Not a DYMO address book"
+msgstr ""
+
+#: src/lib/automation.cpp:84
+#, kde-format
+msgid "\"%1\" is not an object of field names and values."
+msgstr ""
+
+#: src/lib/automation.cpp:90
+#, kde-format
+msgid "\"%1\": the value of %2 is not a text, number or true/false."
+msgstr ""
+
+#: src/lib/automation.cpp:248
+#, kde-format
+msgid "Could not create the folder for %1."
+msgstr ""
+
+#: src/lib/automation.cpp:275
+#, kde-format
+msgid "Not JSON: %1."
+msgstr ""
+
+#: src/lib/automation.cpp:275
+#, kde-format
+msgid "Not a JSON object."
+msgstr ""
+
+#: src/lib/automation.cpp:283
+#, kde-format
+msgid "\"%1\" is not a text."
+msgstr ""
+
+#: src/lib/automation.cpp:292
+#, kde-format
+msgid "\"copies\" is not a whole number from 1 to %1."
+msgstr ""
+
+#: src/lib/automation.cpp:305
+#, kde-format
+msgid "\"rows\" is not a list of rows."
+msgstr ""
+
+#: src/lib/automation.cpp:310
+#, kde-format
+msgid "More than %1 rows in one job."
+msgstr ""
+
+#: src/lib/automation.cpp:323
+#, kde-format
+msgid "\"printAnyway\" is not true or false."
+msgstr ""
+
+#: src/lib/automation.cpp:493
+#, kde-format
+msgid "this label is %1 mm long, but the labels in %2 are %3 mm long"
+msgstr ""
+
+#: src/lib/automation.cpp:547 src/lib/fields.cpp:440
+#, kde-format
+msgid "%1: not a number."
+msgstr ""
+
+#: src/lib/automation.cpp:565
+#, kde-format
+msgid "%1: not a date (%2, or yyyy-MM-dd)."
+msgstr ""
+
+#: src/lib/automation.cpp:586
+#, kde-format
+msgid "%1: true or false, or \"%2\" or \"%3\"."
+msgstr ""
+
+#: src/lib/automation.cpp:650
+#, kde-format
+msgid ""
+"No printer: name one, or choose a default printer in the automation settings."
+msgstr ""
+
+#: src/lib/automation.cpp:657
+#, kde-format
+msgid "There is no printer called %1."
+msgstr ""
+
+#: src/lib/automation.cpp:664
+#, kde-format
+msgid ""
+"%1 is not set up as a label printer: choose which LabelWriter it is in "
+"Plasma Label Creator's print bar first."
+msgstr ""
+
+#: src/lib/automation.cpp:672
+#, kde-format
+msgid "%1 cannot print this label: a %2 is not one of its label types."
+msgstr ""
+
+#: src/lib/automation.cpp:683
+#, kde-format
+msgid "%1 did not answer about its labels: %2"
+msgstr ""
+
+#: src/lib/automation.cpp:688
+#, kde-format
+msgid ""
+"%1 reports: %2. Ask with printAnyway to print anyway: the labels then wait "
+"in the queue."
+msgstr ""
+
+#: src/lib/automation.cpp:765
+#, kde-format
+msgid "The next counter value could not be saved: %1"
+msgstr ""
+
+#: src/lib/automation.cpp:789
+#, kde-format
+msgid "The print history could not be written: %1"
+msgstr ""
+
+#: src/lib/automation.cpp:795
+#, kde-format
+msgid "The counters could not be saved in the label: %1"
+msgstr ""
+
+#: src/lib/barcode.cpp:334
+#, kde-format
+msgid "Lowercase letters cannot be encoded in Code 39"
+msgstr ""
+
+#: src/lib/barcode.cpp:335
+#, kde-format
+msgid "Invalid character at position %1 for Code 39"
+msgstr ""
+
+#: src/lib/barcode.cpp:345
+#, kde-format
+msgid "No data to encode"
+msgstr ""
+
+#: src/lib/clipartlibrary.cpp:47
+#, kde-format
+msgid "My Clip Art"
+msgstr ""
+
+#: src/lib/clipartlibrary.cpp:251
+#, kde-format
+msgid "Not a clip art catalogue"
+msgstr ""
+
+#: src/lib/clipartlibrary.cpp:359
+#, kde-format
+msgid ""
+"%1 contains no DYMO Label clip art; choose DYMO.DLS.dll from the DYMO Label "
+"Software folder."
+msgstr ""
+
+#: src/lib/clipartlibrary.cpp:452
+#, kde-format
+msgid "Could not read the image %1"
+msgstr ""
+
+#: src/lib/clipartlibrary.cpp:481 src/lib/recentlayouts.cpp:112
+#, kde-format
+msgid "Could not create %1"
+msgstr ""
+
+#: src/lib/datatable.cpp:164
+#, kde-format
+msgid "A quoted field is not closed."
+msgstr ""
+
+#: src/lib/fields.cpp:424
+#, kde-format
+msgid "%1: an answer is needed."
+msgstr ""
+
+#: src/lib/fields.cpp:433
+#, kde-format
+msgid "%1: not one of the choices."
+msgstr ""
+
+#: src/lib/fields.cpp:452
+#, kde-format
+msgid "%1: at least %2 characters."
+msgstr ""
+
+#: src/lib/fields.cpp:455
+#, kde-format
+msgid "%1: at most %2 characters."
+msgstr ""
+
+#: src/lib/fields.cpp:467
+#, kde-format
+msgid "%1: digits only."
+msgstr ""
+
+#: src/lib/fields.cpp:474
+#, kde-format
+msgid "%1: letters only."
+msgstr ""
+
+#: src/lib/fields.cpp:481
+#, kde-format
+msgid "%1: letters and digits only."
+msgstr ""
+
+#: src/lib/fields.cpp:487
+#, kde-format
+msgid "%1: the question's pattern is not valid (%2)."
+msgstr ""
+
+#: src/lib/fields.cpp:490
+#, kde-format
+msgid "%1: not in the expected form."
+msgstr ""
+
+#: src/lib/gs1.cpp:53
+#, kde-format
+msgid "Batch or lot number"
+msgstr ""
+
+#: src/lib/gs1.cpp:54
+#, kde-format
+msgid "Expiration date"
+msgstr ""
+
+#: src/lib/gs1.cpp:55
+#, kde-format
+msgid "Best before date"
+msgstr ""
+
+#: src/lib/gs1.cpp:56
+#, kde-format
+msgid "Serial number"
+msgstr ""
+
+#: src/lib/gs1.cpp:58
+#, kde-format
+msgid "GTIN of contained trade items"
+msgstr ""
+
+#: src/lib/gs1.cpp:59
+#, kde-format
+msgid "Production date"
+msgstr ""
+
+#: src/lib/gs1.cpp:60
+#, kde-format
+msgid "Due date"
+msgstr ""
+
+#: src/lib/gs1.cpp:61
+#, kde-format
+msgid "Packaging date"
+msgstr ""
+
+#: src/lib/gs1.cpp:62
+#, kde-format
+msgid "Sell by date"
+msgstr ""
+
+#: src/lib/gs1.cpp:63
+#, kde-format
+msgid "Internal product variant"
+msgstr ""
+
+#: src/lib/gs1.cpp:64
+#, kde-format
+msgid "Consumer product variant"
+msgstr ""
+
+#: src/lib/gs1.cpp:65
+#, kde-format
+msgid "Additional product identification"
+msgstr ""
+
+#: src/lib/gs1.cpp:66
+#, kde-format
+msgid "Customer part number"
+msgstr ""
+
+#: src/lib/gs1.cpp:67
+#, kde-format
+msgid "Secondary serial number"
+msgstr ""
+
+#: src/lib/gs1.cpp:68
+#, kde-format
+msgid "Variable count of items"
+msgstr ""
+
+#: src/lib/gs1.cpp:69
+#, kde-format
+msgid "Count of trade items"
+msgstr ""
+
+#: src/lib/gs1.cpp:70
+#, kde-format
+msgid "Customer's purchase order number"
+msgstr ""
+
+#: src/lib/gs1.cpp:71
+#, kde-format
+msgid "Global Identification Number for Consignment"
+msgstr ""
+
+#: src/lib/gs1.cpp:72
+#, kde-format
+msgid "Global Shipment Identification Number"
+msgstr ""
+
+#: src/lib/gs1.cpp:73
+#, kde-format
+msgid "Ship to / deliver to GLN"
+msgstr ""
+
+#: src/lib/gs1.cpp:74
+#, kde-format
+msgid "Bill to / invoice to GLN"
+msgstr ""
+
+#: src/lib/gs1.cpp:75
+#, kde-format
+msgid "Purchased from GLN"
+msgstr ""
+
+#: src/lib/gs1.cpp:76
+#, kde-format
+msgid "Ship for / deliver for / forward to GLN"
+msgstr ""
+
+#: src/lib/gs1.cpp:77
+#, kde-format
+msgid "Identification of a physical location (GLN)"
+msgstr ""
+
+#: src/lib/gs1.cpp:78
+#, kde-format
+msgid "Ship to / deliver to postal code"
+msgstr ""
+
+#: src/lib/gs1.cpp:79
+#, kde-format
+msgid "Country of origin (ISO 3166 code)"
+msgstr ""
+
+#: src/lib/gs1.cpp:80
+#, kde-format
+msgid "Global Individual Asset Identifier"
+msgstr ""
+
+#: src/lib/gs1.cpp:81
+#, kde-format
+msgid "Information agreed between trading partners"
+msgstr ""
+
+#: src/lib/gs1.cpp:83
+#, kde-format
+msgid "Ship to postal code with ISO country code"
+msgstr ""
+
+#: src/lib/gs1.cpp:87
+#, kde-format
+msgid "Expiration date and time"
+msgstr ""
+
+#: src/lib/gs1.cpp:91
+#, kde-format
+msgid "Net weight, kilograms"
+msgstr ""
+
+#: src/lib/gs1.cpp:92
+#, kde-format
+msgid "Gross weight, kilograms"
+msgstr ""
+
+#: src/lib/gs1.cpp:93
+#, kde-format
+msgid "Length, metres"
+msgstr ""
+
+#: src/lib/gs1.cpp:94
+#, kde-format
+msgid "Width, metres"
+msgstr ""
+
+#: src/lib/gs1.cpp:95
+#, kde-format
+msgid "Height, metres"
+msgstr ""
+
+#: src/lib/gs1.cpp:96
+#, kde-format
+msgid "Net volume, litres"
+msgstr ""
+
+#: src/lib/gs1.cpp:99
+#, kde-format
+msgctxt "@item GS1 measure, such as Net weight, kilograms"
+msgid "%2 (%1 decimal)"
+msgid_plural "%2 (%1 decimals)"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/lib/gs1.cpp:103
+#, kde-format
+msgid "Company internal information"
+msgstr ""
+
+#: src/lib/gs1.cpp:150
+#, kde-format
+msgctxt "@info appended to a GS1 value's form, such as N13"
+msgid ", with check digit"
+msgstr ""
+
+#: src/lib/gs1.cpp:225
+#, kde-format
+msgid "(%1) is not an application identifier."
+msgstr ""
+
+#: src/lib/gs1.cpp:228
+#, kde-format
+msgid "(%1) needs a value of GS1 characters."
+msgstr ""
+
+#: src/lib/gs1.cpp:237
+#, kde-format
+msgid "(%1) %2 takes digits only."
+msgstr ""
+
+#: src/lib/gs1.cpp:240
+#, kde-format
+msgid "(%1) %2 starts with %3 digits."
+msgstr ""
+
+#: src/lib/gs1.cpp:243
+#, kde-format
+msgid ""
+"(%1) %2 has characters GS1 does not allow (letters, digits and !"
+"\"%&'()*+,-./:;<=>?_ only)."
+msgstr ""
+
+#: src/lib/gs1.cpp:246
+#, kde-format
+msgid "(%1) %2 is not a date written YYMMDD."
+msgstr ""
+
+#: src/lib/gs1.cpp:249
+#, kde-format
+msgid "(%1) %2 is not written YYMMDDHHMM."
+msgstr ""
+
+#: src/lib/gs1.cpp:252
+#, kde-format
+msgid "(%1) %2: the check digit should be %3."
+msgstr ""
+
+#: src/lib/labelformat.cpp:613
+#, kde-format
+msgid "Ignoring this program's settings in the file: %1"
+msgstr ""
+
+#: src/lib/labelformat.cpp:844
+#, kde-format
+msgid "Unknown %1 \"%2\", using the default"
+msgstr ""
+
+#: src/lib/labelformat.cpp:850
+#, kde-format
+msgid "Ignoring <%1> in <%2>"
+msgstr ""
+
+#: src/lib/labelformat.cpp:857
+#, kde-format
+msgid "The file is empty"
+msgstr ""
+
+#: src/lib/labelformat.cpp:864
+#, kde-format
+msgid "Not a DYMO label file: unexpected <%1>"
+msgstr ""
+
+#: src/lib/labelformat.cpp:869 src/lib/labelformat.cpp:944
+#, kde-format
+msgid "Unsupported units \"%1\""
+msgstr ""
+
+#: src/lib/labelformat.cpp:903
+#, kde-format
+msgid "The label has no paper outline (DrawCommands)"
+msgstr ""
+
+#: src/lib/labelformat.cpp:932
+#, kde-format
+msgid "Keeping unsupported <%1> as is; it is not drawn"
+msgstr ""
+
+#: src/lib/labelformat.cpp:978
+#, kde-format
+msgid "Unknown tape \"%1\", using 12 mm"
+msgstr ""
+
+#: src/lib/labelformat.cpp:1044
+#, kde-format
+msgid "Skipping an empty <ObjectInfo>"
+msgstr ""
+
+#: src/lib/labelkinds.cpp:296
+#, kde-format
+msgid "Not a DYMO Rhino template"
+msgstr ""
+
+#: src/lib/labelkinds.cpp:301
+#, kde-format
+msgid "Not a DYMO Rhino template: it has no LabelTemplate"
+msgstr ""
+
+#: src/lib/labelkinds.cpp:344
+#, kde-format
+msgid "DYMO Rhino templates of the kind \"%1\" are not supported"
+msgstr ""
+
+#: src/lib/labelprinter.cpp:285
+#, kde-format
+msgid "The queue is paused"
+msgstr ""
+
+#: src/lib/labelprinter.cpp:288
+#, kde-format
+msgid "The queue does not take jobs"
+msgstr ""
+
+#: src/lib/labelprinter.cpp:292
+#, kde-format
+msgid "The printer is offline"
+msgstr ""
+
+#: src/lib/labelprinter.cpp:293 src/lib/labelprinter.cpp:294
+#, kde-format
+msgid "Out of labels"
+msgstr ""
+
+#: src/lib/labelprinter.cpp:295
+#, kde-format
+msgid "Labels are jammed"
+msgstr ""
+
+#: src/lib/labelprinter.cpp:296 src/lib/labelprinter.cpp:297
+#, kde-format
+msgid "The cover is open"
+msgstr ""
+
+#: src/lib/labelprinter.cpp:298
+#, kde-format
+msgid "Out of ribbon"
+msgstr ""
+
+#: src/lib/labelprinter.cpp:299
+#, kde-format
+msgid "The printer is paused"
+msgstr ""
+
+#: src/lib/labelprinter.cpp:370
+#, kde-format
+msgid "Could not get the driver of %1: %2"
+msgstr ""
+
+#: src/lib/labelprinter.cpp:376
+#, kde-format
+msgid "Could not read the driver of %1"
+msgstr ""
+
+#: src/lib/labelprinter.cpp:470
+#, kde-format
+msgid "%1 mm tape"
+msgstr ""
+
+#: src/lib/labelprinter.cpp:665
+#, kde-format
+msgid "Could not write the print data: %1"
+msgstr ""
+
+#: src/lib/labelprinter.cpp:788 src/lib/labelprinter.cpp:921
+#, kde-format
+msgid "Could not create a temporary file for the print job"
+msgstr ""
+
+#: src/lib/labelprinter.cpp:840 src/lib/labelprinter.cpp:939
+#, kde-format
+msgid "Printing on %1 failed: %2"
+msgstr ""
+
+#: src/lib/labelprinter.cpp:862
+#, kde-format
+msgid "Could not get the driver %1: %2"
+msgstr ""
+
+#: src/lib/labelprinter.cpp:869
+#, kde-format
+msgid ""
+"The LabelWriter 550 series cannot print through this queue. Its DYMO driver "
+"reads the printer's status before every label, which only works when the "
+"printer is set up in CUPS with that driver itself, over USB or the network, "
+"not through a raw or shared queue"
+msgstr ""
+
+#: src/lib/labelprinter.cpp:876
+#, kde-format
+msgid "The DYMO printer driver (%1) is not installed on this computer"
+msgstr ""
+
+#: src/lib/labelprinter.cpp:911
+#, kde-format
+msgid "The DYMO driver could not convert the label. %1"
+msgstr ""
+
+#: src/lib/labelrenderer.cpp:1032
+#, kde-format
+msgid "%1: barcode type \"%2\" is not supported"
+msgstr ""
+
+#: src/lib/labelrenderer.cpp:1167
+#, kde-format
+msgid "%1: the image could not be loaded"
+msgstr ""
+
+#: src/lib/labelversions.cpp:77 src/lib/printhistory.cpp:113
+#, kde-format
+msgid "Could not make %1"
+msgstr ""
+
+#: src/lib/labelversions.cpp:86
+#, kde-format
+msgid "Could not keep a version of %1: %2"
+msgstr ""
+
+#: src/lib/printhistory.cpp:122
+#, kde-format
+msgid "Could not keep the printed label: %1"
+msgstr ""
+
+#: src/lib/printhistory.cpp:129
+#, kde-format
+msgid "Could not write the print history: %1"
+msgstr ""
+
+#: src/lib/printrun.cpp:42
+#, kde-format
+msgid "Save the label first: the label %1 is looked for next to it."
+msgstr ""
+
+#: src/lib/printrun.cpp:43
+#, kde-format
+msgid "There is no label %1 next to this one."
+msgstr ""
+
+#: src/lib/printrun.cpp:63
+#, kde-format
+msgid "%1 is for %2 labels, this one for %3: one run prints on one label type."
+msgstr ""
+
+#: src/lib/printrun.cpp:165
+#, kde-format
+msgid "Row %1: \"%2\" in %3 is not a number of copies."
+msgstr ""
+
+#: src/lib/printrun.cpp:179
+#, kde-format
+msgid "Row %1: %2"
+msgstr ""
+
+#: src/lib/printrun.cpp:194
+#, kde-format
+msgid "Nothing to print: every row asks for no copies."
+msgstr ""
+
+#: src/lib/printrun.cpp:223
+#, kde-format
+msgid "Header label: %1"
+msgstr ""
+
+#: src/lib/printrun.cpp:223
+#, kde-format
+msgid "Trailer label: %1"
+msgstr ""
+
+#: src/lib/sharedcounter.cpp:33
+#, kde-format
+msgid "%1 is in use by another computer printing this label."
+msgstr ""
+
+#: src/lib/sharedcounter.cpp:36
+#, kde-format
+msgid "No permission to lock %1."
+msgstr ""
+
+#: src/lib/sharedcounter.cpp:39
+#, kde-format
+msgid "Could not lock %1."
+msgstr ""
+
+#: src/lib/sharedcounter.cpp:57
+#, kde-format
+msgid "Could not read %1: %2"
+msgstr ""
+
+#: src/lib/sharedcounter.cpp:63
+#, kde-format
+msgid "%1 does not hold a number."
+msgstr ""
+
+#: src/lib/sharedcounter.cpp:74
+#, kde-format
+msgid "Could not write %1: %2"
+msgstr ""
+
+#: src/lib/zplprinter.cpp:89
+#, kde-format
+msgctxt "@info ZPL printer problem"
+msgid "head open"
+msgstr ""
+
+#: src/lib/zplprinter.cpp:92
+#, kde-format
+msgctxt "@info ZPL printer problem"
+msgid "out of labels"
+msgstr ""
+
+#: src/lib/zplprinter.cpp:95
+#, kde-format
+msgctxt "@info ZPL printer problem"
+msgid "out of ribbon"
+msgstr ""
+
+#: src/lib/zplprinter.cpp:213
+#, kde-format
+msgid "Could not reach %1:%2: %3"
+msgstr ""
+
+#: src/lib/zplprinter.cpp:236
+#, kde-format
+msgid "%1 did not answer as a ZPL printer"
+msgstr ""
+
+#: src/service/automationservice.cpp:186 src/service/httpapi.cpp:183
+#, kde-format
+msgid "No labels folder is set in the automation settings."
+msgstr ""
+
+#: src/service/automationservice.cpp:187
+#, kde-format
+msgid "There is no label %1 in the labels folder."
+msgstr ""
+
+#: src/service/automationservice.cpp:192
+#, kde-format
+msgid "No label: name one."
+msgstr ""
+
+#: src/service/automationservice.cpp:234
+#, kde-format
+msgid "Folder: %1"
+msgstr ""
+
+#: src/service/automationservice.cpp:247
+#, kde-format
+msgid "The file is too large for a print job."
+msgstr ""
+
+#: src/service/automationservice.cpp:271
+#, kde-format
+msgid "The file has no rows below its column names."
+msgstr ""
+
+#: src/service/httpapi.cpp:77
+#, kde-format
+msgid "A valid token is needed: Authorization: Bearer <token>."
+msgstr ""
+
+#: src/service/httpapi.cpp:99
+#, kde-format
+msgid ""
+"No such request: see GET /v1/status, /v1/printers, /v1/labels and POST /v1/"
+"print."
+msgstr ""
+
+#: src/service/httpapi.cpp:114
+#, kde-format
+msgid ""
+"no token is set (Settings > Automation in Plasma Label Creator makes one)."
+msgstr ""
+
+#: src/service/httpapi.cpp:125
+#, kde-format
+msgid "could not take requests on port %1."
+msgstr ""
+
+#: src/service/httpapi.cpp:219
+#, kde-format
+msgid "Send the request as JSON (Content-Type: application/json)."
+msgstr ""
+
+#: src/service/httpapi.cpp:222
+#, kde-format
+msgid "The request is too large."
+msgstr ""
+
+#: src/service/httpapi.cpp:229
+#, kde-format
+msgid "HTTP from %1"
+msgstr ""
+
+#: src/service/main.cpp:49
+#, kde-format
+msgid ""
+"Prints labels for jobs dropped in watched folders and, when built with Qt "
+"HTTP Server, for requests over HTTP. Set it up in Plasma Label Creator: "
+"Settings > Configure Plasma Label Creator > Automation."
+msgstr ""
+
+#: src/service/main.cpp:53
+#, kde-format
+msgid "The settings file (default %1)."
+msgstr ""
+
+#: src/service/main.cpp:54
+#, kde-format
+msgid "Show what this build can do and exit."
+msgstr ""
+
+#: src/service/main.cpp:69
+#, kde-format
+msgid "The automation service is already running (process %1)."
+msgstr ""

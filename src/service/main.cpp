@@ -6,6 +6,7 @@
 #include "automationservice.h"
 #include "labelcreator_version.h"
 
+#include <KLocalizedString>
 #include <QCommandLineParser>
 #include <QGuiApplication>
 #include <QLockFile>
@@ -45,12 +46,12 @@ int main(int argc, char *argv[])
 
     QCommandLineParser parser;
     parser.setApplicationDescription(
-        u"Prints labels for jobs dropped in watched folders and, when built with Qt HTTP Server, for requests over HTTP. "
-        "Set it up in Plasma Label Creator: Settings > Configure Plasma Label Creator > Automation."_s);
+        i18n("Prints labels for jobs dropped in watched folders and, when built with Qt HTTP Server, for requests over HTTP. "
+        "Set it up in Plasma Label Creator: Settings > Configure Plasma Label Creator > Automation."));
     parser.addHelpOption();
     parser.addVersionOption();
-    const QCommandLineOption settingsOption(u"settings"_s, u"The settings file (default %1)."_s.arg(AutomationSettings::defaultFileName()), u"file"_s);
-    const QCommandLineOption featuresOption(u"features"_s, u"Show what this build can do and exit."_s);
+    const QCommandLineOption settingsOption(u"settings"_s, i18n("The settings file (default %1).", AutomationSettings::defaultFileName()), u"file"_s);
+    const QCommandLineOption featuresOption(u"features"_s, i18n("Show what this build can do and exit."));
     parser.addOptions({settingsOption, featuresOption});
     parser.process(app);
 
@@ -65,7 +66,7 @@ int main(int argc, char *argv[])
     if (!lock.tryLock(0)) {
         qint64 pid = 0;
         lock.getLockInfo(&pid, nullptr, nullptr);
-        fprintf(stderr, "The automation service is already running (process %lld).\n", qlonglong(pid));
+        fprintf(stderr, "%s\n", qPrintable(i18n("The automation service is already running (process %1).", QString::number(pid))));
         return 1;
     }
 

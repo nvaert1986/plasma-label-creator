@@ -5,6 +5,7 @@
 
 #include "gs1.h"
 
+#include <KLocalizedString>
 #include <QDate>
 #include <QRegularExpression>
 #include <QTime>
@@ -49,57 +50,57 @@ QList<Identifier> makeIdentifiers()
     // From the GS1 General Specifications: the ones labels use most.
     QList<Identifier> list = {
         fixedDigits(u"01"_s, u"GTIN"_s, 14, true),
-        text(u"10"_s, u"Batch or lot number"_s, 20),
-        date(u"17"_s, u"Expiration date"_s),
-        date(u"15"_s, u"Best before date"_s),
-        text(u"21"_s, u"Serial number"_s, 20),
+        text(u"10"_s, i18n("Batch or lot number"), 20),
+        date(u"17"_s, i18n("Expiration date")),
+        date(u"15"_s, i18n("Best before date")),
+        text(u"21"_s, i18n("Serial number"), 20),
         fixedDigits(u"00"_s, u"SSCC"_s, 18, true),
-        fixedDigits(u"02"_s, u"GTIN of contained trade items"_s, 14, true),
-        date(u"11"_s, u"Production date"_s),
-        date(u"12"_s, u"Due date"_s),
-        date(u"13"_s, u"Packaging date"_s),
-        date(u"16"_s, u"Sell by date"_s),
-        fixedDigits(u"20"_s, u"Internal product variant"_s, 2),
-        text(u"22"_s, u"Consumer product variant"_s, 20),
-        text(u"240"_s, u"Additional product identification"_s, 30),
-        text(u"241"_s, u"Customer part number"_s, 30),
-        text(u"250"_s, u"Secondary serial number"_s, 30),
-        digitsUpTo(u"30"_s, u"Variable count of items"_s, 8),
-        digitsUpTo(u"37"_s, u"Count of trade items"_s, 8),
-        text(u"400"_s, u"Customer's purchase order number"_s, 30),
-        text(u"401"_s, u"Global Identification Number for Consignment"_s, 30),
-        fixedDigits(u"402"_s, u"Global Shipment Identification Number"_s, 17, true),
-        fixedDigits(u"410"_s, u"Ship to / deliver to GLN"_s, 13, true),
-        fixedDigits(u"411"_s, u"Bill to / invoice to GLN"_s, 13, true),
-        fixedDigits(u"412"_s, u"Purchased from GLN"_s, 13, true),
-        fixedDigits(u"413"_s, u"Ship for / deliver for / forward to GLN"_s, 13, true),
-        fixedDigits(u"414"_s, u"Identification of a physical location (GLN)"_s, 13, true),
-        text(u"420"_s, u"Ship to / deliver to postal code"_s, 20),
-        fixedDigits(u"422"_s, u"Country of origin (ISO 3166 code)"_s, 3),
-        text(u"8004"_s, u"Global Individual Asset Identifier"_s, 30),
-        text(u"90"_s, u"Information agreed between trading partners"_s, 30),
+        fixedDigits(u"02"_s, i18n("GTIN of contained trade items"), 14, true),
+        date(u"11"_s, i18n("Production date")),
+        date(u"12"_s, i18n("Due date")),
+        date(u"13"_s, i18n("Packaging date")),
+        date(u"16"_s, i18n("Sell by date")),
+        fixedDigits(u"20"_s, i18n("Internal product variant"), 2),
+        text(u"22"_s, i18n("Consumer product variant"), 20),
+        text(u"240"_s, i18n("Additional product identification"), 30),
+        text(u"241"_s, i18n("Customer part number"), 30),
+        text(u"250"_s, i18n("Secondary serial number"), 30),
+        digitsUpTo(u"30"_s, i18n("Variable count of items"), 8),
+        digitsUpTo(u"37"_s, i18n("Count of trade items"), 8),
+        text(u"400"_s, i18n("Customer's purchase order number"), 30),
+        text(u"401"_s, i18n("Global Identification Number for Consignment"), 30),
+        fixedDigits(u"402"_s, i18n("Global Shipment Identification Number"), 17, true),
+        fixedDigits(u"410"_s, i18n("Ship to / deliver to GLN"), 13, true),
+        fixedDigits(u"411"_s, i18n("Bill to / invoice to GLN"), 13, true),
+        fixedDigits(u"412"_s, i18n("Purchased from GLN"), 13, true),
+        fixedDigits(u"413"_s, i18n("Ship for / deliver for / forward to GLN"), 13, true),
+        fixedDigits(u"414"_s, i18n("Identification of a physical location (GLN)"), 13, true),
+        text(u"420"_s, i18n("Ship to / deliver to postal code"), 20),
+        fixedDigits(u"422"_s, i18n("Country of origin (ISO 3166 code)"), 3),
+        text(u"8004"_s, i18n("Global Individual Asset Identifier"), 30),
+        text(u"90"_s, i18n("Information agreed between trading partners"), 30),
     };
-    Identifier postal = text(u"421"_s, u"Ship to postal code with ISO country code"_s, 12);
+    Identifier postal = text(u"421"_s, i18n("Ship to postal code with ISO country code"), 12);
     postal.minimumLength = 4;
     postal.numericPrefix = 3;
     list << postal;
-    Identifier expiryTime = fixedDigits(u"7003"_s, u"Expiration date and time"_s, 10);
+    Identifier expiryTime = fixedDigits(u"7003"_s, i18n("Expiration date and time"), 10);
     expiryTime.dateTime = true;
     list << expiryTime;
     // Measures with the decimal point's place in the AI's last digit.
-    const QList<std::pair<QString, QString>> measures = {{u"310"_s, u"Net weight, kilograms"_s},
-                                                         {u"330"_s, u"Gross weight, kilograms"_s},
-                                                         {u"311"_s, u"Length, metres"_s},
-                                                         {u"312"_s, u"Width, metres"_s},
-                                                         {u"313"_s, u"Height, metres"_s},
-                                                         {u"315"_s, u"Net volume, litres"_s}};
+    const QList<std::pair<QString, QString>> measures = {{u"310"_s, i18n("Net weight, kilograms")},
+                                                         {u"330"_s, i18n("Gross weight, kilograms")},
+                                                         {u"311"_s, i18n("Length, metres")},
+                                                         {u"312"_s, i18n("Width, metres")},
+                                                         {u"313"_s, i18n("Height, metres")},
+                                                         {u"315"_s, i18n("Net volume, litres")}};
     for (const auto &[base, title] : measures) {
         for (int decimals = 0; decimals <= 5; ++decimals) {
-            list << fixedDigits(base + QString::number(decimals), u"%1 (%2 decimals)"_s.arg(title).arg(decimals), 6);
+            list << fixedDigits(base + QString::number(decimals), i18ncp("@item GS1 measure, such as Net weight, kilograms", "%2 (%1 decimal)", "%2 (%1 decimals)", decimals, title), 6);
         }
     }
     for (int ai = 91; ai <= 99; ++ai) {
-        list << text(QString::number(ai), u"Company internal information"_s, 90);
+        list << text(QString::number(ai), i18n("Company internal information"), 90);
     }
     return list;
 }
@@ -146,7 +147,7 @@ QString Identifier::format() const
     } else if (dateTime) {
         result += u" (YYMMDDHHMM)"_s;
     } else if (checkDigit) {
-        result += u", with check digit"_s;
+        result += i18nc("@info appended to a GS1 value's form, such as N13", ", with check digit");
     }
     return result;
 }
@@ -221,10 +222,10 @@ std::optional<QString> problem(const Element &element)
     const std::optional<Identifier> known = identifier(element.ai);
     if (!known) {
         if (element.ai.size() < 2 || element.ai.size() > 4) {
-            return u"(%1) is not an application identifier."_s.arg(element.ai);
+            return i18n("(%1) is not an application identifier.", element.ai);
         }
         return isGs1Text(element.value) && !element.value.isEmpty() ? std::nullopt
-                                                                      : std::optional(u"(%1) needs a value of GS1 characters."_s.arg(element.ai));
+                                                                      : std::optional(i18n("(%1) needs a value of GS1 characters.", element.ai));
     }
     const Identifier &id = *known;
     const QString &value = element.value;
@@ -233,22 +234,22 @@ std::optional<QString> problem(const Element &element)
                                                     : u"(%1) %2 needs %3 to %4 characters."_s.arg(id.ai, id.title).arg(id.minimumLength).arg(id.maximumLength);
     }
     if (id.numeric && !isDigits(value)) {
-        return u"(%1) %2 takes digits only."_s.arg(id.ai, id.title);
+        return i18n("(%1) %2 takes digits only.", id.ai, id.title);
     }
     if (id.numericPrefix > 0 && !isDigits(QStringView(value).left(id.numericPrefix))) {
-        return u"(%1) %2 starts with %3 digits."_s.arg(id.ai, id.title).arg(id.numericPrefix);
+        return i18n("(%1) %2 starts with %3 digits.", id.ai, id.title, id.numericPrefix);
     }
     if (!id.numeric && !isGs1Text(value)) {
-        return u"(%1) %2 has characters GS1 does not allow (letters, digits and !\"%&'()*+,-./:;<=>?_ only)."_s.arg(id.ai, id.title);
+        return i18n("(%1) %2 has characters GS1 does not allow (letters, digits and !\"%&'()*+,-./:;<=>?_ only).", id.ai, id.title);
     }
     if (id.date && !isDate(value)) {
-        return u"(%1) %2 is not a date written YYMMDD."_s.arg(id.ai, id.title);
+        return i18n("(%1) %2 is not a date written YYMMDD.", id.ai, id.title);
     }
     if (id.dateTime && (!isDate(QStringView(value).left(6)) || !QTime(value.mid(6, 2).toInt(), value.mid(8, 2).toInt()).isValid())) {
-        return u"(%1) %2 is not written YYMMDDHHMM."_s.arg(id.ai, id.title);
+        return i18n("(%1) %2 is not written YYMMDDHHMM.", id.ai, id.title);
     }
     if (id.checkDigit && checkDigit(value.left(value.size() - 1)) != value.back()) {
-        return u"(%1) %2: the check digit should be %3."_s.arg(id.ai, id.title, QString(checkDigit(value.left(value.size() - 1))));
+        return i18n("(%1) %2: the check digit should be %3.", id.ai, id.title, QString(checkDigit(value.left(value.size() - 1))));
     }
     return std::nullopt;
 }

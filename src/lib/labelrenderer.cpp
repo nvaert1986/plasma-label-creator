@@ -9,6 +9,7 @@
 #include "tapelayout.h"
 #include "units.h"
 
+#include <KLocalizedString>
 #include <QFile>
 #include <QFontMetricsF>
 #include <QHash>
@@ -1028,7 +1029,7 @@ void LabelRenderer::paintBarcode(QPainter *painter, const BarcodeObject &object,
 {
     const BarcodeType *type = barcodeType(object.type);
     if (!type) {
-        m_warnings << u"%1: barcode type \"%2\" is not supported"_s.arg(object.name, object.type);
+        m_warnings << i18n("%1: barcode type \"%2\" is not supported", object.name, object.type);
         paintPlaceholder(painter, box, object.type);
         return;
     }
@@ -1163,7 +1164,7 @@ void LabelRenderer::paintImage(QPainter *painter, const ImageObject &object, con
         painter->drawImage(aligned(size, box, toQt(object.horizontalAlignment) | toQt(object.verticalAlignment)), image);
         painter->restore();
     } else if (!object.imageLocation || !object.imageLocation->isEmpty()) {
-        m_warnings << u"%1: the image could not be loaded"_s.arg(object.name);
+        m_warnings << i18n("%1: the image could not be loaded", object.name);
         paintPlaceholder(painter, box, object.name);
     }
     paintImageBorder(painter, object, box);

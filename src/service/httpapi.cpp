@@ -11,6 +11,7 @@
 #include "labelformat.h"
 #include "labelprinter.h"
 
+#include <KLocalizedString>
 #include <QHttpServer>
 #include <QHttpServerConfiguration>
 #include <QHttpServerResponse>
@@ -73,7 +74,7 @@ HttpApi::HttpApi(AutomationService *service, QObject *parent)
     const auto guarded = [this](auto handler) {
         return [this, handler](const QHttpServerRequest &request) {
             if (!authorised(request)) {
-                QHttpServerResponse response = error(QHttpServerResponse::StatusCode::Unauthorized, u"A valid token is needed: Authorization: Bearer <token>."_s);
+                QHttpServerResponse response = error(QHttpServerResponse::StatusCode::Unauthorized, i18n("A valid token is needed: Authorization: Bearer <token>."));
                 QHttpHeaders headers = response.headers();
                 headers.append(QHttpHeaders::WellKnownHeader::WWWAuthenticate, "Bearer");
                 response.setHeaders(std::move(headers));
@@ -95,7 +96,7 @@ HttpApi::HttpApi(AutomationService *service, QObject *parent)
                         return print(request);
                     }));
     m_server->setMissingHandler(this, [](const QHttpServerRequest &, QHttpServerResponder &responder) {
-        responder.sendResponse(error(QHttpServerResponse::StatusCode::NotFound, u"No such request: see GET /v1/status, /v1/printers, /v1/labels and POST /v1/print."_s));
+        responder.sendResponse(error(QHttpServerResponse::StatusCode::NotFound, i18n("No such request: see GET /v1/status, /v1/printers, /v1/labels and POST /v1/print.")));
     });
 #if QT_VERSION >= QT_VERSION_CHECK(6, 11, 0)
     QHttpServerConfiguration configuration = m_server->configuration();
@@ -110,7 +111,7 @@ QString HttpApi::listen(const AutomationSettings &settings)
 {
     // Anyone who can reach it could print: never without a token.
     if (settings.httpToken.size() < 16) {
-        return u"no token is set (Settings > Automation in Plasma Label Creator makes one)."_s;
+        return i18n("no token is set (Settings > Automation in Plasma Label Creator makes one).");
     }
     m_tcp = new QTcpServer(this);
     const QHostAddress address = settings.httpNetwork ? QHostAddress(QHostAddress::Any) : QHostAddress(QHostAddress::LocalHost);
@@ -121,7 +122,7 @@ QString HttpApi::listen(const AutomationSettings &settings)
         return problem;
     }
     if (!m_server->bind(m_tcp)) {
-        return u"could not take requests on port %1."_s.arg(settings.httpPort);
+        return i18n("could not take requests on port %1.", QString::number(settings.httpPort));
     }
     qInfo("Taking print requests on %s port %d.", settings.httpNetwork ? "every network interface," : "this computer only,", int(m_tcp->serverPort()));
     return {};
@@ -179,7 +180,7 @@ QHttpServerResponse HttpApi::labels() const
 {
     const QString folder = m_service->settings().labelsFolder;
     if (folder.isEmpty()) {
-        return error(QHttpServerResponse::StatusCode::NotFound, u"No labels folder is set in the automation settings."_s);
+        return error(QHttpServerResponse::StatusCode::NotFound, i18n("No labels folder is set in the automation settings."));
     }
     QJsonArray list;
     for (const QString &name : Automation::labelNames(folder)) {
@@ -215,17 +216,17 @@ QHttpServerResponse HttpApi::print(const QHttpServerRequest &request)
     // JSON only: a web page elsewhere cannot send that without asking first.
     const QByteArray type = request.headers().value(QHttpHeaders::WellKnownHeader::ContentType).toByteArray().toLower();
     if (!type.startsWith("application/json")) {
-        return error(QHttpServerResponse::StatusCode::UnsupportedMediaType, u"Send the request as JSON (Content-Type: application/json)."_s);
+        return error(QHttpServerResponse::StatusCode::UnsupportedMediaType, i18n("Send the request as JSON (Content-Type: application/json)."));
     }
     if (request.body().size() > MaxBodySize) {
-        return error(QHttpServerResponse::StatusCode::PayloadTooLarge, u"The request is too large."_s);
+        return error(QHttpServerResponse::StatusCode::PayloadTooLarge, i18n("The request is too large."));
     }
     QString problem;
     const auto job = PrintRequest::fromJson(request.body(), &problem);
     if (!job) {
         return error(QHttpServerResponse::StatusCode::BadRequest, problem);
     }
-    const PrintOutcome outcome = m_service->print(*job, u"HTTP from %1"_s.arg(request.remoteAddress().toString()));
+    const PrintOutcome outcome = m_service->print(*job, i18n("HTTP from %1", request.remoteAddress().toString()));
     using Code = QHttpServerResponse::StatusCode;
     switch (outcome.status) {
     case PrintOutcome::Status::Printed:

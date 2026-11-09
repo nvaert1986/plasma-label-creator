@@ -7,6 +7,7 @@
 
 #include "labelformat.h"
 
+#include <KLocalizedString>
 #include <QCryptographicHash>
 #include <QDir>
 #include <QFile>
@@ -109,7 +110,7 @@ bool PrintHistory::add(PrintRecord record, const LabelDocument &label, QString *
         return false;
     };
     if (!QDir().mkpath(m_directory + u"/labels"_s)) {
-        return fail(u"Could not make %1"_s.arg(m_directory));
+        return fail(i18n("Could not make %1", m_directory));
     }
     // The label as printed, once per content: a label printed a hundred
     // times is kept once.
@@ -118,14 +119,14 @@ bool PrintHistory::add(PrintRecord record, const LabelDocument &label, QString *
     if (!QFile::exists(m_directory + u'/' + copy)) {
         QSaveFile file(m_directory + u'/' + copy);
         if (!file.open(QIODevice::WriteOnly) || file.write(xml) != xml.size() || !file.commit()) {
-            return fail(u"Could not keep the printed label: %1"_s.arg(file.errorString()));
+            return fail(i18n("Could not keep the printed label: %1", file.errorString()));
         }
     }
     record.labelCopy = copy;
 
     QFile history(historyFile());
     if (!history.open(QIODevice::Append)) {
-        return fail(u"Could not write the print history: %1"_s.arg(history.errorString()));
+        return fail(i18n("Could not write the print history: %1", history.errorString()));
     }
     history.write(toLine(record));
     history.close();

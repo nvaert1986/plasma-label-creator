@@ -21,8 +21,9 @@ include(ECMSetupVersion)
 include(ECMAddTests)
 include(FeatureSummary)
 
-# The core library only needs QtCore, QtGui and zint, so the automation
-# service can link it without pulling in widgets or KDE Frameworks.
+# The core library only needs QtCore, QtGui, zint and KI18n, so the
+# automation service can link it without pulling in widgets or the rest of
+# KDE Frameworks.
 option(BUILD_APP "Build the Plasma Label Creator desktop application (needs KDE Frameworks)" ON)
 
 find_package(Qt6 ${QT_MIN_VERSION} REQUIRED COMPONENTS Core Gui Network Svg)
@@ -32,6 +33,9 @@ set_package_properties(zint PROPERTIES
     URL "https://zint.org.uk/"
     TYPE REQUIRED)
 find_package(Cups REQUIRED)
+# Messages are translated in the core library, the command-line tool and the
+# automation service too. KI18n needs only QtCore and gettext.
+find_package(KF6I18n ${KF_MIN_VERSION} REQUIRED)
 set_package_properties(Cups PROPERTIES
     DESCRIPTION "Printing to DYMO LabelWriter queues"
     URL "https://openprinting.github.io/cups/"
@@ -70,6 +74,11 @@ if(BUILD_APP)
         WidgetsAddons
         XmlGui
     )
+    # The handbook (Help > Plasma Label Creator Handbook, F1), in KHelpCenter.
+    option(WITH_HANDBOOK "Install the handbook (needs KDocTools)" ON)
+    if(WITH_HANDBOOK)
+        find_package(KF6DocTools ${KF_MIN_VERSION} REQUIRED)
+    endif()
 endif()
 
 if(BUILD_TESTING)
@@ -88,6 +97,15 @@ add_subdirectory(src/service)
 if(BUILD_APP)
     add_subdirectory(src/app)
     add_subdirectory(src/integration)
+    if(WITH_HANDBOOK)
+        add_subdirectory(doc)
+    endif()
+endif()
+
+# The translations in po/: the messages, and the handbook's.
+ki18n_install(po)
+if(WITH_HANDBOOK)
+    kdoctools_install(po)
 endif()
 
 if(BUILD_TESTING)

@@ -27,7 +27,10 @@ been tried; if one does not, please report it.
 | Qt 6: Test (only for the tests) | 6.7 | 6.11 |
 | Qt 6: HttpServer (optional: print requests over HTTP) | 6.8 | 6.11 |
 | Qt SQL drivers (optional, at run time: printing from databases; the SQLite driver also for the database test) | 6.7 | 6.11 (SQLite, ODBC) |
-| KDE Frameworks 6: Archive, ConfigWidgets, CoreAddons, Crash, I18n, IconThemes, WidgetsAddons, XmlGui | 6.0 | 6.29 |
+| KDE Frameworks 6: I18n (also for the core library, the command-line tool and the automation service) | 6.0 | 6.29 |
+| KDE Frameworks 6: Archive, ConfigWidgets, CoreAddons, Crash, IconThemes, WidgetsAddons, XmlGui (application) | 6.0 | 6.29 |
+| KDE Frameworks 6: DocTools (the handbook; leave it out with `-DWITH_HANDBOOK=OFF`) | 6.0 | 6.29 |
+| GNU gettext (`msgfmt`, to compile the translations) | 0.19 | 0.23 |
 | zint, with its CMake package files | any 2.x that installs them | 2.16 |
 | CUPS library and headers | 2.x | 2.4 |
 | libudev (application) | any | systemd 257 |
@@ -37,6 +40,11 @@ zint must be installed with its CMake package files (`zint-config.cmake`).
 zint's own CMake build installs them; if your distribution leaves them
 out, the build stops with "Could not find a package configuration file
 provided by zint".
+
+KI18n is the one part of KDE Frameworks that every build needs, also one
+with `-DBUILD_APP=OFF`: the core library's messages (printer problems, file
+errors, the automation service's answers) are translated too. It needs
+only Qt Core and gettext.
 
 ### Packages per distribution
 
@@ -52,7 +60,7 @@ emerge --ask --noreplace dev-build/cmake dev-build/ninja \
     kde-frameworks/karchive kde-frameworks/kconfigwidgets \
     kde-frameworks/kcoreaddons kde-frameworks/kcrash kde-frameworks/ki18n \
     kde-frameworks/kiconthemes kde-frameworks/kwidgetsaddons \
-    kde-frameworks/kxmlgui
+    kde-frameworks/kxmlgui kde-frameworks/kdoctools sys-devel/gettext
 ```
 
 Optional, for print requests over HTTP in the automation service:
@@ -77,8 +85,8 @@ without it.
 apt install build-essential cmake ninja-build extra-cmake-modules pkgconf \
     qt6-base-dev qt6-svg-dev libkf6archive-dev libkf6configwidgets-dev libkf6coreaddons-dev \
     libkf6crash-dev libkf6i18n-dev libkf6iconthemes-dev \
-    libkf6widgetsaddons-dev libkf6xmlgui-dev libzint-dev libcups2-dev \
-    libudev-dev
+    libkf6widgetsaddons-dev libkf6xmlgui-dev libkf6doctools-dev gettext \
+    libzint-dev libcups2-dev libudev-dev
 apt install qt6-httpserver-dev   # optional: print requests over HTTP
 # optional: printing from databases (SQLite, ODBC, MySQL, PostgreSQL)
 apt install libqt6sql6-sqlite libqt6sql6-odbc libqt6sql6-mysql libqt6sql6-psql
@@ -90,8 +98,8 @@ apt install libqt6sql6-sqlite libqt6sql6-odbc libqt6sql6-mysql libqt6sql6-psql
 dnf install gcc-c++ cmake ninja-build extra-cmake-modules pkgconf \
     qt6-qtbase-devel qt6-qtsvg-devel kf6-karchive-devel kf6-kconfigwidgets-devel kf6-kcoreaddons-devel \
     kf6-kcrash-devel kf6-ki18n-devel kf6-kiconthemes-devel \
-    kf6-kwidgetsaddons-devel kf6-kxmlgui-devel zint-devel cups-devel \
-    systemd-devel
+    kf6-kwidgetsaddons-devel kf6-kxmlgui-devel kf6-kdoctools-devel gettext \
+    zint-devel cups-devel systemd-devel
 dnf install qt6-qthttpserver-devel   # optional: print requests over HTTP
 # optional: printing from databases; SQLite comes with qt6-qtbase
 dnf install qt6-qtbase-odbc qt6-qtbase-mysql qt6-qtbase-postgresql
@@ -102,7 +110,7 @@ dnf install qt6-qtbase-odbc qt6-qtbase-mysql qt6-qtbase-postgresql
 ```sh
 pacman -S --needed base-devel cmake ninja extra-cmake-modules qt6-base qt6-svg \
     karchive kconfigwidgets kcoreaddons kcrash ki18n kiconthemes kwidgetsaddons \
-    kxmlgui zint cups systemd-libs
+    kxmlgui kdoctools gettext zint cups systemd-libs
 pacman -S --needed qt6-httpserver   # optional: print requests over HTTP
 ```
 
@@ -180,7 +188,8 @@ ctest --test-dir build -j "$(nproc)" --output-on-failure
 | Option | Default | Effect |
 |---|---|---|
 | `-DCMAKE_BUILD_TYPE=` | none | `RelWithDebInfo` or `Release` for normal use, `Debug` for development |
-| `-DBUILD_APP=OFF` | `ON` | Build only the core library and the command-line tool: no KDE Frameworks, Qt Widgets or libudev needed |
+| `-DBUILD_APP=OFF` | `ON` | Build only the core library, the command-line tool and the automation service: of KDE Frameworks only KI18n is needed, and no Qt Widgets or libudev |
+| `-DWITH_HANDBOOK=OFF` | `ON` | Leave out the handbook (Help > Plasma Label Creator Handbook): KDocTools is not needed |
 | `-DBUILD_TESTING=OFF` | `ON` | Skip the tests: Qt Test is not needed |
 | `-DWITH_HTTP_SERVER=OFF` | `ON` | Leave print requests over HTTP out of the automation service even when Qt HTTP Server is installed |
 | `-DWITH_FILE_TYPES=OFF` | `ON` | Leave out the file types: `.label`, `.ABX` and `.rhino` files stay plain XML to the desktop and do not open with the app (also leaves out the Dolphin menu and thumbnails) |
@@ -262,6 +271,12 @@ user unit for the service, the add-on header
 Label Creator, and Label Printing, which starts it in print-only mode
 (`plasma-label-creator --print-only [folder]`) for people who only print.
 
+Also the translations (Dutch, for now) and the handbook in English and
+Dutch, which Help > Plasma Label Creator Handbook (F1) opens in KHelpCenter
+(in `share/doc/HTML/<language>/plasma-label-creator/`; KHelpCenter also
+finds it there on distributions that keep their own handbooks in
+`share/help`).
+
 It also fits the app into the desktop. Each part can be left out with its
 build option (see [Build options](#build-options)), and the app works the
 same without any of them:
@@ -324,7 +339,7 @@ Print-only mode, versions, the print history, printer status and the
 settings need nothing beyond the requirements above.
 
 To keep a computer to printing only, tick "Always start in print-only
-mode" in Settings > Configure Plasma Label Creator > Print-Only Mode. To
+mode" in Settings > Configure Plasma Label Creator > Printing. To
 stop people from changing that again, fix it with KDE's Kiosk in the
 system-wide `/etc/xdg/plasma-label-creatorrc`:
 
@@ -335,6 +350,40 @@ LockPrintOnly[$i]=true
 
 Versions and the print history are kept per user in
 `~/.local/share/plasma-label-creator/` (`versions/`, `print-history/`).
+
+## Languages
+
+Plasma Label Creator speaks the language of the desktop when it has been
+translated into it: English and Dutch for now. Settings > Configure Language…
+chooses another language for the app alone. The command-line tool and the
+automation service follow `LANGUAGE` and `LANG` like other programs; the
+service's job log and HTTP answers are in the language it was started in.
+
+### Translating
+
+The translations are gettext files: `po/<language>/plasma-label-creator.po`
+for the messages, and `doc/po/<language>.po` for the handbook, a paragraph
+at a time. `po/update.sh` brings them up to date with the source (it marks
+what changed as fuzzy) and writes each language's handbook to
+`po/<language>/docs/`. It needs gettext and po4a:
+
+| Tool | Tested | Gentoo | Debian / Ubuntu | Fedora | Arch |
+|---|---|---|---|---|---|
+| gettext (`xgettext`, `msgmerge`) | 0.23 | `sys-devel/gettext` | `gettext` | `gettext` | `gettext` |
+| po4a | 0.74 | `app-text/po4a` | `po4a` | `po4a` | `po4a` |
+
+```sh
+po/update.sh            # update every language after changing the source
+po/update.sh --new de   # start a German translation
+```
+
+Translate the `.po` files with Lokalize or any other PO editor, then run
+`po/update.sh` again so the handbook picks up the translated paragraphs (a
+language's handbook is written once 80% of it is translated). A new
+language that is not yet known to `language_entity` in `po/update.sh` needs
+its DocBook name added there (German, French, …). The tests check that
+every `.po` file compiles. `Messages.sh` follows KDE's conventions, so KDE's
+translation tools can take over should the project move there.
 
 ## Setting up a printer
 

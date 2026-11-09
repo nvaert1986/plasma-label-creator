@@ -5,6 +5,7 @@
 
 #include "datatable.h"
 
+#include <KLocalizedString>
 #include <QStringDecoder>
 
 #include <algorithm>
@@ -160,7 +161,7 @@ std::optional<DataTable> parse(const QByteArray &data, QChar delimiter, bool fir
     }
     if (quoted) {
         if (errorString) {
-            *errorString = u"A quoted field is not closed."_s;
+            *errorString = i18n("A quoted field is not closed.");
         }
         return std::nullopt;
     }

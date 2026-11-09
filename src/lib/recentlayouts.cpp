@@ -9,6 +9,7 @@
 #include "labelrenderer.h"
 #include "units.h"
 
+#include <KLocalizedString>
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
@@ -108,7 +109,7 @@ bool RecentLayouts::add(const LabelDocument &document, const QString &sourceFile
 {
     if (!QDir().mkpath(m_directory)) {
         if (errorString) {
-            *errorString = u"Could not create %1"_s.arg(m_directory);
+            *errorString = i18n("Could not create %1", m_directory);
         }
         return false;
     }

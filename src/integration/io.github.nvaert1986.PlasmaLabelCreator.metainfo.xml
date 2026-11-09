@@ -10,6 +10,7 @@
   <project_license>GPL-2.0-or-later</project_license>
   <name>Plasma Label Creator</name>
   <summary>Design and print labels on DYMO and ZPL label printers</summary>
+  <summary xml:lang="nl">Labels ontwerpen en afdrukken op DYMO- en ZPL-labelprinters</summary>
   <developer id="io.github.nvaert1986">
     <name>nvaert1986</name>
   </developer>
@@ -19,13 +20,24 @@
       LabelManager printers and on ZPL label printers such as Zebra and Altec.
       It opens and saves .label files and DYMO address books.
     </p>
+    <p xml:lang="nl">
+      Plasma Label Creator ontwerpt en drukt labels af op DYMO LabelWriter- en
+      LabelManager-printers en op ZPL-labelprinters zoals Zebra en Altec.
+      Het opent en bewaart .label-bestanden en DYMO-adresboeken.
+    </p>
     <ul>
       <li>Text, addresses, barcodes and QR codes, pictures, shapes, counters and dates</li>
+      <li xml:lang="nl">Tekst, adressen, barcodes en QR-codes, afbeeldingen, vormen, tellers en datums</li>
       <li>Fields filled from questions asked when printing, or a label per row of a CSV, spreadsheet or database</li>
+      <li xml:lang="nl">Velden ingevuld met vragen bij het afdrukken, of een label per rij van een CSV-bestand, rekenblad of database</li>
       <li>Label types for every DYMO model, tape labels, and custom sizes for ZPL printers</li>
+      <li xml:lang="nl">Labeltypes voor elk DYMO-model, tapelabels, en aangepaste formaten voor ZPL-printers</li>
       <li>A print-only mode with forms, for people who only print</li>
+      <li xml:lang="nl">Een modus Alleen afdrukken met formulieren, voor mensen die alleen afdrukken</li>
       <li>Versions of labels, a print history and shared counters</li>
+      <li xml:lang="nl">Versies van labels, een afdrukgeschiedenis en gedeelde tellers</li>
       <li>An automation service that prints jobs from folders and over HTTP</li>
+      <li xml:lang="nl">Een automatiseringsdienst die taken uit mappen en via HTTP afdrukt</li>
     </ul>
   </description>
   <categories>
@@ -45,6 +57,7 @@
   <screenshots>
     <screenshot type="default">
       <caption>Designing a label</caption>
+      <caption xml:lang="nl">Een label ontwerpen</caption>
       <image>https://raw.githubusercontent.com/nvaert1986/plasma-label-creator/main/doc/screenshot.png</image>
     </screenshot>
   </screenshots>

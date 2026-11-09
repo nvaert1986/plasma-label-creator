@@ -5,6 +5,7 @@
 
 #include "labelversions.h"
 
+#include <KLocalizedString>
 #include <QCryptographicHash>
 #include <QDir>
 #include <QFile>
@@ -73,7 +74,7 @@ bool LabelVersions::keep(const QString &labelFile, int keep, QString *errorStrin
     }
     const QString folder = folderFor(labelFile);
     if (!QDir().mkpath(folder)) {
-        return fail(u"Could not make %1"_s.arg(folder));
+        return fail(i18n("Could not make %1", folder));
     }
     // Which label the folder is for, for whoever looks in it.
     QFile source(folder + u"/source.txt"_s);
@@ -82,7 +83,7 @@ bool LabelVersions::keep(const QString &labelFile, int keep, QString *errorStrin
     }
     QFile copy(folder + u'/' + QDateTime::currentDateTime().toString(TimeFormat) + u".label"_s);
     if (!copy.open(QIODevice::WriteOnly) || copy.write(now) != now.size()) {
-        return fail(u"Could not keep a version of %1: %2"_s.arg(labelFile, copy.errorString()));
+        return fail(i18n("Could not keep a version of %1: %2", labelFile, copy.errorString()));
     }
     copy.close();
     // The oldest go.

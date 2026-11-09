@@ -10,6 +10,8 @@
 
 #include "units.h"
 
+#include <KLocalizedString>
+
 #include <QRegularExpression>
 #include <QSet>
 
@@ -134,7 +136,7 @@ LabelObject create(Kind kind, const LabelDocument &document, const QByteArray &i
         AddressObject address;
         address.name = uniqueName(document, u"ADDRESS"_s);
         address.variable = true;
-        address.spans = {span(u"Name\nStreet 1\n1234 AB City"_s)};
+        address.spans = {span(i18nc("sample address in a new address object", "Name\nStreet 1\n1234 AB City"))};
         address.lineFonts = {newTextFont(), newTextFont(), newTextFont()};
         address.bounds = centredBox(document, 1.0, 1.0);
         return address;
@@ -176,7 +178,7 @@ LabelObject create(Kind kind, const LabelDocument &document, const QByteArray &i
     case Kind::CurvedText: {
         CircularTextObject curved;
         curved.name = uniqueName(document, u"CIRCULARTEXT"_s);
-        curved.text = u"Curved text"_s;
+        curved.text = i18nc("sample text of a new curved text object", "Curved text");
         curved.font = newTextFont();
         curved.bounds = centredBox(document, 0.8, 0.8);
         return curved;

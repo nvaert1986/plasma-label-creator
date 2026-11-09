@@ -136,3 +136,17 @@ if(BUILD_APP)
         set_tests_properties(${test} PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
     endforeach()
 endif()
+
+# Every translation compiles, with its placeholders and plurals right.
+find_program(MSGFMT_EXECUTABLE msgfmt)
+if(MSGFMT_EXECUTABLE)
+    file(GLOB_RECURSE po_files ${CMAKE_SOURCE_DIR}/po/*.po ${CMAKE_SOURCE_DIR}/doc/po/*.po)
+    foreach(po_file ${po_files})
+        file(RELATIVE_PATH name ${CMAKE_SOURCE_DIR} ${po_file})
+        add_test(NAME "translation:${name}" COMMAND ${MSGFMT_EXECUTABLE} --check -o /dev/null ${po_file})
+    endforeach()
+endif()
+
+# The tests compare messages in English, whatever language the desktop speaks.
+get_property(all_tests DIRECTORY PROPERTY TESTS)
+set_property(TEST ${all_tests} APPEND PROPERTY ENVIRONMENT "LANGUAGE=en")

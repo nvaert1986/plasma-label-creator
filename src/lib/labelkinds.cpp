@@ -8,6 +8,7 @@
 #include "tapelayout.h"
 #include "units.h"
 
+#include <KLocalizedString>
 #include <QXmlStreamReader>
 
 #include <cmath>
@@ -292,12 +293,12 @@ std::optional<RhinoTemplate> readRhinoTemplate(const QByteArray &data, QString *
     };
     QXmlStreamReader xml(data);
     if (!xml.readNextStartElement() || xml.name() != "plist"_L1 || !xml.readNextStartElement()) {
-        return fail(u"Not a DYMO Rhino template"_s);
+        return fail(i18n("Not a DYMO Rhino template"));
     }
     const QVariantMap root = readPlistValue(xml).toMap();
     const QVariantMap label = root.value(u"LabelTemplate"_s).toMap();
     if (label.isEmpty()) {
-        return fail(u"Not a DYMO Rhino template: it has no LabelTemplate"_s);
+        return fail(i18n("Not a DYMO Rhino template: it has no LabelTemplate"));
     }
 
     RhinoTemplate result;
@@ -340,7 +341,7 @@ std::optional<RhinoTemplate> readRhinoTemplate(const QByteArray &data, QString *
     } else if (result.kind == u"FixedLabel"_s) {
         result.fixedLengthMm = Units::twipsToMm(label.value(u"FixedLabelLength"_s).toDouble());
     } else {
-        return fail(u"DYMO Rhino templates of the kind \"%1\" are not supported"_s.arg(result.kind));
+        return fail(i18n("DYMO Rhino templates of the kind \"%1\" are not supported", result.kind));
     }
     return result;
 }

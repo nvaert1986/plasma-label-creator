@@ -4,7 +4,9 @@
 Type=Application
 Name=Plasma Label Creator
 GenericName=Label Designer
+GenericName[nl]=Labelontwerper
 Comment=Design and print labels on DYMO LabelWriter and LabelManager printers and ZPL label printers
+Comment[nl]=Labels ontwerpen en afdrukken op DYMO LabelWriter- en LabelManager-printers en ZPL-labelprinters
 Exec=@KDE_INSTALL_FULL_BINDIR@/plasma-label-creator %F
 Icon=@APP_ICON@
 Terminal=false

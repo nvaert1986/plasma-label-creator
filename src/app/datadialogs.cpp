@@ -498,7 +498,7 @@ QuestionsDialog::QuestionsDialog(const QList<PrintQuestion> &questions, QWidget 
     m_editor = new QWidget(this);
     auto *form = new QFormLayout(m_editor);
     m_name = new QLineEdit(m_editor);
-    m_name->setPlaceholderText(u"Batch"_s);
+    m_name->setPlaceholderText(i18nc("example field name", "Batch"));
     form->addRow(i18n("Field name:"), m_name);
     m_prompt = new QLineEdit(m_editor);
     m_prompt->setPlaceholderText(i18n("Batch number"));

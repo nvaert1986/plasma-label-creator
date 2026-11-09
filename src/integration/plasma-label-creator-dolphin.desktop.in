@@ -11,5 +11,6 @@ X-KDE-Priority=TopLevel
 
 [Desktop Action printLabel]
 Name=Print Label…
+Name[nl]=Label afdrukken…
 Icon=@PRINT_ICON@
 Exec=@KDE_INSTALL_FULL_BINDIR@/plasma-label-creator --print-only %f

@@ -5,6 +5,7 @@
 
 #include "barcode.h"
 
+#include <KLocalizedString>
 #include <QFont>
 #include <QFontMetricsF>
 #include <QPainter>
@@ -330,8 +331,8 @@ bool Barcode::encodeCode39()
         const QChar c = m_data.at(i);
         const char *found = c.unicode() < 128 ? std::strchr(characters, char(c.unicode())) : nullptr;
         if (!found || c.unicode() == 0) {
-            m_errorString = c.isLower() ? u"Lowercase letters cannot be encoded in Code 39"_s
-                                        : u"Invalid character at position %1 for Code 39"_s.arg(i + 1);
+            m_errorString = c.isLower() ? i18n("Lowercase letters cannot be encoded in Code 39")
+                                        : i18n("Invalid character at position %1 for Code 39", i + 1);
             return false;
         }
         const int index = int(found - characters);
@@ -341,7 +342,7 @@ bool Barcode::encodeCode39()
         }
     }
     if (m_data.isEmpty()) {
-        m_errorString = u"No data to encode"_s;
+        m_errorString = i18n("No data to encode");
         return false;
     }
     if (m_symbology == Symbology::Code39WithCheckDigit) {

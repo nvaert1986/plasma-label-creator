@@ -9,6 +9,7 @@
 #include "tapelayout.h"
 #include "units.h"
 
+#include <KLocalizedString>
 #include <QFile>
 #include <QFileInfo>
 #include <QProcess>
@@ -281,21 +282,21 @@ QStringList QueueStatus::problems() const
 {
     QStringList problems;
     if (state == State::Stopped) {
-        problems << u"The queue is paused"_s;
+        problems << i18n("The queue is paused");
     }
     if (!acceptingJobs) {
-        problems << u"The queue does not take jobs"_s;
+        problems << i18n("The queue does not take jobs");
     }
     // The reasons that stop printing, in words; the rest (a -report, being
     // busy connecting) are not problems.
-    static const QList<std::pair<QString, QString>> known = {{u"offline"_s, u"The printer is offline"_s},
-                                                            {u"media-empty"_s, u"Out of labels"_s},
-                                                            {u"media-needed"_s, u"Out of labels"_s},
-                                                            {u"media-jam"_s, u"Labels are jammed"_s},
-                                                            {u"cover-open"_s, u"The cover is open"_s},
-                                                            {u"door-open"_s, u"The cover is open"_s},
-                                                            {u"marker-supply-empty"_s, u"Out of ribbon"_s},
-                                                            {u"paused"_s, u"The printer is paused"_s}};
+    static const QList<std::pair<QString, QString>> known = {{u"offline"_s, i18n("The printer is offline")},
+                                                            {u"media-empty"_s, i18n("Out of labels")},
+                                                            {u"media-needed"_s, i18n("Out of labels")},
+                                                            {u"media-jam"_s, i18n("Labels are jammed")},
+                                                            {u"cover-open"_s, i18n("The cover is open")},
+                                                            {u"door-open"_s, i18n("The cover is open")},
+                                                            {u"marker-supply-empty"_s, i18n("Out of ribbon")},
+                                                            {u"paused"_s, i18n("The printer is paused")}};
     for (const QString &reason : reasons) {
         QString base = reason;
         bool reported = false;
@@ -366,13 +367,13 @@ bool LabelPrinter::load()
     const QByteArray name = (m_driver.isEmpty() ? m_printerName : m_driver).toUtf8();
     const char *ppdFile = m_driver.isEmpty() ? cupsGetPPD2(CUPS_HTTP_DEFAULT, name.constData()) : cupsGetServerPPD(CUPS_HTTP_DEFAULT, name.constData());
     if (!ppdFile) {
-        m_errorString = u"Could not get the driver of %1: %2"_s.arg(m_printerName, QString::fromUtf8(cupsLastErrorString()));
+        m_errorString = i18n("Could not get the driver of %1: %2", m_printerName, QString::fromUtf8(cupsLastErrorString()));
         return false;
     }
     ppd_file_t *ppd = ppdOpenFile(ppdFile);
     unlink(ppdFile);
     if (!ppd) {
-        m_errorString = u"Could not read the driver of %1"_s.arg(m_printerName);
+        m_errorString = i18n("Could not read the driver of %1", m_printerName);
         return false;
     }
     // Opening a PPD marks nothing: without this, no resolution is "marked"
@@ -466,7 +467,7 @@ QList<PaperSize> LabelPrinter::tapeTypes(const QList<PaperSize> &driverSizes)
             continue;
         }
         PaperSize tape = size;
-        tape.name = u"%1 mm tape"_s.arg(*millimetres);
+        tape.name = i18n("%1 mm tape", *millimetres);
         tape.tape = *millimetres;
         tapes << tape;
     }
@@ -596,7 +597,7 @@ bool LabelPrinter::writeRaster(int fd, const QList<QImage> &pages, const PaperSi
 {
     if (pages.isEmpty()) {
         if (errorString) {
-            *errorString = u"Nothing to print"_s;
+            *errorString = i18n("Nothing to print");
         }
         return false;
     }
@@ -661,7 +662,7 @@ bool LabelPrinter::writeRaster(int fd, const QList<QImage> &pages, const PaperSi
     cupsRasterClose(raster);
 
     if (!ok && errorString) {
-        *errorString = u"Could not write the print data: %1"_s.arg(QString::fromUtf8(cupsRasterErrorString()));
+        *errorString = i18n("Could not write the print data: %1", QString::fromUtf8(cupsRasterErrorString()));
     }
     return ok;
 }
@@ -683,7 +684,7 @@ std::optional<PaperSize> LabelPrinter::paperOf(const LabelDocument &document)
     }
     const auto paper = paperFor(document);
     if (!paper) {
-        m_errorString = u"%1 has no paper size for \"%2\""_s.arg(m_printerName, document.paperName);
+        m_errorString = i18n("%1 has no paper size for \"%2\"", m_printerName, document.paperName);
     }
     return paper;
 }
@@ -693,7 +694,7 @@ QList<QImage> LabelPrinter::pages(const QList<LabelDocument> &labels, const Opti
     m_errorString.clear();
     m_warnings.clear();
     if (labels.isEmpty()) {
-        m_errorString = u"Nothing to print"_s;
+        m_errorString = i18n("Nothing to print");
         return {};
     }
     const auto paper = paperOf(labels.constFirst());
@@ -784,7 +785,7 @@ int LabelPrinter::print(const QList<LabelDocument> &labels, const Options &optio
     char fileName[1024];
     const int fd = cupsTempFd(fileName, sizeof(fileName));
     if (fd < 0) {
-        m_errorString = u"Could not create a temporary file for the print job"_s;
+        m_errorString = i18n("Could not create a temporary file for the print job");
         return 0;
     }
     const bool written = writeRaster(fd, pages, *paper, m_resolution, &m_errorString);
@@ -836,7 +837,7 @@ int LabelPrinter::print(const QList<LabelDocument> &labels, const Options &optio
     unlink(fileName);
 
     if (job == 0) {
-        m_errorString = u"Printing on %1 failed: %2"_s.arg(m_printerName, QString::fromUtf8(cupsLastErrorString()));
+        m_errorString = i18n("Printing on %1 failed: %2", m_printerName, QString::fromUtf8(cupsLastErrorString()));
     } else {
         m_printedLabels = m_pagedLabels;
     }
@@ -858,21 +859,21 @@ bool LabelPrinter::convertWithDriver(const QString &rasterFile,
     };
     const char *ppdFile = cupsGetServerPPD(CUPS_HTTP_DEFAULT, driver.toUtf8().constData());
     if (!ppdFile) {
-        return fail(u"Could not get the driver %1: %2"_s.arg(driver, QString::fromUtf8(cupsLastErrorString())));
+        return fail(i18n("Could not get the driver %1: %2", driver, QString::fromUtf8(cupsLastErrorString())));
     }
     // The driver says which filter it uses: raster2dymolw for the 4xx,
     // raster2dymolw_v2 for the 550 series.
     const QString filterName = rasterFilter(ppdFile);
     if (needsDirectConnection(filterName)) {
         unlink(ppdFile);
-        return fail(u"The LabelWriter 550 series cannot print through this queue. Its DYMO driver reads the printer's status before every label, "
+        return fail(i18n("The LabelWriter 550 series cannot print through this queue. Its DYMO driver reads the printer's status before every label, "
                     "which only works when the printer is set up in CUPS with that driver itself, over USB or the network, not through a raw "
-                    "or shared queue"_s);
+                    "or shared queue"));
     }
     const QString filter = filterProgram(filterName.isEmpty() ? u"raster2dymolw"_s : filterName);
     if (filter.isEmpty()) {
         unlink(ppdFile);
-        return fail(u"The DYMO printer driver (%1) is not installed on this computer"_s.arg(filterName.isEmpty() ? u"raster2dymolw"_s : filterName));
+        return fail(i18n("The DYMO printer driver (%1) is not installed on this computer", filterName.isEmpty() ? u"raster2dymolw"_s : filterName));
     }
 
     // Run the filter as CUPS would: job, user, title, copies, options, with
@@ -907,7 +908,7 @@ bool LabelPrinter::convertWithDriver(const QString &rasterFile,
                 errors << line.mid(6).trimmed();
             }
         }
-        return fail(u"The DYMO driver could not convert the label. %1"_s.arg(errors.join(u' ')));
+        return fail(i18n("The DYMO driver could not convert the label. %1", errors.join(u' ')));
     }
     return true;
 }
@@ -917,7 +918,7 @@ int LabelPrinter::sendThroughLocalDriver(const QString &rasterFile, const PaperS
     char outputName[1024];
     const int outputFd = cupsTempFd(outputName, sizeof(outputName));
     if (outputFd < 0) {
-        m_errorString = u"Could not create a temporary file for the print job"_s;
+        m_errorString = i18n("Could not create a temporary file for the print job");
         return 0;
     }
     close(outputFd);
@@ -935,7 +936,7 @@ int LabelPrinter::sendThroughLocalDriver(const QString &rasterFile, const PaperS
     cupsFreeOptions(rawCount, rawOptions);
     unlink(outputName);
     if (job == 0) {
-        m_errorString = u"Printing on %1 failed: %2"_s.arg(m_printerName, QString::fromUtf8(cupsLastErrorString()));
+        m_errorString = i18n("Printing on %1 failed: %2", m_printerName, QString::fromUtf8(cupsLastErrorString()));
     }
     return job;
 }

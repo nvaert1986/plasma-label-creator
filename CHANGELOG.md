@@ -5,6 +5,30 @@
 
 # Changelog
 
+## Unreleased
+
+- **Translations**: the app is in English and Dutch, following the
+  desktop's language; Settings > Configure Language… switches the app
+  alone. Translated too: the messages of the core library (printer
+  problems, file errors, GS1 names), the command-line tool's help and
+  errors, the automation service's answers and job log, the launchers, the
+  file types, Dolphin's "Print Label", the AppStream metadata, and the
+  sample text of new address and curved text objects. Check boxes answered
+  by the automation service print the same "Yes" and "No" as the app.
+- **Handbook**: Help > Plasma Label Creator Handbook (F1) opens a KDE-style
+  handbook in KHelpCenter, in English and Dutch: getting started,
+  designing, data and questions, printing, print-only mode, automation,
+  the settings and every menu.
+- **For translators**: gettext `.po` files in `po/` (messages) and
+  `doc/po/` (the handbook, through po4a); `po/update.sh` updates them and
+  starts new languages; `Messages.sh` follows KDE's conventions. The tests
+  check that every translation compiles, and run in English whatever the
+  desktop's language.
+- **Requirements**: KI18n is now needed by every build, also with
+  `-DBUILD_APP=OFF` (it needs only Qt Core and gettext); KDocTools for the
+  handbook (`-DWITH_HANDBOOK=OFF` leaves it out); GNU gettext to compile
+  the translations. po4a only to update translations.
+
 ## 0.6.1 (2026-11-04)
 
 - **Desktop integration**, each part optional at build time: file types

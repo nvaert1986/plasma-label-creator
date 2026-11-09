@@ -1,0 +1,1918 @@
+# SOME DESCRIPTIVE TITLE
+# Copyright (C) YEAR nvaert1986
+# This file is distributed under the same license as the plasma-label-creator package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: plasma-label-creator VERSION\n"
+"Report-Msgid-Bugs-To: "
+"https://github.com/nvaert1986/plasma-label-creator/issues\n"
+"POT-Creation-Date: 2026-11-09 09:31+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. type: Content of the kappname entity
+#: doc/index.docbook:7
+msgid "Plasma Label Creator"
+msgstr ""
+
+#. type: Attribute 'lang' of: <book>
+#: doc/index.docbook:12
+msgid "&language;"
+msgstr ""
+
+#. type: Content of: <book><bookinfo><title>
+#: doc/index.docbook:15
+msgid "The &kappname; Handbook"
+msgstr ""
+
+#. type: Content of: <book><bookinfo><authorgroup><author><othername>
+#: doc/index.docbook:19
+msgid "nvaert1986"
+msgstr ""
+
+#. type: Content of: <book><bookinfo><authorgroup><author><affiliation><address>
+#: doc/index.docbook:21
+#, no-wrap
+msgid "<email>25772781+nvaert1986@users.noreply.github.com</email>"
+msgstr ""
+
+#. type: Content of: <book><bookinfo>
+#: doc/index.docbook:27
+msgid "<copyright> <year>2026</year> <holder>nvaert1986</holder> </copyright>"
+msgstr ""
+
+#. type: Content of: <book><bookinfo><legalnotice><para>
+#: doc/index.docbook:33
+msgid ""
+"This handbook is dedicated to the public domain under CC0-1.0: you may copy, "
+"change and pass it on without asking."
+msgstr ""
+
+#. type: Content of: <book><bookinfo>
+#: doc/index.docbook:36
+msgid "<date>2026-11-09</date>"
+msgstr ""
+
+#. type: Content of: <book><bookinfo><releaseinfo>
+#: doc/index.docbook:37
+msgid "0.6.1"
+msgstr ""
+
+#. type: Content of: <book><bookinfo><abstract><para>
+#: doc/index.docbook:40
+msgid ""
+"&kappname; designs and prints labels on DYMO LabelWriter and LabelManager "
+"printers and on ZPL label printers, such as the Altec ATP series and "
+"Zebra. It opens and saves <filename>.label</filename> files, so labels move "
+"between Linux and Windows unchanged."
+msgstr ""
+
+#. type: Content of: <book><bookinfo><keywordset><keyword>
+#: doc/index.docbook:44
+msgid "KDE"
+msgstr ""
+
+#. type: Content of: <book><bookinfo><keywordset><keyword>
+#: doc/index.docbook:45
+msgid "Plasma"
+msgstr ""
+
+#. type: Content of: <book><bookinfo><keywordset><keyword>
+#: doc/index.docbook:46
+msgid "label"
+msgstr ""
+
+#. type: Content of: <book><bookinfo><keywordset><keyword>
+#: doc/index.docbook:47
+msgid "DYMO"
+msgstr ""
+
+#. type: Content of: <book><bookinfo><keywordset><keyword>
+#: doc/index.docbook:48
+msgid "LabelWriter"
+msgstr ""
+
+#. type: Content of: <book><bookinfo><keywordset><keyword>
+#: doc/index.docbook:49
+msgid "LabelManager"
+msgstr ""
+
+#. type: Content of: <book><bookinfo><keywordset><keyword>
+#: doc/index.docbook:50
+msgid "ZPL"
+msgstr ""
+
+#. type: Content of: <book><bookinfo><keywordset><keyword>
+#: doc/index.docbook:51
+msgid "barcode"
+msgstr ""
+
+#. type: Content of: <book><chapter><title>
+#: doc/index.docbook:57
+msgid "Introduction"
+msgstr ""
+
+#. type: Content of: <book><chapter><para>
+#: doc/index.docbook:59
+msgid ""
+"&kappname; is a label designer for Linux. You draw a label on a canvas the "
+"size of the real one, with text, addresses, barcodes and 2D codes, pictures, "
+"clip art, shapes, counters and dates, and print it on the label printer next "
+"to you."
+msgstr ""
+
+#. type: Content of: <book><chapter><para>
+#: doc/index.docbook:61
+msgid "It supports:"
+msgstr ""
+
+#. type: Content of: <book><chapter><itemizedlist><listitem><para>
+#: doc/index.docbook:63
+msgid ""
+"DYMO LabelWriter printers (the 450 series and older, the 4XL, and the 550 "
+"series) and DYMO LabelManager tape printers, through DYMO's own CUPS "
+"drivers;"
+msgstr ""
+
+#. type: Content of: <book><chapter><itemizedlist><listitem><para>
+#: doc/index.docbook:64
+msgid ""
+"ZPL label printers, such as the Altec ATP series and Zebra, through the "
+"Zebra ZPL driver that comes with CUPS, with labels across the roll and "
+"continuous rolls;"
+msgstr ""
+
+#. type: Content of: <book><chapter><itemizedlist><listitem><para>
+#: doc/index.docbook:65
+msgid ""
+"<filename>.label</filename> files, address books (<filename>.ABX</filename>) "
+"and Rhino templates (<filename>.rhino</filename>) as DYMO's software writes "
+"them;"
+msgstr ""
+
+#. type: Content of: <book><chapter><itemizedlist><listitem><para>
+#: doc/index.docbook:66
+msgid ""
+"printing from data: a label for each row of a CSV file, a spreadsheet or a "
+"database query, with questions asked when printing;"
+msgstr ""
+
+#. type: Content of: <book><chapter><itemizedlist><listitem><para>
+#: doc/index.docbook:67
+msgid ""
+"print-only mode for people who only print, an automation service that prints "
+"for other programs, and add-ons."
+msgstr ""
+
+#. type: Content of: <book><chapter><screenshot><screeninfo>
+#: doc/index.docbook:71
+msgid "The main window"
+msgstr ""
+
+#. type: Content of: <book><chapter><screenshot><mediaobject>
+#: doc/index.docbook:73
+msgid ""
+"<imageobject><imagedata fileref=\"screenshot.png\" "
+"format=\"PNG\"/></imageobject>"
+msgstr ""
+
+#. type: Content of: <book><chapter><screenshot><mediaobject><textobject><phrase>
+#: doc/index.docbook:74
+msgid ""
+"The main window of &kappname;, with the label types on the left and an empty "
+"label on the canvas"
+msgstr ""
+
+#. type: Content of: <book><chapter><screenshot>
+#: doc/index.docbook:71
+msgid ""
+"<placeholder type=\"screeninfo\" id=\"0\"/> <placeholder "
+"type=\"mediaobject\" id=\"1\"/>"
+msgstr ""
+
+#. type: Content of: <book><chapter><para>
+#: doc/index.docbook:78
+msgid ""
+"Objects &kappname; does not know are kept in the file and written back "
+"unchanged, so a label made elsewhere loses nothing by being opened and saved "
+"here."
+msgstr ""
+
+#. type: Content of: <book><chapter><title>
+#: doc/index.docbook:83
+msgid "Getting Started"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><title>
+#: doc/index.docbook:86
+msgid "The Main Window"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:88
+msgid "The main window has four parts:"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><term>
+#: doc/index.docbook:92
+msgid "The sidebar"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:93
+msgid ""
+"On the left, with three tabs. <guilabel>Labels</guilabel> lists the label "
+"types of the printer chosen in the print bar; type in the search field to "
+"find one, and click a label type to start a label on "
+"it. <guilabel>Insert</guilabel> lists the objects to put on a label, and the "
+"clip art below them. <guilabel>Address Book</guilabel> holds addresses to "
+"print (see <xref linkend=\"address-book\"/>)."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><term>
+#: doc/index.docbook:96
+msgid "The canvas"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:97
+msgid ""
+"In the middle: the label at its real proportions, with rulers along the top "
+"and left side. The status line under it gives the label's name and size, and "
+"the zoom."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><term>
+#: doc/index.docbook:100
+msgid "The toolbars"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:101
+msgid ""
+"At the top: the main toolbar (recently used layouts, new, open, save, undo "
+"and print), the insert toolbar, the format toolbar for text, and the arrange "
+"toolbar for aligning, grouping, locking and turning objects."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><term>
+#: doc/index.docbook:104
+msgid "The print bar"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:105
+msgid ""
+"At the bottom: the printer, what to print, the number of copies and the "
+"<guibutton>Print</guibutton> button (see <xref linkend=\"print-bar\"/>)."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><title>
+#: doc/index.docbook:111
+msgid "Your First Label"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><procedure><step><para>
+#: doc/index.docbook:114
+msgid ""
+"Choose your printer in the print bar. A DYMO printer plugged in over USB is "
+"noticed; when it has no printer queue yet, the print bar offers "
+"<guibutton>Set Up Printer</guibutton>."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><procedure><step><para>
+#: doc/index.docbook:115
+msgid ""
+"In the <guilabel>Labels</guilabel> tab, click the label type that is loaded "
+"in the printer, such as <guilabel>30252 Address</guilabel>."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><procedure><step><para>
+#: doc/index.docbook:116
+msgid ""
+"In the <guilabel>Insert</guilabel> tab, double-click "
+"<guilabel>Text</guilabel>, or drag it onto the label."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><procedure><step><para>
+#: doc/index.docbook:117
+msgid ""
+"Double-click the text on the label and type. Press &Esc; or click outside "
+"the text when you are done."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><procedure><step><para>
+#: doc/index.docbook:118
+msgid "Press <guibutton>Print</guibutton>."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><procedure><step><para>
+#: doc/index.docbook:119
+msgid ""
+"Save the label with <menuchoice><shortcut><keycombo "
+"action=\"simul\">&Ctrl;<keycap>S</keycap></keycombo></shortcut><guimenu>File</guimenu><guimenuitem>Save</guimenuitem></menuchoice> "
+"to print it again later."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><title>
+#: doc/index.docbook:124
+msgid "Opening and Saving Labels"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:126
+msgid ""
+"&kappname; opens <filename>.label</filename> files (die-cut labels and "
+"LabelManager tape labels) and DYMO Rhino templates "
+"(<filename>.rhino</filename>, which open as tape labels), and saves "
+"<filename>.label</filename> files. Labels are saved with DYMO's own label "
+"ids, so other label software that reads the file finds the right label."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:128
+msgid ""
+"Settings that only &kappname; uses, such as a label's data source and its "
+"questions, are kept in the file as a comment, which other label software "
+"ignores."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:130
+msgid ""
+"Each time a label is saved over, the version it replaces is "
+"kept. "
+"<menuchoice><guimenu>File</guimenu><guimenuitem>Versions…</guimenuitem></menuchoice> "
+"lists them; restoring one puts it on the canvas, where you save it to keep "
+"it, or undo."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:132
+msgid ""
+"<guilabel>Recently Used Layouts</guilabel>, the first button on the main "
+"toolbar, lists the labels you printed last, with a picture of each."
+msgstr ""
+
+#. type: Content of: <book><chapter><title>
+#: doc/index.docbook:138
+msgid "Designing Labels"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><title>
+#: doc/index.docbook:141
+msgid "Objects"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:143
+msgid ""
+"A label is made of objects. Add one from the <guilabel>Insert</guilabel> tab "
+"or the <guimenu>Insert</guimenu> menu, or drag a picture in from "
+"&dolphin;. The objects are:"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><term>
+#: doc/index.docbook:146
+msgid "<guilabel>Address</guilabel>"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:147
+msgid ""
+"A text box for addresses. The checked addresses of the address book print in "
+"it, one label each."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><term>
+#: doc/index.docbook:148
+msgid "<guilabel>Text</guilabel>"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:149
+msgid ""
+"A text box. Text can mix fonts, sizes and styles, word by word, print white "
+"on black, wrap within its box, and shrink or grow to fit."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><term>
+#: doc/index.docbook:150
+msgid "<guilabel>Counter</guilabel>"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:151
+msgid ""
+"A number that counts on with every label printed, with text before and after "
+"it, a start value, an increment and leading zeros. A counter can be shared "
+"with other computers through a counter file (see <xref "
+"linkend=\"shared-counters\"/>)."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><term>
+#: doc/index.docbook:152
+msgid "<guilabel>Date and Time</guilabel>"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:153
+msgid "The date and time of printing, in a format and language of your choice."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><term>
+#: doc/index.docbook:154
+msgid "<guilabel>Barcode</guilabel>"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:155
+msgid ""
+"Code 128, Code 39, Codabar, Interleaved 2 of 5, ITF-14, EAN, UPC, QR Code, "
+"PDF417, POSTNET, PLANET and Intelligent Mail, and also Data Matrix, Aztec "
+"Code, MaxiCode, Micro QR Code, Code 93, Code 11, MSI Plessey, Pharmacode, "
+"GS1-128, GS1 Data Matrix, GS1 DataBar, HIBC, KIX (PostNL) and Royal "
+"Mail. Other label software that opens the file may not show the types of the "
+"second group."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><term>
+#: doc/index.docbook:156
+msgid "<guilabel>Image</guilabel>"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:157
+msgid ""
+"A picture from your files, kept in the label. SVG drawings stay sharp at any "
+"size."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><term>
+#: doc/index.docbook:158
+msgid ""
+"<guilabel>Rectangle</guilabel>, <guilabel>Ellipse</guilabel>, "
+"<guilabel>Horizontal Line</guilabel>, <guilabel>Vertical Line</guilabel>"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:159
+msgid "Shapes with an outline and a fill."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><term>
+#: doc/index.docbook:160
+msgid ""
+"<guilabel>Polygon</guilabel>, <guilabel>Star</guilabel>, "
+"<guilabel>Arrow</guilabel>"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:161
+msgid "More shapes. Other label software shows these as pictures."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><term>
+#: doc/index.docbook:162
+msgid "<guilabel>Curved Text</guilabel>"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:163
+msgid "Text along an arc or around a circle."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:166
+msgid ""
+"Clip art is in the lower half of the <guilabel>Insert</guilabel> tab: drag "
+"an image onto the label or double-click it. Add your own images with the "
+"<guibutton>+</guibutton> button. If you own DYMO Label Software, "
+"<guilabel>Import / Export</guilabel> imports its clip art from your own copy "
+"of <filename>DYMO.DLS.dll</filename>; &kappname; does not include it."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><title>
+#: doc/index.docbook:170
+msgid "Selecting, Moving and Editing"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:172
+msgid ""
+"Click an object to select it; &Ctrl;-click or &Shift;-click adds objects to "
+"the selection, and dragging over the empty label selects every object in the "
+"box. <menuchoice><shortcut><keycombo "
+"action=\"simul\">&Ctrl;<keycap>A</keycap></keycombo></shortcut><guimenu>Edit</guimenu><guimenuitem>Select "
+"All</guimenuitem></menuchoice> selects them all."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:174
+msgid ""
+"Drag an object to move it and its handles to resize it. The arrow keys move "
+"the selection a little, with &Shift; a little more (the steps are set in the "
+"settings). Drag the round handle above an object to turn it; with &Shift; "
+"held it turns in steps. <keycombo "
+"action=\"simul\">&Ctrl;<keycap>[</keycap></keycombo> and <keycombo "
+"action=\"simul\">&Ctrl;<keycap>]</keycap></keycombo> turn the selection left "
+"and right."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:176
+msgid ""
+"Double-click a text, an address or a counter to edit its text on the label "
+"itself; &Enter; or <keycap>F2</keycap> does the same for the selected "
+"object. Double-click another object, or press <keycombo "
+"action=\"simul\">&Alt;&Enter;</keycombo>, to open its properties (see <xref "
+"linkend=\"properties\"/>)."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:178
+msgid ""
+"Every change can be undone with <keycombo "
+"action=\"simul\">&Ctrl;<keycap>Z</keycap></keycombo>. Cut, copy, paste, "
+"<guimenuitem>Duplicate Object</guimenuitem> (<keycombo "
+"action=\"simul\">&Ctrl;<keycap>D</keycap></keycombo>) and "
+"<guimenuitem>Delete Object</guimenuitem> (&Del;) are in the "
+"<guimenu>Edit</guimenu> menu and in the menu that opens when you right-click "
+"an object."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><title>
+#: doc/index.docbook:182
+msgid "Formatting Text"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:184
+msgid ""
+"The format toolbar and the <guimenu>Format</guimenu> menu change the "
+"selected text, or the selected words while you edit it: the font and size, "
+"<guimenuitem>Larger Font</guimenuitem> and <guimenuitem>Smaller "
+"Font</guimenuitem>, bold, italic, underline and strikeout, and "
+"<guimenuitem>White on Black</guimenuitem>."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:186
+msgid ""
+"<guisubmenu>Horizontal Alignment</guisubmenu> and <guisubmenu>Vertical "
+"Alignment</guisubmenu> place the text in its box. <guisubmenu>Text "
+"Fit</guisubmenu> chooses between a fixed font size, shrinking long text to "
+"fit, and always fitting the text to the box. <guimenuitem>Wrap "
+"Text</guimenuitem> breaks long lines at spaces to fit the box's width."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><title>
+#: doc/index.docbook:190
+msgid "Arranging Objects"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:192
+msgid ""
+"The <guimenu>Layout</guimenu> menu, the arrange toolbar and the right-click "
+"menu arrange objects:"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><term>
+#: doc/index.docbook:195
+msgid "<guisubmenu>Position Object on Label</guisubmenu>"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:196
+msgid "Puts the selection against an edge of the label, or centres it."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><term>
+#: doc/index.docbook:197
+msgid "<guisubmenu>Align Objects</guisubmenu>"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:198
+msgid ""
+"Lines the selected objects up by their edges or centres, or distributes them "
+"evenly."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><term>
+#: doc/index.docbook:199
+msgid "<guimenuitem>Group</guimenuitem> and <guimenuitem>Ungroup</guimenuitem>"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:200
+msgid ""
+"A group is selected, moved and turned as one (<keycombo "
+"action=\"simul\">&Ctrl;<keycap>G</keycap></keycombo> and <keycombo "
+"action=\"simul\">&Ctrl;&Shift;<keycap>G</keycap></keycombo>)."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><term>
+#: doc/index.docbook:201
+msgid "<guimenuitem>Lock Position and Size</guimenuitem>"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:202
+msgid "Locked objects cannot be moved or resized by accident."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><term>
+#: doc/index.docbook:203
+msgid ""
+"<guimenuitem>Bring to Front</guimenuitem> and <guimenuitem>Send to "
+"Back</guimenuitem>"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:204
+msgid "Change which object is drawn on top."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><term>
+#: doc/index.docbook:205
+msgid "<guimenuitem>Do Not Print</guimenuitem>"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:206
+msgid "The object shows faded while you design and is left out when printing."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><term>
+#: doc/index.docbook:207
+msgid ""
+"<guimenuitem>Layers…</guimenuitem> and <guimenuitem>Move to "
+"Layer</guimenuitem>"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:208
+msgid ""
+"Objects on a layer show, print and can be edited as the layer says. A layer "
+"that does not print suits a picture of the product to design on."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:211
+msgid ""
+"The <guimenu>View</guimenu> menu shows a grid (<keycombo "
+"action=\"simul\">&Ctrl;<keycap>'</keycap></keycombo>) and makes objects snap "
+"to it (<keycombo "
+"action=\"simul\">&Ctrl;&Shift;<keycap>'</keycap></keycombo>). Drag a "
+"guideline out of a ruler to place objects by; objects snap to it, and "
+"dragging it back to the ruler removes it. Hold &Alt; while moving to place "
+"an object freely."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><title>
+#: doc/index.docbook:215
+msgid "Object Properties"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:217
+msgid ""
+"<menuchoice><guimenu>Edit</guimenu><guimenuitem>Object "
+"Properties…</guimenuitem></menuchoice> shows everything about the selected "
+"object. The <guilabel>General</guilabel> page has its position and size in "
+"millimetres or inches, its rotation and angle, mirroring and a border. The "
+"next page depends on the kind of object:"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><itemizedlist><listitem><para>
+#: doc/index.docbook:220
+msgid ""
+"Text and addresses: the font, the alignment, how the text fits, wrapping, "
+"and <guilabel>Grow the box to fit the text</guilabel>, which makes the box "
+"wider for longer text, or taller when it wraps, instead of making the text "
+"smaller."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><itemizedlist><listitem><para>
+#: doc/index.docbook:221
+msgid ""
+"Barcodes: the type, the data, the size and where the human-readable text "
+"goes. <guibutton>Build…</guibutton> puts GS1 data together from application "
+"identifiers, checking each value and adding a missing check digit."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><itemizedlist><listitem><para>
+#: doc/index.docbook:222
+msgid ""
+"Images: another picture, how it scales, and a picture file to show instead "
+"of the one in the label. The file name may use fields, such as "
+"<filename>/photos/{Serial}.png</filename>, for a picture per data row."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><itemizedlist><listitem><para>
+#: doc/index.docbook:223
+msgid ""
+"Counters: the text before and after, the start value, the next value, the "
+"increment, the minimum number of digits, and a counter file shared with "
+"other computers."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><itemizedlist><listitem><para>
+#: doc/index.docbook:224
+msgid "Dates: the format, the language, and whether the time is included."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><itemizedlist><listitem><para>
+#: doc/index.docbook:225
+msgid "Curved text: where the text sits on the circle and the start angle."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:228
+msgid ""
+"The <guilabel>When It Prints</guilabel> page sets a condition: the object "
+"prints only when a field is empty, has a value, is or is not a value, "
+"contains a value, or is more or less than one. Objects that do not print for "
+"the current data show faded. On the same page, an object can stay where it "
+"is or stay to the right of a text that grows to fit, moving along with it."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><title>
+#: doc/index.docbook:232
+msgid "Label Types, Sizes and Rolls"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:234
+msgid ""
+"The <guilabel>Labels</guilabel> tab lists the label types the chosen printer "
+"takes. For an Altec ATP printer it lists Altec's labels by product, those "
+"fitting the loaded labels "
+"first. <menuchoice><guimenu>Layout</guimenu><guimenuitem>Label "
+"Type…</guimenuitem></menuchoice> changes the label type of the label on the "
+"canvas."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:236
+msgid ""
+"<menuchoice><guimenu>Layout</guimenu><guimenuitem>Custom Label "
+"Size…</guimenuitem></menuchoice> makes a label size that is in no "
+"list. Measure one label without the gap to the next. When only part of the "
+"label takes print, such as the white strip of a wrap label, give that part "
+"too. Your own sizes are listed under <guilabel>My label sizes</guilabel>; "
+"right-click one to edit or remove it."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:238
+msgid ""
+"<menuchoice><guimenu>Layout</guimenu><guimenuitem>Roll "
+"Layout…</guimenuitem></menuchoice> is for printers that take any label size, "
+"such as Altec and Zebra: rolls with several labels across, printed a row at "
+"a time, and continuous rolls, where each label takes the length you set."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:240
+msgid ""
+"<guisubmenu>Label Orientation</guisubmenu> chooses between portrait and "
+"landscape. <guimenuitem>Rotate Label</guimenuitem> on the arrange toolbar "
+"turns the label a quarter turn together with its objects, so it prints as "
+"before."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><title>
+#: doc/index.docbook:244
+msgid "Tape Labels"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:246
+msgid ""
+"LabelManager labels are printed on tape. Objects on a tape label sit in "
+"cells side by side along the "
+"tape. <menuchoice><guimenu>Layout</guimenu><guimenuitem>Tape "
+"Length…</guimenuitem></menuchoice> makes the label as long as its content or "
+"a fixed length; <guimenuitem>Move Earlier on the Tape</guimenuitem> and "
+"<guimenuitem>Move Later on the Tape</guimenuitem> change the order of the "
+"cells. In an object's properties, <guilabel>On the Tape</guilabel> sets how "
+"long its cell is."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><title>
+#: doc/index.docbook:250
+msgid "Labels of a Kind"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:252
+msgid ""
+"<menuchoice><guimenu>Insert</guimenu><guimenuitem>Label of a "
+"Kind…</guimenuitem></menuchoice> makes common labels from a few values:"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><term>
+#: doc/index.docbook:255
+msgid "<guilabel>Cable Wrap</guilabel>"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:255
+msgid "Wraps around a cable and can be read from every side."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><term>
+#: doc/index.docbook:256
+msgid "<guilabel>Cable Flag</guilabel>"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:256
+msgid "Folds around a cable, with the text on both sides."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><term>
+#: doc/index.docbook:257
+msgid "<guilabel>Patch Panel</guilabel>"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:257
+msgid ""
+"A row of numbered ports at the panel's pitch, with optional arrows and lines "
+"between the cells."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><term>
+#: doc/index.docbook:258
+msgid "<guilabel>Terminal Block</guilabel>"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:258
+msgid "Terminals at their pitch on a DIN rail."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><term>
+#: doc/index.docbook:259
+msgid "<guilabel>Breaker Panel</guilabel>"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:259
+msgid "Breakers of one module (18 mm) each."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><term>
+#: doc/index.docbook:260
+msgid "<guilabel>Rack Markers</guilabel>"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:260
+msgid "Height units along a rack's rail, boxed."
+msgstr ""
+
+#. type: Content of: <book><chapter><title>
+#: doc/index.docbook:267
+msgid "Data, Questions and Addresses"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><title>
+#: doc/index.docbook:270
+msgid "Printing from Data"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:272
+msgid ""
+"<menuchoice><guimenu>Data</guimenu><guimenuitem>Data "
+"Source…</guimenuitem></menuchoice> prints a label for each row of a CSV "
+"file, an Excel or OpenDocument spreadsheet, or a database query (SQLite, "
+"ODBC for SQL Server and others, MySQL, MariaDB, PostgreSQL, Firebird and "
+"Oracle, when Qt has the driver)."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:274
+msgid ""
+"Put fields on the label as <userinput>{Column}</userinput>, in texts, "
+"addresses, barcodes or an image's file name; "
+"<menuchoice><guimenu>Data</guimenu><guimenuitem>Insert "
+"Field</guimenuitem></menuchoice> lists them. Each label gets the values of "
+"its row."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:276
+msgid ""
+"<guibutton>Load Rows</guibutton> shows the rows; tick the ones to print. A "
+"column can say how many copies each row prints, and another which label file "
+"prints it, for a different label per row. All of them must be for the same "
+"label type."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:278
+msgid ""
+"Only queries that read are run (<literal>SELECT</literal>, or "
+"<literal>WITH</literal> … <literal>SELECT</literal>), so printing never "
+"changes the database. A query can use the answers to the questions, such as "
+"<userinput>WHERE Serial = {Serial}</userinput>; they are passed as values, "
+"so an answer can never change the query. Database passwords are never saved: "
+"they are asked for when printing."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><title>
+#: doc/index.docbook:282
+msgid "Questions When Printing"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:284
+msgid ""
+"<menuchoice><guimenu>Data</guimenu><guimenuitem>Print-Time "
+"Questions…</guimenuitem></menuchoice> sets questions asked each time the "
+"label is printed, such as a batch number. The answer fills "
+"<userinput>{Name}</userinput> on every label of the print run. A question "
+"can be:"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><itemizedlist><listitem><para>
+#: doc/index.docbook:287
+msgid ""
+"text, with rules: an answer is needed, a length, digits or letters only, or "
+"a pattern;"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><itemizedlist><listitem><para>
+#: doc/index.docbook:288
+msgid "a drop-down list, of fixed choices or of a column of the data;"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><itemizedlist><listitem><para>
+#: doc/index.docbook:289
+msgid "a number, within a range and with decimals;"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><itemizedlist><listitem><para>
+#: doc/index.docbook:290
+msgid "a date, in a format of your choice;"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><itemizedlist><listitem><para>
+#: doc/index.docbook:291
+msgid "a check box, with the text to print when ticked and when not."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:294
+msgid ""
+"A text question can be looked up in a column of the data: the row found "
+"fills the other questions named after its columns."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><title>
+#: doc/index.docbook:298
+msgid "Calculated Fields"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:300
+msgid ""
+"<menuchoice><guimenu>Data</guimenu><guimenuitem>Calculated "
+"Fields…</guimenuitem></menuchoice> works out fields when printing, from "
+"other fields, and uses them on the label like "
+"columns. <userinput>{Date}</userinput>, <userinput>{Time}</userinput> and "
+"<userinput>{Now}</userinput> are the moment of "
+"printing. <userinput>{Date+30}</userinput> or "
+"<userinput>{Installed+1y}</userinput> moves a date by days, weeks "
+"(<literal>w</literal>), months (<literal>m</literal>), years "
+"(<literal>y</literal>) or hours (<literal>h</literal>); "
+"<userinput>{Serial+1}</userinput> adds to a number."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:302
+msgid ""
+"After a <literal>|</literal>, a filter changes the value: "
+"<literal>upper</literal>, <literal>lower</literal>, <literal>trim</literal>, "
+"<literal>left:3</literal>, <literal>right:4</literal>, "
+"<literal>mid:2:3</literal>, <literal>pad:6</literal>, "
+"<literal>date:dd-MM-yyyy</literal>, <literal>replace:old:new</literal> and "
+"<literal>default:text</literal>. For example "
+"<userinput>{Date+30|date:dd-MM-yyyy}</userinput> or "
+"<userinput>{Prefix}-{Serial|pad:6}</userinput>."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><title>
+#: doc/index.docbook:306
+msgid "The Address Book"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:308
+msgid ""
+"The <guilabel>Address Book</guilabel> tab holds addresses in a DYMO address "
+"book (<filename>.ABX</filename>). Search it, tick the addresses to print, "
+"and choose <guilabel>All checked addresses in the address book</guilabel> in "
+"the print bar: each prints on its own label, in the label's address "
+"object. The <guimenu>Address Book</guimenu> menu makes, opens and saves "
+"address books, and imports addresses from a CSV file."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><title>
+#: doc/index.docbook:312
+msgid "GS1 Data"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:314
+msgid ""
+"For GS1-128, GS1 Data Matrix and GS1 DataBar Expanded barcodes, "
+"<guibutton>Build…</guibutton> in the barcode's properties lists the common "
+"application identifiers, such as the GTIN, a batch number or an expiry "
+"date. Give the values; each is checked, and a check digit left out is "
+"added. A value may use fields, such as <userinput>{Batch}</userinput>, which "
+"are checked when printing."
+msgstr ""
+
+#. type: Content of: <book><chapter><title>
+#: doc/index.docbook:320
+msgid "Printing"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><title>
+#: doc/index.docbook:323
+msgid "The Print Bar"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:325
+msgid ""
+"The print bar at the bottom of the window chooses the printer and says how "
+"it is: a stopped queue, jobs waiting, and for a network ZPL printer which "
+"labels are loaded and whether it is ready. The button next to the printer "
+"opens its settings:"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><term>
+#: doc/index.docbook:328
+msgid "<guimenuitem>Use as Default Printer</guimenuitem>"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:328
+msgid "Always start with this printer, even when another LabelWriter is plugged in."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><term>
+#: doc/index.docbook:329
+msgid "<guimenuitem>Which LabelWriter Is This…</guimenuitem>"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:329
+msgid ""
+"For a printer queue that does not use DYMO's driver, such as a printer "
+"shared from Windows: labels are then prepared with that model's driver on "
+"this computer and sent as they are."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><term>
+#: doc/index.docbook:330
+msgid "<guimenuitem>Detect the Loaded Labels Again</guimenuitem>"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:330
+msgid "Asks a network ZPL printer which labels are loaded."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><term>
+#: doc/index.docbook:331
+msgid "<guimenuitem>Print Offset…</guimenuitem>"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:331
+msgid ""
+"Moves everything this printer prints a little, when labels come out "
+"shifted. Print a label, measure how far everything must move, and enter it."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><term>
+#: doc/index.docbook:332
+msgid "<guimenuitem>Printer Status…</guimenuitem>"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:332
+msgid "How every label printer is."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:335
+msgid ""
+"Below the printer, <guilabel>Barcodes and graphics quality</guilabel> prints "
+"a LabelWriter label slower but sharper. Next to it, choose what to print: "
+"only the label on the canvas, every checked address in the address book, or "
+"each ticked row of the data source. Set the number of copies and press "
+"<guibutton>Print</guibutton>."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:337
+msgid ""
+"Before printing, &kappname; checks that the label fits the printer: that it "
+"is one of the printer's label types, that it is as long as the labels "
+"loaded, and that the printer is ready. It asks before printing anyway."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><title>
+#: doc/index.docbook:341
+msgid "Setting Up Printers"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:343
+msgid ""
+"&kappname; prints through CUPS. A DYMO LabelWriter or LabelManager needs "
+"DYMO's CUPS drivers: the LabelWriter 450 and older and the LabelManagers use "
+"<filename>dymo-cups-drivers</filename>, the LabelWriter 550 series DYMO's "
+"LW5xx driver. The 550 series reads its status before every label, so it must "
+"have a queue of its own with that driver, over USB or the network. A ZPL "
+"printer, such as an Altec ATP or a Zebra, uses the <guilabel>Zebra ZPL Label "
+"Printer</guilabel> driver that comes with CUPS."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:345
+msgid ""
+"A DYMO printer plugged in over USB without a queue gets a <guibutton>Set Up "
+"Printer</guibutton> button in the print bar; this needs "
+"<filename>cups-pk-helper</filename>. Otherwise add the printer in the "
+"system's printer settings."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><title>
+#: doc/index.docbook:349
+msgid "Print Settings, Preview and Export"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:351
+msgid ""
+"<menuchoice><guimenu>Layout</guimenu><guimenuitem>Print "
+"Settings…</guimenuitem></menuchoice> sets how the printer prints this label: "
+"the DYMO print density, or the darkness and speed of an Altec or Zebra "
+"printer. It also sets a header label and a trailer label, printed once "
+"before and after a print run and filled with the answers and "
+"<userinput>{Count}</userinput>, the number of labels in between."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:353
+msgid ""
+"<menuchoice><guimenu>File</guimenu><guimenuitem>Print "
+"Preview</guimenuitem></menuchoice> shows the pages exactly as the printer "
+"receives them, dot for dot, and steps through a run where counters or "
+"addresses change."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:355
+msgid ""
+"<menuchoice><guimenu>File</guimenu><guimenuitem>Export as PDF or "
+"Image…</guimenuitem></menuchoice> saves the label as a PDF at its own size "
+"or as a PNG image at the printer's resolution, optionally with the label's "
+"outline as a proof."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><title>
+#: doc/index.docbook:359
+msgid "Counters"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:361
+msgid ""
+"A counter counts on with every label printed, and its next value is saved in "
+"the label. When several computers print the same label, give the counter a "
+"counter file on a network share in its properties: the file keeps the next "
+"value for every computer, and is locked while one prints, so no number "
+"prints twice."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><title>
+#: doc/index.docbook:365
+msgid "Print History and Printer Status"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:367
+msgid ""
+"<menuchoice><guimenu>File</guimenu><guimenuitem>Print "
+"History…</guimenuitem></menuchoice> lists what was printed, when and on "
+"which printer, with the answers and data rows. Search it, open a label as it "
+"was printed, or print it again with the same answers and rows."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:369
+msgid ""
+"<menuchoice><guimenu>File</guimenu><guimenuitem>Printer "
+"Status…</guimenuitem></menuchoice> shows every label printer: its queue, the "
+"jobs waiting, and what network ZPL printers say about themselves, such as "
+"being out of labels or having the head open."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><title>
+#: doc/index.docbook:373
+msgid "Print-Only Mode"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:375
+msgid ""
+"Print-only mode is for people who only print: "
+"<menuchoice><guimenu>File</guimenu><guimenuitem>Print-Only "
+"Mode</guimenuitem></menuchoice>, or the <guilabel>Label Printing</guilabel> "
+"launcher. Choose a label from a folder, fill in its questions, tick the data "
+"rows and print, without being able to change the label. Counters are kept in "
+"the label."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:377
+msgid ""
+"In the settings, an administrator can make the app always start in "
+"print-only mode, with no way back to designing, and fix that setting with "
+"KDE's Kiosk (see <xref linkend=\"settings\"/>)."
+msgstr ""
+
+#. type: Content of: <book><chapter><title>
+#: doc/index.docbook:383
+msgid "Automation"
+msgstr ""
+
+#. type: Content of: <book><chapter><para>
+#: doc/index.docbook:385
+msgid ""
+"The automation service, <command>plasma-label-creator-automation</command>, "
+"prints labels for other programs without anyone at the screen, also when "
+"&kappname; is closed. It makes the same checks as the "
+"<guibutton>Print</guibutton> button: the answers to the label's questions, "
+"shared counters, the printer's label types and state. Counters count on in "
+"the label, and every print goes in the print history."
+msgstr ""
+
+#. type: Content of: <book><chapter><para>
+#: doc/index.docbook:387
+msgid ""
+"Set it up in <menuchoice><guimenu>Settings</guimenu><guimenuitem>Configure "
+"&kappname;…</guimenuitem><guilabel>Automation</guilabel></menuchoice>: start "
+"it there, or have it start when you log in. <guibutton>Recent "
+"Jobs…</guibutton> lists what it printed lately, where each job came from, "
+"and why a job was not printed. On a computer without a desktop session, run "
+"it as a systemd user service: <userinput><command>systemctl --user enable "
+"--now plasma-label-creator-automation</command></userinput>."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><title>
+#: doc/index.docbook:390
+msgid "Watched Folders"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:392
+msgid ""
+"Each watched folder has a label, a printer and a number of copies. A CSV "
+"file dropped in it prints a label for each row, its first line naming the "
+"fields; a JSON file is a print job as sent over HTTP. Printed files move to "
+"<filename>printed</filename>, the others to <filename>failed</filename> with "
+"the reason in a <filename>.txt</filename> file."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:394
+msgid ""
+"A file is printed once it has not changed for two seconds. A program that "
+"writes slowly should write the file under another name, such as "
+"<filename>job.csv.part</filename>, and rename it when done."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><title>
+#: doc/index.docbook:398
+msgid "Print Requests over HTTP"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:400
+msgid ""
+"When &kappname; is built with Qt HTTP Server, the service also takes print "
+"requests over HTTP, from this computer only or from the network. Every "
+"request carries the token shown in the settings. Labels are named relative "
+"to the labels folder set there, and only labels in it print."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><programlisting>
+#: doc/index.docbook:402
+#, no-wrap
+msgid ""
+"curl -H \"Authorization: Bearer $TOKEN\" -H \"Content-Type: "
+"application/json\" \\\n"
+"     -d '{\"label\": \"Rack/patch panel\", \"printer\": \"Zebra-ZT230\", "
+"\"copies\": 1,\n"
+"          \"values\": {\"Port\": \"A12\"},\n"
+"          \"rows\": [{\"Serial\": \"S1\"}, {\"Serial\": \"S2\"}]}' \\\n"
+"     http://localhost:8631/v1/print"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:408
+msgid ""
+"<literal>values</literal> fill fields and answer the label's questions on "
+"every label; each of <literal>rows</literal> gives one label. <literal>GET "
+"/v1/labels</literal> lists the labels with their fields and questions, "
+"<literal>GET /v1/printers</literal> the printers and their state, and "
+"<literal>GET /v1/status</literal> the service's version and settings."
+msgstr ""
+
+#. type: Content of: <book><chapter><title>
+#: doc/index.docbook:414
+msgid "Configuring &kappname;"
+msgstr ""
+
+#. type: Content of: <book><chapter><para>
+#: doc/index.docbook:416
+msgid ""
+"<menuchoice><guimenu>Settings</guimenu><guimenuitem>Configure "
+"&kappname;…</guimenuitem></menuchoice> has these pages:"
+msgstr ""
+
+#. type: Content of: <book><chapter><variablelist><varlistentry><term>
+#: doc/index.docbook:419
+msgid "<guilabel>Designing</guilabel>"
+msgstr ""
+
+#. type: Content of: <book><chapter><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:420
+msgid ""
+"The font of new text, how far the arrow keys move objects (also with "
+"&Shift;), the steps for turning, the tape to start with, and whether the "
+"rulers show millimetres or inches."
+msgstr ""
+
+#. type: Content of: <book><chapter><variablelist><varlistentry><term>
+#: doc/index.docbook:421
+msgid "<guilabel>Printing</guilabel>"
+msgstr ""
+
+#. type: Content of: <book><chapter><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:422
+msgid ""
+"Whether and how often network label printers are asked how they are, whether "
+"to warn before printing when the printer is not ready, the copies to start "
+"with, the gap between Altec labels across and the length continuous rolls "
+"start at, how long to wait for a shared counter, and print-only mode: the "
+"folder its labels come from and whether the app always starts in it."
+msgstr ""
+
+#. type: Content of: <book><chapter><variablelist><varlistentry><term>
+#: doc/index.docbook:423
+msgid "<guilabel>History</guilabel>"
+msgstr ""
+
+#. type: Content of: <book><chapter><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:424
+msgid ""
+"How many versions are kept per label, and whether they are kept next to the "
+"label in a <filename>.versions</filename> folder, where they go along with "
+"the label for everyone who opens it there; how many prints the history "
+"keeps; how many recently used layouts are kept."
+msgstr ""
+
+#. type: Content of: <book><chapter><variablelist><varlistentry><term>
+#: doc/index.docbook:425
+msgid "<guilabel>Automation</guilabel>"
+msgstr ""
+
+#. type: Content of: <book><chapter><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:426
+msgid "The automation service (see <xref linkend=\"automation\"/>)."
+msgstr ""
+
+#. type: Content of: <book><chapter><variablelist><varlistentry><term>
+#: doc/index.docbook:427
+msgid "<guilabel>Add-ons</guilabel>"
+msgstr ""
+
+#. type: Content of: <book><chapter><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:428
+msgid ""
+"The add-ons installed on this computer, each of which can be switched off. A "
+"change takes effect when &kappname; starts again."
+msgstr ""
+
+#. type: Content of: <book><chapter><para>
+#: doc/index.docbook:431
+msgid ""
+"An administrator can fix settings for everyone with KDE's Kiosk. For "
+"example, <literal>LockPrintOnly[$i]=true</literal> in the "
+"<literal>[Settings]</literal> group of "
+"<filename>plasma-label-creatorrc</filename> keeps people from leaving "
+"print-only mode."
+msgstr ""
+
+#. type: Content of: <book><chapter><para>
+#: doc/index.docbook:433
+msgid ""
+"&kappname; speaks the language of your desktop when it has been translated "
+"into it; for now, that is English and "
+"Dutch. <menuchoice><guimenu>Settings</guimenu><guimenuitem>Configure "
+"Language…</guimenuitem></menuchoice> chooses another language for &kappname; "
+"alone."
+msgstr ""
+
+#. type: Content of: <book><chapter><title>
+#: doc/index.docbook:437
+msgid "Command Reference"
+msgstr ""
+
+#. type: Content of: <book><chapter><para>
+#: doc/index.docbook:439
+msgid ""
+"Besides the menus described here, &kappname; has the common &plasma; "
+"<guimenu>Settings</guimenu> and <guimenu>Help</guimenu> menus."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><title>
+#: doc/index.docbook:442
+msgid "The File Menu"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><term>
+#: doc/index.docbook:444
+msgid ""
+"<menuchoice><shortcut><keycombo "
+"action=\"simul\">&Ctrl;<keycap>N</keycap></keycombo></shortcut><guimenu>File</guimenu><guimenuitem>New</guimenuitem></menuchoice>"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:444
+msgid "Starts a new label."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><term>
+#: doc/index.docbook:445
+msgid ""
+"<menuchoice><shortcut><keycombo "
+"action=\"simul\">&Ctrl;<keycap>O</keycap></keycombo></shortcut><guimenu>File</guimenu><guimenuitem>Open…</guimenuitem></menuchoice>"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:445
+msgid "Opens a <filename>.label</filename> file or a Rhino template."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><term>
+#: doc/index.docbook:446
+msgid ""
+"<menuchoice><guimenu>File</guimenu><guisubmenu>Open "
+"Recent</guisubmenu></menuchoice>"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:446
+msgid "Opens a label you opened before."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><term>
+#: doc/index.docbook:447
+msgid ""
+"<menuchoice><guimenu>File</guimenu><guisubmenu>Recently Used "
+"Layouts</guisubmenu></menuchoice>"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:447
+msgid "Opens one of the labels printed last, as it was printed."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><term>
+#: doc/index.docbook:448
+msgid ""
+"<menuchoice><shortcut><keycombo "
+"action=\"simul\">&Ctrl;<keycap>S</keycap></keycombo></shortcut><guimenu>File</guimenu><guimenuitem>Save</guimenuitem></menuchoice>, "
+"<menuchoice><guimenu>File</guimenu><guimenuitem>Save "
+"As…</guimenuitem></menuchoice>"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:448
+msgid "Saves the label."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><term>
+#: doc/index.docbook:449
+msgid "<menuchoice><guimenu>File</guimenu><guimenuitem>Versions…</guimenuitem></menuchoice>"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:449
+msgid "Earlier versions of the label, kept each time it was saved over."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><term>
+#: doc/index.docbook:450
+msgid ""
+"<menuchoice><guimenu>File</guimenu><guimenuitem>Export as PDF or "
+"Image…</guimenuitem></menuchoice>"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:450
+msgid "Saves the label as a PDF or a PNG image."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><term>
+#: doc/index.docbook:451
+msgid ""
+"<menuchoice><shortcut><keycombo "
+"action=\"simul\">&Ctrl;<keycap>P</keycap></keycombo></shortcut><guimenu>File</guimenu><guimenuitem>Print…</guimenuitem></menuchoice>"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:451
+msgid "Prints, as the <guibutton>Print</guibutton> button does."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><term>
+#: doc/index.docbook:452
+msgid ""
+"<menuchoice><guimenu>File</guimenu><guimenuitem>Print "
+"Preview</guimenuitem></menuchoice>"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:452
+msgid "Shows what the printer will receive."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><term>
+#: doc/index.docbook:453
+msgid ""
+"<menuchoice><guimenu>File</guimenu><guimenuitem>Print "
+"History…</guimenuitem></menuchoice>, "
+"<menuchoice><guimenu>File</guimenu><guimenuitem>Printer "
+"Status…</guimenuitem></menuchoice>"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:453
+msgid "See <xref linkend=\"history\"/>."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><term>
+#: doc/index.docbook:454
+msgid ""
+"<menuchoice><guimenu>File</guimenu><guimenuitem>Print-Only "
+"Mode</guimenuitem></menuchoice>"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:454
+msgid "Switches to print-only mode and back."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><term>
+#: doc/index.docbook:455
+msgid ""
+"<menuchoice><shortcut><keycombo "
+"action=\"simul\">&Ctrl;<keycap>Q</keycap></keycombo></shortcut><guimenu>File</guimenu><guimenuitem>Quit</guimenuitem></menuchoice>"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:455
+msgid "Quits &kappname;, asking to save changes first."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:457
+msgid "Add-ons may add their own actions to this menu."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><title>
+#: doc/index.docbook:461
+msgid "The Edit Menu"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><term>
+#: doc/index.docbook:463
+msgid "<guimenuitem>Undo</guimenuitem>, <guimenuitem>Redo</guimenuitem>"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:463
+msgid ""
+"Undoes or redoes the last change (<keycombo "
+"action=\"simul\">&Ctrl;<keycap>Z</keycap></keycombo>, <keycombo "
+"action=\"simul\">&Ctrl;&Shift;<keycap>Z</keycap></keycombo>)."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><term>
+#: doc/index.docbook:464
+msgid ""
+"<guimenuitem>Cut</guimenuitem>, <guimenuitem>Copy</guimenuitem>, "
+"<guimenuitem>Paste</guimenuitem>"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:464
+msgid ""
+"Objects can also be pasted into another label, and text or pictures from "
+"other programs pasted as new objects."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><term>
+#: doc/index.docbook:465
+msgid ""
+"<guimenuitem>Delete Object</guimenuitem>, <guimenuitem>Duplicate "
+"Object</guimenuitem>"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:465
+msgid "Deletes or duplicates the selection."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><term>
+#: doc/index.docbook:466
+msgid "<guimenuitem>Object Properties…</guimenuitem>"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:466
+msgid "See <xref linkend=\"properties\"/>."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><term>
+#: doc/index.docbook:467
+msgid "<guimenuitem>Select All</guimenuitem>"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:467
+msgid "Selects every object."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><title>
+#: doc/index.docbook:472
+msgid "The View Menu"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><term>
+#: doc/index.docbook:474
+msgid ""
+"<guimenuitem>Zoom In</guimenuitem>, <guimenuitem>Zoom Out</guimenuitem>, "
+"<guimenuitem>Fit to Page</guimenuitem>, <guimenuitem>Actual "
+"Size</guimenuitem>"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:474
+msgid "Change the zoom; the slider under the canvas does too."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><term>
+#: doc/index.docbook:475
+msgid ""
+"<guimenuitem>Show Grid</guimenuitem>, <guimenuitem>Snap to "
+"Grid</guimenuitem>, <guisubmenu>Grid Spacing</guisubmenu>"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:475
+msgid "The grid to place objects by."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><term>
+#: doc/index.docbook:476
+msgid ""
+"<guimenuitem>Show Guidelines</guimenuitem>, <guimenuitem>Clear "
+"Guidelines</guimenuitem>"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><variablelist><varlistentry><listitem><para>
+#: doc/index.docbook:476
+msgid "The guidelines dragged out of the rulers."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><title>
+#: doc/index.docbook:481
+msgid "The Format Menu"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:482
+msgid ""
+"The font, size and style of text, its alignment, how it fits its box and "
+"whether it wraps; see <xref linkend=\"formatting\"/>."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><title>
+#: doc/index.docbook:486
+msgid "The Insert Menu"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:487
+msgid ""
+"Every kind of object (see <xref linkend=\"objects\"/>), and "
+"<guimenuitem>Label of a Kind…</guimenuitem> (see <xref "
+"linkend=\"label-kinds\"/>)."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><title>
+#: doc/index.docbook:491
+msgid "The Layout Menu"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:492
+msgid ""
+"The label type, custom sizes, the roll layout, print settings and "
+"orientation; the tape length and the order of cells on tape labels; "
+"positioning, aligning, grouping, locking, turning and stacking objects; "
+"layers, and leaving objects out of print. See <xref linkend=\"arranging\"/> "
+"and <xref linkend=\"label-types\"/>."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><title>
+#: doc/index.docbook:496
+msgid "The Data Menu"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:497
+msgid ""
+"<guimenuitem>Data Source…</guimenuitem>, <guimenuitem>Insert "
+"Field</guimenuitem>, <guimenuitem>Print-Time Questions…</guimenuitem>, "
+"<guimenuitem>Calculated Fields…</guimenuitem> and <guimenuitem>Remove Data "
+"Source</guimenuitem>; see <xref linkend=\"data\"/>."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><title>
+#: doc/index.docbook:501
+msgid "The Address Book Menu"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:502
+msgid ""
+"<guimenuitem>New Address Book</guimenuitem>, <guimenuitem>Open Address "
+"Book…</guimenuitem>, <guimenuitem>Import Addresses from CSV…</guimenuitem>, "
+"and saving the address book; see <xref linkend=\"address-book\"/>."
+msgstr ""
+
+#. type: Content of: <book><chapter><title>
+#: doc/index.docbook:508
+msgid "Command-Line Tools and Add-ons"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><title>
+#: doc/index.docbook:511
+msgid "plasma-label-creator-render"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:513
+msgid ""
+"<command>plasma-label-creator-render</command> renders a label to a PNG or "
+"PDF file, prints it, or shows what a printer would receive. For example:"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><programlisting>
+#: doc/index.docbook:515
+#, no-wrap
+msgid ""
+"# Render a label to an image, and list what is on it\n"
+"plasma-label-creator-render --info label.label preview.png\n"
+"\n"
+"# Print it on a CUPS queue\n"
+"plasma-label-creator-render label.label --send DYMO-LabelWriter-450\n"
+"\n"
+"# Ask a ZPL printer on the network what it is and what is loaded\n"
+"plasma-label-creator-render --zpl-info 192.0.2.10\n"
+"\n"
+"# A PDF proof with the label's outline\n"
+"plasma-label-creator-render --outline label.label proof.pdf"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:527
+msgid ""
+"<userinput><command>plasma-label-creator-render</command> "
+"<option>--help</option></userinput> lists every option."
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><title>
+#: doc/index.docbook:531
+msgid "Add-ons"
+msgstr ""
+
+#. type: Content of: <book><chapter><sect1><para>
+#: doc/index.docbook:533
+msgid ""
+"&kappname; needs no add-ons. An add-on can put actions in the "
+"<guimenu>File</guimenu> menu and a status indicator in the status bar, and "
+"open labels it keeps in a folder of its own, such as a team's labels kept on "
+"a server. Add-ons found on the computer are on until they are switched off "
+"on the <guilabel>Add-ons</guilabel> page of the settings."
+msgstr ""
+
+#. type: Content of: <book><chapter><title>
+#: doc/index.docbook:539
+msgid "Credits and License"
+msgstr ""
+
+#. type: Content of: <book><chapter><para>
+#: doc/index.docbook:541
+msgid "&kappname;"
+msgstr ""
+
+#. type: Content of: <book><chapter><para>
+#: doc/index.docbook:542
+msgid "Program copyright 2026 nvaert1986"
+msgstr ""
+
+#. type: Content of: <book><chapter><para>
+#: doc/index.docbook:543
+msgid ""
+"Barcodes are drawn with zint (<ulink "
+"url=\"https://zint.org.uk/\">zint.org.uk</ulink>)."
+msgstr ""
+
+#. type: Content of: <book><chapter><para>
+#: doc/index.docbook:544
+msgid "Documentation copyright 2026 nvaert1986"
+msgstr ""
+
+#. type: Content of: <book><chapter><para>
+#: doc/index.docbook:546
+msgid ""
+"DYMO, LabelWriter, LabelManager and Rhino are trademarks of Newell "
+"Brands. Altec is a trademark of its owner. Zebra and ZPL are trademarks of "
+"Zebra Technologies. They are used here only to say which printers and files "
+"&kappname; works with. &kappname; is not affiliated with, endorsed by or "
+"supported by any of them."
+msgstr ""
+
+#. type: Content of: <book><chapter><para>
+#: doc/index.docbook:550
+msgid "This documentation is dedicated to the public domain under CC0-1.0."
+msgstr ""
+
+#. type: Content of: <book><appendix><title>
+#: doc/index.docbook:556
+msgid "Installation"
+msgstr ""
+
+#. type: Content of: <book><appendix><para>
+#: doc/index.docbook:558
+msgid ""
+"&kappname; is built with CMake. It needs Qt 6.7 or newer, KDE Frameworks 6, "
+"zint, CUPS and libudev; the handbook needs "
+"KDocTools. <filename>INSTALL.md</filename> in the source lists every "
+"requirement, the packages for common distributions, the build options and "
+"how to set up each kind of printer."
+msgstr ""
+
+#. type: Content of: <book><appendix><programlisting>
+#: doc/index.docbook:560
+#, no-wrap
+msgid ""
+"cmake -S . -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo "
+"-DCMAKE_INSTALL_PREFIX=/usr\n"
+"cmake --build build\n"
+"cmake --install build"
+msgstr ""
+
+#. type: Content of: <book><appendix><para>
+#: doc/index.docbook:564
+msgid ""
+"The source is at <ulink "
+"url=\"https://github.com/nvaert1986/plasma-label-creator\">github.com/nvaert1986/plasma-label-creator</ulink>."
+msgstr ""

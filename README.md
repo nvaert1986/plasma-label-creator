@@ -106,6 +106,10 @@ Altec, Zebra Technologies or KDE e.V. See [Trademarks](#trademarks).
 - **Recently used layouts**: every printed label, with a thumbnail.
 - **`plasma-label-creator-render`**: a command-line tool that renders a
   label to PNG or PDF, prints it, or shows what a printer would receive.
+- **In English and Dutch**, following the desktop's language (Settings >
+  Configure Language… switches the app alone), with a **handbook** in both
+  (Help > Plasma Label Creator Handbook, or F1), in KHelpCenter. The
+  command-line tool and the automation service speak the same languages.
 - **Automation service** (`plasma-label-creator-automation`): prints
   without anyone at the screen, also when the app is closed. CSV and JSON
   files dropped in watched folders print a label per row; other programs
@@ -145,10 +149,13 @@ for those, make the label size with Layout > Custom Label Size….
 
 ## Requirements
 
-- Linux with Qt 6.7 or newer (with Qt SVG) and KDE Frameworks 6, a C++20 compiler,
-  CMake 3.22 or newer, zint, CUPS and libudev. Developed and tested on
-  Gentoo with Qt 6.11, KDE Frameworks 6.29, zint 2.16, CUPS 2.4 and
-  GCC 15.
+- Linux with Qt 6.7 or newer (with Qt SVG) and KDE Frameworks 6 (KDocTools
+  for the handbook), a C++20 compiler, CMake 3.22 or newer, GNU gettext,
+  zint, CUPS and libudev. Developed and tested on Gentoo with Qt 6.11, KDE
+  Frameworks 6.29, zint 2.16, CUPS 2.4, gettext 0.23 and GCC 15.
+- Built without the app (`-DBUILD_APP=OFF`), the core library, the
+  command-line tool and the automation service need only KI18n of KDE
+  Frameworks, for their translated messages.
 - To print: CUPS with DYMO's driver for DYMO printers, or CUPS's own Zebra
   ZPL driver for Altec and Zebra printers (also for labels across the roll
   and continuous rolls).
@@ -279,15 +286,27 @@ print-only mode. Shared counters of its labels can count on with the add-on inst
 of in a counter file. That is enough for, say, a team's labels kept on a
 server.
 
+## Translations
+
+The app, its messages from the core library, the command-line tool, the
+automation service, the launchers, file types and AppStream metadata, and
+the handbook are in English and Dutch. Translations are gettext `.po` files
+in `po/` (messages) and `doc/po/` (the handbook, a paragraph at a time);
+`po/update.sh` keeps them up to date with the source and starts a new
+language with `po/update.sh --new <code>`. It needs gettext and po4a; see
+[INSTALL.md](INSTALL.md#translating). New languages are welcome.
+
 ## Source layout
 
 | Path | Contents |
 |---|---|
-| `src/lib` | `labelcreatorcore`: file formats, layout, rendering, printing. Qt Core, Gui and Network, zint and CUPS only; no widgets or KDE Frameworks |
+| `src/lib` | `labelcreatorcore`: file formats, layout, rendering, printing. Qt Core, Gui and Network, zint, CUPS and KI18n only; no widgets or other KDE Frameworks |
 | `src/cli` | `plasma-label-creator-render` |
-| `src/service` | `plasma-label-creator-automation`, the automation service (Qt only, Qt HTTP Server optional) |
+| `src/service` | `plasma-label-creator-automation`, the automation service (Qt and KI18n only, Qt HTTP Server optional) |
 | `src/app` | The desktop application (Qt Widgets and KDE Frameworks 6) |
 | `src/plugin` | The add-on interface, a header only |
+| `doc` | The handbook (DocBook, `index.docbook`) and its translations' `.po` files |
+| `po` | The translated messages, and the translated handbooks made from `doc/po` |
 | `autotests` | Qt Test suites and their test data |
 
 ## Contributing
@@ -305,7 +324,8 @@ What each version changed is in [CHANGELOG.md](CHANGELOG.md).
 - Core library (`src/lib`): LGPL-2.1-or-later
 - Application and command-line tool: GPL-2.0-or-later
 - Build files: BSD-2-Clause
-- Data files and documentation: CC0-1.0
+- Data files and documentation (also the handbook and its translations): CC0-1.0
+- Translations of the messages: GPL-2.0-or-later, as the program
 
 As a whole, the program is GPL-2.0-or-later; that is the `LICENSE` file.
 The full texts of all four are in `LICENSES/`. Each file states its licence

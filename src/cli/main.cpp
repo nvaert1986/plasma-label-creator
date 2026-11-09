@@ -12,6 +12,8 @@
 #include "units.h"
 #include "zplprinter.h"
 
+#include <KLocalizedString>
+
 #include <QCommandLineParser>
 #include <QFile>
 #include <QFileInfo>
@@ -76,25 +78,25 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationVersion(QStringLiteral(LABELCREATOR_VERSION_STRING));
 
     QCommandLineParser parser;
-    parser.setApplicationDescription(u"Renders a DYMO Label Software .label file to an image."_s);
+    parser.setApplicationDescription(i18n("Renders a DYMO Label Software .label file to an image."));
     parser.addHelpOption();
     parser.addVersionOption();
-    const QCommandLineOption dpiOption(u"dpi"_s, u"Resolution of the image (default 300, the LabelWriter head)."_s, u"dpi"_s, u"300"_s);
-    const QCommandLineOption printOption(u"print"_s, u"Render as for the printer: no antialiasing, no outline."_s);
-    const QCommandLineOption outlineOption(u"outline"_s, u"With --print or a PDF: draw the label's outline, a proof of how it will look."_s);
-    const QCommandLineOption infoOption(u"info"_s, u"List the paper and the objects."_s);
-    const QCommandLineOption resaveOption(u"resave"_s, u"Write the label back out to <file>, to check round trips."_s, u"file"_s);
-    const QCommandLineOption listPrintersOption(u"list-printers"_s, u"List the CUPS queues and their DYMO paper sizes."_s);
-    const QCommandLineOption sendOption(u"send"_s, u"Print the label on CUPS queue <printer>."_s, u"printer"_s);
-    const QCommandLineOption copiesOption(u"copies"_s, u"Number of copies to print (default 1)."_s, u"n"_s, u"1"_s);
-    const QCommandLineOption qualityOption(u"quality"_s, u"DYMO print quality: Text or Graphics."_s, u"quality"_s);
-    const QCommandLineOption densityOption(u"density"_s, u"DYMO print density: Light, Medium, Normal or Dark."_s, u"density"_s);
-    const QCommandLineOption offsetOption(u"offset"_s, u"Extra print offset in mm, x,y (right and down positive)."_s, u"x,y"_s);
-    const QCommandLineOption noMarginOption(u"no-margin-compensation"_s, u"Do not move the label up by the driver's top margin."_s);
-    const QCommandLineOption paperImageOption(u"paper-image"_s, u"Write the 1-bit image that would be printed to <file>."_s, u"file"_s);
-    const QCommandLineOption queueOption(u"queue"_s, u"The CUPS queue whose driver --paper-image uses, without printing."_s, u"printer"_s);
+    const QCommandLineOption dpiOption(u"dpi"_s, i18n("Resolution of the image (default 300, the LabelWriter head)."), u"dpi"_s, u"300"_s);
+    const QCommandLineOption printOption(u"print"_s, i18n("Render as for the printer: no antialiasing, no outline."));
+    const QCommandLineOption outlineOption(u"outline"_s, i18n("With --print or a PDF: draw the label's outline, a proof of how it will look."));
+    const QCommandLineOption infoOption(u"info"_s, i18n("List the paper and the objects."));
+    const QCommandLineOption resaveOption(u"resave"_s, i18n("Write the label back out to <file>, to check round trips."), u"file"_s);
+    const QCommandLineOption listPrintersOption(u"list-printers"_s, i18n("List the CUPS queues and their DYMO paper sizes."));
+    const QCommandLineOption sendOption(u"send"_s, i18n("Print the label on CUPS queue <printer>."), u"printer"_s);
+    const QCommandLineOption copiesOption(u"copies"_s, i18n("Number of copies to print (default 1)."), u"n"_s, u"1"_s);
+    const QCommandLineOption qualityOption(u"quality"_s, i18n("DYMO print quality: Text or Graphics."), u"quality"_s);
+    const QCommandLineOption densityOption(u"density"_s, i18n("DYMO print density: Light, Medium, Normal or Dark."), u"density"_s);
+    const QCommandLineOption offsetOption(u"offset"_s, i18n("Extra print offset in mm, x,y (right and down positive)."), u"x,y"_s);
+    const QCommandLineOption noMarginOption(u"no-margin-compensation"_s, i18n("Do not move the label up by the driver's top margin."));
+    const QCommandLineOption paperImageOption(u"paper-image"_s, i18n("Write the 1-bit image that would be printed to <file>."), u"file"_s);
+    const QCommandLineOption queueOption(u"queue"_s, i18n("The CUPS queue whose driver --paper-image uses, without printing."), u"printer"_s);
     const QCommandLineOption zplInfoOption(u"zpl-info"_s,
-                                           u"Ask the ZPL label printer at <host[:port]> what it is and which labels are in it (prints nothing)."_s,
+                                           i18n("Ask the ZPL label printer at <host[:port]> what it is and which labels are in it (prints nothing)."),
                                            u"host"_s);
     parser.addOptions({dpiOption,
                        printOption,
@@ -111,8 +113,8 @@ int main(int argc, char *argv[])
                        paperImageOption,
                        queueOption,
                        zplInfoOption});
-    parser.addPositionalArgument(u"input"_s, u"The .label file."_s);
-    parser.addPositionalArgument(u"output"_s, u"The image to write, for example label.png, or label.pdf for a PDF."_s, u"[output]"_s);
+    parser.addPositionalArgument(u"input"_s, i18n("The .label file."));
+    parser.addPositionalArgument(u"output"_s, i18n("The image to write, for example label.png, or label.pdf for a PDF."), u"[output]"_s);
     parser.process(app);
 
     QTextStream out(stdout);
@@ -173,7 +175,7 @@ int main(int argc, char *argv[])
     bool dpiOk = false;
     const qreal dpi = parser.value(dpiOption).toDouble(&dpiOk);
     if (!dpiOk || dpi <= 0) {
-        err << "Invalid --dpi value\n";
+        err << i18n("Invalid --dpi value") << '\n';
         return 1;
     }
 
@@ -193,7 +195,7 @@ int main(int argc, char *argv[])
         document = reader.readFile(arguments.at(0));
     }
     for (const QString &warning : reader.warnings()) {
-        err << "warning: " << warning << '\n';
+        err << i18n("warning: %1", warning) << '\n';
     }
     if (!document) {
         err << arguments.at(0) << ": " << reader.errorString() << '\n';
@@ -232,17 +234,17 @@ int main(int argc, char *argv[])
             }
             const auto paper = driver.paperFor(*document);
             if (!paper) {
-                err << queue << " has no paper size for \"" << document->paperName << "\"\n";
+                err << i18n("%1 has no paper size for \"%2\"", queue, document->paperName) << '\n';
                 return 4;
             }
             QStringList warnings;
             const QImage page = LabelPrinter::paperImage(*document, *paper, driver.resolution(), &warnings);
             for (const QString &warning : warnings) {
-                err << "warning: " << warning << '\n';
+                err << i18n("warning: %1", warning) << '\n';
             }
             out << "Paper: " << paper->keyword << " (" << paper->name << "), " << page.width() << 'x' << page.height() << " dots\n";
             if (!page.save(parser.value(paperImageOption))) {
-                err << parser.value(paperImageOption) << ": could not write the image\n";
+                err << i18n("%1: could not write the image", parser.value(paperImageOption)) << '\n';
                 return 3;
             }
         }
@@ -259,13 +261,13 @@ int main(int argc, char *argv[])
             }
             const int job = printer.print(*document, options);
             for (const QString &warning : printer.warnings()) {
-                err << "warning: " << warning << '\n';
+                err << i18n("warning: %1", warning) << '\n';
             }
             if (job == 0) {
                 err << printer.errorString() << '\n';
                 return 4;
             }
-            out << "Sent to " << printerName << " as job " << job << '\n';
+            out << i18n("Sent to %1 as job %2", printerName, QString::number(job)) << '\n';
         }
     }
 
@@ -275,21 +277,21 @@ int main(int argc, char *argv[])
         renderer.setPrinterResolution(dpi);
         renderer.setOutline(parser.isSet(outlineOption));
         if (!renderer.writePdf(*document, arguments.at(1), QFileInfo(arguments.at(0)).completeBaseName())) {
-            err << arguments.at(1) << ": could not write the PDF\n";
+            err << i18n("%1: could not write the PDF", arguments.at(1)) << '\n';
             return 3;
         }
         for (const QString &warning : renderer.warnings()) {
-            err << "warning: " << warning << '\n';
+            err << i18n("warning: %1", warning) << '\n';
         }
     } else if (arguments.size() == 2) {
         LabelRenderer renderer(parser.isSet(printOption) ? LabelRenderer::Mode::Print : LabelRenderer::Mode::Preview);
         renderer.setOutline(parser.isSet(outlineOption));
         const QImage image = renderer.renderImage(*document, dpi);
         for (const QString &warning : renderer.warnings()) {
-            err << "warning: " << warning << '\n';
+            err << i18n("warning: %1", warning) << '\n';
         }
         if (!image.save(arguments.at(1))) {
-            err << arguments.at(1) << ": could not write the image\n";
+            err << i18n("%1: could not write the image", arguments.at(1)) << '\n';
             return 3;
         }
     }

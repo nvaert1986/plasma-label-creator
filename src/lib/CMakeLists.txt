@@ -59,6 +59,10 @@ target_link_libraries(labelcreatorcore
         Qt6::Svg
     PRIVATE
         Qt6::Network
+        KF6::I18n
         Cups::Cups
         zint::zint
 )
+
+# Its messages are in the app's catalogue.
+target_compile_definitions(labelcreatorcore PRIVATE TRANSLATION_DOMAIN="plasma-label-creator")

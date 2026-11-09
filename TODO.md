@@ -70,6 +70,17 @@ Features found in other label software, the Easy to Medium ones:
   with File menu actions, a status bar indicator, their own label folders,
   and hooks for saving, printing and shared counters. Settings > Add-ons.
 
+## Done since 0.6.1 (unreleased)
+
+- [x] Translations: English and Dutch (the app, the core library's
+  messages, the command-line tool, the automation service, launchers, file
+  types, AppStream), gettext `.po` files with `po/update.sh`.
+- [x] A KDE-style handbook in English and Dutch (Help > Handbook, F1).
+- [ ] Screenshots in the handbook: it has the README's screenshot only, in
+  English (the Dutch handbook shows it too). Pictures of the main dialogs,
+  in each language, would help. (Easy)
+- [ ] The web version is not translated yet. (Medium)
+
 ## Next session
 
 Version 0.6.1: desktop integration (file types, icons, Dolphin thumbnails and menu, launcher extras, AppStream), each optional. Version 0.6.0: add-ons. Version 0.5.0: print conditions, growing text and anchoring, guidelines,

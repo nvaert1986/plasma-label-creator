@@ -15,6 +15,7 @@
 #include "units.h"
 #include "zplprinter.h"
 
+#include <KLocalizedString>
 #include <QDateTime>
 #include <QDir>
 #include <QDirIterator>
@@ -80,13 +81,13 @@ std::optional<QHash<QString, QString>> fieldValues(const QJsonValue &value, cons
         return values;
     }
     if (!value.isObject()) {
-        fail(errorString, u"\"%1\" is not an object of field names and values."_s.arg(what));
+        fail(errorString, i18n("\"%1\" is not an object of field names and values.", what));
         return std::nullopt;
     }
     const QJsonObject object = value.toObject();
     for (auto it = object.begin(); it != object.end(); ++it) {
         if (it->isArray() || it->isObject()) {
-            fail(errorString, u"\"%1\": the value of %2 is not a text, number or true/false."_s.arg(what, it.key()));
+            fail(errorString, i18n("\"%1\": the value of %2 is not a text, number or true/false.", what, it.key()));
             return std::nullopt;
         }
         if (!it->isNull()) {
@@ -174,12 +175,12 @@ QDate readDate(const PrintQuestion &question, const QString &text)
 
 QString checkedText(const PrintQuestion &question)
 {
-    return question.checkedText.isEmpty() ? u"Yes"_s : question.checkedText;
+    return question.checkedText.isEmpty() ? i18nc("answer of a ticked check box", "Yes") : question.checkedText;
 }
 
 QString uncheckedText(const PrintQuestion &question)
 {
-    return question.uncheckedText.isEmpty() ? u"No"_s : question.uncheckedText;
+    return question.uncheckedText.isEmpty() ? i18nc("answer of a check box not ticked", "No") : question.uncheckedText;
 }
 
 } // namespace
@@ -244,7 +245,7 @@ bool AutomationSettings::save(const QString &fileName, QString *errorString) con
         {"http"_L1, QJsonObject{{"enabled"_L1, http}, {"network"_L1, httpNetwork}, {"port"_L1, httpPort}, {"token"_L1, httpToken}}},
     };
     if (!QDir().mkpath(QFileInfo(fileName).absolutePath())) {
-        return fail(errorString, u"Could not create the folder for %1."_s.arg(fileName));
+        return fail(errorString, i18n("Could not create the folder for %1.", fileName));
     }
     QSaveFile file(fileName);
     if (!file.open(QIODevice::WriteOnly)) {
@@ -271,7 +272,7 @@ std::optional<PrintRequest> PrintRequest::fromJson(const QByteArray &json, QStri
     QJsonParseError parseError;
     const QJsonDocument document = QJsonDocument::fromJson(json, &parseError);
     if (!document.isObject()) {
-        fail(errorString, document.isNull() ? u"Not JSON: %1."_s.arg(parseError.errorString()) : u"Not a JSON object."_s);
+        fail(errorString, document.isNull() ? i18n("Not JSON: %1.", parseError.errorString()) : i18n("Not a JSON object."));
         return std::nullopt;
     }
     const QJsonObject root = document.object();
@@ -279,7 +280,7 @@ std::optional<PrintRequest> PrintRequest::fromJson(const QByteArray &json, QStri
     for (const char *name : {"label", "printer"}) {
         const QJsonValue value = root.value(QLatin1StringView(name));
         if (!value.isUndefined() && !value.isNull() && !value.isString()) {
-            fail(errorString, u"\"%1\" is not a text."_s.arg(QLatin1StringView(name)));
+            fail(errorString, i18n("\"%1\" is not a text.", QString::fromLatin1(name)));
             return std::nullopt;
         }
     }
@@ -288,7 +289,7 @@ std::optional<PrintRequest> PrintRequest::fromJson(const QByteArray &json, QStri
     const QJsonValue copies = root.value("copies"_L1);
     if (!copies.isUndefined()) {
         if (!copies.isDouble() || copies.toDouble() != std::floor(copies.toDouble()) || copies.toInt() < 1 || copies.toInt() > MaxCopies) {
-            fail(errorString, u"\"copies\" is not a whole number from 1 to %1."_s.arg(MaxCopies));
+            fail(errorString, i18n("\"copies\" is not a whole number from 1 to %1.", MaxCopies));
             return std::nullopt;
         }
         request.copies = copies.toInt();
@@ -301,12 +302,12 @@ std::optional<PrintRequest> PrintRequest::fromJson(const QByteArray &json, QStri
     const QJsonValue rows = root.value("rows"_L1);
     if (!rows.isUndefined() && !rows.isNull()) {
         if (!rows.isArray()) {
-            fail(errorString, u"\"rows\" is not a list of rows."_s);
+            fail(errorString, i18n("\"rows\" is not a list of rows."));
             return std::nullopt;
         }
         const QJsonArray list = rows.toArray();
         if (list.size() > MaxRows) {
-            fail(errorString, u"More than %1 rows in one job."_s.arg(MaxRows));
+            fail(errorString, i18n("More than %1 rows in one job.", MaxRows));
             return std::nullopt;
         }
         for (const QJsonValue row : list) {
@@ -319,7 +320,7 @@ std::optional<PrintRequest> PrintRequest::fromJson(const QByteArray &json, QStri
     }
     const QJsonValue anyway = root.value("printAnyway"_L1);
     if (!anyway.isUndefined() && !anyway.isBool()) {
-        fail(errorString, u"\"printAnyway\" is not true or false."_s);
+        fail(errorString, i18n("\"printAnyway\" is not true or false."));
         return std::nullopt;
     }
     request.printAnyway = anyway.toBool(false);
@@ -489,7 +490,7 @@ QStringList zplProblems(const LabelDocument &document, const ZplPrinterInfo &inf
         const qreal loaded = info.labelSizeMm().height();
         const qreal length = Units::twipsToMm(document.paperSize().height());
         if (!Zpl::fitsLoaded(length, loaded)) {
-            problems << u"this label is %1 mm long, but the labels in %2 are %3 mm long"_s.arg(QString::number(length, 'f', 1), printerName, QString::number(loaded, 'f', 1));
+            problems << i18n("this label is %1 mm long, but the labels in %2 are %3 mm long", QString::number(length, 'f', 1), printerName, QString::number(loaded, 'f', 1));
         }
     }
     return problems;
@@ -543,7 +544,7 @@ std::optional<QHash<QString, QString>> answers(const LabelDocument &document, co
                     number = local.toDouble(answer.trimmed(), &ok);
                 }
                 if (!ok && !answer.trimmed().isEmpty()) {
-                    fail(errorString, u"%1: not a number."_s.arg(label));
+                    fail(errorString, i18n("%1: not a number.", label));
                     return std::nullopt;
                 }
             } else {
@@ -561,7 +562,7 @@ std::optional<QHash<QString, QString>> answers(const LabelDocument &document, co
             // Today unless set, as the form does; a date given must be one.
             QDate date = answer.trimmed().isEmpty() ? QDate() : readDate(question, answer.trimmed());
             if (!date.isValid() && answered && !answer.trimmed().isEmpty()) {
-                fail(errorString, u"%1: not a date (%2, or yyyy-MM-dd)."_s.arg(label, question.dateFormat.isEmpty() ? QLocale().dateFormat(QLocale::ShortFormat) : question.dateFormat));
+                fail(errorString, i18n("%1: not a date (%2, or yyyy-MM-dd).", label, question.dateFormat.isEmpty() ? QLocale().dateFormat(QLocale::ShortFormat) : question.dateFormat));
                 return std::nullopt;
             }
             if (!date.isValid()) {
@@ -582,7 +583,7 @@ std::optional<QHash<QString, QString>> answers(const LabelDocument &document, co
             } else if (answer == uncheckedText(question) || lower.isEmpty() || lower == u"false"_s || lower == u"0"_s || lower == u"no"_s) {
                 answer = uncheckedText(question);
             } else {
-                fail(errorString, u"%1: true or false, or \"%2\" or \"%3\"."_s.arg(label, checkedText(question), uncheckedText(question)));
+                fail(errorString, i18n("%1: true or false, or \"%2\" or \"%3\".", label, checkedText(question), uncheckedText(question)));
                 return std::nullopt;
             }
             break;
@@ -638,7 +639,7 @@ PrintOutcome print(const QString &labelFile, const PrintRequest &request, const 
     LabelReader reader;
     auto read = reader.readFile(labelFile);
     if (!read) {
-        return refuse(PrintOutcome::Status::NotFound, u"%1 could not be read: %2"_s.arg(QFileInfo(labelFile).fileName(), reader.errorString()));
+        return refuse(PrintOutcome::Status::NotFound, i18n("%1 could not be read: %2", QFileInfo(labelFile).fileName(), reader.errorString()));
     }
     // A tape label's cells place its objects and set its length.
     TapeLayout::layout(*read);
@@ -646,21 +647,21 @@ PrintOutcome print(const QString &labelFile, const PrintRequest &request, const 
 
     const QString printerName = request.printer;
     if (printerName.isEmpty()) {
-        return refuse(PrintOutcome::Status::BadRequest, u"No printer: name one, or choose a default printer in the automation settings."_s);
+        return refuse(PrintOutcome::Status::BadRequest, i18n("No printer: name one, or choose a default printer in the automation settings."));
     }
     const QList<PrinterInfo> printers = LabelPrinter::printers();
     const auto info = std::find_if(printers.cbegin(), printers.cend(), [&printerName](const PrinterInfo &printer) {
         return printer.name == printerName;
     });
     if (info == printers.cend()) {
-        return refuse(PrintOutcome::Status::NotFound, u"There is no printer called %1."_s.arg(printerName));
+        return refuse(PrintOutcome::Status::NotFound, i18n("There is no printer called %1.", printerName));
     }
     // A queue without a label printer driver prints as the LabelWriter it
     // was told it is, in the app's print bar.
     const QString driver = info->hasLabelDriver() ? QString() : environment.drivers.value(printerName);
     if (!info->hasLabelDriver() && driver.isEmpty()) {
         return refuse(PrintOutcome::Status::NotReady,
-                      u"%1 is not set up as a label printer: choose which LabelWriter it is in Plasma Label Creator's print bar first."_s.arg(printerName));
+                      i18n("%1 is not set up as a label printer: choose which LabelWriter it is in Plasma Label Creator's print bar first.", printerName));
     }
     LabelPrinter printer(printerName, driver);
     if (!printer.load()) {
@@ -668,7 +669,7 @@ PrintOutcome print(const QString &labelFile, const PrintRequest &request, const 
     }
     if (!printer.paperFor(document)) {
         return refuse(PrintOutcome::Status::NotReady,
-                      u"%1 cannot print this label: a %2 is not one of its label types."_s.arg(printerName, document.paperName));
+                      i18n("%1 cannot print this label: a %2 is not one of its label types.", printerName, document.paperName));
     }
     // What the queue says, and a ZPL printer on the network itself, as the
     // print bar asks it: whether it is ready, and which labels are loaded.
@@ -679,12 +680,12 @@ PrintOutcome print(const QString &labelFile, const PrintRequest &request, const 
             problems += zplProblems(document, *zpl, printerName);
         } else {
             // Not answering says nothing about the labels: printed, as the app does.
-            outcome.warnings << u"%1 did not answer about its labels: %2"_s.arg(printerName, zplError);
+            outcome.warnings << i18n("%1 did not answer about its labels: %2", printerName, zplError);
         }
     }
     if (!problems.isEmpty() && !request.printAnyway) {
         return refuse(PrintOutcome::Status::NotReady,
-                      u"%1 reports: %2. Ask with printAnyway to print anyway: the labels then wait in the queue."_s.arg(printerName, problems.join(u", "_s)));
+                      i18n("%1 reports: %2. Ask with printAnyway to print anyway: the labels then wait in the queue.", printerName, problems.join(u", "_s)));
     }
 
     QString error;
@@ -740,7 +741,7 @@ PrintOutcome print(const QString &labelFile, const PrintRequest &request, const 
     outcome.job = job;
     outcome.labels = printer.printedLabels();
     outcome.warnings += printer.warnings();
-    outcome.message = u"Sent %1 label(s) to %2 as job %3."_s.arg(outcome.labels).arg(printerName).arg(job);
+    outcome.message = i18np("Sent one label to %2 as job %3.", "Sent %1 labels to %2 as job %3.", outcome.labels, printerName, QString::number(job));
 
     // Counters count on: shared ones in their files, the others in the label.
     QStringList written;
@@ -761,7 +762,7 @@ PrintOutcome print(const QString &labelFile, const PrintRequest &request, const 
             written << counter->sharedFile;
             SharedCounter file(counter->sharedFile);
             if (!file.write(next)) {
-                outcome.warnings << u"The next counter value could not be saved: %1"_s.arg(file.errorString());
+                outcome.warnings << i18n("The next counter value could not be saved: %1", file.errorString());
             }
         }
     }
@@ -785,13 +786,13 @@ PrintOutcome print(const QString &labelFile, const PrintRequest &request, const 
         QString historyError;
         // Kept as it was printed, before the counters moved on.
         if (!history.add(record, *read, &historyError)) {
-            outcome.warnings << u"The print history could not be written: %1"_s.arg(historyError);
+            outcome.warnings << i18n("The print history could not be written: %1", historyError);
         }
     }
     if (counted && environment.saveCounters) {
         QString saveError;
         if (!LabelWriter::writeFile(document, labelFile, &saveError)) {
-            outcome.warnings << u"The counters could not be saved in the label: %1"_s.arg(saveError);
+            outcome.warnings << i18n("The counters could not be saved in the label: %1", saveError);
         }
     }
     return outcome;

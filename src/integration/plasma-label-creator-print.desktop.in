@@ -3,8 +3,11 @@
 [Desktop Entry]
 Type=Application
 Name=Label Printing
+Name[nl]=Labels afdrukken
 GenericName=Label Printing
+GenericName[nl]=Labels afdrukken
 Comment=Choose a label, fill in its form and print it, without editing
+Comment[nl]=Een label kiezen, het formulier invullen en het afdrukken, zonder te bewerken
 Exec=@KDE_INSTALL_FULL_BINDIR@/plasma-label-creator --print-only %F
 Icon=@PRINT_ICON@
 Terminal=false

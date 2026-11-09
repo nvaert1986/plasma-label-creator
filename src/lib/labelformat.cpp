@@ -10,6 +10,7 @@
 #include "tapelayout.h"
 #include "units.h"
 
+#include <KLocalizedString>
 #include <QBuffer>
 #include <functional>
 #include <QFile>
@@ -609,7 +610,7 @@ void readExtensions(const QByteArray &data, LabelDocument &document, QStringList
     QJsonParseError error;
     const QJsonObject root = QJsonDocument::fromJson(match.captured(1).toUtf8(), &error).object();
     if (error.error != QJsonParseError::NoError) {
-        warnings << u"Ignoring this program's settings in the file: %1"_s.arg(error.errorString());
+        warnings << i18n("Ignoring this program's settings in the file: %1", error.errorString());
         return;
     }
     for (const auto &value : root[u"questions"_s].toArray()) {
@@ -840,32 +841,32 @@ Enum Parser::readEnum(const EnumName<Enum> (&names)[N], Enum fallback)
             return entry.value;
         }
     }
-    m_warnings << u"Unknown %1 \"%2\", using the default"_s.arg(elementName, text);
+    m_warnings << i18n("Unknown %1 \"%2\", using the default", elementName, text);
     return fallback;
 }
 
 void Parser::skipUnknown(QStringView context)
 {
-    m_warnings << u"Ignoring <%1> in <%2>"_s.arg(m_xml.name(), context);
+    m_warnings << i18n("Ignoring <%1> in <%2>", m_xml.name().toString(), context.toString());
     m_xml.skipCurrentElement();
 }
 
 std::optional<LabelDocument> Parser::parseDocument(QString &errorString)
 {
     if (!m_xml.readNextStartElement()) {
-        errorString = m_xml.hasError() ? m_xml.errorString() : u"The file is empty"_s;
+        errorString = m_xml.hasError() ? m_xml.errorString() : i18n("The file is empty");
         return std::nullopt;
     }
     if (m_xml.name() == "ContinuousLabel"_L1) {
         return parseContinuousLabel(errorString);
     }
     if (m_xml.name() != "DieCutLabel"_L1) {
-        errorString = u"Not a DYMO label file: unexpected <%1>"_s.arg(m_xml.name());
+        errorString = i18n("Not a DYMO label file: unexpected <%1>", m_xml.name().toString());
         return std::nullopt;
     }
     const QStringView units = m_xml.attributes().value("Units"_L1);
     if (!units.isEmpty() && units != "twips"_L1) {
-        errorString = u"Unsupported units \"%1\""_s.arg(units);
+        errorString = i18n("Unsupported units \"%1\"", units.toString());
         return std::nullopt;
     }
 
@@ -899,7 +900,7 @@ std::optional<LabelDocument> Parser::parseDocument(QString &errorString)
         return std::nullopt;
     }
     if (document.paperOutline.isEmpty()) {
-        errorString = u"The label has no paper outline (DrawCommands)"_s;
+        errorString = i18n("The label has no paper outline (DrawCommands)");
         return std::nullopt;
     }
     return document;
@@ -928,7 +929,7 @@ std::optional<LabelObject> Parser::parseObject()
         UnknownObject unknown;
         unknown.elementName = name.toString();
         unknown.xml = captureElement(m_xml);
-        m_warnings << u"Keeping unsupported <%1> as is; it is not drawn"_s.arg(unknown.elementName);
+        m_warnings << i18n("Keeping unsupported <%1> as is; it is not drawn", unknown.elementName);
         return unknown;
     }
     return std::nullopt;
@@ -940,7 +941,7 @@ std::optional<LabelDocument> Parser::parseContinuousLabel(QString &errorString)
     // cells holding the objects (which have no bounds of their own).
     const QStringView units = m_xml.attributes().value("Units"_L1);
     if (!units.isEmpty() && units != "twips"_L1) {
-        errorString = u"Unsupported units \"%1\""_s.arg(units);
+        errorString = i18n("Unsupported units \"%1\"", units.toString());
         return std::nullopt;
     }
     LabelDocument document;
@@ -974,7 +975,7 @@ std::optional<LabelDocument> Parser::parseContinuousLabel(QString &errorString)
     const auto millimetres = TapeLayout::millimetresOf(document.id).value_or(TapeLayout::millimetresOf(document.paperName).value_or(0));
     const auto known = TapeLayout::tape(millimetres);
     if (!known) {
-        m_warnings << u"Unknown tape \"%1\", using 12 mm"_s.arg(document.paperName);
+        m_warnings << i18n("Unknown tape \"%1\", using 12 mm", document.paperName);
     }
     tape.width = Units::pointsToTwips(known.value_or(*TapeLayout::tape(12)).width);
     document.tape = tape;
@@ -1040,7 +1041,7 @@ void Parser::parseObjectInfo(LabelDocument &document)
     }
 
     if (!object) {
-        m_warnings << u"Skipping an empty <ObjectInfo>"_s;
+        m_warnings << i18n("Skipping an empty <ObjectInfo>");
         return;
     }
     objectBase(*object).bounds = bounds;

@@ -10,6 +10,7 @@
 #include "tapelayout.h"
 #include "units.h"
 
+#include <KLocalizedString>
 #include <QDir>
 #include <QFileInfo>
 
@@ -38,8 +39,8 @@ std::optional<LabelDocument> otherLabel(const QString &name, const Request &requ
     const QString file = labelFileFor(name, request.labelFile);
     if (file.isEmpty()) {
         fail(errorString,
-             request.labelFile.isEmpty() ? u"Save the label first: the label %1 is looked for next to it."_s.arg(name)
-                                         : u"There is no label %1 next to this one."_s.arg(name));
+             request.labelFile.isEmpty() ? i18n("Save the label first: the label %1 is looked for next to it.", name)
+                                         : i18n("There is no label %1 next to this one.", name));
         return std::nullopt;
     }
     if (const auto it = cache.constFind(file); it != cache.cend()) {
@@ -53,15 +54,13 @@ std::optional<LabelDocument> otherLabel(const QString &name, const Request &requ
     LabelReader reader;
     auto document = reader.readFile(file);
     if (!document) {
-        fail(errorString, u"%1 could not be read: %2"_s.arg(QFileInfo(file).fileName(), reader.errorString()));
+        fail(errorString, i18n("%1 could not be read: %2", QFileInfo(file).fileName(), reader.errorString()));
         return std::nullopt;
     }
     TapeLayout::layout(*document);
     if (!sameLabelType(*document, request.document)) {
         fail(errorString,
-             u"%1 is for %2 labels, this one for %3: one run prints on one label type."_s.arg(QFileInfo(file).fileName(),
-                                                                                            document->paperName,
-                                                                                            request.document.paperName));
+             i18n("%1 is for %2 labels, this one for %3: one run prints on one label type.", QFileInfo(file).fileName(), document->paperName, request.document.paperName));
         return std::nullopt;
     }
     cache.insert(file, *document);
@@ -163,7 +162,7 @@ std::optional<Run> make(const Request &request, QString *errorString)
                 bool ok = true;
                 count = copies.isEmpty() ? 1 : copies.toInt(&ok);
                 if (!ok || count < 0) {
-                    fail(errorString, u"Row %1: \"%2\" in %3 is not a number of copies."_s.arg(i + 1).arg(copies, source.copiesColumn));
+                    fail(errorString, i18n("Row %1: \"%2\" in %3 is not a number of copies.", i + 1, copies, source.copiesColumn));
                     return std::nullopt;
                 }
                 count = std::min(count, MaxRowCopies);
@@ -177,7 +176,7 @@ std::optional<Run> make(const Request &request, QString *errorString)
                 QString error;
                 const auto other = otherLabel(name, request, others, &error);
                 if (!other) {
-                    fail(errorString, u"Row %1: %2"_s.arg(i + 1).arg(error));
+                    fail(errorString, i18n("Row %1: %2", i + 1, error));
                     return std::nullopt;
                 }
                 label = *other;
@@ -192,7 +191,7 @@ std::optional<Run> make(const Request &request, QString *errorString)
             }
         }
         if (run.labels.isEmpty()) {
-            fail(errorString, u"Nothing to print: every row asks for no copies."_s);
+            fail(errorString, i18n("Nothing to print: every row asks for no copies."));
             return std::nullopt;
         }
     }
@@ -221,7 +220,7 @@ std::optional<Run> make(const Request &request, QString *errorString)
         QString error;
         const auto label = otherLabel(name, request, others, &error);
         if (!label) {
-            fail(errorString, (header ? u"Header label: %1"_s : u"Trailer label: %1"_s).arg(error));
+            fail(errorString, header ? i18n("Header label: %1", error) : i18n("Trailer label: %1", error));
             return std::nullopt;
         }
         const LabelDocument one = filled(*label, withDefaults(*label, values), pictures);

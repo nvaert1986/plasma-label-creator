@@ -5,6 +5,7 @@
 
 #include "zplprinter.h"
 
+#include <KLocalizedString>
 #include <QElapsedTimer>
 #include <QRegularExpression>
 #include <QTcpSocket>
@@ -85,13 +86,13 @@ QStringList ZplPrinterInfo::problems() const
 {
     QStringList list;
     if (headOpen) {
-        list << u"head open"_s;
+        list << i18nc("@info ZPL printer problem", "head open");
     }
     if (paperOut) {
-        list << u"out of labels"_s;
+        list << i18nc("@info ZPL printer problem", "out of labels");
     }
     if (ribbonOut && thermalTransfer) {
-        list << u"out of ribbon"_s;
+        list << i18nc("@info ZPL printer problem", "out of ribbon");
     }
     if (paused) {
         list << u"paused"_s;
@@ -209,7 +210,7 @@ std::optional<ZplPrinterInfo> query(const QString &host, quint16 port, int timeo
     connecting.start();
     while (!socket.waitForConnected(Slice)) {
         if (socket.state() == QAbstractSocket::UnconnectedState || connecting.elapsed() >= timeoutMs || interrupted()) {
-            return fail(u"Could not reach %1:%2: %3"_s.arg(host).arg(port).arg(socket.errorString()));
+            return fail(i18n("Could not reach %1:%2: %3", host, QString::number(port), socket.errorString()));
         }
     }
 
@@ -232,7 +233,7 @@ std::optional<ZplPrinterInfo> query(const QString &host, quint16 port, int timeo
 
     ZplPrinterInfo info;
     if (!parseHostIdentification(ask("~HI", 1), &info)) {
-        return fail(u"%1 did not answer as a ZPL printer"_s.arg(host));
+        return fail(i18n("%1 did not answer as a ZPL printer", host));
     }
     parseHostStatus(ask("~HS", 3), &info);
     info.configuration = parseConfiguration(ask("^XA^HH^XZ", 1));

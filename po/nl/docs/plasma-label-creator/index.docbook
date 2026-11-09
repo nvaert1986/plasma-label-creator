@@ -1,0 +1,962 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+    SPDX-FileCopyrightText: 2026 nvaert1986 <25772781+nvaert1986@users.noreply.github.com>
+
+    SPDX-License-Identifier: CC0-1.0
+-->
+<!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN" "dtd/kdedbx45.dtd" [
+  <!ENTITY kappname "Plasma Label Creator">
+  <!ENTITY % addindex "IGNORE">
+  <!ENTITY % Dutch "INCLUDE"><!-- change language only here -->
+]>
+
+<book id="plasma-label-creator" lang="&language;">
+
+<bookinfo>
+<title>Het handboek van &kappname;</title>
+
+<authorgroup>
+<author>
+<othername>nvaert1986</othername>
+<affiliation>
+<address><email>25772781+nvaert1986@users.noreply.github.com</email></address>
+</affiliation>
+</author>
+
+<!-- TRANS:ROLES_OF_TRANSLATORS -->
+</authorgroup>
+
+<copyright> <year>2026</year> <holder>nvaert1986</holder> </copyright>
+
+<legalnotice>
+<para>Dit handboek is onder CC0-1.0 vrijgegeven in het publieke domein: u mag het
+kopiëren, wijzigen en doorgeven zonder te vragen.</para>
+</legalnotice>
+
+<date>2026-11-09</date>
+<releaseinfo>0.6.1</releaseinfo>
+
+<abstract>
+<para>&kappname; ontwerpt en drukt labels af op DYMO LabelWriter- en
+LabelManager-printers en op ZPL-labelprinters, zoals de Altec ATP-serie en
+Zebra. Het opent en bewaart <filename>.label</filename>-bestanden, zodat
+labels ongewijzigd tussen Linux en Windows uitgewisseld kunnen worden.</para>
+</abstract>
+
+<keywordset>
+<keyword>KDE</keyword>
+<keyword>Plasma</keyword>
+<keyword>label</keyword>
+<keyword>DYMO</keyword>
+<keyword>LabelWriter</keyword>
+<keyword>LabelManager</keyword>
+<keyword>ZPL</keyword>
+<keyword>barcode</keyword>
+</keywordset>
+
+</bookinfo>
+
+<chapter id="introduction">
+<title>Inleiding</title>
+
+<para>&kappname; is een labelontwerper voor Linux. U tekent een label op een
+canvas met de afmetingen van het echte label, met tekst, adressen, barcodes
+en 2D-codes, afbeeldingen, illustraties, vormen, tellers en datums, en drukt
+het af op de labelprinter naast u.</para>
+
+<para>Het ondersteunt:</para>
+<itemizedlist>
+<listitem><para>DYMO LabelWriter-printers (de 450-serie en ouder, de 4XL en de 550-serie) en
+DYMO LabelManager-tapeprinters, via de eigen CUPS-stuurprogramma's van DYMO;</para></listitem>
+<listitem><para>ZPL-labelprinters, zoals de Altec ATP-serie en Zebra, via het Zebra
+ZPL-stuurprogramma dat bij CUPS hoort, met labels naast elkaar op de rol en
+doorlopende rollen;</para></listitem>
+<listitem><para><filename>.label</filename>-bestanden, adresboeken
+(<filename>.ABX</filename>) en Rhino-sjablonen (<filename>.rhino</filename>)
+zoals de software van DYMO ze schrijft;</para></listitem>
+<listitem><para>afdrukken uit gegevens: een label voor elke rij van een CSV-bestand, een
+rekenblad of een databasequery, met vragen die bij het afdrukken worden
+gesteld;</para></listitem>
+<listitem><para>de modus Alleen afdrukken voor mensen die alleen afdrukken, een
+automatiseringsdienst die afdrukt voor andere programma's, en add-ons.</para></listitem>
+</itemizedlist>
+
+<screenshot>
+<screeninfo>Het hoofdvenster</screeninfo> <mediaobject>
+<imageobject><imagedata fileref="screenshot.png"
+format="PNG"/></imageobject>
+<textobject><phrase>Het hoofdvenster van &kappname;, met de labeltypes links en een leeg label
+op het canvas</phrase></textobject>
+</mediaobject></screenshot>
+
+<para>Objecten die &kappname; niet kent, blijven in het bestand staan en worden
+ongewijzigd teruggeschreven, zodat een label dat elders is gemaakt niets
+verliest als het hier wordt geopend en opgeslagen.</para>
+
+</chapter>
+
+<chapter id="getting-started">
+<title>Aan de slag</title>
+
+<sect1 id="main-window">
+<title>Het hoofdvenster</title>
+
+<para>Het hoofdvenster bestaat uit vier delen:</para>
+
+<variablelist>
+<varlistentry>
+<term>De zijbalk</term>
+<listitem><para>Links, met drie tabbladen. <guilabel>Labels</guilabel> toont de labeltypes
+van de printer die in de afdrukbalk is gekozen; typ in het zoekveld om er
+een te vinden, en klik op een labeltype om daarop een label te
+beginnen. <guilabel>Invoegen</guilabel> toont de objecten die u op een label
+kunt zetten, met de illustraties eronder. <guilabel>Adresboek</guilabel>
+bevat adressen om af te drukken (zie <xref linkend="address-book"/>).</para></listitem>
+</varlistentry>
+<varlistentry>
+<term>Het canvas</term>
+<listitem><para>In het midden: het label in de echte verhoudingen, met linialen langs de
+boven- en linkerkant. De statusregel eronder geeft de naam en grootte van
+het label, en de zoom.</para></listitem>
+</varlistentry>
+<varlistentry>
+<term>De werkbalken</term>
+<listitem><para>Bovenaan: de hoofdwerkbalk (recent gebruikte lay-outs, nieuw, openen,
+opslaan, ongedaan maken en afdrukken), de werkbalk Invoegen, de werkbalk
+Opmaak voor tekst, en de werkbalk Schikken voor het uitlijnen, groeperen,
+vergrendelen en draaien van objecten.</para></listitem>
+</varlistentry>
+<varlistentry>
+<term>De afdrukbalk</term>
+<listitem><para>Onderaan: de printer, wat er wordt afgedrukt, het aantal exemplaren en de
+knop <guibutton>Afdrukken</guibutton> (zie <xref linkend="print-bar"/>).</para></listitem>
+</varlistentry>
+</variablelist>
+</sect1>
+
+<sect1 id="first-label">
+<title>Uw eerste label</title>
+
+<procedure>
+<step><para>Kies uw printer in de afdrukbalk. Een DYMO-printer die via USB wordt
+aangesloten, wordt opgemerkt; als die nog geen printerwachtrij heeft, biedt
+de afdrukbalk <guibutton>Printer instellen</guibutton> aan.</para></step>
+<step><para>Klik op het tabblad <guilabel>Labels</guilabel> op het labeltype dat in de
+printer zit, zoals <guilabel>30252 Address</guilabel>.</para></step>
+<step><para>Dubbelklik op het tabblad <guilabel>Invoegen</guilabel> op
+<guilabel>Tekst</guilabel>, of sleep het naar het label.</para></step>
+<step><para>Dubbelklik op de tekst op het label en typ. Druk op &Esc; of klik buiten de
+tekst als u klaar bent.</para></step>
+<step><para>Druk op <guibutton>Afdrukken</guibutton>.</para></step>
+<step><para>Sla het label op met <menuchoice><shortcut><keycombo
+action="simul">&Ctrl;<keycap>S</keycap></keycombo></shortcut><guimenu>Bestand</guimenu><guimenuitem>Opslaan</guimenuitem></menuchoice>
+om het later opnieuw af te drukken.</para></step>
+</procedure>
+</sect1>
+
+<sect1 id="opening-files">
+<title>Labels openen en opslaan</title>
+
+<para>&kappname; opent <filename>.label</filename>-bestanden (gestanste labels en
+LabelManager-tapelabels) en DYMO Rhino-sjablonen
+(<filename>.rhino</filename>, die als tapelabels openen), en slaat
+<filename>.label</filename>-bestanden op. Labels worden opgeslagen met de
+eigen label-id's van DYMO, zodat andere labelsoftware die het bestand leest
+het juiste label vindt.</para>
+
+<para>Instellingen die alleen &kappname; gebruikt, zoals de gegevensbron van een
+label en de vragen ervan, worden als opmerking in het bestand bewaard, en
+die negeert andere labelsoftware.</para>
+
+<para>Elke keer dat een label wordt overschreven, wordt de versie die het vervangt
+bewaard.
+<menuchoice><guimenu>Bestand</guimenu><guimenuitem>Versies…</guimenuitem></menuchoice>
+toont ze; een versie herstellen zet die op het canvas, waar u hem opslaat om
+hem te houden, of het ongedaan maakt.</para>
+
+<para><guilabel>Recent gebruikte lay-outs</guilabel>, de eerste knop op de
+hoofdwerkbalk, toont de labels die u het laatst hebt afgedrukt, met een
+afbeelding van elk.</para>
+</sect1>
+
+</chapter>
+
+<chapter id="designing">
+<title>Labels ontwerpen</title>
+
+<sect1 id="objects">
+<title>Objecten</title>
+
+<para>Een label bestaat uit objecten. Voeg er een toe vanaf het tabblad
+<guilabel>Invoegen</guilabel> of het menu <guimenu>Invoegen</guimenu>, of
+sleep een afbeelding vanuit &dolphin; naar binnen. De objecten zijn:</para>
+
+<variablelist>
+<varlistentry><term><guilabel>Adres</guilabel></term>
+<listitem><para>Een tekstvak voor adressen. De aangevinkte adressen van het adresboek worden
+erin afgedrukt, één label per adres.</para></listitem></varlistentry>
+<varlistentry><term><guilabel>Tekst</guilabel></term>
+<listitem><para>Een tekstvak. Tekst kan per woord lettertypes, groottes en stijlen mengen,
+wit op zwart afdrukken, teruglopen binnen het vak, en krimpen of groeien om
+te passen.</para></listitem></varlistentry>
+<varlistentry><term><guilabel>Teller</guilabel></term>
+<listitem><para>Een getal dat met elk afgedrukt label verder telt, met tekst ervoor en erna,
+een beginwaarde, een stapgrootte en voorloopnullen. Een teller kan via een
+tellerbestand worden gedeeld met andere computers (zie <xref
+linkend="shared-counters"/>).</para></listitem></varlistentry>
+<varlistentry><term><guilabel>Datum en tijd</guilabel></term>
+<listitem><para>De datum en tijd van afdrukken, in een notatie en taal naar keuze.</para></listitem></varlistentry>
+<varlistentry><term><guilabel>Barcode</guilabel></term>
+<listitem><para>Code 128, Code 39, Codabar, Interleaved 2 of 5, ITF-14, EAN, UPC, QR Code,
+PDF417, POSTNET, PLANET en Intelligent Mail, en ook Data Matrix, Aztec Code,
+MaxiCode, Micro QR Code, Code 93, Code 11, MSI Plessey, Pharmacode, GS1-128,
+GS1 Data Matrix, GS1 DataBar, HIBC, KIX (PostNL) en Royal Mail. Andere
+labelsoftware die het bestand opent, toont de types van de tweede groep
+mogelijk niet.</para></listitem></varlistentry>
+<varlistentry><term><guilabel>Afbeelding</guilabel></term>
+<listitem><para>Een afbeelding uit uw bestanden, die in het label wordt
+bewaard. SVG-tekeningen blijven op elke grootte scherp.</para></listitem></varlistentry>
+<varlistentry><term><guilabel>Rechthoek</guilabel>, <guilabel>Ellips</guilabel>,
+<guilabel>Horizontale lijn</guilabel>, <guilabel>Verticale lijn</guilabel></term>
+<listitem><para>Vormen met een omtrek en een vulling.</para></listitem></varlistentry>
+<varlistentry><term><guilabel>Veelhoek</guilabel>, <guilabel>Ster</guilabel>,
+<guilabel>Pijl</guilabel></term>
+<listitem><para>Meer vormen. Andere labelsoftware toont deze als afbeeldingen.</para></listitem></varlistentry>
+<varlistentry><term><guilabel>Gebogen tekst</guilabel></term>
+<listitem><para>Tekst langs een boog of rond een cirkel.</para></listitem></varlistentry>
+</variablelist>
+
+<para>De illustraties staan in de onderste helft van het tabblad
+<guilabel>Invoegen</guilabel>: sleep een afbeelding naar het label of
+dubbelklik erop. Voeg uw eigen afbeeldingen toe met de knop
+<guibutton>+</guibutton>. Als u DYMO Label Software bezit, importeert
+<guilabel>Importeren / exporteren</guilabel> de illustraties ervan uit uw
+eigen exemplaar van <filename>DYMO.DLS.dll</filename>; &kappname; levert ze
+niet mee.</para>
+</sect1>
+
+<sect1 id="editing">
+<title>Selecteren, verplaatsen en bewerken</title>
+
+<para>Klik op een object om het te selecteren; &Ctrl;-klik of &Shift;-klik voegt
+objecten toe aan de selectie, en slepen over het lege label selecteert elk
+object binnen het kader. <menuchoice><shortcut><keycombo
+action="simul">&Ctrl;<keycap>A</keycap></keycombo></shortcut><guimenu>Bewerken</guimenu><guimenuitem>Alles
+selecteren</guimenuitem></menuchoice> selecteert ze allemaal.</para>
+
+<para>Sleep een object om het te verplaatsen en de grepen ervan om de grootte te
+wijzigen. De pijltjestoetsen verplaatsen de selectie een klein stukje, met
+&Shift; iets meer (de stappen stelt u in bij de instellingen). Sleep de
+ronde greep boven een object om het te draaien; met &Shift; ingedrukt draait
+het in stappen. <keycombo action="simul">&Ctrl;<keycap>[</keycap></keycombo>
+en <keycombo action="simul">&Ctrl;<keycap>]</keycap></keycombo> draaien de
+selectie naar links en naar rechts.</para>
+
+<para>Dubbelklik op een tekst, een adres of een teller om de tekst ervan op het
+label zelf te bewerken; &Enter; of <keycap>F2</keycap> doet hetzelfde voor
+het geselecteerde object. Dubbelklik op een ander object, of druk op
+<keycombo action="simul">&Alt;&Enter;</keycombo>, om de eigenschappen ervan
+te openen (zie <xref linkend="properties"/>).</para>
+
+<para>Elke wijziging kan ongedaan worden gemaakt met <keycombo
+action="simul">&Ctrl;<keycap>Z</keycap></keycombo>. Knippen, kopiëren,
+plakken, <guimenuitem>Object dupliceren</guimenuitem> (<keycombo
+action="simul">&Ctrl;<keycap>D</keycap></keycombo>) en <guimenuitem>Object
+verwijderen</guimenuitem> (&Del;) staan in het menu
+<guimenu>Bewerken</guimenu> en in het menu dat opent als u met de
+rechtermuisknop op een object klikt.</para>
+</sect1>
+
+<sect1 id="formatting">
+<title>Tekst opmaken</title>
+
+<para>De werkbalk Opmaak en het menu <guimenu>Opmaak</guimenu> wijzigen de
+geselecteerde tekst, of de geselecteerde woorden terwijl u de tekst bewerkt:
+het lettertype en de grootte, <guimenuitem>Grotere letters</guimenuitem> en
+<guimenuitem>Kleinere letters</guimenuitem>, vet, cursief, onderstrepen en
+doorhalen, en <guimenuitem>Wit op zwart</guimenuitem>.</para>
+
+<para><guisubmenu>Horizontale uitlijning</guisubmenu> en <guisubmenu>Verticale
+uitlijning</guisubmenu> plaatsen de tekst in het vak. <guisubmenu>Tekst
+passend maken</guisubmenu> kiest tussen een vaste tekengrootte, lange tekst
+verkleinen om te passen, en de tekst altijd passend maken in het
+vak. <guimenuitem>Tekst laten teruglopen</guimenuitem> breekt lange regels
+af bij spaties zodat ze in de breedte van het vak passen.</para>
+</sect1>
+
+<sect1 id="arranging">
+<title>Objecten schikken</title>
+
+<para>Het menu <guimenu>Indeling</guimenu>, de werkbalk Schikken en het
+rechtermuisknopmenu schikken objecten:</para>
+
+<variablelist>
+<varlistentry><term><guisubmenu>Object op label plaatsen</guisubmenu></term>
+<listitem><para>Zet de selectie tegen een rand van het label, of centreert haar.</para></listitem></varlistentry>
+<varlistentry><term><guisubmenu>Objecten uitlijnen</guisubmenu></term>
+<listitem><para>Lijnt de geselecteerde objecten uit op hun randen of middens, of verdeelt ze
+gelijkmatig.</para></listitem></varlistentry>
+<varlistentry><term><guimenuitem>Groeperen</guimenuitem> en <guimenuitem>Groepering
+opheffen</guimenuitem></term>
+<listitem><para>Een groep wordt als één geheel geselecteerd, verplaatst en gedraaid
+(<keycombo action="simul">&Ctrl;<keycap>G</keycap></keycombo> en <keycombo
+action="simul">&Ctrl;&Shift;<keycap>G</keycap></keycombo>).</para></listitem></varlistentry>
+<varlistentry><term><guimenuitem>Positie en grootte vergrendelen</guimenuitem></term>
+<listitem><para>Vergrendelde objecten kunnen niet per ongeluk worden verplaatst of van
+grootte veranderd.</para></listitem></varlistentry>
+<varlistentry><term><guimenuitem>Naar voorgrond</guimenuitem> en <guimenuitem>Naar
+achtergrond</guimenuitem></term>
+<listitem><para>Wijzigen welk object bovenop wordt getekend.</para></listitem></varlistentry>
+<varlistentry><term><guimenuitem>Niet afdrukken</guimenuitem></term>
+<listitem><para>Het object wordt vervaagd getoond tijdens het ontwerpen en weggelaten bij
+het afdrukken.</para></listitem></varlistentry>
+<varlistentry><term><guimenuitem>Lagen…</guimenuitem> en <guimenuitem>Naar laag
+verplaatsen</guimenuitem></term>
+<listitem><para>Objecten op een laag worden getoond, afgedrukt en kunnen worden bewerkt
+zoals de laag aangeeft. Een laag die niet wordt afgedrukt, is geschikt voor
+een afbeelding van het product om op te ontwerpen.</para></listitem></varlistentry>
+</variablelist>
+
+<para>Het menu <guimenu>Beeld</guimenu> toont een raster (<keycombo
+action="simul">&Ctrl;<keycap>'</keycap></keycombo>) en laat objecten erop
+uitlijnen (<keycombo
+action="simul">&Ctrl;&Shift;<keycap>'</keycap></keycombo>). Sleep een
+hulplijn uit een liniaal om objecten langs te plaatsen; objecten worden erop
+uitgelijnd, en de hulplijn terugslepen naar de liniaal verwijdert hem. Houd
+&Alt; ingedrukt tijdens het verplaatsen om een object vrij te plaatsen.</para>
+</sect1>
+
+<sect1 id="properties">
+<title>Objecteigenschappen</title>
+
+<para><menuchoice><guimenu>Bewerken</guimenu><guimenuitem>Objecteigenschappen…</guimenuitem></menuchoice>
+toont alles van het geselecteerde object. De pagina
+<guilabel>Algemeen</guilabel> bevat de positie en grootte in millimeters of
+inches, de draaiing en hoek, spiegelen en een rand. De volgende pagina hangt
+af van het soort object:</para>
+
+<itemizedlist>
+<listitem><para>Tekst en adressen: het lettertype, de uitlijning, hoe de tekst past,
+teruglopen, en <guilabel>Het vak laten meegroeien met de tekst</guilabel>,
+waardoor het vak breder wordt voor langere tekst, of hoger als die
+terugloopt, in plaats van dat de tekst kleiner wordt.</para></listitem>
+<listitem><para>Barcodes: het type, de gegevens, de grootte en waar de leesbare tekst
+staat. <guibutton>Samenstellen…</guibutton> stelt GS1-gegevens samen uit
+applicatie-identificaties, controleert elke waarde en voegt een ontbrekend
+controlecijfer toe.</para></listitem>
+<listitem><para>Afbeeldingen: een andere afbeelding, hoe die wordt geschaald, en een
+afbeeldingsbestand dat in plaats van de afbeelding in het label wordt
+getoond. De bestandsnaam mag velden gebruiken, zoals
+<filename>/fotos/{Serial}.png</filename>, voor een afbeelding per
+gegevensrij.</para></listitem>
+<listitem><para>Tellers: de tekst ervoor en erna, de beginwaarde, de volgende waarde, de
+stapgrootte, het minimum aantal cijfers, en een tellerbestand dat met andere
+computers wordt gedeeld.</para></listitem>
+<listitem><para>Datums: de notatie, de taal, en of de tijd erbij staat.</para></listitem>
+<listitem><para>Gebogen tekst: waar de tekst op de cirkel staat en de beginhoek.</para></listitem>
+</itemizedlist>
+
+<para>De pagina <guilabel>Wanneer het wordt afgedrukt</guilabel> stelt een
+voorwaarde in: het object wordt alleen afgedrukt als een veld leeg is, een
+waarde heeft, wel of niet gelijk is aan een waarde, een waarde bevat, of
+groter of kleiner is dan een waarde. Objecten die voor de huidige gegevens
+niet worden afgedrukt, worden vervaagd getoond. Op dezelfde pagina kan een
+object blijven waar het staat, of rechts blijven van een tekst die
+meegroeit, en daarmee meeschuiven.</para>
+</sect1>
+
+<sect1 id="label-types">
+<title>Labeltypes, formaten en rollen</title>
+
+<para>Het tabblad <guilabel>Labels</guilabel> toont de labeltypes die de gekozen
+printer aankan. Voor een Altec ATP-printer toont het de labels van Altec per
+product, met de labels die bij de geladen labels passen
+eerst.
+<menuchoice><guimenu>Indeling</guimenu><guimenuitem>Labeltype…</guimenuitem></menuchoice>
+wijzigt het labeltype van het label op het canvas.</para>
+
+<para><menuchoice><guimenu>Indeling</guimenu><guimenuitem>Aangepast
+labelformaat…</guimenuitem></menuchoice> maakt een labelformaat dat in geen
+enkele lijst staat. Meet één label zonder de tussenruimte tot het
+volgende. Als slechts een deel van het label bedrukt kan worden, zoals de
+witte strook van een wikkellabel, geef dat deel dan ook op. Uw eigen
+formaten staan onder <guilabel>Mijn labelformaten</guilabel>; klik er met de
+rechtermuisknop op om er een te bewerken of te verwijderen.</para>
+
+<para><menuchoice><guimenu>Indeling</guimenu><guimenuitem>Rolindeling…</guimenuitem></menuchoice>
+is voor printers die elk labelformaat aankunnen, zoals Altec en Zebra:
+rollen met meerdere labels naast elkaar, die een rij tegelijk worden
+afgedrukt, en doorlopende rollen, waarop elk label de lengte krijgt die u
+instelt.</para>
+
+<para><guisubmenu>Labelstand</guisubmenu> kiest tussen staand en
+liggend. <guimenuitem>Label draaien</guimenuitem> op de werkbalk Schikken
+draait het label een kwartslag samen met de objecten erop, zodat het afdrukt
+zoals voorheen.</para>
+</sect1>
+
+<sect1 id="tape-labels">
+<title>Tapelabels</title>
+
+<para>LabelManager-labels worden op tape afgedrukt. Objecten op een tapelabel
+staan in vakken naast elkaar langs de
+tape.
+<menuchoice><guimenu>Indeling</guimenu><guimenuitem>Tapelengte…</guimenuitem></menuchoice>
+maakt het label zo lang als de inhoud of een vaste lengte;
+<guimenuitem>Eerder op de tape plaatsen</guimenuitem> en <guimenuitem>Later
+op de tape plaatsen</guimenuitem> wijzigen de volgorde van de vakken. In de
+eigenschappen van een object stelt <guilabel>Op de tape</guilabel> in hoe
+lang het vak is.</para>
+</sect1>
+
+<sect1 id="label-kinds">
+<title>Labels van een soort</title>
+
+<para><menuchoice><guimenu>Invoegen</guimenu><guimenuitem>Label van een
+soort…</guimenuitem></menuchoice> maakt veelgebruikte labels uit een paar
+waarden:</para>
+
+<variablelist>
+<varlistentry><term><guilabel>Kabelwikkellabel</guilabel></term><listitem><para>Wordt om een kabel gewikkeld en is van alle kanten leesbaar.</para></listitem></varlistentry>
+<varlistentry><term><guilabel>Kabelvlag</guilabel></term><listitem><para>Wordt om een kabel gevouwen, met de tekst aan beide kanten.</para></listitem></varlistentry>
+<varlistentry><term><guilabel>Patchpaneel</guilabel></term><listitem><para>Een rij genummerde poorten op de steek van het paneel, met naar keuze pijlen
+en lijnen tussen de vakken.</para></listitem></varlistentry>
+<varlistentry><term><guilabel>Klemmenstrook</guilabel></term><listitem><para>Klemmen op hun steek op een DIN-rail.</para></listitem></varlistentry>
+<varlistentry><term><guilabel>Groepenkast</guilabel></term><listitem><para>Automaten van elk één module (18 mm).</para></listitem></varlistentry>
+<varlistentry><term><guilabel>Rackmarkeringen</guilabel></term><listitem><para>Hoogte-eenheden langs de rail van een rack, met kaders.</para></listitem></varlistentry>
+</variablelist>
+</sect1>
+
+</chapter>
+
+<chapter id="data">
+<title>Gegevens, vragen en adressen</title>
+
+<sect1 id="data-source">
+<title>Afdrukken uit gegevens</title>
+
+<para><menuchoice><guimenu>Gegevens</guimenu><guimenuitem>Gegevensbron…</guimenuitem></menuchoice>
+drukt een label af voor elke rij van een CSV-bestand, een Excel- of
+OpenDocument-rekenblad, of een databasequery (SQLite, ODBC voor SQL Server
+en andere, MySQL, MariaDB, PostgreSQL, Firebird en Oracle, als Qt het
+stuurprogramma heeft).</para>
+
+<para>Zet velden op het label als <userinput>{Kolom}</userinput>, in teksten,
+adressen, barcodes of de bestandsnaam van een afbeelding;
+<menuchoice><guimenu>Gegevens</guimenu><guimenuitem>Veld
+invoegen</guimenuitem></menuchoice> toont ze. Elk label krijgt de waarden
+van zijn rij.</para>
+
+<para><guibutton>Rijen laden</guibutton> toont de rijen; vink de rijen aan die
+afgedrukt moeten worden. Een kolom kan zeggen hoeveel exemplaren elke rij
+afdrukt, en een andere met welk labelbestand, voor een ander label per
+rij. Ze moeten allemaal voor hetzelfde labeltype zijn.</para>
+
+<para>Alleen query's die lezen worden uitgevoerd (<literal>SELECT</literal>, of
+<literal>WITH</literal> … <literal>SELECT</literal>), zodat afdrukken de
+database nooit wijzigt. Een query kan de antwoorden op de vragen gebruiken,
+zoals <userinput>WHERE Serial = {Serial}</userinput>; die worden als waarden
+doorgegeven, zodat een antwoord de query nooit kan
+veranderen. Databasewachtwoorden worden nooit opgeslagen: ze worden bij het
+afdrukken gevraagd.</para>
+</sect1>
+
+<sect1 id="questions">
+<title>Vragen bij het afdrukken</title>
+
+<para><menuchoice><guimenu>Gegevens</guimenu><guimenuitem>Vragen bij
+afdrukken…</guimenuitem></menuchoice> stelt vragen in die elke keer worden
+gesteld als het label wordt afgedrukt, zoals een batchnummer. Het antwoord
+vult <userinput>{Naam}</userinput> op elk label van de afdrukreeks. Een
+vraag kan zijn:</para>
+
+<itemizedlist>
+<listitem><para>tekst, met regels: een antwoord is verplicht, een lengte, alleen cijfers of
+letters, of een patroon;</para></listitem>
+<listitem><para>een keuzelijst, met vaste keuzes of met een kolom van de gegevens;</para></listitem>
+<listitem><para>een getal, binnen een bereik en met decimalen;</para></listitem>
+<listitem><para>een datum, in een notatie naar keuze;</para></listitem>
+<listitem><para>een selectievakje, met de tekst die wordt afgedrukt als het wel en als het
+niet is aangevinkt.</para></listitem>
+</itemizedlist>
+
+<para>Een tekstvraag kan in een kolom van de gegevens worden opgezocht: de
+gevonden rij vult de andere vragen die naar de kolommen ervan zijn genoemd.</para>
+</sect1>
+
+<sect1 id="calculated-fields">
+<title>Berekende velden</title>
+
+<para><menuchoice><guimenu>Gegevens</guimenu><guimenuitem>Berekende
+velden…</guimenuitem></menuchoice> rekent bij het afdrukken velden uit
+andere velden uit, en gebruikt ze op het label als
+kolommen. <userinput>{Date}</userinput>, <userinput>{Time}</userinput> en
+<userinput>{Now}</userinput> zijn het moment van
+afdrukken. <userinput>{Date+30}</userinput> of
+<userinput>{Installed+1y}</userinput> verschuift een datum met dagen, weken
+(<literal>w</literal>), maanden (<literal>m</literal>), jaren
+(<literal>y</literal>) of uren (<literal>h</literal>);
+<userinput>{Serial+1}</userinput> telt op bij een getal.</para>
+
+<para>Na een <literal>|</literal> wijzigt een filter de waarde:
+<literal>upper</literal>, <literal>lower</literal>, <literal>trim</literal>,
+<literal>left:3</literal>, <literal>right:4</literal>,
+<literal>mid:2:3</literal>, <literal>pad:6</literal>,
+<literal>date:dd-MM-yyyy</literal>, <literal>replace:oud:nieuw</literal> en
+<literal>default:tekst</literal>. Bijvoorbeeld
+<userinput>{Date+30|date:dd-MM-yyyy}</userinput> of
+<userinput>{Prefix}-{Serial|pad:6}</userinput>.</para>
+</sect1>
+
+<sect1 id="address-book">
+<title>Het adresboek</title>
+
+<para>Het tabblad <guilabel>Adresboek</guilabel> bevat adressen in een
+DYMO-adresboek (<filename>.ABX</filename>). Doorzoek het, vink de adressen
+aan die afgedrukt moeten worden, en kies <guilabel>Alle aangevinkte adressen
+in het adresboek</guilabel> in de afdrukbalk: elk adres wordt op een eigen
+label afgedrukt, in het adresobject van het label. Het menu
+<guimenu>Adresboek</guimenu> maakt, opent en bewaart adresboeken, en
+importeert adressen uit een CSV-bestand.</para>
+</sect1>
+
+<sect1 id="gs1">
+<title>GS1-gegevens</title>
+
+<para>Voor GS1-128-, GS1 Data Matrix- en GS1 DataBar Expanded-barcodes toont
+<guibutton>Samenstellen…</guibutton> in de eigenschappen van de barcode de
+veelgebruikte applicatie-identificaties, zoals de GTIN, een batchnummer of
+een vervaldatum. Geef de waarden op; elke waarde wordt gecontroleerd, en een
+weggelaten controlecijfer wordt toegevoegd. Een waarde mag velden gebruiken,
+zoals <userinput>{Batch}</userinput>, die bij het afdrukken worden
+gecontroleerd.</para>
+</sect1>
+
+</chapter>
+
+<chapter id="printing">
+<title>Afdrukken</title>
+
+<sect1 id="print-bar">
+<title>De afdrukbalk</title>
+
+<para>De afdrukbalk onderaan het venster kiest de printer en vertelt hoe het ermee
+gaat: een gestopte wachtrij, wachtende taken, en voor een ZPL-netwerkprinter
+welke labels er zijn geladen en of hij gereed is. De knop naast de printer
+opent de instellingen ervan:</para>
+
+<variablelist>
+<varlistentry><term><guimenuitem>Als standaardprinter gebruiken</guimenuitem></term><listitem><para>Altijd met deze printer beginnen, ook als er een andere LabelWriter is
+aangesloten.</para></listitem></varlistentry>
+<varlistentry><term><guimenuitem>Welke LabelWriter is dit…</guimenuitem></term><listitem><para>Voor een printerwachtrij die het stuurprogramma van DYMO niet gebruikt,
+zoals een printer die vanuit Windows wordt gedeeld: labels worden dan op
+deze computer klaargemaakt met het stuurprogramma van dat model en
+ongewijzigd verstuurd.</para></listitem></varlistentry>
+<varlistentry><term><guimenuitem>De geladen labels opnieuw herkennen</guimenuitem></term><listitem><para>Vraagt een ZPL-netwerkprinter welke labels er zijn geladen.</para></listitem></varlistentry>
+<varlistentry><term><guimenuitem>Afdrukverschuiving…</guimenuitem></term><listitem><para>Verschuift alles wat deze printer afdrukt een beetje, als labels verschoven
+uit de printer komen. Druk een label af, meet hoe ver alles moet
+verschuiven, en vul dat in.</para></listitem></varlistentry>
+<varlistentry><term><guimenuitem>Printerstatus…</guimenuitem></term><listitem><para>Hoe het met elke labelprinter gaat.</para></listitem></varlistentry>
+</variablelist>
+
+<para>Onder de printer drukt <guilabel>Kwaliteit voor barcodes en
+afbeeldingen</guilabel> een LabelWriter-label langzamer maar scherper
+af. Kies ernaast wat er wordt afgedrukt: alleen het label op het canvas, elk
+aangevinkt adres in het adresboek, of elke aangevinkte rij van de
+gegevensbron. Stel het aantal exemplaren in en druk op
+<guibutton>Afdrukken</guibutton>.</para>
+
+<para>Voor het afdrukken controleert &kappname; of het label bij de printer past:
+of het een van de labeltypes van de printer is, of het even lang is als de
+geladen labels, en of de printer gereed is. Het vraagt dan of u toch wilt
+afdrukken.</para>
+</sect1>
+
+<sect1 id="printers">
+<title>Printers instellen</title>
+
+<para>&kappname; drukt af via CUPS. Een DYMO LabelWriter of LabelManager heeft de
+CUPS-stuurprogramma's van DYMO nodig: de LabelWriter 450 en ouder en de
+LabelManagers gebruiken <filename>dymo-cups-drivers</filename>, de
+LabelWriter 550-serie het LW5xx-stuurprogramma van DYMO. De 550-serie leest
+voor elk label zijn status, en heeft daarom een eigen wachtrij met dat
+stuurprogramma nodig, via USB of het netwerk. Een ZPL-printer, zoals een
+Altec ATP of een Zebra, gebruikt het stuurprogramma <guilabel>Zebra ZPL
+Label Printer</guilabel> dat bij CUPS hoort.</para>
+
+<para>Een DYMO-printer die via USB is aangesloten zonder wachtrij, krijgt een knop
+<guibutton>Printer instellen</guibutton> in de afdrukbalk; daarvoor is
+<filename>cups-pk-helper</filename> nodig. Voeg de printer anders toe in de
+printerinstellingen van het systeem.</para>
+</sect1>
+
+<sect1 id="print-settings">
+<title>Afdrukinstellingen, voorbeeld en exporteren</title>
+
+<para><menuchoice><guimenu>Indeling</guimenu><guimenuitem>Afdrukinstellingen…</guimenuitem></menuchoice>
+stelt in hoe de printer dit label afdrukt: de DYMO-afdrukdichtheid, of de
+donkerheid en snelheid van een Altec- of Zebra-printer. Het stelt ook een
+beginlabel en een eindlabel in, die één keer voor en na een afdrukreeks
+worden afgedrukt en worden ingevuld met de antwoorden en
+<userinput>{Count}</userinput>, het aantal labels ertussen.</para>
+
+<para><menuchoice><guimenu>Bestand</guimenu><guimenuitem>Afdrukvoorbeeld</guimenuitem></menuchoice>
+toont de pagina's precies zoals de printer ze ontvangt, punt voor punt, en
+bladert door een reeks waarin tellers of adressen veranderen.</para>
+
+<para><menuchoice><guimenu>Bestand</guimenu><guimenuitem>Exporteren als PDF of
+afbeelding…</guimenuitem></menuchoice> bewaart het label als PDF op het
+eigen formaat of als PNG-afbeelding op de resolutie van de printer, naar
+keuze met de omtrek van het label als proef.</para>
+</sect1>
+
+<sect1 id="shared-counters">
+<title>Tellers</title>
+
+<para>Een teller telt verder met elk afgedrukt label, en de volgende waarde wordt
+in het label opgeslagen. Als meerdere computers hetzelfde label afdrukken,
+geef de teller dan in de eigenschappen een tellerbestand op een
+netwerkshare: het bestand houdt de volgende waarde bij voor elke computer,
+en wordt vergrendeld terwijl er een afdrukt, zodat geen nummer twee keer
+wordt afgedrukt.</para>
+</sect1>
+
+<sect1 id="history">
+<title>Afdrukgeschiedenis en printerstatus</title>
+
+<para><menuchoice><guimenu>Bestand</guimenu><guimenuitem>Afdrukgeschiedenis…</guimenuitem></menuchoice>
+toont wat er is afgedrukt, wanneer en op welke printer, met de antwoorden en
+gegevensrijen. Doorzoek de lijst, open een label zoals het is afgedrukt, of
+druk het opnieuw af met dezelfde antwoorden en rijen.</para>
+
+<para><menuchoice><guimenu>Bestand</guimenu><guimenuitem>Printerstatus…</guimenuitem></menuchoice>
+toont elke labelprinter: de wachtrij, de wachtende taken, en wat
+ZPL-netwerkprinters over zichzelf melden, zoals dat de labels op zijn of de
+kop open staat.</para>
+</sect1>
+
+<sect1 id="print-only-mode">
+<title>De modus Alleen afdrukken</title>
+
+<para>De modus Alleen afdrukken is voor mensen die alleen afdrukken:
+<menuchoice><guimenu>Bestand</guimenu><guimenuitem>Modus Alleen
+afdrukken</guimenuitem></menuchoice>, of de starter <guilabel>Labels
+afdrukken</guilabel>. Kies een label uit een map, beantwoord de vragen
+ervan, vink de gegevensrijen aan en druk af, zonder het label te kunnen
+wijzigen. Tellers worden in het label bijgehouden.</para>
+
+<para>In de instellingen kan een beheerder het programma altijd laten starten in
+de modus Alleen afdrukken, zonder terug te kunnen naar het ontwerpen, en die
+instelling vastzetten met KDE's Kiosk (zie <xref linkend="settings"/>).</para>
+</sect1>
+
+</chapter>
+
+<chapter id="automation">
+<title>Automatisering</title>
+
+<para>De automatiseringsdienst,
+<command>plasma-label-creator-automation</command>, drukt labels af voor
+andere programma's zonder dat er iemand achter het scherm zit, ook als
+&kappname; gesloten is. Hij doet dezelfde controles als de knop
+<guibutton>Afdrukken</guibutton>: de antwoorden op de vragen van het label,
+gedeelde tellers, de labeltypes en de toestand van de printer. Tellers
+tellen verder in het label, en elke afdruk komt in de afdrukgeschiedenis.</para>
+
+<para>Stel hem in bij
+<menuchoice><guimenu>Instellingen</guimenu><guimenuitem>&kappname;
+configureren…</guimenuitem><guilabel>Automatisering</guilabel></menuchoice>:
+start hem daar, of laat hem starten als u zich aanmeldt. <guibutton>Recente
+taken…</guibutton> toont wat hij onlangs heeft afgedrukt, waar elke taak
+vandaan kwam, en waarom een taak niet is afgedrukt. Op een computer zonder
+bureaubladsessie draait u hem als systemd-gebruikersdienst:
+<userinput><command>systemctl --user enable --now
+plasma-label-creator-automation</command></userinput>.</para>
+
+<sect1 id="watched-folders">
+<title>Bewaakte mappen</title>
+
+<para>Elke bewaakte map heeft een label, een printer en een aantal exemplaren. Een
+CSV-bestand dat erin wordt gezet, drukt een label af voor elke rij, met de
+veldnamen op de eerste regel; een JSON-bestand is een afdruktaak zoals die
+via HTTP wordt verstuurd. Afgedrukte bestanden gaan naar
+<filename>printed</filename>, de andere naar <filename>failed</filename> met
+de reden in een <filename>.txt</filename>-bestand.</para>
+
+<para>Een bestand wordt afgedrukt zodra het twee seconden niet meer is
+veranderd. Een programma dat langzaam schrijft, schrijft het bestand beter
+onder een andere naam, zoals <filename>job.csv.part</filename>, en hernoemt
+het als het klaar is.</para>
+</sect1>
+
+<sect1 id="http">
+<title>Afdrukverzoeken via HTTP</title>
+
+<para>Als &kappname; met Qt HTTP Server is gebouwd, neemt de dienst ook
+afdrukverzoeken via HTTP aan, alleen van deze computer of ook uit het
+netwerk. Elk verzoek bevat het token dat in de instellingen wordt
+getoond. Labels worden genoemd ten opzichte van de labelmap die daar is
+ingesteld, en alleen labels daarin worden afgedrukt.</para>
+
+<programlisting>curl -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+     -d '{"label": "Rack/patch panel", "printer": "Zebra-ZT230", "copies": 1,
+          "values": {"Port": "A12"},
+          "rows": [{"Serial": "S1"}, {"Serial": "S2"}]}' \
+     http://localhost:8631/v1/print</programlisting>
+
+<para><literal>values</literal> vullen velden en beantwoorden de vragen van het
+label op elk label; elk van de <literal>rows</literal> geeft één
+label. <literal>GET /v1/labels</literal> toont de labels met hun velden en
+vragen, <literal>GET /v1/printers</literal> de printers en hun toestand, en
+<literal>GET /v1/status</literal> de versie en instellingen van de dienst.</para>
+</sect1>
+
+</chapter>
+
+<chapter id="settings">
+<title>&kappname; configureren</title>
+
+<para><menuchoice><guimenu>Instellingen</guimenu><guimenuitem>&kappname;
+configureren…</guimenuitem></menuchoice> heeft deze pagina's:</para>
+
+<variablelist>
+<varlistentry><term><guilabel>Ontwerpen</guilabel></term>
+<listitem><para>Het lettertype van nieuwe tekst, hoe ver de pijltjestoetsen objecten
+verplaatsen (ook met &Shift;), de stappen voor het draaien, de tape om mee
+te beginnen, en of de linialen millimeters of inches tonen.</para></listitem></varlistentry>
+<varlistentry><term><guilabel>Afdrukken</guilabel></term>
+<listitem><para>Of en hoe vaak labelprinters in het netwerk wordt gevraagd hoe het met ze
+gaat, of er voor het afdrukken wordt gewaarschuwd als de printer niet gereed
+is, het aantal exemplaren om mee te beginnen, de tussenruimte tussen
+Altec-labels naast elkaar en de lengte waarmee doorlopende rollen beginnen,
+hoe lang er op een gedeelde teller wordt gewacht, en de modus Alleen
+afdrukken: de map waar de labels vandaan komen en of het programma er altijd
+in start.</para></listitem></varlistentry>
+<varlistentry><term><guilabel>Geschiedenis</guilabel></term>
+<listitem><para>Hoeveel versies er per label worden bewaard, en of ze naast het label worden
+bewaard in een map <filename>.versions</filename>, waar ze met het label
+meegaan voor iedereen die het daar opent; hoeveel afdrukken de geschiedenis
+bewaart; hoeveel recent gebruikte lay-outs er worden bewaard.</para></listitem></varlistentry>
+<varlistentry><term><guilabel>Automatisering</guilabel></term>
+<listitem><para>De automatiseringsdienst (zie <xref linkend="automation"/>).</para></listitem></varlistentry>
+<varlistentry><term><guilabel>Add-ons</guilabel></term>
+<listitem><para>De add-ons die op deze computer zijn geïnstalleerd, die elk kunnen worden
+uitgeschakeld. Een wijziging werkt pas als &kappname; opnieuw start.</para></listitem></varlistentry>
+</variablelist>
+
+<para>Een beheerder kan instellingen voor iedereen vastzetten met KDE's Kiosk. Zo
+voorkomt <literal>LockPrintOnly[$i]=true</literal> in de groep
+<literal>[Settings]</literal> van
+<filename>plasma-label-creatorrc</filename> dat mensen de modus Alleen
+afdrukken verlaten.</para>
+
+<para>&kappname; spreekt de taal van uw bureaublad als het in die taal is
+vertaald; voorlopig zijn dat Engels en
+Nederlands. <menuchoice><guimenu>Instellingen</guimenu><guimenuitem>Taal
+configureren…</guimenuitem></menuchoice> kiest een andere taal voor alleen
+&kappname;.</para>
+</chapter>
+
+<chapter id="commands">
+<title>Overzicht van de opdrachten</title>
+
+<para>Naast de menu's die hier worden beschreven, heeft &kappname; de
+gebruikelijke menu's <guimenu>Instellingen</guimenu> en
+<guimenu>Help</guimenu> van &plasma;.</para>
+
+<sect1 id="menu-file">
+<title>Het menu Bestand</title>
+<variablelist>
+<varlistentry><term><menuchoice><shortcut><keycombo
+action="simul">&Ctrl;<keycap>N</keycap></keycombo></shortcut><guimenu>Bestand</guimenu><guimenuitem>Nieuw</guimenuitem></menuchoice></term><listitem><para>Begint een nieuw label.</para></listitem></varlistentry>
+<varlistentry><term><menuchoice><shortcut><keycombo
+action="simul">&Ctrl;<keycap>O</keycap></keycombo></shortcut><guimenu>Bestand</guimenu><guimenuitem>Openen…</guimenuitem></menuchoice></term><listitem><para>Opent een <filename>.label</filename>-bestand of een Rhino-sjabloon.</para></listitem></varlistentry>
+<varlistentry><term><menuchoice><guimenu>Bestand</guimenu><guisubmenu>Recent
+geopend</guisubmenu></menuchoice></term><listitem><para>Opent een label dat u eerder hebt geopend.</para></listitem></varlistentry>
+<varlistentry><term><menuchoice><guimenu>Bestand</guimenu><guisubmenu>Recent gebruikte
+lay-outs</guisubmenu></menuchoice></term><listitem><para>Opent een van de laatst afgedrukte labels, zoals het is afgedrukt.</para></listitem></varlistentry>
+<varlistentry><term><menuchoice><shortcut><keycombo
+action="simul">&Ctrl;<keycap>S</keycap></keycombo></shortcut><guimenu>Bestand</guimenu><guimenuitem>Opslaan</guimenuitem></menuchoice>,
+<menuchoice><guimenu>Bestand</guimenu><guimenuitem>Opslaan
+als…</guimenuitem></menuchoice></term><listitem><para>Slaat het label op.</para></listitem></varlistentry>
+<varlistentry><term><menuchoice><guimenu>Bestand</guimenu><guimenuitem>Versies…</guimenuitem></menuchoice></term><listitem><para>Eerdere versies van het label, bewaard elke keer dat het werd overschreven.</para></listitem></varlistentry>
+<varlistentry><term><menuchoice><guimenu>Bestand</guimenu><guimenuitem>Exporteren als PDF of
+afbeelding…</guimenuitem></menuchoice></term><listitem><para>Bewaart het label als PDF of als PNG-afbeelding.</para></listitem></varlistentry>
+<varlistentry><term><menuchoice><shortcut><keycombo
+action="simul">&Ctrl;<keycap>P</keycap></keycombo></shortcut><guimenu>Bestand</guimenu><guimenuitem>Afdrukken…</guimenuitem></menuchoice></term><listitem><para>Drukt af, zoals de knop <guibutton>Afdrukken</guibutton>.</para></listitem></varlistentry>
+<varlistentry><term><menuchoice><guimenu>Bestand</guimenu><guimenuitem>Afdrukvoorbeeld</guimenuitem></menuchoice></term><listitem><para>Toont wat de printer zal ontvangen.</para></listitem></varlistentry>
+<varlistentry><term><menuchoice><guimenu>Bestand</guimenu><guimenuitem>Afdrukgeschiedenis…</guimenuitem></menuchoice>,
+<menuchoice><guimenu>Bestand</guimenu><guimenuitem>Printerstatus…</guimenuitem></menuchoice></term><listitem><para>Zie <xref linkend="history"/>.</para></listitem></varlistentry>
+<varlistentry><term><menuchoice><guimenu>Bestand</guimenu><guimenuitem>Modus Alleen
+afdrukken</guimenuitem></menuchoice></term><listitem><para>Schakelt over naar de modus Alleen afdrukken en terug.</para></listitem></varlistentry>
+<varlistentry><term><menuchoice><shortcut><keycombo
+action="simul">&Ctrl;<keycap>Q</keycap></keycombo></shortcut><guimenu>Bestand</guimenu><guimenuitem>Afsluiten</guimenuitem></menuchoice></term><listitem><para>Sluit &kappname; af, en vraagt eerst of wijzigingen moeten worden
+opgeslagen.</para></listitem></varlistentry>
+</variablelist>
+<para>Add-ons kunnen eigen acties aan dit menu toevoegen.</para>
+</sect1>
+
+<sect1 id="menu-edit">
+<title>Het menu Bewerken</title>
+<variablelist>
+<varlistentry><term><guimenuitem>Ongedaan maken</guimenuitem>,
+<guimenuitem>Opnieuw</guimenuitem></term><listitem><para>Maakt de laatste wijziging ongedaan of voert die opnieuw uit (<keycombo
+action="simul">&Ctrl;<keycap>Z</keycap></keycombo>, <keycombo
+action="simul">&Ctrl;&Shift;<keycap>Z</keycap></keycombo>).</para></listitem></varlistentry>
+<varlistentry><term><guimenuitem>Knippen</guimenuitem>, <guimenuitem>Kopiëren</guimenuitem>,
+<guimenuitem>Plakken</guimenuitem></term><listitem><para>Objecten kunnen ook in een ander label worden geplakt, en tekst of
+afbeeldingen uit andere programma's kunnen als nieuwe objecten worden
+geplakt.</para></listitem></varlistentry>
+<varlistentry><term><guimenuitem>Object verwijderen</guimenuitem>, <guimenuitem>Object
+dupliceren</guimenuitem></term><listitem><para>Verwijdert of dupliceert de selectie.</para></listitem></varlistentry>
+<varlistentry><term><guimenuitem>Objecteigenschappen…</guimenuitem></term><listitem><para>Zie <xref linkend="properties"/>.</para></listitem></varlistentry>
+<varlistentry><term><guimenuitem>Alles selecteren</guimenuitem></term><listitem><para>Selecteert elk object.</para></listitem></varlistentry>
+</variablelist>
+</sect1>
+
+<sect1 id="menu-view">
+<title>Het menu Beeld</title>
+<variablelist>
+<varlistentry><term><guimenuitem>Inzoomen</guimenuitem>, <guimenuitem>Uitzoomen</guimenuitem>,
+<guimenuitem>Passend in pagina</guimenuitem>, <guimenuitem>Werkelijke
+grootte</guimenuitem></term><listitem><para>Wijzigen de zoom; de schuifregelaar onder het canvas doet dat ook.</para></listitem></varlistentry>
+<varlistentry><term><guimenuitem>Raster tonen</guimenuitem>, <guimenuitem>Op raster
+uitlijnen</guimenuitem>, <guisubmenu>Rasterafstand</guisubmenu></term><listitem><para>Het raster om objecten langs te plaatsen.</para></listitem></varlistentry>
+<varlistentry><term><guimenuitem>Hulplijnen tonen</guimenuitem>, <guimenuitem>Hulplijnen
+wissen</guimenuitem></term><listitem><para>De hulplijnen die uit de linialen zijn gesleept.</para></listitem></varlistentry>
+</variablelist>
+</sect1>
+
+<sect1 id="menu-format">
+<title>Het menu Opmaak</title>
+<para>Het lettertype, de grootte en de stijl van tekst, de uitlijning ervan, hoe
+die in het vak past en of die terugloopt; zie <xref linkend="formatting"/>.</para>
+</sect1>
+
+<sect1 id="menu-insert">
+<title>Het menu Invoegen</title>
+<para>Elk soort object (zie <xref linkend="objects"/>), en <guimenuitem>Label van
+een soort…</guimenuitem> (zie <xref linkend="label-kinds"/>).</para>
+</sect1>
+
+<sect1 id="menu-layout">
+<title>Het menu Indeling</title>
+<para>Het labeltype, aangepaste formaten, de rolindeling, afdrukinstellingen en de
+labelstand; de tapelengte en de volgorde van de vakken op tapelabels;
+objecten plaatsen, uitlijnen, groeperen, vergrendelen, draaien en stapelen;
+lagen, en objecten weglaten uit de afdruk. Zie <xref linkend="arranging"/>
+en <xref linkend="label-types"/>.</para>
+</sect1>
+
+<sect1 id="menu-data">
+<title>Het menu Gegevens</title>
+<para><guimenuitem>Gegevensbron…</guimenuitem>, <guimenuitem>Veld
+invoegen</guimenuitem>, <guimenuitem>Vragen bij afdrukken…</guimenuitem>,
+<guimenuitem>Berekende velden…</guimenuitem> en <guimenuitem>Gegevensbron
+verwijderen</guimenuitem>; zie <xref linkend="data"/>.</para>
+</sect1>
+
+<sect1 id="menu-address-book">
+<title>Het menu Adresboek</title>
+<para><guimenuitem>Nieuw adresboek</guimenuitem>, <guimenuitem>Adresboek
+openen…</guimenuitem>, <guimenuitem>Adressen importeren uit
+CSV…</guimenuitem>, en het adresboek opslaan; zie <xref
+linkend="address-book"/>.</para>
+</sect1>
+
+</chapter>
+
+<chapter id="tools">
+<title>Opdrachtregelprogramma's en add-ons</title>
+
+<sect1 id="render-tool">
+<title>plasma-label-creator-render</title>
+
+<para><command>plasma-label-creator-render</command> zet een label om naar een
+PNG- of PDF-bestand, drukt het af, of toont wat een printer zou
+ontvangen. Bijvoorbeeld:</para>
+
+<programlisting># Een label omzetten naar een afbeelding, en tonen wat erop staat
+plasma-label-creator-render --info label.label preview.png
+
+# Het afdrukken op een CUPS-wachtrij
+plasma-label-creator-render label.label --send DYMO-LabelWriter-450
+
+# Een ZPL-printer in het netwerk vragen wat hij is en wat er is geladen
+plasma-label-creator-render --zpl-info 192.0.2.10
+
+# Een PDF-proef met de omtrek van het label
+plasma-label-creator-render --outline label.label proof.pdf</programlisting>
+
+<para><userinput><command>plasma-label-creator-render</command>
+<option>--help</option></userinput> toont alle opties.</para>
+</sect1>
+
+<sect1 id="addons">
+<title>Add-ons</title>
+
+<para>&kappname; heeft geen add-ons nodig. Een add-on kan acties in het menu
+<guimenu>Bestand</guimenu> en een statusaanduiding in de statusbalk zetten,
+en labels openen die het in een eigen map bewaart, zoals de labels van een
+team die op een server staan. Add-ons die op de computer worden gevonden,
+staan aan totdat ze worden uitgeschakeld op de pagina
+<guilabel>Add-ons</guilabel> van de instellingen.</para>
+</sect1>
+
+</chapter>
+
+<chapter id="credits">
+<title>Dankbetuigingen en licentie</title>
+
+<para>&kappname;</para>
+<para>Copyright programma 2026 nvaert1986</para>
+<para>Barcodes worden getekend met zint (<ulink
+url="https://zint.org.uk/">zint.org.uk</ulink>).</para>
+<para>Copyright documentatie 2026 nvaert1986</para>
+
+<para>DYMO, LabelWriter, LabelManager en Rhino zijn handelsmerken van Newell
+Brands. Altec is een handelsmerk van de eigenaar ervan. Zebra en ZPL zijn
+handelsmerken van Zebra Technologies. Ze worden hier alleen gebruikt om te
+zeggen met welke printers en bestanden &kappname; werkt. &kappname; is niet
+verbonden aan, goedgekeurd door of ondersteund door een van hen.</para>
+
+
+
+<!-- TRANS:CREDIT_FOR_TRANSLATORS -->
+<para>Deze documentatie is onder CC0-1.0 vrijgegeven in het publieke domein.</para>
+&underGPL;
+
+</chapter>
+
+<appendix id="installation">
+<title>Installatie</title>
+
+<para>&kappname; wordt gebouwd met CMake. Het heeft Qt 6.7 of nieuwer, KDE
+Frameworks 6, zint, CUPS en libudev nodig; het handboek heeft KDocTools
+nodig. <filename>INSTALL.md</filename> in de broncode noemt alle vereisten,
+de pakketten voor veelgebruikte distributies, de bouwopties en hoe u elk
+soort printer instelt.</para>
+
+<programlisting>cmake -S . -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=/usr
+cmake --build build
+cmake --install build</programlisting>
+
+<para>De broncode staat op <ulink
+url="https://github.com/nvaert1986/plasma-label-creator">github.com/nvaert1986/plasma-label-creator</ulink>.</para>
+</appendix>
+
+</book>
+
+<!--
+Local Variables:
+mode: xml
+sgml-minimize-attributes:nil
+sgml-general-insert-case:lower
+sgml-indent-step:0
+sgml-indent-data:nil
+End:
+
+vim:tabstop=2:shiftwidth=2:expandtab
+kate: space-indent on; indent-width 2; tab-width 2; indent-mode none;
+-->

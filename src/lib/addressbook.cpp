@@ -5,6 +5,7 @@
 
 #include "addressbook.h"
 
+#include <KLocalizedString>
 #include <QCollator>
 #include <QFile>
 #include <QSaveFile>
@@ -171,7 +172,7 @@ std::optional<AddressBook> AddressBook::load(const QString &fileName, QString *e
     QXmlStreamReader xml(&file);
     if (!xml.readNextStartElement() || xml.name() != "AddressBook"_L1) {
         if (errorString) {
-            *errorString = xml.hasError() ? xml.errorString() : u"Not a DYMO address book"_s;
+            *errorString = xml.hasError() ? xml.errorString() : i18n("Not a DYMO address book");
         }
         return std::nullopt;
     }

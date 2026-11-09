@@ -5,6 +5,7 @@
 
 #include "sharedcounter.h"
 
+#include <KLocalizedString>
 #include <QFile>
 #include <QSaveFile>
 
@@ -29,13 +30,13 @@ bool SharedCounter::lock(int timeoutMs)
     }
     switch (m_lock.error()) {
     case QLockFile::LockFailedError:
-        m_errorString = u"%1 is in use by another computer printing this label."_s.arg(m_fileName);
+        m_errorString = i18n("%1 is in use by another computer printing this label.", m_fileName);
         break;
     case QLockFile::PermissionError:
-        m_errorString = u"No permission to lock %1."_s.arg(m_fileName);
+        m_errorString = i18n("No permission to lock %1.", m_fileName);
         break;
     default:
-        m_errorString = u"Could not lock %1."_s.arg(m_fileName);
+        m_errorString = i18n("Could not lock %1.", m_fileName);
         break;
     }
     return false;
@@ -53,13 +54,13 @@ std::optional<int> SharedCounter::read(int fallback)
         return fallback;
     }
     if (!file.open(QIODevice::ReadOnly)) {
-        m_errorString = u"Could not read %1: %2"_s.arg(m_fileName, file.errorString());
+        m_errorString = i18n("Could not read %1: %2", m_fileName, file.errorString());
         return std::nullopt;
     }
     bool ok = false;
     const int value = QString::fromUtf8(file.readAll()).trimmed().toInt(&ok);
     if (!ok) {
-        m_errorString = u"%1 does not hold a number."_s.arg(m_fileName);
+        m_errorString = i18n("%1 does not hold a number.", m_fileName);
         return std::nullopt;
     }
     return value;
@@ -70,7 +71,7 @@ bool SharedCounter::write(int value)
     // Whole or not at all: a half-written file would stop every computer.
     QSaveFile file(m_fileName);
     if (!file.open(QIODevice::WriteOnly) || file.write(QByteArray::number(value) + '\n') < 0 || !file.commit()) {
-        m_errorString = u"Could not write %1: %2"_s.arg(m_fileName, file.errorString());
+        m_errorString = i18n("Could not write %1: %2", m_fileName, file.errorString());
         return false;
     }
     return true;

@@ -5,6 +5,7 @@
 
 #include "fields.h"
 
+#include <KLocalizedString>
 #include <QLocale>
 #include <QRegularExpression>
 
@@ -420,7 +421,7 @@ std::optional<QString> problem(const PrintQuestion &question, const QString &ans
 {
     const QString label = question.prompt.isEmpty() ? question.name : question.prompt;
     if (answer.isEmpty()) {
-        return question.required ? std::optional(u"%1: an answer is needed."_s.arg(label)) : std::nullopt;
+        return question.required ? std::optional(i18n("%1: an answer is needed.", label)) : std::nullopt;
     }
     // The form's own fields keep their answers in shape; what is left to
     // check is a fixed choice and a number's range.
@@ -429,14 +430,14 @@ std::optional<QString> problem(const PrintQuestion &question, const QString &ans
         break;
     case PrintQuestion::Kind::Choice:
         if (!question.choices.isEmpty() && question.choicesColumn.isEmpty() && !question.choices.contains(answer)) {
-            return u"%1: not one of the choices."_s.arg(label);
+            return i18n("%1: not one of the choices.", label);
         }
         return std::nullopt;
     case PrintQuestion::Kind::Number: {
         bool ok = false;
         const double value = QLocale().toDouble(answer, &ok);
         if (!ok) {
-            return u"%1: not a number."_s.arg(label);
+            return i18n("%1: not a number.", label);
         }
         if ((question.minimum != 0 || question.maximum != 0) && (value < question.minimum || value > question.maximum)) {
             return u"%1: from %2 to %3."_s.arg(label, QLocale().toString(question.minimum), QLocale().toString(question.maximum));
@@ -448,10 +449,10 @@ std::optional<QString> problem(const PrintQuestion &question, const QString &ans
         return std::nullopt;
     }
     if (question.minimumLength > 0 && answer.size() < question.minimumLength) {
-        return u"%1: at least %2 characters."_s.arg(label).arg(question.minimumLength);
+        return i18n("%1: at least %2 characters.", label, question.minimumLength);
     }
     if (question.maximumLength > 0 && answer.size() > question.maximumLength) {
-        return u"%1: at most %2 characters."_s.arg(label).arg(question.maximumLength);
+        return i18n("%1: at most %2 characters.", label, question.maximumLength);
     }
     const auto all = [&answer](const std::function<bool(QChar)> &allowed) {
         return std::all_of(answer.cbegin(), answer.cend(), allowed);
@@ -463,30 +464,30 @@ std::optional<QString> problem(const PrintQuestion &question, const QString &ans
         if (!all([](QChar c) {
                 return c.isDigit();
             })) {
-            return u"%1: digits only."_s.arg(label);
+            return i18n("%1: digits only.", label);
         }
         break;
     case PrintQuestion::Allowed::Letters:
         if (!all([](QChar c) {
                 return c.isLetter();
             })) {
-            return u"%1: letters only."_s.arg(label);
+            return i18n("%1: letters only.", label);
         }
         break;
     case PrintQuestion::Allowed::LettersAndDigits:
         if (!all([](QChar c) {
                 return c.isLetterOrNumber();
             })) {
-            return u"%1: letters and digits only."_s.arg(label);
+            return i18n("%1: letters and digits only.", label);
         }
         break;
     case PrintQuestion::Allowed::Pattern: {
         const QRegularExpression pattern(QRegularExpression::anchoredPattern(question.pattern));
         if (!pattern.isValid()) {
-            return u"%1: the question's pattern is not valid (%2)."_s.arg(label, pattern.errorString());
+            return i18n("%1: the question's pattern is not valid (%2).", label, pattern.errorString());
         }
         if (!pattern.match(answer).hasMatch()) {
-            return u"%1: not in the expected form."_s.arg(label);
+            return i18n("%1: not in the expected form.", label);
         }
         break;
     }

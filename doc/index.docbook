@@ -1,0 +1,579 @@
+<?xml version="1.0" ?>
+<!--
+    SPDX-FileCopyrightText: 2026 nvaert1986 <25772781+nvaert1986@users.noreply.github.com>
+    SPDX-License-Identifier: CC0-1.0
+-->
+<!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN" "dtd/kdedbx45.dtd" [
+  <!ENTITY kappname "Plasma Label Creator">
+  <!ENTITY % addindex "IGNORE">
+  <!ENTITY % English "INCLUDE"><!-- change language only here -->
+]>
+
+<book id="plasma-label-creator" lang="&language;">
+
+<bookinfo>
+<title>The &kappname; Handbook</title>
+
+<authorgroup>
+<author>
+<othername>nvaert1986</othername>
+<affiliation>
+<address><email>25772781+nvaert1986@users.noreply.github.com</email></address>
+</affiliation>
+</author>
+<!-- TRANS:ROLES_OF_TRANSLATORS -->
+</authorgroup>
+
+<copyright>
+<year>2026</year>
+<holder>nvaert1986</holder>
+</copyright>
+
+<legalnotice>
+<para>This handbook is dedicated to the public domain under CC0-1.0: you may copy, change and pass it on without asking.</para>
+</legalnotice>
+
+<date>2026-11-09</date>
+<releaseinfo>0.6.1</releaseinfo>
+
+<abstract>
+<para>&kappname; designs and prints labels on DYMO LabelWriter and LabelManager printers and on ZPL label printers, such as the Altec ATP series and Zebra. It opens and saves <filename>.label</filename> files, so labels move between Linux and Windows unchanged.</para>
+</abstract>
+
+<keywordset>
+<keyword>KDE</keyword>
+<keyword>Plasma</keyword>
+<keyword>label</keyword>
+<keyword>DYMO</keyword>
+<keyword>LabelWriter</keyword>
+<keyword>LabelManager</keyword>
+<keyword>ZPL</keyword>
+<keyword>barcode</keyword>
+</keywordset>
+
+</bookinfo>
+
+<chapter id="introduction">
+<title>Introduction</title>
+
+<para>&kappname; is a label designer for Linux. You draw a label on a canvas the size of the real one, with text, addresses, barcodes and 2D codes, pictures, clip art, shapes, counters and dates, and print it on the label printer next to you.</para>
+
+<para>It supports:</para>
+<itemizedlist>
+<listitem><para>DYMO LabelWriter printers (the 450 series and older, the 4XL, and the 550 series) and DYMO LabelManager tape printers, through DYMO's own CUPS drivers;</para></listitem>
+<listitem><para>ZPL label printers, such as the Altec ATP series and Zebra, through the Zebra ZPL driver that comes with CUPS, with labels across the roll and continuous rolls;</para></listitem>
+<listitem><para><filename>.label</filename> files, address books (<filename>.ABX</filename>) and Rhino templates (<filename>.rhino</filename>) as DYMO's software writes them;</para></listitem>
+<listitem><para>printing from data: a label for each row of a CSV file, a spreadsheet or a database query, with questions asked when printing;</para></listitem>
+<listitem><para>print-only mode for people who only print, an automation service that prints for other programs, and add-ons.</para></listitem>
+</itemizedlist>
+
+<screenshot>
+<screeninfo>The main window</screeninfo>
+<mediaobject>
+<imageobject><imagedata fileref="screenshot.png" format="PNG"/></imageobject>
+<textobject><phrase>The main window of &kappname;, with the label types on the left and an empty label on the canvas</phrase></textobject>
+</mediaobject>
+</screenshot>
+
+<para>Objects &kappname; does not know are kept in the file and written back unchanged, so a label made elsewhere loses nothing by being opened and saved here.</para>
+
+</chapter>
+
+<chapter id="getting-started">
+<title>Getting Started</title>
+
+<sect1 id="main-window">
+<title>The Main Window</title>
+
+<para>The main window has four parts:</para>
+
+<variablelist>
+<varlistentry>
+<term>The sidebar</term>
+<listitem><para>On the left, with three tabs. <guilabel>Labels</guilabel> lists the label types of the printer chosen in the print bar; type in the search field to find one, and click a label type to start a label on it. <guilabel>Insert</guilabel> lists the objects to put on a label, and the clip art below them. <guilabel>Address Book</guilabel> holds addresses to print (see <xref linkend="address-book"/>).</para></listitem>
+</varlistentry>
+<varlistentry>
+<term>The canvas</term>
+<listitem><para>In the middle: the label at its real proportions, with rulers along the top and left side. The status line under it gives the label's name and size, and the zoom.</para></listitem>
+</varlistentry>
+<varlistentry>
+<term>The toolbars</term>
+<listitem><para>At the top: the main toolbar (recently used layouts, new, open, save, undo and print), the insert toolbar, the format toolbar for text, and the arrange toolbar for aligning, grouping, locking and turning objects.</para></listitem>
+</varlistentry>
+<varlistentry>
+<term>The print bar</term>
+<listitem><para>At the bottom: the printer, what to print, the number of copies and the <guibutton>Print</guibutton> button (see <xref linkend="print-bar"/>).</para></listitem>
+</varlistentry>
+</variablelist>
+</sect1>
+
+<sect1 id="first-label">
+<title>Your First Label</title>
+
+<procedure>
+<step><para>Choose your printer in the print bar. A DYMO printer plugged in over USB is noticed; when it has no printer queue yet, the print bar offers <guibutton>Set Up Printer</guibutton>.</para></step>
+<step><para>In the <guilabel>Labels</guilabel> tab, click the label type that is loaded in the printer, such as <guilabel>30252 Address</guilabel>.</para></step>
+<step><para>In the <guilabel>Insert</guilabel> tab, double-click <guilabel>Text</guilabel>, or drag it onto the label.</para></step>
+<step><para>Double-click the text on the label and type. Press &Esc; or click outside the text when you are done.</para></step>
+<step><para>Press <guibutton>Print</guibutton>.</para></step>
+<step><para>Save the label with <menuchoice><shortcut><keycombo action="simul">&Ctrl;<keycap>S</keycap></keycombo></shortcut><guimenu>File</guimenu><guimenuitem>Save</guimenuitem></menuchoice> to print it again later.</para></step>
+</procedure>
+</sect1>
+
+<sect1 id="opening-files">
+<title>Opening and Saving Labels</title>
+
+<para>&kappname; opens <filename>.label</filename> files (die-cut labels and LabelManager tape labels) and DYMO Rhino templates (<filename>.rhino</filename>, which open as tape labels), and saves <filename>.label</filename> files. Labels are saved with DYMO's own label ids, so other label software that reads the file finds the right label.</para>
+
+<para>Settings that only &kappname; uses, such as a label's data source and its questions, are kept in the file as a comment, which other label software ignores.</para>
+
+<para>Each time a label is saved over, the version it replaces is kept. <menuchoice><guimenu>File</guimenu><guimenuitem>Versions…</guimenuitem></menuchoice> lists them; restoring one puts it on the canvas, where you save it to keep it, or undo.</para>
+
+<para><guilabel>Recently Used Layouts</guilabel>, the first button on the main toolbar, lists the labels you printed last, with a picture of each.</para>
+</sect1>
+
+</chapter>
+
+<chapter id="designing">
+<title>Designing Labels</title>
+
+<sect1 id="objects">
+<title>Objects</title>
+
+<para>A label is made of objects. Add one from the <guilabel>Insert</guilabel> tab or the <guimenu>Insert</guimenu> menu, or drag a picture in from &dolphin;. The objects are:</para>
+
+<variablelist>
+<varlistentry><term><guilabel>Address</guilabel></term>
+<listitem><para>A text box for addresses. The checked addresses of the address book print in it, one label each.</para></listitem></varlistentry>
+<varlistentry><term><guilabel>Text</guilabel></term>
+<listitem><para>A text box. Text can mix fonts, sizes and styles, word by word, print white on black, wrap within its box, and shrink or grow to fit.</para></listitem></varlistentry>
+<varlistentry><term><guilabel>Counter</guilabel></term>
+<listitem><para>A number that counts on with every label printed, with text before and after it, a start value, an increment and leading zeros. A counter can be shared with other computers through a counter file (see <xref linkend="shared-counters"/>).</para></listitem></varlistentry>
+<varlistentry><term><guilabel>Date and Time</guilabel></term>
+<listitem><para>The date and time of printing, in a format and language of your choice.</para></listitem></varlistentry>
+<varlistentry><term><guilabel>Barcode</guilabel></term>
+<listitem><para>Code 128, Code 39, Codabar, Interleaved 2 of 5, ITF-14, EAN, UPC, QR Code, PDF417, POSTNET, PLANET and Intelligent Mail, and also Data Matrix, Aztec Code, MaxiCode, Micro QR Code, Code 93, Code 11, MSI Plessey, Pharmacode, GS1-128, GS1 Data Matrix, GS1 DataBar, HIBC, KIX (PostNL) and Royal Mail. Other label software that opens the file may not show the types of the second group.</para></listitem></varlistentry>
+<varlistentry><term><guilabel>Image</guilabel></term>
+<listitem><para>A picture from your files, kept in the label. SVG drawings stay sharp at any size.</para></listitem></varlistentry>
+<varlistentry><term><guilabel>Rectangle</guilabel>, <guilabel>Ellipse</guilabel>, <guilabel>Horizontal Line</guilabel>, <guilabel>Vertical Line</guilabel></term>
+<listitem><para>Shapes with an outline and a fill.</para></listitem></varlistentry>
+<varlistentry><term><guilabel>Polygon</guilabel>, <guilabel>Star</guilabel>, <guilabel>Arrow</guilabel></term>
+<listitem><para>More shapes. Other label software shows these as pictures.</para></listitem></varlistentry>
+<varlistentry><term><guilabel>Curved Text</guilabel></term>
+<listitem><para>Text along an arc or around a circle.</para></listitem></varlistentry>
+</variablelist>
+
+<para>Clip art is in the lower half of the <guilabel>Insert</guilabel> tab: drag an image onto the label or double-click it. Add your own images with the <guibutton>+</guibutton> button. If you own DYMO Label Software, <guilabel>Import / Export</guilabel> imports its clip art from your own copy of <filename>DYMO.DLS.dll</filename>; &kappname; does not include it.</para>
+</sect1>
+
+<sect1 id="editing">
+<title>Selecting, Moving and Editing</title>
+
+<para>Click an object to select it; &Ctrl;-click or &Shift;-click adds objects to the selection, and dragging over the empty label selects every object in the box. <menuchoice><shortcut><keycombo action="simul">&Ctrl;<keycap>A</keycap></keycombo></shortcut><guimenu>Edit</guimenu><guimenuitem>Select All</guimenuitem></menuchoice> selects them all.</para>
+
+<para>Drag an object to move it and its handles to resize it. The arrow keys move the selection a little, with &Shift; a little more (the steps are set in the settings). Drag the round handle above an object to turn it; with &Shift; held it turns in steps. <keycombo action="simul">&Ctrl;<keycap>[</keycap></keycombo> and <keycombo action="simul">&Ctrl;<keycap>]</keycap></keycombo> turn the selection left and right.</para>
+
+<para>Double-click a text, an address or a counter to edit its text on the label itself; &Enter; or <keycap>F2</keycap> does the same for the selected object. Double-click another object, or press <keycombo action="simul">&Alt;&Enter;</keycombo>, to open its properties (see <xref linkend="properties"/>).</para>
+
+<para>Every change can be undone with <keycombo action="simul">&Ctrl;<keycap>Z</keycap></keycombo>. Cut, copy, paste, <guimenuitem>Duplicate Object</guimenuitem> (<keycombo action="simul">&Ctrl;<keycap>D</keycap></keycombo>) and <guimenuitem>Delete Object</guimenuitem> (&Del;) are in the <guimenu>Edit</guimenu> menu and in the menu that opens when you right-click an object.</para>
+</sect1>
+
+<sect1 id="formatting">
+<title>Formatting Text</title>
+
+<para>The format toolbar and the <guimenu>Format</guimenu> menu change the selected text, or the selected words while you edit it: the font and size, <guimenuitem>Larger Font</guimenuitem> and <guimenuitem>Smaller Font</guimenuitem>, bold, italic, underline and strikeout, and <guimenuitem>White on Black</guimenuitem>.</para>
+
+<para><guisubmenu>Horizontal Alignment</guisubmenu> and <guisubmenu>Vertical Alignment</guisubmenu> place the text in its box. <guisubmenu>Text Fit</guisubmenu> chooses between a fixed font size, shrinking long text to fit, and always fitting the text to the box. <guimenuitem>Wrap Text</guimenuitem> breaks long lines at spaces to fit the box's width.</para>
+</sect1>
+
+<sect1 id="arranging">
+<title>Arranging Objects</title>
+
+<para>The <guimenu>Layout</guimenu> menu, the arrange toolbar and the right-click menu arrange objects:</para>
+
+<variablelist>
+<varlistentry><term><guisubmenu>Position Object on Label</guisubmenu></term>
+<listitem><para>Puts the selection against an edge of the label, or centres it.</para></listitem></varlistentry>
+<varlistentry><term><guisubmenu>Align Objects</guisubmenu></term>
+<listitem><para>Lines the selected objects up by their edges or centres, or distributes them evenly.</para></listitem></varlistentry>
+<varlistentry><term><guimenuitem>Group</guimenuitem> and <guimenuitem>Ungroup</guimenuitem></term>
+<listitem><para>A group is selected, moved and turned as one (<keycombo action="simul">&Ctrl;<keycap>G</keycap></keycombo> and <keycombo action="simul">&Ctrl;&Shift;<keycap>G</keycap></keycombo>).</para></listitem></varlistentry>
+<varlistentry><term><guimenuitem>Lock Position and Size</guimenuitem></term>
+<listitem><para>Locked objects cannot be moved or resized by accident.</para></listitem></varlistentry>
+<varlistentry><term><guimenuitem>Bring to Front</guimenuitem> and <guimenuitem>Send to Back</guimenuitem></term>
+<listitem><para>Change which object is drawn on top.</para></listitem></varlistentry>
+<varlistentry><term><guimenuitem>Do Not Print</guimenuitem></term>
+<listitem><para>The object shows faded while you design and is left out when printing.</para></listitem></varlistentry>
+<varlistentry><term><guimenuitem>Layers…</guimenuitem> and <guimenuitem>Move to Layer</guimenuitem></term>
+<listitem><para>Objects on a layer show, print and can be edited as the layer says. A layer that does not print suits a picture of the product to design on.</para></listitem></varlistentry>
+</variablelist>
+
+<para>The <guimenu>View</guimenu> menu shows a grid (<keycombo action="simul">&Ctrl;<keycap>'</keycap></keycombo>) and makes objects snap to it (<keycombo action="simul">&Ctrl;&Shift;<keycap>'</keycap></keycombo>). Drag a guideline out of a ruler to place objects by; objects snap to it, and dragging it back to the ruler removes it. Hold &Alt; while moving to place an object freely.</para>
+</sect1>
+
+<sect1 id="properties">
+<title>Object Properties</title>
+
+<para><menuchoice><guimenu>Edit</guimenu><guimenuitem>Object Properties…</guimenuitem></menuchoice> shows everything about the selected object. The <guilabel>General</guilabel> page has its position and size in millimetres or inches, its rotation and angle, mirroring and a border. The next page depends on the kind of object:</para>
+
+<itemizedlist>
+<listitem><para>Text and addresses: the font, the alignment, how the text fits, wrapping, and <guilabel>Grow the box to fit the text</guilabel>, which makes the box wider for longer text, or taller when it wraps, instead of making the text smaller.</para></listitem>
+<listitem><para>Barcodes: the type, the data, the size and where the human-readable text goes. <guibutton>Build…</guibutton> puts GS1 data together from application identifiers, checking each value and adding a missing check digit.</para></listitem>
+<listitem><para>Images: another picture, how it scales, and a picture file to show instead of the one in the label. The file name may use fields, such as <filename>/photos/{Serial}.png</filename>, for a picture per data row.</para></listitem>
+<listitem><para>Counters: the text before and after, the start value, the next value, the increment, the minimum number of digits, and a counter file shared with other computers.</para></listitem>
+<listitem><para>Dates: the format, the language, and whether the time is included.</para></listitem>
+<listitem><para>Curved text: where the text sits on the circle and the start angle.</para></listitem>
+</itemizedlist>
+
+<para>The <guilabel>When It Prints</guilabel> page sets a condition: the object prints only when a field is empty, has a value, is or is not a value, contains a value, or is more or less than one. Objects that do not print for the current data show faded. On the same page, an object can stay where it is or stay to the right of a text that grows to fit, moving along with it.</para>
+</sect1>
+
+<sect1 id="label-types">
+<title>Label Types, Sizes and Rolls</title>
+
+<para>The <guilabel>Labels</guilabel> tab lists the label types the chosen printer takes. For an Altec ATP printer it lists Altec's labels by product, those fitting the loaded labels first. <menuchoice><guimenu>Layout</guimenu><guimenuitem>Label Type…</guimenuitem></menuchoice> changes the label type of the label on the canvas.</para>
+
+<para><menuchoice><guimenu>Layout</guimenu><guimenuitem>Custom Label Size…</guimenuitem></menuchoice> makes a label size that is in no list. Measure one label without the gap to the next. When only part of the label takes print, such as the white strip of a wrap label, give that part too. Your own sizes are listed under <guilabel>My label sizes</guilabel>; right-click one to edit or remove it.</para>
+
+<para><menuchoice><guimenu>Layout</guimenu><guimenuitem>Roll Layout…</guimenuitem></menuchoice> is for printers that take any label size, such as Altec and Zebra: rolls with several labels across, printed a row at a time, and continuous rolls, where each label takes the length you set.</para>
+
+<para><guisubmenu>Label Orientation</guisubmenu> chooses between portrait and landscape. <guimenuitem>Rotate Label</guimenuitem> on the arrange toolbar turns the label a quarter turn together with its objects, so it prints as before.</para>
+</sect1>
+
+<sect1 id="tape-labels">
+<title>Tape Labels</title>
+
+<para>LabelManager labels are printed on tape. Objects on a tape label sit in cells side by side along the tape. <menuchoice><guimenu>Layout</guimenu><guimenuitem>Tape Length…</guimenuitem></menuchoice> makes the label as long as its content or a fixed length; <guimenuitem>Move Earlier on the Tape</guimenuitem> and <guimenuitem>Move Later on the Tape</guimenuitem> change the order of the cells. In an object's properties, <guilabel>On the Tape</guilabel> sets how long its cell is.</para>
+</sect1>
+
+<sect1 id="label-kinds">
+<title>Labels of a Kind</title>
+
+<para><menuchoice><guimenu>Insert</guimenu><guimenuitem>Label of a Kind…</guimenuitem></menuchoice> makes common labels from a few values:</para>
+
+<variablelist>
+<varlistentry><term><guilabel>Cable Wrap</guilabel></term><listitem><para>Wraps around a cable and can be read from every side.</para></listitem></varlistentry>
+<varlistentry><term><guilabel>Cable Flag</guilabel></term><listitem><para>Folds around a cable, with the text on both sides.</para></listitem></varlistentry>
+<varlistentry><term><guilabel>Patch Panel</guilabel></term><listitem><para>A row of numbered ports at the panel's pitch, with optional arrows and lines between the cells.</para></listitem></varlistentry>
+<varlistentry><term><guilabel>Terminal Block</guilabel></term><listitem><para>Terminals at their pitch on a DIN rail.</para></listitem></varlistentry>
+<varlistentry><term><guilabel>Breaker Panel</guilabel></term><listitem><para>Breakers of one module (18 mm) each.</para></listitem></varlistentry>
+<varlistentry><term><guilabel>Rack Markers</guilabel></term><listitem><para>Height units along a rack's rail, boxed.</para></listitem></varlistentry>
+</variablelist>
+</sect1>
+
+</chapter>
+
+<chapter id="data">
+<title>Data, Questions and Addresses</title>
+
+<sect1 id="data-source">
+<title>Printing from Data</title>
+
+<para><menuchoice><guimenu>Data</guimenu><guimenuitem>Data Source…</guimenuitem></menuchoice> prints a label for each row of a CSV file, an Excel or OpenDocument spreadsheet, or a database query (SQLite, ODBC for SQL Server and others, MySQL, MariaDB, PostgreSQL, Firebird and Oracle, when Qt has the driver).</para>
+
+<para>Put fields on the label as <userinput>{Column}</userinput>, in texts, addresses, barcodes or an image's file name; <menuchoice><guimenu>Data</guimenu><guimenuitem>Insert Field</guimenuitem></menuchoice> lists them. Each label gets the values of its row.</para>
+
+<para><guibutton>Load Rows</guibutton> shows the rows; tick the ones to print. A column can say how many copies each row prints, and another which label file prints it, for a different label per row. All of them must be for the same label type.</para>
+
+<para>Only queries that read are run (<literal>SELECT</literal>, or <literal>WITH</literal> … <literal>SELECT</literal>), so printing never changes the database. A query can use the answers to the questions, such as <userinput>WHERE Serial = {Serial}</userinput>; they are passed as values, so an answer can never change the query. Database passwords are never saved: they are asked for when printing.</para>
+</sect1>
+
+<sect1 id="questions">
+<title>Questions When Printing</title>
+
+<para><menuchoice><guimenu>Data</guimenu><guimenuitem>Print-Time Questions…</guimenuitem></menuchoice> sets questions asked each time the label is printed, such as a batch number. The answer fills <userinput>{Name}</userinput> on every label of the print run. A question can be:</para>
+
+<itemizedlist>
+<listitem><para>text, with rules: an answer is needed, a length, digits or letters only, or a pattern;</para></listitem>
+<listitem><para>a drop-down list, of fixed choices or of a column of the data;</para></listitem>
+<listitem><para>a number, within a range and with decimals;</para></listitem>
+<listitem><para>a date, in a format of your choice;</para></listitem>
+<listitem><para>a check box, with the text to print when ticked and when not.</para></listitem>
+</itemizedlist>
+
+<para>A text question can be looked up in a column of the data: the row found fills the other questions named after its columns.</para>
+</sect1>
+
+<sect1 id="calculated-fields">
+<title>Calculated Fields</title>
+
+<para><menuchoice><guimenu>Data</guimenu><guimenuitem>Calculated Fields…</guimenuitem></menuchoice> works out fields when printing, from other fields, and uses them on the label like columns. <userinput>{Date}</userinput>, <userinput>{Time}</userinput> and <userinput>{Now}</userinput> are the moment of printing. <userinput>{Date+30}</userinput> or <userinput>{Installed+1y}</userinput> moves a date by days, weeks (<literal>w</literal>), months (<literal>m</literal>), years (<literal>y</literal>) or hours (<literal>h</literal>); <userinput>{Serial+1}</userinput> adds to a number.</para>
+
+<para>After a <literal>|</literal>, a filter changes the value: <literal>upper</literal>, <literal>lower</literal>, <literal>trim</literal>, <literal>left:3</literal>, <literal>right:4</literal>, <literal>mid:2:3</literal>, <literal>pad:6</literal>, <literal>date:dd-MM-yyyy</literal>, <literal>replace:old:new</literal> and <literal>default:text</literal>. For example <userinput>{Date+30|date:dd-MM-yyyy}</userinput> or <userinput>{Prefix}-{Serial|pad:6}</userinput>.</para>
+</sect1>
+
+<sect1 id="address-book">
+<title>The Address Book</title>
+
+<para>The <guilabel>Address Book</guilabel> tab holds addresses in a DYMO address book (<filename>.ABX</filename>). Search it, tick the addresses to print, and choose <guilabel>All checked addresses in the address book</guilabel> in the print bar: each prints on its own label, in the label's address object. The <guimenu>Address Book</guimenu> menu makes, opens and saves address books, and imports addresses from a CSV file.</para>
+</sect1>
+
+<sect1 id="gs1">
+<title>GS1 Data</title>
+
+<para>For GS1-128, GS1 Data Matrix and GS1 DataBar Expanded barcodes, <guibutton>Build…</guibutton> in the barcode's properties lists the common application identifiers, such as the GTIN, a batch number or an expiry date. Give the values; each is checked, and a check digit left out is added. A value may use fields, such as <userinput>{Batch}</userinput>, which are checked when printing.</para>
+</sect1>
+
+</chapter>
+
+<chapter id="printing">
+<title>Printing</title>
+
+<sect1 id="print-bar">
+<title>The Print Bar</title>
+
+<para>The print bar at the bottom of the window chooses the printer and says how it is: a stopped queue, jobs waiting, and for a network ZPL printer which labels are loaded and whether it is ready. The button next to the printer opens its settings:</para>
+
+<variablelist>
+<varlistentry><term><guimenuitem>Use as Default Printer</guimenuitem></term><listitem><para>Always start with this printer, even when another LabelWriter is plugged in.</para></listitem></varlistentry>
+<varlistentry><term><guimenuitem>Which LabelWriter Is This…</guimenuitem></term><listitem><para>For a printer queue that does not use DYMO's driver, such as a printer shared from Windows: labels are then prepared with that model's driver on this computer and sent as they are.</para></listitem></varlistentry>
+<varlistentry><term><guimenuitem>Detect the Loaded Labels Again</guimenuitem></term><listitem><para>Asks a network ZPL printer which labels are loaded.</para></listitem></varlistentry>
+<varlistentry><term><guimenuitem>Print Offset…</guimenuitem></term><listitem><para>Moves everything this printer prints a little, when labels come out shifted. Print a label, measure how far everything must move, and enter it.</para></listitem></varlistentry>
+<varlistentry><term><guimenuitem>Printer Status…</guimenuitem></term><listitem><para>How every label printer is.</para></listitem></varlistentry>
+</variablelist>
+
+<para>Below the printer, <guilabel>Barcodes and graphics quality</guilabel> prints a LabelWriter label slower but sharper. Next to it, choose what to print: only the label on the canvas, every checked address in the address book, or each ticked row of the data source. Set the number of copies and press <guibutton>Print</guibutton>.</para>
+
+<para>Before printing, &kappname; checks that the label fits the printer: that it is one of the printer's label types, that it is as long as the labels loaded, and that the printer is ready. It asks before printing anyway.</para>
+</sect1>
+
+<sect1 id="printers">
+<title>Setting Up Printers</title>
+
+<para>&kappname; prints through CUPS. A DYMO LabelWriter or LabelManager needs DYMO's CUPS drivers: the LabelWriter 450 and older and the LabelManagers use <filename>dymo-cups-drivers</filename>, the LabelWriter 550 series DYMO's LW5xx driver. The 550 series reads its status before every label, so it must have a queue of its own with that driver, over USB or the network. A ZPL printer, such as an Altec ATP or a Zebra, uses the <guilabel>Zebra ZPL Label Printer</guilabel> driver that comes with CUPS.</para>
+
+<para>A DYMO printer plugged in over USB without a queue gets a <guibutton>Set Up Printer</guibutton> button in the print bar; this needs <filename>cups-pk-helper</filename>. Otherwise add the printer in the system's printer settings.</para>
+</sect1>
+
+<sect1 id="print-settings">
+<title>Print Settings, Preview and Export</title>
+
+<para><menuchoice><guimenu>Layout</guimenu><guimenuitem>Print Settings…</guimenuitem></menuchoice> sets how the printer prints this label: the DYMO print density, or the darkness and speed of an Altec or Zebra printer. It also sets a header label and a trailer label, printed once before and after a print run and filled with the answers and <userinput>{Count}</userinput>, the number of labels in between.</para>
+
+<para><menuchoice><guimenu>File</guimenu><guimenuitem>Print Preview</guimenuitem></menuchoice> shows the pages exactly as the printer receives them, dot for dot, and steps through a run where counters or addresses change.</para>
+
+<para><menuchoice><guimenu>File</guimenu><guimenuitem>Export as PDF or Image…</guimenuitem></menuchoice> saves the label as a PDF at its own size or as a PNG image at the printer's resolution, optionally with the label's outline as a proof.</para>
+</sect1>
+
+<sect1 id="shared-counters">
+<title>Counters</title>
+
+<para>A counter counts on with every label printed, and its next value is saved in the label. When several computers print the same label, give the counter a counter file on a network share in its properties: the file keeps the next value for every computer, and is locked while one prints, so no number prints twice.</para>
+</sect1>
+
+<sect1 id="history">
+<title>Print History and Printer Status</title>
+
+<para><menuchoice><guimenu>File</guimenu><guimenuitem>Print History…</guimenuitem></menuchoice> lists what was printed, when and on which printer, with the answers and data rows. Search it, open a label as it was printed, or print it again with the same answers and rows.</para>
+
+<para><menuchoice><guimenu>File</guimenu><guimenuitem>Printer Status…</guimenuitem></menuchoice> shows every label printer: its queue, the jobs waiting, and what network ZPL printers say about themselves, such as being out of labels or having the head open.</para>
+</sect1>
+
+<sect1 id="print-only-mode">
+<title>Print-Only Mode</title>
+
+<para>Print-only mode is for people who only print: <menuchoice><guimenu>File</guimenu><guimenuitem>Print-Only Mode</guimenuitem></menuchoice>, or the <guilabel>Label Printing</guilabel> launcher. Choose a label from a folder, fill in its questions, tick the data rows and print, without being able to change the label. Counters are kept in the label.</para>
+
+<para>In the settings, an administrator can make the app always start in print-only mode, with no way back to designing, and fix that setting with KDE's Kiosk (see <xref linkend="settings"/>).</para>
+</sect1>
+
+</chapter>
+
+<chapter id="automation">
+<title>Automation</title>
+
+<para>The automation service, <command>plasma-label-creator-automation</command>, prints labels for other programs without anyone at the screen, also when &kappname; is closed. It makes the same checks as the <guibutton>Print</guibutton> button: the answers to the label's questions, shared counters, the printer's label types and state. Counters count on in the label, and every print goes in the print history.</para>
+
+<para>Set it up in <menuchoice><guimenu>Settings</guimenu><guimenuitem>Configure &kappname;…</guimenuitem><guilabel>Automation</guilabel></menuchoice>: start it there, or have it start when you log in. <guibutton>Recent Jobs…</guibutton> lists what it printed lately, where each job came from, and why a job was not printed. On a computer without a desktop session, run it as a systemd user service: <userinput><command>systemctl --user enable --now plasma-label-creator-automation</command></userinput>.</para>
+
+<sect1 id="watched-folders">
+<title>Watched Folders</title>
+
+<para>Each watched folder has a label, a printer and a number of copies. A CSV file dropped in it prints a label for each row, its first line naming the fields; a JSON file is a print job as sent over HTTP. Printed files move to <filename>printed</filename>, the others to <filename>failed</filename> with the reason in a <filename>.txt</filename> file.</para>
+
+<para>A file is printed once it has not changed for two seconds. A program that writes slowly should write the file under another name, such as <filename>job.csv.part</filename>, and rename it when done.</para>
+</sect1>
+
+<sect1 id="http">
+<title>Print Requests over HTTP</title>
+
+<para>When &kappname; is built with Qt HTTP Server, the service also takes print requests over HTTP, from this computer only or from the network. Every request carries the token shown in the settings. Labels are named relative to the labels folder set there, and only labels in it print.</para>
+
+<programlisting>curl -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+     -d '{"label": "Rack/patch panel", "printer": "Zebra-ZT230", "copies": 1,
+          "values": {"Port": "A12"},
+          "rows": [{"Serial": "S1"}, {"Serial": "S2"}]}' \
+     http://localhost:8631/v1/print</programlisting>
+
+<para><literal>values</literal> fill fields and answer the label's questions on every label; each of <literal>rows</literal> gives one label. <literal>GET /v1/labels</literal> lists the labels with their fields and questions, <literal>GET /v1/printers</literal> the printers and their state, and <literal>GET /v1/status</literal> the service's version and settings.</para>
+</sect1>
+
+</chapter>
+
+<chapter id="settings">
+<title>Configuring &kappname;</title>
+
+<para><menuchoice><guimenu>Settings</guimenu><guimenuitem>Configure &kappname;…</guimenuitem></menuchoice> has these pages:</para>
+
+<variablelist>
+<varlistentry><term><guilabel>Designing</guilabel></term>
+<listitem><para>The font of new text, how far the arrow keys move objects (also with &Shift;), the steps for turning, the tape to start with, and whether the rulers show millimetres or inches.</para></listitem></varlistentry>
+<varlistentry><term><guilabel>Printing</guilabel></term>
+<listitem><para>Whether and how often network label printers are asked how they are, whether to warn before printing when the printer is not ready, the copies to start with, the gap between Altec labels across and the length continuous rolls start at, how long to wait for a shared counter, and print-only mode: the folder its labels come from and whether the app always starts in it.</para></listitem></varlistentry>
+<varlistentry><term><guilabel>History</guilabel></term>
+<listitem><para>How many versions are kept per label, and whether they are kept next to the label in a <filename>.versions</filename> folder, where they go along with the label for everyone who opens it there; how many prints the history keeps; how many recently used layouts are kept.</para></listitem></varlistentry>
+<varlistentry><term><guilabel>Automation</guilabel></term>
+<listitem><para>The automation service (see <xref linkend="automation"/>).</para></listitem></varlistentry>
+<varlistentry><term><guilabel>Add-ons</guilabel></term>
+<listitem><para>The add-ons installed on this computer, each of which can be switched off. A change takes effect when &kappname; starts again.</para></listitem></varlistentry>
+</variablelist>
+
+<para>An administrator can fix settings for everyone with KDE's Kiosk. For example, <literal>LockPrintOnly[$i]=true</literal> in the <literal>[Settings]</literal> group of <filename>plasma-label-creatorrc</filename> keeps people from leaving print-only mode.</para>
+
+<para>&kappname; speaks the language of your desktop when it has been translated into it; for now, that is English and Dutch. <menuchoice><guimenu>Settings</guimenu><guimenuitem>Configure Language…</guimenuitem></menuchoice> chooses another language for &kappname; alone.</para>
+</chapter>
+
+<chapter id="commands">
+<title>Command Reference</title>
+
+<para>Besides the menus described here, &kappname; has the common &plasma; <guimenu>Settings</guimenu> and <guimenu>Help</guimenu> menus.</para>
+
+<sect1 id="menu-file">
+<title>The File Menu</title>
+<variablelist>
+<varlistentry><term><menuchoice><shortcut><keycombo action="simul">&Ctrl;<keycap>N</keycap></keycombo></shortcut><guimenu>File</guimenu><guimenuitem>New</guimenuitem></menuchoice></term><listitem><para>Starts a new label.</para></listitem></varlistentry>
+<varlistentry><term><menuchoice><shortcut><keycombo action="simul">&Ctrl;<keycap>O</keycap></keycombo></shortcut><guimenu>File</guimenu><guimenuitem>Open…</guimenuitem></menuchoice></term><listitem><para>Opens a <filename>.label</filename> file or a Rhino template.</para></listitem></varlistentry>
+<varlistentry><term><menuchoice><guimenu>File</guimenu><guisubmenu>Open Recent</guisubmenu></menuchoice></term><listitem><para>Opens a label you opened before.</para></listitem></varlistentry>
+<varlistentry><term><menuchoice><guimenu>File</guimenu><guisubmenu>Recently Used Layouts</guisubmenu></menuchoice></term><listitem><para>Opens one of the labels printed last, as it was printed.</para></listitem></varlistentry>
+<varlistentry><term><menuchoice><shortcut><keycombo action="simul">&Ctrl;<keycap>S</keycap></keycombo></shortcut><guimenu>File</guimenu><guimenuitem>Save</guimenuitem></menuchoice>, <menuchoice><guimenu>File</guimenu><guimenuitem>Save As…</guimenuitem></menuchoice></term><listitem><para>Saves the label.</para></listitem></varlistentry>
+<varlistentry><term><menuchoice><guimenu>File</guimenu><guimenuitem>Versions…</guimenuitem></menuchoice></term><listitem><para>Earlier versions of the label, kept each time it was saved over.</para></listitem></varlistentry>
+<varlistentry><term><menuchoice><guimenu>File</guimenu><guimenuitem>Export as PDF or Image…</guimenuitem></menuchoice></term><listitem><para>Saves the label as a PDF or a PNG image.</para></listitem></varlistentry>
+<varlistentry><term><menuchoice><shortcut><keycombo action="simul">&Ctrl;<keycap>P</keycap></keycombo></shortcut><guimenu>File</guimenu><guimenuitem>Print…</guimenuitem></menuchoice></term><listitem><para>Prints, as the <guibutton>Print</guibutton> button does.</para></listitem></varlistentry>
+<varlistentry><term><menuchoice><guimenu>File</guimenu><guimenuitem>Print Preview</guimenuitem></menuchoice></term><listitem><para>Shows what the printer will receive.</para></listitem></varlistentry>
+<varlistentry><term><menuchoice><guimenu>File</guimenu><guimenuitem>Print History…</guimenuitem></menuchoice>, <menuchoice><guimenu>File</guimenu><guimenuitem>Printer Status…</guimenuitem></menuchoice></term><listitem><para>See <xref linkend="history"/>.</para></listitem></varlistentry>
+<varlistentry><term><menuchoice><guimenu>File</guimenu><guimenuitem>Print-Only Mode</guimenuitem></menuchoice></term><listitem><para>Switches to print-only mode and back.</para></listitem></varlistentry>
+<varlistentry><term><menuchoice><shortcut><keycombo action="simul">&Ctrl;<keycap>Q</keycap></keycombo></shortcut><guimenu>File</guimenu><guimenuitem>Quit</guimenuitem></menuchoice></term><listitem><para>Quits &kappname;, asking to save changes first.</para></listitem></varlistentry>
+</variablelist>
+<para>Add-ons may add their own actions to this menu.</para>
+</sect1>
+
+<sect1 id="menu-edit">
+<title>The Edit Menu</title>
+<variablelist>
+<varlistentry><term><guimenuitem>Undo</guimenuitem>, <guimenuitem>Redo</guimenuitem></term><listitem><para>Undoes or redoes the last change (<keycombo action="simul">&Ctrl;<keycap>Z</keycap></keycombo>, <keycombo action="simul">&Ctrl;&Shift;<keycap>Z</keycap></keycombo>).</para></listitem></varlistentry>
+<varlistentry><term><guimenuitem>Cut</guimenuitem>, <guimenuitem>Copy</guimenuitem>, <guimenuitem>Paste</guimenuitem></term><listitem><para>Objects can also be pasted into another label, and text or pictures from other programs pasted as new objects.</para></listitem></varlistentry>
+<varlistentry><term><guimenuitem>Delete Object</guimenuitem>, <guimenuitem>Duplicate Object</guimenuitem></term><listitem><para>Deletes or duplicates the selection.</para></listitem></varlistentry>
+<varlistentry><term><guimenuitem>Object Properties…</guimenuitem></term><listitem><para>See <xref linkend="properties"/>.</para></listitem></varlistentry>
+<varlistentry><term><guimenuitem>Select All</guimenuitem></term><listitem><para>Selects every object.</para></listitem></varlistentry>
+</variablelist>
+</sect1>
+
+<sect1 id="menu-view">
+<title>The View Menu</title>
+<variablelist>
+<varlistentry><term><guimenuitem>Zoom In</guimenuitem>, <guimenuitem>Zoom Out</guimenuitem>, <guimenuitem>Fit to Page</guimenuitem>, <guimenuitem>Actual Size</guimenuitem></term><listitem><para>Change the zoom; the slider under the canvas does too.</para></listitem></varlistentry>
+<varlistentry><term><guimenuitem>Show Grid</guimenuitem>, <guimenuitem>Snap to Grid</guimenuitem>, <guisubmenu>Grid Spacing</guisubmenu></term><listitem><para>The grid to place objects by.</para></listitem></varlistentry>
+<varlistentry><term><guimenuitem>Show Guidelines</guimenuitem>, <guimenuitem>Clear Guidelines</guimenuitem></term><listitem><para>The guidelines dragged out of the rulers.</para></listitem></varlistentry>
+</variablelist>
+</sect1>
+
+<sect1 id="menu-format">
+<title>The Format Menu</title>
+<para>The font, size and style of text, its alignment, how it fits its box and whether it wraps; see <xref linkend="formatting"/>.</para>
+</sect1>
+
+<sect1 id="menu-insert">
+<title>The Insert Menu</title>
+<para>Every kind of object (see <xref linkend="objects"/>), and <guimenuitem>Label of a Kind…</guimenuitem> (see <xref linkend="label-kinds"/>).</para>
+</sect1>
+
+<sect1 id="menu-layout">
+<title>The Layout Menu</title>
+<para>The label type, custom sizes, the roll layout, print settings and orientation; the tape length and the order of cells on tape labels; positioning, aligning, grouping, locking, turning and stacking objects; layers, and leaving objects out of print. See <xref linkend="arranging"/> and <xref linkend="label-types"/>.</para>
+</sect1>
+
+<sect1 id="menu-data">
+<title>The Data Menu</title>
+<para><guimenuitem>Data Source…</guimenuitem>, <guimenuitem>Insert Field</guimenuitem>, <guimenuitem>Print-Time Questions…</guimenuitem>, <guimenuitem>Calculated Fields…</guimenuitem> and <guimenuitem>Remove Data Source</guimenuitem>; see <xref linkend="data"/>.</para>
+</sect1>
+
+<sect1 id="menu-address-book">
+<title>The Address Book Menu</title>
+<para><guimenuitem>New Address Book</guimenuitem>, <guimenuitem>Open Address Book…</guimenuitem>, <guimenuitem>Import Addresses from CSV…</guimenuitem>, and saving the address book; see <xref linkend="address-book"/>.</para>
+</sect1>
+
+</chapter>
+
+<chapter id="tools">
+<title>Command-Line Tools and Add-ons</title>
+
+<sect1 id="render-tool">
+<title>plasma-label-creator-render</title>
+
+<para><command>plasma-label-creator-render</command> renders a label to a PNG or PDF file, prints it, or shows what a printer would receive. For example:</para>
+
+<programlisting># Render a label to an image, and list what is on it
+plasma-label-creator-render --info label.label preview.png
+
+# Print it on a CUPS queue
+plasma-label-creator-render label.label --send DYMO-LabelWriter-450
+
+# Ask a ZPL printer on the network what it is and what is loaded
+plasma-label-creator-render --zpl-info 192.0.2.10
+
+# A PDF proof with the label's outline
+plasma-label-creator-render --outline label.label proof.pdf</programlisting>
+
+<para><userinput><command>plasma-label-creator-render</command> <option>--help</option></userinput> lists every option.</para>
+</sect1>
+
+<sect1 id="addons">
+<title>Add-ons</title>
+
+<para>&kappname; needs no add-ons. An add-on can put actions in the <guimenu>File</guimenu> menu and a status indicator in the status bar, and open labels it keeps in a folder of its own, such as a team's labels kept on a server. Add-ons found on the computer are on until they are switched off on the <guilabel>Add-ons</guilabel> page of the settings.</para>
+</sect1>
+
+</chapter>
+
+<chapter id="credits">
+<title>Credits and License</title>
+
+<para>&kappname;</para>
+<para>Program copyright 2026 nvaert1986</para>
+<para>Barcodes are drawn with zint (<ulink url="https://zint.org.uk/">zint.org.uk</ulink>).</para>
+<para>Documentation copyright 2026 nvaert1986</para>
+
+<para>DYMO, LabelWriter, LabelManager and Rhino are trademarks of Newell Brands. Altec is a trademark of its owner. Zebra and ZPL are trademarks of Zebra Technologies. They are used here only to say which printers and files &kappname; works with. &kappname; is not affiliated with, endorsed by or supported by any of them.</para>
+
+<!-- TRANS:CREDIT_FOR_TRANSLATORS -->
+
+<para>This documentation is dedicated to the public domain under CC0-1.0.</para>
+&underGPL;
+
+</chapter>
+
+<appendix id="installation">
+<title>Installation</title>
+
+<para>&kappname; is built with CMake. It needs Qt 6.7 or newer, KDE Frameworks 6, zint, CUPS and libudev; the handbook needs KDocTools. <filename>INSTALL.md</filename> in the source lists every requirement, the packages for common distributions, the build options and how to set up each kind of printer.</para>
+
+<programlisting>cmake -S . -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=/usr
+cmake --build build
+cmake --install build</programlisting>
+
+<para>The source is at <ulink url="https://github.com/nvaert1986/plasma-label-creator">github.com/nvaert1986/plasma-label-creator</ulink>.</para>
+</appendix>
+
+</book>
+<!--
+Local Variables:
+mode: xml
+sgml-minimize-attributes:nil
+sgml-general-insert-case:lower
+sgml-indent-step:0
+sgml-indent-data:nil
+End:
+
+vim:tabstop=2:shiftwidth=2:expandtab
+kate: space-indent on; indent-width 2; tab-width 2; indent-mode none;
+-->

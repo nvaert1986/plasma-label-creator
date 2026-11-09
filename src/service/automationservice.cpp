@@ -12,6 +12,7 @@
 #include "httpapi.h"
 #endif
 
+#include <KLocalizedString>
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
@@ -182,13 +183,13 @@ PrintOutcome AutomationService::print(const PrintRequest &request, const QString
         const auto found = Automation::labelInFolder(m_settings.labelsFolder, request.label);
         if (!found) {
             outcome.status = PrintOutcome::Status::NotFound;
-            outcome.message = m_settings.labelsFolder.isEmpty() ? u"No labels folder is set in the automation settings."_s
-                                                                : u"There is no label %1 in the labels folder."_s.arg(request.label);
+            outcome.message = m_settings.labelsFolder.isEmpty() ? i18n("No labels folder is set in the automation settings.")
+                                                                : i18n("There is no label %1 in the labels folder.", request.label);
         }
         labelFile = found.value_or(QString());
     } else if (labelFile.isEmpty()) {
         outcome.status = PrintOutcome::Status::BadRequest;
-        outcome.message = u"No label: name one."_s;
+        outcome.message = i18n("No label: name one.");
     }
     if (!labelFile.isEmpty()) {
         // The app's printer settings as they are now: a print offset or a
@@ -230,7 +231,7 @@ void AutomationService::logJob(const AutomationJob &job)
 void AutomationService::processFile(const AutomationSettings::Folder &folder, const QString &fileName)
 {
     QFile file(fileName);
-    const QString source = u"Folder: %1"_s.arg(fileName);
+    const QString source = i18n("Folder: %1", fileName);
     const auto refuse = [&](const QString &reason) {
         AutomationJob logged;
         logged.when = QDateTime::currentDateTime();
@@ -243,7 +244,7 @@ void AutomationService::processFile(const AutomationSettings::Folder &folder, co
         putAway(fileName, u"failed"_s, reason);
     };
     if (file.size() > MaxJobSize || !file.open(QIODevice::ReadOnly)) {
-        refuse(file.size() > MaxJobSize ? u"The file is too large for a print job."_s : file.errorString());
+        refuse(file.size() > MaxJobSize ? i18n("The file is too large for a print job.") : file.errorString());
         return;
     }
     const QByteArray data = file.readAll();
@@ -267,7 +268,7 @@ void AutomationService::processFile(const AutomationSettings::Folder &folder, co
             }
             if (request->rows.isEmpty()) {
                 request.reset();
-                error = u"The file has no rows below its column names."_s;
+                error = i18n("The file has no rows below its column names.");
             }
         }
     }

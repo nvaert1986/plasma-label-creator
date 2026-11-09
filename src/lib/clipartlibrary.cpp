@@ -5,6 +5,7 @@
 
 #include "clipartlibrary.h"
 
+#include <KLocalizedString>
 #include <QBuffer>
 #include <QDir>
 #include <QFile>
@@ -40,6 +41,11 @@ QString languageKey(const QLocale &locale)
 
 QString ClipartCategory::displayName() const
 {
+    // The user's own category is this program's, so it speaks the
+    // program's language; DYMO's categories carry their own names.
+    if (id == ClipartLibrary::UserCategory) {
+        return i18n("My Clip Art");
+    }
     const QLocale locale;
     for (const QString &key : {languageKey(locale), QLocale::languageToCode(locale.language()), u"en"_s}) {
         const auto it = names.constFind(key);
@@ -242,7 +248,7 @@ bool ClipartLibrary::readCatalog(const QByteArray &data, QList<ClipartCategory> 
     QXmlStreamReader xml(data);
     if (!xml.readNextStartElement() || xml.name() != "Clipart"_L1) {
         if (errorString) {
-            *errorString = u"Not a clip art catalogue"_s;
+            *errorString = i18n("Not a clip art catalogue");
         }
         return false;
     }
@@ -350,7 +356,7 @@ int ClipartLibrary::importDlsProgram(const QString &dllFileName, QString *errorS
     const QByteArray catalog = resources.value(QLatin1String(DlsCatalogResource));
     if (catalog.isEmpty()) {
         if (errorString) {
-            *errorString = u"%1 contains no DYMO Label clip art; choose DYMO.DLS.dll from the DYMO Label Software folder."_s.arg(QFileInfo(dllFileName).fileName());
+            *errorString = i18n("%1 contains no DYMO Label clip art; choose DYMO.DLS.dll from the DYMO Label Software folder.", QFileInfo(dllFileName).fileName());
         }
         return 0;
     }
@@ -443,7 +449,7 @@ int ClipartLibrary::importImages(const QStringList &fileNames, const QString &ca
         const QImage image(source);
         if (image.isNull()) {
             if (errorString) {
-                *errorString = u"Could not read the image %1"_s.arg(source);
+                *errorString = i18n("Could not read the image %1", source);
             }
             continue;
         }
@@ -472,7 +478,7 @@ bool ClipartLibrary::exportTo(const QString &directory, const QStringList &categ
 {
     if (!QDir().mkpath(directory)) {
         if (errorString) {
-            *errorString = u"Could not create %1"_s.arg(directory);
+            *errorString = i18n("Could not create %1", directory);
         }
         return false;
     }
