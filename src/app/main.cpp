@@ -23,6 +23,7 @@
 #include <QStandardPaths>
 #include <QUrl>
 
+#include <clocale>
 #include <cstdio>
 #include <functional>
 
@@ -41,9 +42,31 @@ void applyChosenLanguage()
     const QSettings overrides(QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation) + u"/klanguageoverridesrc"_s,
                               QSettings::IniFormat);
     const QByteArray chosen = overrides.value(u"Language/plasma-label-creator"_s).toByteArray();
-    if (!chosen.isEmpty()) {
-        const QByteArray desktop = qgetenv("LANGUAGE");
-        qputenv("LANGUAGE", desktop.isEmpty() ? chosen : chosen + ':' + desktop);
+    if (chosen.isEmpty()) {
+        return;
+    }
+    const QByteArray desktop = qgetenv("LANGUAGE");
+    qputenv("LANGUAGE", desktop.isEmpty() ? chosen : chosen + ':' + desktop);
+
+    // gettext ignores LANGUAGE when the locale for messages is C or POSIX
+    // (a desktop with LANG=C.UTF-8, say), so nothing would be translated:
+    // then messages take another installed locale, the chosen language's
+    // own if there is one. Dates and numbers keep the desktop's formats.
+    if (!qEnvironmentVariableIsEmpty("LC_ALL")) {
+        return;
+    }
+    const char *current = std::setlocale(LC_MESSAGES, "");
+    const QByteArray messages = current ? QByteArray(current) : QByteArray("C");
+    if (messages != "C" && messages != "POSIX" && !messages.startsWith("C.")) {
+        return;
+    }
+    const QByteArray language = chosen.split(':').constFirst();
+    const QByteArray own = language.contains('_') ? language : language + '_' + language.toUpper();
+    for (const QByteArray &candidate : QByteArrayList{own + ".UTF-8", "en_US.UTF-8", "en_GB.UTF-8"}) {
+        if (std::setlocale(LC_MESSAGES, candidate.constData())) {
+            qputenv("LC_MESSAGES", candidate);
+            return;
+        }
     }
 }
 
@@ -54,6 +77,11 @@ int main(int argc, char *argv[])
     applyChosenLanguage();
     QApplication app(argc, argv);
     KLocalizedString::setApplicationDomain("plasma-label-creator");
+    // Started from the build folder, before installing: its translations
+    // are in build/locale, next to build/bin.
+    if (const QString built = QCoreApplication::applicationDirPath() + u"/../locale"_s; QFileInfo::exists(built)) {
+        KLocalizedString::addDomainLocaleDir("plasma-label-creator", built);
+    }
 
     KAboutData aboutData(u"plasma-label-creator"_s,
                          i18n("Plasma Label Creator"),
