@@ -5,7 +5,7 @@
 
 # Changelog
 
-## Unreleased
+## 0.7.0 (2026-11-09)
 
 - **Translations**: the app is in English and Dutch, following the
   desktop's language; Settings > Configure Language… switches the app

@@ -6,10 +6,10 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: plasma-label-creator 0.6.1\n"
+"Project-Id-Version: plasma-label-creator 0.7.0\n"
 "Report-Msgid-Bugs-To: https://github.com/nvaert1986/plasma-label-creator/"
 "issues\n"
-"POT-Creation-Date: 2026-11-09 09:31+0100\n"
+"POT-Creation-Date: 2026-11-09 11:50+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1981,34 +1981,34 @@ msgstr ""
 msgid "Layer %1"
 msgstr ""
 
-#: src/app/main.cpp:35
+#: src/app/main.cpp:87
 #, kde-format
 msgid "Plasma Label Creator"
 msgstr ""
 
-#: src/app/main.cpp:37
+#: src/app/main.cpp:89
 #, kde-format
 msgid ""
 "Label designer for DYMO LabelWriter and LabelManager printers and ZPL label "
 "printers"
 msgstr ""
 
-#: src/app/main.cpp:39
+#: src/app/main.cpp:91
 #, kde-format
 msgid "© 2026 nvaert1986"
 msgstr ""
 
-#: src/app/main.cpp:40
+#: src/app/main.cpp:92
 #, kde-format
 msgid "Developer"
 msgstr ""
 
-#: src/app/main.cpp:50
+#: src/app/main.cpp:102
 #, kde-format
 msgid "Label files to open."
 msgstr ""
 
-#: src/app/main.cpp:51
+#: src/app/main.cpp:103
 #, kde-format
 msgid ""
 "Start in print-only mode: choose a label from a folder and print it, without "

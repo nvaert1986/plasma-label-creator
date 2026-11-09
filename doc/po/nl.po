@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: plasma-label-creator\n"
 "Report-Msgid-Bugs-To: https://github.com/nvaert1986/plasma-label-creator/"
 "issues\n"
-"POT-Creation-Date: 2026-11-09 09:31+0100\n"
+"POT-Creation-Date: 2026-11-09 11:50+0100\n"
 "PO-Revision-Date: 2026-11-09 12:00+0100\n"
 "Last-Translator: nvaert1986 <25772781+nvaert1986@users.noreply.github.com>\n"
 "Language-Team: Dutch\n"
@@ -64,8 +64,8 @@ msgstr "<date>2026-11-09</date>"
 
 #. type: Content of: <book><bookinfo><releaseinfo>
 #: doc/index.docbook:37
-msgid "0.6.1"
-msgstr "0.6.1"
+msgid "0.7.0"
+msgstr "0.7.0"
 
 #. type: Content of: <book><bookinfo><abstract><para>
 #: doc/index.docbook:40

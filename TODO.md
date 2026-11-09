@@ -70,7 +70,7 @@ Features found in other label software, the Easy to Medium ones:
   with File menu actions, a status bar indicator, their own label folders,
   and hooks for saving, printing and shared counters. Settings > Add-ons.
 
-## Done since 0.6.1 (unreleased)
+## Done in 0.7.0
 
 - [x] Translations: English and Dutch (the app, the core library's
   messages, the command-line tool, the automation service, launchers, file
@@ -83,7 +83,7 @@ Features found in other label software, the Easy to Medium ones:
 
 ## Next session
 
-Version 0.6.1: desktop integration (file types, icons, Dolphin thumbnails and menu, launcher extras, AppStream), each optional. Version 0.6.0: add-ons. Version 0.5.0: print conditions, growing text and anchoring, guidelines,
+Version 0.7.0: translations (English, Dutch) and the handbook. Version 0.6.1: desktop integration (file types, icons, Dolphin thumbnails and menu, launcher extras, AppStream), each optional. Version 0.6.0: add-ons. Version 0.5.0: print conditions, growing text and anchoring, guidelines,
 polygons, stars, arrows and SVG, copies and a label per row, header and
 trailer labels, density, darkness and speed per label, query parameters
 and pictures from a database (tested). Version 0.4.0 before it: print-only

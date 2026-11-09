@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: plasma-label-creator\n"
 "Report-Msgid-Bugs-To: https://github.com/nvaert1986/plasma-label-creator/"
 "issues\n"
-"POT-Creation-Date: 2026-11-09 09:23+0100\n"
+"POT-Creation-Date: 2026-11-09 11:50+0100\n"
 "PO-Revision-Date: 2026-11-09 12:00+0100\n"
 "Last-Translator: nvaert1986 <25772781+nvaert1986@users.noreply.github.com>\n"
 "Language-Team: Dutch\n"
@@ -2064,12 +2064,12 @@ msgstr "De objecten ervan gaan naar het label zelf"
 msgid "Layer %1"
 msgstr "Laag %1"
 
-#: src/app/main.cpp:35
+#: src/app/main.cpp:87
 #, kde-format
 msgid "Plasma Label Creator"
 msgstr "Plasma Label Creator"
 
-#: src/app/main.cpp:37
+#: src/app/main.cpp:89
 #, kde-format
 msgid ""
 "Label designer for DYMO LabelWriter and LabelManager printers and ZPL label "
@@ -2078,22 +2078,22 @@ msgstr ""
 "Labelontwerper voor DYMO LabelWriter- en LabelManager-printers en ZPL-"
 "labelprinters"
 
-#: src/app/main.cpp:39
+#: src/app/main.cpp:91
 #, kde-format
 msgid "© 2026 nvaert1986"
 msgstr "© 2026 nvaert1986"
 
-#: src/app/main.cpp:40
+#: src/app/main.cpp:92
 #, kde-format
 msgid "Developer"
 msgstr "Ontwikkelaar"
 
-#: src/app/main.cpp:50
+#: src/app/main.cpp:102
 #, kde-format
 msgid "Label files to open."
 msgstr "Te openen labelbestanden."
 
-#: src/app/main.cpp:51
+#: src/app/main.cpp:103
 #, kde-format
 msgid ""
 "Start in print-only mode: choose a label from a folder and print it, without "

@@ -74,6 +74,12 @@
     <color type="primary" scheme_preference="dark">#2980b9</color>
   </branding>
   <releases>
+    <release version="0.7.0" date="2026-11-09">
+      <description>
+        <p>Translations: the app, its launchers and this metadata in English and Dutch, following the desktop's language or one chosen for the app alone. A handbook in English and Dutch, opened from the Help menu.</p>
+        <p xml:lang="nl">Vertalingen: het programma, de starters en deze gegevens in het Engels en het Nederlands, volgens de taal van het bureaublad of een taal die alleen voor het programma is gekozen. Een handboek in het Engels en het Nederlands, te openen via het menu Help.</p>
+      </description>
+    </release>
     <release version="0.6.1" date="2026-11-04">
       <description>
         <p>Desktop integration, each part optional: file types for label files and address books, the app's own icons, label thumbnails in Dolphin, "Print Label" in Dolphin's right-click menu, launcher keywords and actions, and this metadata. Installing system-wide or for one user is documented.</p>

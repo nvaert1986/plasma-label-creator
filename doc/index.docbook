@@ -34,7 +34,7 @@
 </legalnotice>
 
 <date>2026-11-09</date>
-<releaseinfo>0.6.1</releaseinfo>
+<releaseinfo>0.7.0</releaseinfo>
 
 <abstract>
 <para>&kappname; designs and prints labels on DYMO LabelWriter and LabelManager printers and on ZPL label printers, such as the Altec ATP series and Zebra. It opens and saves <filename>.label</filename> files, so labels move between Linux and Windows unchanged.</para>
