@@ -19,6 +19,8 @@
 #include <QMenuBar>
 #include <QFileInfo>
 #include <QMenu>
+#include <QSettings>
+#include <QStandardPaths>
 #include <QUrl>
 
 #include <cstdio>
@@ -26,8 +28,30 @@
 
 using namespace Qt::Literals::StringLiterals;
 
+namespace
+{
+
+// The language chosen under Settings > Configure Language. KXmlGui applies
+// it once the application exists, but Plasma's platform theme already loads
+// the frameworks' translations while the application is made, so their
+// menu items (Configure Toolbars…) kept the desktop's language: apply it
+// before.
+void applyChosenLanguage()
+{
+    const QSettings overrides(QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation) + u"/klanguageoverridesrc"_s,
+                              QSettings::IniFormat);
+    const QByteArray chosen = overrides.value(u"Language/plasma-label-creator"_s).toByteArray();
+    if (!chosen.isEmpty()) {
+        const QByteArray desktop = qgetenv("LANGUAGE");
+        qputenv("LANGUAGE", desktop.isEmpty() ? chosen : chosen + ':' + desktop);
+    }
+}
+
+} // namespace
+
 int main(int argc, char *argv[])
 {
+    applyChosenLanguage();
     QApplication app(argc, argv);
     KLocalizedString::setApplicationDomain("plasma-label-creator");
 
